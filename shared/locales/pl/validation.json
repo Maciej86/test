@@ -1,0 +1,17 @@
+{
+  "required": "To pole jest wymagane.",
+  "email_invalid": "Podaj poprawny adres e-mail, np. jan.kowalski@firma.pl.",
+  "too_short": "Za mało znaków.",
+  "too_long": "Za dużo znaków.",
+  "postal_code": "Podaj kod pocztowy w formacie 00-000, np. 64-300.",
+  "nip": "Podaj poprawny NIP: 10 cyfr, np. 526-000-12-46.",
+  "regon": "Podaj poprawny REGON: 9 albo 14 cyfr.",
+  "pesel": "Podaj poprawny PESEL: 11 cyfr.",
+  "phone": "Podaj numer telefonu, np. 600 100 200 albo +48 600 100 200.",
+  "iban": "Podaj poprawny numer konta: 26 cyfr.",
+  "money": "Kwota może mieć najwyżej 2 miejsca po przecinku.",
+  "quantity": "Ilość może mieć najwyżej 3 miejsca po przecinku.",
+  "min": "Wartość jest za mała.",
+  "max": "Wartość jest za duża.",
+  "list_sort": "Nie można sortować po tej kolumnie."
+}

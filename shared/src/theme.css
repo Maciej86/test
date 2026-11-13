@@ -1,0 +1,9 @@
+/* Style wspólne dla makiet i prawdziwej aplikacji (np. import czcionek, tło strony). Ustalane w kroku 6 /stepkit:start. */
+
+/* Tło panelu i konta: inne niż kart (InfoCard), żeby boksy na pulpicie odcinały się od tła. */
+:root {
+  --app-panel-background: var(--mantine-color-gray-0);
+}
+[data-mantine-color-scheme='dark'] {
+  --app-panel-background: var(--mantine-color-dark-8);
+}

@@ -1,0 +1,12 @@
+{
+  "not_found": "Nie ma takiego adresu.",
+  "error": "Coś poszło nie tak po stronie serwera.",
+  "login_required": "Zaloguj się, aby kontynuować.",
+  "no_access": "Nie masz dostępu do tej części aplikacji.",
+  "invalid_data": "Popraw zaznaczone pola.",
+  "db_down": "Baza danych nie odpowiada. Czy Docker jest uruchomiony? (npm run db)",
+  "too_many_logins": "Za dużo prób logowania. Spróbuj ponownie za 15 minut.",
+  "file_too_large": "Plik jest za duży.",
+  "file_type_not_allowed": "Tego rodzaju pliku nie można dodać.",
+  "password_change_required": "Najpierw ustaw własne hasło."
+}
