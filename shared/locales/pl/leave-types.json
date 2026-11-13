@@ -1,0 +1,19 @@
+{
+  "title": "Typy urlopów",
+  "add": "Dodaj typ urlopu",
+  "col_name": "Nazwa",
+  "col_deducts": "Odejmuje dni z puli",
+  "yes": "Tak",
+  "no": "Nie",
+  "edit": "Edytuj",
+  "hide": "Ukryj",
+  "cancel": "Anuluj",
+  "save": "Zapisz",
+  "col_limit": "Limit dni w roku",
+  "no_limit": "bez limitu",
+  "limit_days_one": "{{count}} dzień",
+  "limit_days_few": "{{count}} dni",
+  "limit_days_many": "{{count}} dni",
+  "limit_days_other": "{{count}} dni",
+  "limit_hint": "Nieobowiązkowy. Puste = bez limitu."
+}

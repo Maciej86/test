@@ -7,7 +7,7 @@ import type { i18n } from 'i18next';
  */
 export const MOCK_USER_NAMES: Partial<Record<Role, string>> = {
   admin: 'Anna Nowak',
-  user: 'Jan Kowalski',
+  employee: 'Jan Kowalski',
 };
 
 export function mockUserName(role: Role, t: i18n['t']): string {

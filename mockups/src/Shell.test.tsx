@@ -5,10 +5,10 @@ import { renderWithProviders } from './test/render';
 
 const nav: NavItem[] = [
   { key: 'dashboard', path: '/admin', label: 'common.nav.dashboard', icon: 'house', roles: ['admin'] },
-  { key: 'missing', path: '/admin/missing', label: 'common.nav.home', icon: 'house', roles: ['admin', 'user'] },
+  { key: 'missing', path: '/admin/missing', label: 'common.nav.home', icon: 'house', roles: ['admin', 'employee'] },
 ];
 const account: NavItem[] = [
-  { key: 'my-account', path: '/account', label: 'common.nav.my_account', icon: 'user', roles: ['user'] },
+  { key: 'my-account', path: '/account', label: 'common.nav.my_account', icon: 'user', roles: ['admin', 'employee'] },
 ];
 const publicNav: PublicNavItem[] = [{ key: 'home', path: '/', label: 'common.nav.home' }];
 const all: Areas = { public: true, account: true, admin: true };
@@ -38,8 +38,8 @@ describe('mockup shell', () => {
   it('shows the app header with the person chosen in "Oglądam jako"', async () => {
     renderMockup(all, '/account');
     expect(await screen.findByText('Ekran konta')).toBeInTheDocument();
-    expect(screen.getByText('Moja aplikacja')).toBeInTheDocument();
-    expect(screen.getByText('JK')).toBeInTheDocument();
+    expect(screen.getByText('Urlopy i zadania')).toBeInTheDocument();
+    expect(screen.getByText('AN')).toBeInTheDocument();
   });
 
   it('always shows the MAKIETA bar', () => {
@@ -68,7 +68,7 @@ describe('mockup shell', () => {
     renderMockup();
     const nav = await screen.findByRole('navigation');
     expect(within(nav).getByText('Pulpit')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('radio', { name: 'Użytkownik' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Pracownik' }));
     expect(within(nav).queryByText('Pulpit')).not.toBeInTheDocument();
   });
 
@@ -76,7 +76,7 @@ describe('mockup shell', () => {
     renderMockup();
     const nav = await screen.findByRole('navigation');
     expect(within(nav).getByText('Postęp')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('radio', { name: 'Użytkownik' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Pracownik' }));
     expect(within(nav).getByText('Postęp')).toBeInTheDocument();
   });
 

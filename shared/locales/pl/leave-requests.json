@@ -1,0 +1,28 @@
+{
+  "title": "Wnioski urlopowe",
+  "filter_pending": "Czekają ({{count}})",
+  "filter_all": "Wszystkie",
+  "search": "Szukaj pracownika",
+  "col_employee": "Pracownik",
+  "col_type": "Typ urlopu",
+  "col_dates": "Termin",
+  "col_days": "Dni",
+  "col_left": "Zostanie w puli",
+  "col_status": "Status",
+  "status": {
+    "pending": "Czeka na decyzję",
+    "approved": "Zatwierdzony",
+    "rejected": "Odrzucony",
+    "withdrawn": "Wycofany",
+    "cancelled": "Anulowany"
+  },
+  "approve": "Zatwierdź",
+  "reject": "Odrzuć",
+  "print": "Drukuj / PDF",
+  "cancel_leave": "Anuluj urlop",
+  "reject_title": "Odrzucenie wniosku",
+  "reject_text": "Pracownik zobaczy powód w swoich wnioskach i w powiadomieniu.",
+  "reject_reason": "Powód odrzucenia",
+  "back": "Wróć",
+  "empty": "Brak wniosków w tym widoku."
+}

@@ -1,13 +1,20 @@
 {
-  "app_name": "Moja aplikacja",
+  "app_name": "Urlopy i zadania",
   "roles": {
     "admin": "Administrator",
-    "user": "Użytkownik"
+    "employee": "Pracownik"
   },
   "nav": {
     "home": "Strona główna",
-    "my_account": "Moje konto",
-    "dashboard": "Pulpit"
+    "dashboard": "Pulpit",
+    "my_leave": "Moje urlopy",
+    "leave_requests": "Wnioski urlopowe",
+    "tasks": "Zadania",
+    "employees": "Pracownicy",
+    "leave_types": "Typy urlopów",
+    "activity_log": "Historia zmian",
+    "archive": "Archiwum",
+    "my_account": "Moje konto"
   },
   "login": "Zaloguj się",
   "logout": "Wyloguj",

@@ -22,7 +22,7 @@ import {
 } from './index';
 
 const admin: SessionUser = { id: 1, name: 'Anna', role: 'admin' };
-const user: SessionUser = { id: 2, name: 'Jan', role: 'user' };
+const user: SessionUser = { id: 2, name: 'Jan', role: 'employee' };
 
 const item = (key: string, roles: NavItem['roles'], children?: NavItem[]): NavItem => ({
   key,
@@ -35,7 +35,7 @@ const item = (key: string, roles: NavItem['roles'], children?: NavItem[]): NavIt
 
 describe('canSee', () => {
   it('hides everything from a logged-out visitor', () => {
-    expect(canSee(item('a', ['admin', 'user']), null)).toBe(false);
+    expect(canSee(item('a', ['admin', 'employee']), null)).toBe(false);
   });
 
   it('shows an item to a role listed in roles', () => {
@@ -47,25 +47,25 @@ describe('canSee', () => {
   });
 
   it('hides an item from an unknown role', () => {
-    expect(canSee(item('a', ['admin', 'user']), { id: 3, name: 'X', role: 'hacker' } as never)).toBe(false);
+    expect(canSee(item('a', ['admin', 'employee']), { id: 3, name: 'X', role: 'hacker' } as never)).toBe(false);
   });
 });
 
 describe('visibleNav', () => {
   it('keeps a parent with only its visible children', () => {
-    const items = [item('p', ['user'], [item('c1', ['user']), item('c2', ['admin'])])];
+    const items = [item('p', ['employee'], [item('c1', ['employee']), item('c2', ['admin'])])];
     const result = visibleNav(items, user);
     expect(result).toHaveLength(1);
     expect(result[0].children?.map((c) => c.key)).toEqual(['c1']);
   });
 
   it('drops a parent whose children are all hidden', () => {
-    const items = [item('p', ['user'], [item('c1', ['admin'])])];
+    const items = [item('p', ['employee'], [item('c1', ['admin'])])];
     expect(visibleNav(items, user)).toEqual([]);
   });
 
   it('does not modify the input', () => {
-    const items = [item('p', ['user'], [item('c1', ['user']), item('c2', ['admin'])])];
+    const items = [item('p', ['employee'], [item('c1', ['employee']), item('c2', ['admin'])])];
     const copy = structuredClone(items);
     visibleNav(items, user);
     expect(items).toEqual(copy);
@@ -74,7 +74,7 @@ describe('visibleNav', () => {
 
 describe('flattenNav', () => {
   it('lists parents before their children', () => {
-    const items = [item('p', ['user'], [item('c1', ['user'])]), item('q', ['user'])];
+    const items = [item('p', ['employee'], [item('c1', ['employee'])]), item('q', ['employee'])];
     expect(flattenNav(items).map((i) => i.key)).toEqual(['p', 'c1', 'q']);
   });
 });
@@ -131,9 +131,9 @@ describe('navigation config', () => {
 
 describe('rolesFor', () => {
   it('returns the roles of a navigation item together with its children', () => {
-    const items = [item('p', ['admin'], [item('c', ['user'])])];
-    expect(rolesFor('p', items)?.sort()).toEqual(['admin', 'user']);
-    expect(rolesFor('c', items)).toEqual(['user']);
+    const items = [item('p', ['admin'], [item('c', ['employee'])])];
+    expect(rolesFor('p', items)?.sort()).toEqual(['admin', 'employee']);
+    expect(rolesFor('c', items)).toEqual(['employee']);
   });
 
   it('returns null for a key that is not in the navigation', () => {
@@ -141,9 +141,9 @@ describe('rolesFor', () => {
   });
 
   it('joins the roles of a module that is in both the account and the panel menu', () => {
-    const account = [item('notifications', ['user'])];
+    const account = [item('notifications', ['employee'])];
     const panel = [item('dashboard', ['admin']), item('notifications', ['admin'])];
-    expect(rolesFor('notifications', [...panel, ...account])?.sort()).toEqual(['admin', 'user']);
+    expect(rolesFor('notifications', [...panel, ...account])?.sort()).toEqual(['admin', 'employee']);
   });
 });
 
@@ -192,7 +192,7 @@ describe('initials', () => {
 });
 
 describe('findVisibleNavItem', () => {
-  const account = [item('my-account', ['user'])];
+  const account = [item('my-account', ['employee'])];
   const panel = [item('dashboard', ['admin']), item('my-account', ['admin'])];
 
   it('finds the item the person can see in any of the menus', () => {

@@ -1,0 +1,29 @@
+{
+  "title": "Moje urlopy",
+  "new_request": "Złóż wniosek",
+  "left": "Zostało dni do wykorzystania",
+  "carried": "Zaległy urlop z {{year}}",
+  "carried_hint": "z {{count}} dni, wykorzystywany najpierw",
+  "annual": "Pula na {{year}}",
+  "annual_hint": "z {{count}} dni",
+  "history": "Moje wnioski",
+  "col_type": "Typ urlopu",
+  "col_dates": "Termin",
+  "col_days": "Dni robocze",
+  "col_status": "Status",
+  "status": {
+    "pending": "Czeka na decyzję",
+    "approved": "Zatwierdzony",
+    "rejected": "Odrzucony",
+    "withdrawn": "Wycofany",
+    "cancelled": "Anulowany"
+  },
+  "withdraw": "Wycofaj",
+  "print": "Drukuj / PDF",
+  "from": "Od",
+  "to": "Do",
+  "days_preview": "Dni robocze we wniosku: 7 (weekendy i święta są pomijane)",
+  "comment": "Komentarz (nieobowiązkowy)",
+  "cancel": "Anuluj",
+  "submit": "Złóż wniosek"
+}

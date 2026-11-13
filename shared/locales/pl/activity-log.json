@@ -1,0 +1,14 @@
+{
+  "title": "Historia zmian",
+  "filter_area": "Wszystkie obszary",
+  "search": "Szukaj osoby lub treści",
+  "col_when": "Kiedy",
+  "col_who": "Kto",
+  "col_area": "Obszar",
+  "col_what": "Co zmienił",
+  "area": {
+    "leave": "Urlopy",
+    "pool": "Pule dni",
+    "tasks": "Zadania"
+  }
+}

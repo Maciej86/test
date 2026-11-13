@@ -5,7 +5,7 @@ import { NavMenu } from './NavMenu';
 import { renderWithProviders } from '../test/render';
 
 const items: NavItem[] = [
-  { key: 'dashboard', path: '/admin', label: 'common.nav.dashboard', icon: 'house', roles: ['admin', 'user'] },
+  { key: 'dashboard', path: '/admin', label: 'common.nav.dashboard', icon: 'house', roles: ['admin', 'employee'] },
   { key: 'my-account', path: '/admin/secret', label: 'common.nav.my_account', icon: 'user', roles: ['admin'] },
 ];
 
@@ -13,7 +13,7 @@ describe('NavMenu', () => {
   it('shows only items the role may see', () => {
     renderWithProviders(
       <MemoryRouter>
-        <NavMenu items={items} user={{ id: 2, name: 'Jan', role: 'user' }} />
+        <NavMenu items={items} user={{ id: 2, name: 'Jan', role: 'employee' }} />
       </MemoryRouter>,
     );
     expect(screen.getByText('Pulpit')).toBeInTheDocument();

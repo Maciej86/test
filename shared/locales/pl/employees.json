@@ -1,0 +1,29 @@
+{
+  "title": "Pracownicy",
+  "search": "Szukaj pracownika",
+  "add": "Dodaj pracownika",
+  "col_name": "Imię i nazwisko",
+  "col_login": "Login",
+  "col_notify": "E-mail do powiadomień",
+  "col_role": "Rola",
+  "col_pool": "Pula w 2026",
+  "col_left": "Zostało dni",
+  "no_email": "brak",
+  "role": {
+    "admin": "Administrator",
+    "employee": "Pracownik"
+  },
+  "pool": "{{annual}} + {{carried}} zaległe",
+  "edit": "Edytuj",
+  "set_password": "Ustaw hasło",
+  "archive": "Do archiwum",
+  "login_hint": "Wygląda jak adres e-mail, ale nie musi to być prawdziwa skrzynka.",
+  "notify_hint": "Nieobowiązkowe. Bez niego pracownik widzi powiadomienia tylko w aplikacji.",
+  "password": "Hasło startowe",
+  "password_hint": "Przekaż je pracownikowi; zmieni je w „Moje konto”.",
+  "annual": "Pula dni na rok",
+  "carried": "Zaległe dni",
+  "cancel": "Anuluj",
+  "save": "Zapisz",
+  "close_year": "Zamknij rok 2026"
+}

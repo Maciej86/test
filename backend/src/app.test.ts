@@ -71,7 +71,7 @@ describe('behind a proxy (Caddy on the server)', () => {
 
 describe('unknown address', () => {
   it('returns 404 with a message key to a logged-in user', async () => {
-    const token = signToken({ id: 2, name: 'Jan', role: 'user' });
+    const token = signToken({ id: 2, name: 'Jan', role: 'employee' });
     const res = await request(createApp()).get('/api/does-not-exist').set('Cookie', cookie(token));
     expect(res.status).toBe(404);
     expect(res.body.error.message).toBe('server.not_found');
@@ -91,7 +91,7 @@ describe('protected by default', () => {
   });
 
   it('lets any logged-in user through such a route', async () => {
-    const token = signToken({ id: 2, name: 'Jan', role: 'user' });
+    const token = signToken({ id: 2, name: 'Jan', role: 'employee' });
     const res = await request(appWithTestRoutes()).get('/api/test/forgotten').set('Cookie', cookie(token));
     expect(res.status).toBe(200);
   });
@@ -113,17 +113,17 @@ describe('mountModule', () => {
     return createApp({ extraRoutes: extra });
   }
 
-  it('takes the roles of the navigation item (dashboard: admin only)', async () => {
-    const user = signToken({ id: 2, name: 'Jan', role: 'user' });
+  it('takes the roles of the navigation item (dashboard: admin and employee)', async () => {
+    const user = signToken({ id: 2, name: 'Jan', role: 'employee' });
     const admin = signToken({ id: 1, name: 'Anna', role: 'admin' });
-    expect((await request(appWithModule()).get('/api/dashboard').set('Cookie', cookie(user))).status).toBe(403);
+    expect((await request(appWithModule()).get('/api/dashboard').set('Cookie', cookie(user))).status).toBe(200);
     expect((await request(appWithModule()).get('/api/dashboard').set('Cookie', cookie(admin))).status).toBe(200);
   });
 
   it('accepts explicit roles for a module without a navigation item', async () => {
-    const user = signToken({ id: 2, name: 'Jan', role: 'user' });
-    const res = await request(appWithModule(['admin', 'user'])).get('/api/dashboard').set('Cookie', cookie(user));
-    expect(res.status).toBe(200);
+    const user = signToken({ id: 2, name: 'Jan', role: 'employee' });
+    const res = await request(appWithModule(['admin'])).get('/api/dashboard').set('Cookie', cookie(user));
+    expect(res.status).toBe(403);
   });
 
   it('refuses to start with a module that is not in the navigation and has no roles', () => {
@@ -144,7 +144,7 @@ describe('requireRole', () => {
   });
 
   it('rejects a user with the wrong role', async () => {
-    const token = signToken({ id: 2, name: 'Jan', role: 'user' });
+    const token = signToken({ id: 2, name: 'Jan', role: 'employee' });
     const res = await request(app).get('/api/test/admin-only').set('Cookie', cookie(token));
     expect(res.status).toBe(403);
     expect(res.body.error.message).toBe('server.no_access');

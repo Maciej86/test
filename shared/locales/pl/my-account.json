@@ -1,4 +1,15 @@
 {
   "title": "Moje konto",
-  "intro": "Tu powstanie konto użytkownika."
+  "data": "Moje dane",
+  "name": "Imię i nazwisko",
+  "login": "Login",
+  "readonly_hint": "Imię i login zmienia administrator.",
+  "notify_email": "E-mail do powiadomień",
+  "notify_hint": "Zostaw puste, jeśli nie chcesz dostawać e-maili.",
+  "save": "Zapisz",
+  "password": "Hasło",
+  "current_password": "Obecne hasło",
+  "new_password": "Nowe hasło",
+  "repeat_password": "Powtórz nowe hasło",
+  "change_password": "Zmień hasło"
 }

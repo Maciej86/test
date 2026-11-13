@@ -1,0 +1,12 @@
+{
+  "title": "Archiwum",
+  "employees": "Pracownicy ({{count}})",
+  "tasks": "Zadania ({{count}})",
+  "col_name": "Imię i nazwisko",
+  "col_login": "Login",
+  "col_task": "Zadanie",
+  "col_by": "Usunął(a)",
+  "col_archived": "W archiwum od",
+  "restore": "Przywróć",
+  "delete_forever": "Usuń na stałe"
+}

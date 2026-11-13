@@ -1,5 +1,22 @@
 {
   "title": "Pulpit",
   "ready": "Twoja aplikacja jest gotowa do budowy. Wróć do Claude'a i wpisz /stepkit:dalej.",
-  "start_card": "Start"
+  "start_card": "Start",
+  "pending_title": "Wnioski do rozpatrzenia ({{count}})",
+  "pending_all": "Wszystkie wnioski",
+  "days_one": "{{count}} dzień",
+  "days_few": "{{count}} dni",
+  "days_many": "{{count}} dni",
+  "days_other": "{{count}} dni",
+  "tasks_title": "Tablica zadań",
+  "tasks_open": "Otwórz tablicę",
+  "col_draft": "W opracowaniu",
+  "col_in_progress": "W toku",
+  "col_done": "Zrealizowane",
+  "overdue": "Po terminie",
+  "pool_title": "Mój urlop w {{year}} roku",
+  "pool_left": "dni zostało z {{total}}",
+  "pool_details": "Pula roczna: {{annual}}, zaległy: {{carried}}, wykorzystane: {{used}}",
+  "pool_request": "Złóż wniosek",
+  "my_tasks_title": "Moje zadania"
 }

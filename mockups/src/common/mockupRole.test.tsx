@@ -12,13 +12,13 @@ describe('useMockupRole', () => {
   it('gives screens the role chosen in the bar', async () => {
     renderWithProviders(
       <MockupApp
-        navigation={[{ key: 'dashboard', path: '/admin', label: 'common.nav.dashboard', icon: 'house', roles: ['admin', 'user'] }]}
+        navigation={[{ key: 'dashboard', path: '/admin', label: 'common.nav.dashboard', icon: 'house', roles: ['admin', 'employee'] }]}
         screens={{ dashboard: RoleProbe }}
         initialPath="/admin"
       />,
     );
     expect(await screen.findByText('Rola: admin')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('radio', { name: 'Użytkownik' }));
-    expect(await screen.findByText('Rola: user')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('radio', { name: 'Pracownik' }));
+    expect(await screen.findByText('Rola: employee')).toBeInTheDocument();
   });
 });

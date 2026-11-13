@@ -1,0 +1,19 @@
+{
+  "title": "Zadania",
+  "search": "Szukaj zadania",
+  "new_task": "Dodaj zadanie",
+  "column": {
+    "draft": "W opracowaniu",
+    "in_progress": "W toku",
+    "done": "Zrealizowane"
+  },
+  "drag_hint": "Przeciągnij kartę, żeby zmienić kolumnę albo kolejność.",
+  "field_title": "Tytuł",
+  "field_description": "Opis",
+  "field_due": "Termin (nieobowiązkowy)",
+  "field_people": "Przypisane osoby",
+  "cancel": "Anuluj",
+  "save": "Dodaj zadanie",
+  "only_mine": "Tylko moje zadania",
+  "show_old_done": "Pokaż starsze zrealizowane"
+}

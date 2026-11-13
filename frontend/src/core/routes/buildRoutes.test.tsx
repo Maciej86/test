@@ -5,7 +5,7 @@ import { buildRoutes } from './buildRoutes';
 import { renderRoutes } from '../../test/render';
 
 const admin: SessionUser = { id: 1, name: 'Anna', role: 'admin' };
-const user: SessionUser = { id: 2, name: 'Jan', role: 'user' };
+const user: SessionUser = { id: 2, name: 'Jan', role: 'employee' };
 const Page = () => <p>Strona testowa</p>;
 
 const adminOnly: NavItem = { key: 'reports', path: '/admin/reports', label: 'common.nav.dashboard', icon: 'house', roles: ['admin'] };
@@ -35,10 +35,10 @@ describe('buildAppRoutes', () => {
     expect(router.state.location.pathname).toBe('/admin');
   });
 
-  it('sends a user from / to the account when there is no public site', async () => {
-    const { router } = renderRoutes(buildAppRoutes({ public: false, account: true, admin: true }, {}, user), '/');
+  it('sends an employee from / to the panel when there is no public site', async () => {
+    const { router } = renderRoutes(buildAppRoutes({ public: false, account: false, admin: true }, {}, user), '/');
     await screen.findByText('Ten ekran jeszcze nie powstał.');
-    expect(router.state.location.pathname).toBe('/account');
+    expect(router.state.location.pathname).toBe('/admin');
   });
 
   it('has no panel or account when only the public site is on', async () => {
@@ -53,12 +53,12 @@ describe('buildAppRoutes', () => {
   });
 
   it('shows the login link on the public site when accounts exist', async () => {
-    renderRoutes(buildAppRoutes({ public: true, account: true, admin: false }, {}, null), '/');
+    renderRoutes(buildAppRoutes({ public: true, account: false, admin: true }, {}, null), '/login');
     expect(await screen.findByText('Zaloguj się')).toBeInTheDocument();
   });
 
-  it('blocks a user from the panel', async () => {
-    renderRoutes(buildAppRoutes({ public: true, account: true, admin: true }, {}, user), '/admin');
-    expect(await screen.findByText('Nie masz dostępu do tej części aplikacji.')).toBeInTheDocument();
+  it('lets an employee into the panel', async () => {
+    renderRoutes(buildAppRoutes({ public: false, account: false, admin: true }, {}, user), '/admin');
+    expect(await screen.findByText('Ten ekran jeszcze nie powstał.')).toBeInTheDocument();
   });
 });
