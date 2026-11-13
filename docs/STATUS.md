@@ -1,13 +1,13 @@
-# Stan projektu: Moja aplikacja
+# Stan projektu: test
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Wpisz /stepkit:start, żeby zaplanować aplikację.
+**Następny krok:** Krok 3 startu: opis aplikacji (wpisz /stepkit:start).
 
 ## Start aplikacji
 
-- [ ] 1. Sprawdzenie komputera
-- [ ] 2. Szkielet i repo
+- [x] 1. Sprawdzenie komputera
+- [x] 2. Szkielet i repo
 - [ ] 3. Opis
 - [ ] 4. Wywiad
 - [ ] 5. Podsumowanie
@@ -17,4 +17,4 @@
 
 ## Ostatnie decyzje
 
-- (jeszcze brak)
+- Podgląd bazy (phpMyAdmin) na porcie 8081, bo 8080 zajmuje inny projekt.
