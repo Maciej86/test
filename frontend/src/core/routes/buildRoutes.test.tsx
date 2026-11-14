@@ -64,7 +64,34 @@ describe('buildAppRoutes', () => {
 });
 
 describe('login guard', () => {
-  it.todo('a logged-out person on /admin/tasks sees the login screen');
-  it.todo('a person with a temporary password on /admin/tasks sees the change password screen');
-  it.todo('a logged-in person sees the dashboard');
+  const areas = { public: false, account: false, admin: true };
+  const pages = {
+    login: () => <p>Ekran logowania</p>,
+    'change-password': () => <p>Ekran hasła</p>,
+    dashboard: () => <p>Pulpit testowy</p>,
+    tasks: () => <p>Zadania testowe</p>,
+  };
+
+  it('a logged-out person on /admin/tasks sees the login screen', async () => {
+    const { router } = renderRoutes(buildAppRoutes(areas, pages, null), '/admin/tasks');
+    expect(await screen.findByText('Ekran logowania')).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/login');
+  });
+
+  it('a person with a temporary password on /admin/tasks sees the change password screen', async () => {
+    const { router } = renderRoutes(buildAppRoutes(areas, pages, { ...user, mustChangePassword: true }), '/admin/tasks');
+    expect(await screen.findByText('Ekran hasła')).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/change-password');
+  });
+
+  it('a logged-in person sees the dashboard', async () => {
+    renderRoutes(buildAppRoutes(areas, pages, user), '/admin');
+    expect(await screen.findByText('Pulpit testowy')).toBeInTheDocument();
+  });
+
+  it('a logged-out person on /change-password sees the login screen', async () => {
+    const { router } = renderRoutes(buildAppRoutes(areas, pages, null), '/change-password');
+    expect(await screen.findByText('Ekran logowania')).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/login');
+  });
 });

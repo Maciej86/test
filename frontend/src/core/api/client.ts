@@ -1,7 +1,8 @@
-import axios, { isAxiosError } from 'axios';
-import { SERVER_MESSAGES, translateKey } from '@app/shared';
+import axios, { isAxiosError, type InternalAxiosRequestConfig } from 'axios';
+import { SERVER_MESSAGES, translateKey, USER_ACTIVITY_HEADER } from '@app/shared';
 import type { TFunction } from 'i18next';
 import { PASSWORD_CHANGE_PATH, SESSION_EXPIRED_PATH } from '../../config/constants';
+import { isRecentlyActive } from '../auth/activity';
 
 /** Jedyny klient HTTP aplikacji. Moduły nie używają `fetch` ani własnego `axios.create`. */
 export const api = axios.create({ baseURL: '/api', withCredentials: true });
@@ -42,4 +43,14 @@ export function handleSessionError(err: unknown): Promise<never> {
   return Promise.reject(err);
 }
 
+/**
+ * Zapytanie wysłane, gdy człowiek coś robił w ostatniej minucie, dostaje nagłówek aktywności: tylko takie przedłużają
+ * sesję na serwerze. Odświeżanie w tle bez czynności (np. po powrocie do okna) sesji nie przedłuża.
+ */
+export function addActivityHeader(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
+  if (isRecentlyActive()) config.headers.set(USER_ACTIVITY_HEADER, '1');
+  return config;
+}
+
+api.interceptors.request.use(addActivityHeader);
 api.interceptors.response.use(undefined, handleSessionError);

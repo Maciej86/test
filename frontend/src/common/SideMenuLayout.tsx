@@ -5,7 +5,6 @@ import { Outlet, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ACCOUNT_NAVIGATION, findVisibleNavItem, NAVIGATION, type NavItem } from '@app/shared';
 import { COLOR_SCHEME_TOGGLE } from '@app/shared/theme';
-import { api } from '../core/api/client';
 import { useAuth } from '../core/auth/AuthProvider';
 import { ColorSchemeToggle } from './ColorSchemeToggle';
 import { NavMenu } from './NavMenu';
@@ -18,12 +17,8 @@ import { UserMenu } from './UserMenu';
  */
 export function SideMenuLayout({ items }: { items: NavItem[] }) {
   const { t } = useTranslation();
-  const { user, refresh } = useAuth();
+  const { user, logout } = useAuth();
   const accountPath = findVisibleNavItem('my-account', [ACCOUNT_NAVIGATION, NAVIGATION], user)?.path ?? null;
-  const logout = async () => {
-    await api.post('/auth/logout').catch(() => undefined);
-    await refresh();
-  };
   const { pathname } = useLocation();
   const [opened, { toggle, close }] = useDisclosure(false);
   useEffect(close, [pathname, close]);
@@ -50,7 +45,7 @@ export function SideMenuLayout({ items }: { items: NavItem[] }) {
           </Group>
           <Group gap="xs" wrap="nowrap">
             {COLOR_SCHEME_TOGGLE && <ColorSchemeToggle />}
-            {user && <UserMenu name={user.name} accountPath={accountPath} onLogout={logout} />}
+            {user && <UserMenu name={user.name} accountPath={accountPath} onLogout={() => void logout()} />}
           </Group>
         </Group>
       </AppShell.Header>

@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Moduł Logowanie, implementacja: krok 8 z 14 (sesja na froncie).
+**Następny krok:** Moduł Logowanie, implementacja: krok 10 z 14 (ekran logowania).
 
 ## Start aplikacji
 
@@ -20,7 +20,7 @@
 | # | Moduł | Folder | Status | Etap | Zależy od |
 |---|---|---|---|---|---|
 | 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
-| 2 | Logowanie | login | w toku | implementacja (krok 8/14) | appearance |
+| 2 | Logowanie | login | w toku | implementacja (krok 10/14) | appearance |
 | 3 | Pracownicy | employees | czeka | makieta | login |
 | 4 | Typy urlopów | leave-types | czeka | makieta | login |
 | 5 | E-mail | email | czeka | makieta | login |

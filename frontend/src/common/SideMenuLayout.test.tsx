@@ -3,8 +3,9 @@ import type { NavItem } from '@app/shared';
 import { renderRoutes } from '../test/render';
 import { SideMenuLayout } from './SideMenuLayout';
 
+const logout = vi.fn(async () => {});
 vi.mock('../core/auth/AuthProvider', () => ({
-  useAuth: () => ({ user: { id: 1, name: 'Ala', role: 'admin' }, loading: false, refresh: vi.fn() }),
+  useAuth: () => ({ user: { id: 1, name: 'Ala', role: 'admin', mustChangePassword: false }, loading: false, refresh: vi.fn(), logout }),
 }));
 
 const items: NavItem[] = [
@@ -39,5 +40,12 @@ describe('SideMenuLayout', () => {
     fireEvent.click(screen.getByText('Moje konto'));
     expect(screen.getByText('Konto treść')).toBeInTheDocument();
     expect(screen.getByLabelText('Pokaż menu')).toBeInTheDocument();
+  });
+
+  it('logs out from the user menu', async () => {
+    show();
+    fireEvent.click(screen.getByLabelText('Menu użytkownika'));
+    fireEvent.click(await screen.findByText('Wyloguj'));
+    expect(logout).toHaveBeenCalledWith();
   });
 });

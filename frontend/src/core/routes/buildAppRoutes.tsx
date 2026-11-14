@@ -12,6 +12,18 @@ import { AppLayout } from '../../common/AppLayout';
 import { MissingScreen } from '../../common/MissingScreen';
 import { PublicLayout } from '../../common/PublicLayout';
 import { buildRoutes, type Pages } from './buildRoutes';
+import { PASSWORD_CHANGE_PATH } from '../../config/constants';
+import type { ReactElement } from 'react';
+
+/**
+ * Konto i panel tylko dla zalogowanych: niezalogowany trafia na /login, osoba z hasłem tymczasowym na ustawienie
+ * własnego hasła (serwer i tak odrzuci jej zapytania, ale tak nie zobaczy nawet pustych ekranów).
+ */
+function guarded(layout: ReactElement, user: SessionUser | null): ReactElement {
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.mustChangePassword) return <Navigate to={PASSWORD_CHANGE_PATH} replace />;
+  return layout;
+}
 
 /** Wszystkie trasy aplikacji według włączonych części (AREAS). */
 export function buildAppRoutes(areas: Areas, pages: Pages, user: SessionUser | null): RouteObject[] {
@@ -35,10 +47,18 @@ export function buildAppRoutes(areas: Areas, pages: Pages, user: SessionUser | n
   }
 
   if (areas.account) {
-    routes.push({ element: <AccountLayout />, children: buildRoutes(ACCOUNT_NAVIGATION, pages, user) });
+    routes.push({ element: guarded(<AccountLayout />, user), children: buildRoutes(ACCOUNT_NAVIGATION, pages, user) });
   }
   if (areas.admin) {
-    routes.push({ element: <AppLayout />, children: buildRoutes(NAVIGATION, pages, user) });
+    routes.push({ element: guarded(<AppLayout />, user), children: buildRoutes(NAVIGATION, pages, user) });
+  }
+
+  if (areas.account || areas.admin) {
+    const ChangePassword = pages['change-password'];
+    routes.push({
+      path: PASSWORD_CHANGE_PATH,
+      element: !user ? <Navigate to="/login" replace /> : ChangePassword ? <ChangePassword /> : <MissingScreen />,
+    });
   }
 
   routes.push({ path: '*', element: <MissingScreen /> });

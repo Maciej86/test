@@ -1,16 +1,27 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { SessionUser } from '@app/shared';
-import { api } from '../api/client';
+import { api, sessionRedirect } from '../api/client';
+import { announceLogout, watchLogoutInOtherTabs } from './activity';
+
+/** Dlaczego wylogowano: po bezczynności ekran logowania pokazuje komunikat. */
+export type LogoutReason = 'idle';
 
 interface AuthState {
   user: SessionUser | null;
   loading: boolean;
   refresh(): Promise<void>;
+  /** Wylogowanie: serwer usuwa ciasteczko, inne karty też wracają do logowania, ta przechodzi na /login. */
+  logout(reason?: LogoutReason): Promise<void>;
 }
 
-const AuthContext = createContext<AuthState>({ user: null, loading: false, refresh: async () => {} });
+const AuthContext = createContext<AuthState>({
+  user: null,
+  loading: false,
+  refresh: async () => {},
+  logout: async () => {},
+});
 
-/** Zalogowany użytkownik z GET /api/auth/me (adres powstaje w module Logowanie; do tego czasu nikt nie jest zalogowany). */
+/** Zalogowany użytkownik z GET /api/auth/me (moduł Logowanie). */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,11 +37,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const logout = useCallback(async (reason?: LogoutReason) => {
+    await api.post('/auth/logout').catch(() => undefined);
+    announceLogout();
+    // Pełne przeładowanie czyści zalogowanego i wszystkie pobrane dane.
+    sessionRedirect.go(reason ? `/login?reason=${reason}` : '/login');
+  }, []);
+
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
-  return <AuthContext.Provider value={{ user, loading, refresh }}>{children}</AuthContext.Provider>;
+  useEffect(() => watchLogoutInOtherTabs(), []);
+
+  return <AuthContext.Provider value={{ user, loading, refresh, logout }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthState {

@@ -107,7 +107,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   (`admin_cli.*`); README: „Pierwszy administrator”. Testy funkcji: poprawne dane → `insert` z rolą `admin`
   i skrótem (nie hasłem); zajęty login → błąd, bez `insert`; słabe hasło → `validation.password_rules`.
 
-- [ ] **8. Sesja na froncie.** `frontend/src/core/auth/activity.ts`: `markActivity()`, `lastActivityAt()`,
+- [x] **8. Sesja na froncie.** `frontend/src/core/auth/activity.ts`: `markActivity()`, `lastActivityAt()`,
   `isRecentlyActive(now)` (wspólne dla kart przez `localStorage`, odporne na brak `localStorage`),
   `onLogoutInOtherTab(cb)` / `announceLogout()` (zdarzenie `storage`). `client.ts`: przechwytywacz żądań dokleja
   `X-User-Activity: 1`, gdy `isRecentlyActive`. `AuthProvider`: `logout(reason?: 'idle')` (POST `/auth/logout`,
@@ -115,7 +115,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   Testy: nagłówek tylko po świeżej czynności; czynność zapisana w jednej „karcie” widoczna w drugiej; zdarzenie
   wylogowania z innej karty → `sessionRedirect.go('/login')`.
 
-- [ ] **9. Trasy frontu.** `buildAppRoutes`: niezalogowany na trasach panelu → `<Navigate to="/login">`; podczas
+- [x] **9. Trasy frontu.** `buildAppRoutes`: niezalogowany na trasach panelu → `<Navigate to="/login">`; podczas
   `loading` kręciołek; `/change-password` → `pages['change-password']`; zalogowany z
   `mustChangePassword` na trasach panelu → `/change-password`. `pages.ts`: `login`, `change-password`.
   `SideMenuLayout`: „Wyloguj” → `logout()` z `useAuth`. Testy w `buildRoutes.test.tsx`: niezalogowany `/admin/tasks`
