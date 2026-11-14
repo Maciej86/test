@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Moduł Pracownicy, etap makieta (otwórz nową rozmowę i wpisz /stepkit:dalej).
+**Następny krok:** Moduł Pracownicy, etap pytania: odpowiedzi na 10 pytań w makiecie (http://localhost:5181/admin/employees).
 
 ## Start aplikacji
 
@@ -21,7 +21,7 @@
 |---|---|---|---|---|---|
 | 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
 | 2 | Logowanie | login | zrobiony | zamknięcie | appearance |
-| 3 | Pracownicy | employees | czeka | makieta | login |
+| 3 | Pracownicy | employees | w toku | pytania | login |
 | 4 | Typy urlopów | leave-types | czeka | makieta | login |
 | 5 | E-mail | email | czeka | makieta | login |
 | 6 | Powiadomienia | notifications | czeka | makieta | login |
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-15: Pracownicy: makieta listy (pasek puli dni: wykorzystane, zaległe, z puli rocznej), okna: dodaj/edytuj, ustaw hasło, „Zamknij rok” z podglądem, do archiwum; 10 pytań. Nowe ikony przycisków: Ustaw hasło (`KeyRound`), Zamknij rok (`CalendarCheck`).
 
 - 2026-11-14: Porty na komputerze: aplikacja 5180, makiety 5181, serwer 3006 (5173, 5174 i 3001 zajmują inne aplikacje); ustawione w `.env`.
 

@@ -113,6 +113,8 @@ Ta sama akcja ma w całej aplikacji tę samą ikonę (`ButtonIcon` w `common/`, 
 | Szczegóły | `Eye` |
 | Kopiuj | `Copy` |
 | Zaloguj / wyloguj | `LogIn` / `LogOut` |
+| Ustaw hasło | `KeyRound` (klucz) |
+| Zamknij rok | `CalendarCheck` |
 
 ## Historia zmian wyglądu
 

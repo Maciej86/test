@@ -2,11 +2,13 @@ import {
   Archive,
   ArchiveRestore,
   ArrowLeft,
+  CalendarCheck,
   Check,
   Copy,
   Download,
   Eye,
   Funnel,
+  KeyRound,
   LogIn,
   LogOut,
   Pencil,
@@ -47,6 +49,8 @@ export const BUTTON_ICONS = {
   copy: Copy,
   login: LogIn,
   logout: LogOut,
+  password: KeyRound,
+  close_year: CalendarCheck,
 } as const satisfies Record<string, LucideIcon>;
 
 export type ButtonAction = keyof typeof BUTTON_ICONS;
