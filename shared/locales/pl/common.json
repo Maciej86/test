@@ -38,7 +38,7 @@
     "questions_show": "Pokaż pytania",
     "question_about": "Dotyczy: {{about}}",
     "done": "Tę część już wykonano.",
-    "done_link": "Zobacz ją w prawdziwej aplikacji: http://localhost:5173",
+    "done_link": "Zobacz ją w prawdziwej aplikacji: http://localhost:5180",
     "progress_title": "Postęp budowy",
     "next_step": "Następny krok",
     "start_steps": "Start aplikacji",

@@ -37,7 +37,7 @@
     "email": "E-mail do powiadomień (Enter = brak):",
     "password": "Hasło (co najmniej 8 znaków, w tym cyfra i znak specjalny):",
     "repeat_password": "Powtórz hasło:",
-    "created": "Gotowe. Administrator „{{login}}” może się zalogować na http://localhost:5173/login.",
+    "created": "Gotowe. Administrator „{{login}}” może się zalogować na http://localhost:5180/login.",
     "try_again": "Popraw dane i spróbuj jeszcze raz.",
     "field_name": "Imię i nazwisko",
     "field_login": "Login",

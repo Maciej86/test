@@ -1,6 +1,6 @@
 # Logowanie: pytania do makiety
 
-Makieta: http://localhost:5174/login (w menu makiety „Ekran logowania”), przełącznik „Pokaż stan” pokazuje wszystkie
+Makieta: http://localhost:5181/login (w menu makiety „Ekran logowania”), przełącznik „Pokaż stan” pokazuje wszystkie
 stany ekranu.
 
 ## 1. Wylogowanie po bezczynności: po jakim czasie?

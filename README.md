@@ -17,7 +17,7 @@ projektu:
 **Pierwszy administrator** (raz, po pierwszym `npm run migrate`): `npm run admin`. Polecenie zapyta o imię
 i nazwisko, login (np. `anna.nowak@firma.pl`), e-mail do powiadomień (Enter = brak) i hasło (co najmniej 8 znaków,
 w tym cyfra i znak specjalny; podczas wpisywania nic nie widać). Hasło wpisujesz tylko w terminalu, nigdy w rozmowie
-z Claude. Potem logujesz się na http://localhost:5173/login. Kolejne konta zakłada administrator w aplikacji.
+z Claude. Potem logujesz się na http://localhost:5180/login. Kolejne konta zakłada administrator w aplikacji.
 
 Wyłączenie bazy: `npm run db:stop`. Dane zostają, przy następnym `npm run db` wszystko wróci.
 
@@ -25,9 +25,9 @@ Wyłączenie bazy: `npm run db:stop`. Dane zostają, przy następnym `npm run db
 
 | Adres | Co to jest | Działa, gdy |
 |---|---|---|
-| http://localhost:5173 | Twoja aplikacja | `npm run dev` |
-| http://localhost:5174 | makiety (podgląd ekranów) | `npm run dev` |
-| http://localhost:5174/progress | **postęp prac**: co zrobione, co dalej | `npm run dev` |
+| http://localhost:5180 | Twoja aplikacja | `npm run dev` |
+| http://localhost:5181 | makiety (podgląd ekranów) | `npm run dev` |
+| http://localhost:5181/progress | **postęp prac**: co zrobione, co dalej | `npm run dev` |
 | http://localhost:8081 | podgląd bazy (phpMyAdmin) | `npm run db` |
 
 **Logowanie do phpMyAdmin:** użytkownik `app`, hasło to wartość `DB_PASSWORD` z pliku `.env`
