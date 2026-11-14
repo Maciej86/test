@@ -376,5 +376,9 @@ describe('employees routes', () => {
     expect(q.upsertPool).toHaveBeenCalledWith(conn, 2, thisYear + 1, 26, 30);
   });
 
-  it.todo('account archived during the session → 401 on the next request');
+  it('account archived during the session → 401 on the next request', async () => {
+    const app = as(anna);
+    vi.mocked(users.findActiveUserById).mockResolvedValue(null);
+    expect((await app.get('/employees')).status).toBe(401);
+  });
 });

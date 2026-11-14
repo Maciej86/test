@@ -275,3 +275,20 @@ export async function closeYear(input: CloseYearInput, actor: Actor): Promise<Re
     return { ok: true as const };
   });
 }
+
+/* Funkcje dla innych modułów (SPEC.md, „Powiązania”). */
+
+/** Pula osoby na rok, z policzonymi dniami; administrator albo brak puli → null. */
+export async function getPool(userId: number, year: number): Promise<EmployeePool | null> {
+  const user = await q.findUser(pool, userId);
+  if (!user || user.role !== 'employee') return null;
+  const row = await q.findPool(pool, userId, year);
+  if (!row) return null;
+  const usage = (await getPoolUsage([userId], year)).get(userId) ?? { usedDays: 0, pendingDays: 0 };
+  return toPool(year, row.annual_days, row.carried_days, usage);
+}
+
+/** Osoby spoza archiwum (np. do przypisania zadania): tylko numer i imię z nazwiskiem. */
+export async function listActiveUsers(): Promise<{ id: number; name: string }[]> {
+  return q.listActiveUsers(pool);
+}

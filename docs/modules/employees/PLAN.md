@@ -105,7 +105,7 @@ w e2e.
     samego roku → 409; `pools` z obcym `userId` jest pomijane; rok 2027 w 2026 → 409.
   - Klucze `employees.*` w `employees.json` (sekcja `server`) i `EMPLOYEE_MESSAGES`.
 
-- [ ] **6. Funkcje dla innych modułów.** W `employees.service.ts`: `getPool(userId, year)`, `listActiveUsers():
+- [x] **6. Funkcje dla innych modułów.** W `employees.service.ts`: `getPool(userId, year)`, `listActiveUsers():
   { id, name }[]`, `restoreEmployee(id, actor)` (używane przez trasę restore). Testy: `listActiveUsers` bez
   archiwum; `getPool` dla admina → `null`. Test „konto zarchiwizowane w trakcie sesji → 401” na `GET /employees`
   z `findActiveUserById` → `null`.

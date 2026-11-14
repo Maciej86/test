@@ -4,7 +4,7 @@ vi.mock('../../db/pool', () => ({ pool: { query: vi.fn(), getConnection: vi.fn()
 vi.mock('./employees.queries', () => ({ minOpenYear: vi.fn(), findUser: vi.fn(), findPool: vi.fn(), listActiveUsers: vi.fn() }));
 
 const q = await import('./employees.queries');
-const { getOpenYear, getPoolUsage, toPool } = await import('./employees.service');
+const { getOpenYear, getPool, getPoolUsage, listActiveUsers, toPool } = await import('./employees.service');
 const { todayIsoDate } = await import('@app/shared');
 
 describe('employees service', () => {
@@ -39,6 +39,18 @@ describe('employees service', () => {
     ]);
   });
 
-  it.todo('listActiveUsers skips archived accounts');
-  it.todo('getPool for an admin → null');
+  it('listActiveUsers passes on the query that skips archived accounts', async () => {
+    vi.mocked(q.listActiveUsers).mockResolvedValue([{ id: 2, name: 'Jan Kowalski' }]);
+    expect(await listActiveUsers()).toEqual([{ id: 2, name: 'Jan Kowalski' }]);
+  });
+
+  it('getPool for an admin → null; for an employee → counted pool', async () => {
+    vi.mocked(q.findUser).mockResolvedValue({ id: 1, role: 'admin', archived_at: null } as never);
+    expect(await getPool(1, 2026)).toBeNull();
+    vi.mocked(q.findUser).mockResolvedValue({ id: 2, role: 'employee', archived_at: null } as never);
+    vi.mocked(q.findPool).mockResolvedValue({ annual_days: 26, carried_days: 4 } as never);
+    expect(await getPool(2, 2026)).toMatchObject({ year: 2026, leftDays: 30, leftCarriedDays: 4 });
+    vi.mocked(q.findPool).mockResolvedValue(null);
+    expect(await getPool(2, 2027)).toBeNull();
+  });
 });
