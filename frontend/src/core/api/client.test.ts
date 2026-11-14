@@ -1,5 +1,5 @@
 import { AxiosError, AxiosHeaders } from 'axios';
-import { apiErrorMessage, handleSessionError, sessionRedirect } from './client';
+import { apiErrorFields, apiErrorKey, apiErrorMessage, handleSessionError, sessionRedirect } from './client';
 import { i18n } from '../../test/render';
 
 function axiosError(data: unknown, status = 403, url = '/orders') {
@@ -23,6 +23,22 @@ describe('apiErrorMessage', () => {
     expect(apiErrorMessage(new AxiosError('Network Error', 'ERR_NETWORK'), i18n.t)).toBe(
       'Brak połączenia z serwerem. Czy backend działa? (npm run dev)',
     );
+  });
+});
+
+describe('apiErrorKey', () => {
+  it('returns the key sent by the server or null', () => {
+    expect(apiErrorKey(axiosError({ error: { message: 'server.login_failed' } }, 401))).toBe('server.login_failed');
+    expect(apiErrorKey(new AxiosError('Network Error', 'ERR_NETWORK'))).toBeNull();
+    expect(apiErrorKey(new Error('x'))).toBeNull();
+  });
+});
+
+describe('apiErrorFields', () => {
+  it('returns field keys sent by the server or null', () => {
+    const fields = { newPassword: 'validation.password_same_as_temporary' };
+    expect(apiErrorFields(axiosError({ error: { message: 'server.invalid_data', fields } }, 400))).toEqual(fields);
+    expect(apiErrorFields(axiosError({ error: { message: 'server.no_access' } }))).toBeNull();
   });
 });
 

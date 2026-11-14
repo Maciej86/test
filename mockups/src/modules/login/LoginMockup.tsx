@@ -93,7 +93,7 @@ function NewPasswordForm() {
       <Title order={2}>{t('new_password_title')}</Title>
       <Text size="sm" c="dimmed">{t('new_password_intro')}</Text>
       <PasswordInput label={t('new_password')} description={t('new_password_hint')} defaultValue="Urlop-2026" size="md" />
-      <PasswordInput label={t('repeat_password')} defaultValue="Urlop-2025" error={t('passwords_differ')} size="md" />
+      <PasswordInput label={t('repeat_password')} defaultValue="Urlop-2025" error={t('validation:passwords_differ')} size="md" />
       <Button size="md" fullWidth leftSection={<ButtonIcon action="save" />}>{t('new_password_submit')}</Button>
     </FormCard>
   );

@@ -7,6 +7,18 @@ import { isRecentlyActive } from '../auth/activity';
 /** Jedyny klient HTTP aplikacji. Moduły nie używają `fetch` ani własnego `axios.create`. */
 export const api = axios.create({ baseURL: '/api', withCredentials: true });
 
+/** Klucz komunikatu z odpowiedzi serwera (np. server.login_failed) albo null (brak połączenia, inny błąd). */
+export function apiErrorKey(err: unknown): string | null {
+  if (!isAxiosError(err) || !err.response) return null;
+  return (err.response.data as { error?: { message?: string } } | undefined)?.error?.message ?? null;
+}
+
+/** Błędy pól z odpowiedzi 400 (`{ pole: klucz }`), do pokazania pod polami formularza; brak = null. */
+export function apiErrorFields(err: unknown): Record<string, string> | null {
+  if (!isAxiosError(err) || !err.response) return null;
+  return (err.response.data as { error?: { fields?: Record<string, string> } } | undefined)?.error?.fields ?? null;
+}
+
 /** Tekst błędu dla człowieka: tłumaczy klucz z odpowiedzi serwera. */
 export function apiErrorMessage(err: unknown, t: TFunction): string {
   if (isAxiosError(err) && err.response) {

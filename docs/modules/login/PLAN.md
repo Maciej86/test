@@ -121,13 +121,13 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   `SideMenuLayout`: „Wyloguj” → `logout()` z `useAuth`. Testy w `buildRoutes.test.tsx`: niezalogowany `/admin/tasks`
   → ekran logowania; z hasłem tymczasowym `/admin/tasks` → ekran zmiany hasła; zalogowany → Pulpit.
 
-- [ ] **10. Ekran logowania.** `frontend/src/modules/login/`: `LoginPage.tsx`, `components/CalendarSheet.tsx`,
+- [x] **10. Ekran logowania.** `frontend/src/modules/login/`: `LoginPage.tsx`, `components/CalendarSheet.tsx`,
   `components/AuthCard.tsx` (układ wspólny z ekranem hasła), `login.api.ts` (`useLogin()` → POST `/auth/login`,
   potem `refresh()`). Układ i teksty jak makieta (bez paska stanów). Testy: puste pola → „To pole jest wymagane.”;
   401 → czerwony komunikat `login_failed`; 429 → żółty `too_many_logins`; `?reason=idle` i `?reason=expired` →
   komunikaty; brak połączenia → `notify.error`; sukces z `mustChangePassword` → `/change-password`, bez → `/admin`; zalogowany na `/login` → `/admin`.
 
-- [ ] **11. Ekran „Ustaw własne hasło”.** `ChangePasswordPage.tsx` (ten sam `AuthCard`), `useChangePassword()`
+- [x] **11. Ekran „Ustaw własne hasło”.** `ChangePasswordPage.tsx` (ten sam `AuthCard`), `useChangePassword()`
   w `login.api.ts`. Testy: różne hasła → błąd pod „Powtórz”; słabe → `password_rules`; 400 z serwera
   `password_same_as_temporary` → błąd pod „Nowe hasło”; sukces → dymek „Hasło zapisane.” i `/admin`; bez hasła
   tymczasowego → `/admin`; link „Wyloguj”.
@@ -157,3 +157,5 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
 - Krok 4: zapytania o konta w `backend/src/auth/users.queries.ts` (nie w `modules/auth/`), bo używa ich `authenticate`; `DUMMY_PASSWORD_HASH` jako funkcja `dummyPasswordHash()` liczona przy pierwszym użyciu (szybszy start i testy).
 - Kroki 5–6: trasy dla zalogowanych podpięte przez `mountModule(api, 'auth', authRoutes, ['admin', 'employee'])` (adresy `/me`, `/change-password` pod `/api/auth`), żeby test ochrony tras sprawdzał też je; `POST /auth/logout` i `api.use(requirePasswordChanged)` z `// rule-ok` (brak danych wejściowych; blokada, nie moduł). Krok 6 zrobiony razem z 5, bo test zasad wymaga testu 403 przy trasach.
 - Krok 7: polecenie sprawdza też zajęty e-mail (`validation.email_taken`), bo e-mail jest unikalny w bazie.
+- Krok 10: kod błędu serwera czyta nowa wspólna funkcja `apiErrorKey` w `core/api/client.ts` (test zasad nie pozwala modułom importować axios).
+- Krok 11: błędy pól z serwera czyta wspólna funkcja `apiErrorFields` w `core/api/client.ts`; klucz `login.passwords_differ` z makiety zastąpiony wspólnym `validation.passwords_differ`.

@@ -12,7 +12,6 @@
   "new_password": "Nowe hasło",
   "new_password_hint": "Co najmniej 8 znaków, w tym cyfra i znak specjalny (np. ! # -)",
   "repeat_password": "Powtórz nowe hasło",
-  "passwords_differ": "Hasła się różnią. Wpisz to samo hasło dwa razy.",
   "new_password_submit": "Zapisz i przejdź dalej",
   "idle_warning_title": "Zaraz Cię wylogujemy",
   "idle_warning_text": "Od {{minutes}} minut nic się nie dzieje. Za {{seconds}} s wylogujemy Cię, żeby nikt nie użył Twojego konta.",
