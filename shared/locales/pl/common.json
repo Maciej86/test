@@ -30,6 +30,7 @@
     "viewing_as": "Oglądam jako:",
     "role_cannot_see": "Ta rola nie widzi tego ekranu.",
     "progress": "Postęp",
+    "screen_login": "Ekran logowania",
     "question": "Pytanie {{number}}",
     "recommended": "(polecam)",
     "questions_title": "Pytania do tej makiety ({{count}})",

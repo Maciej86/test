@@ -22,7 +22,7 @@ export function Questions({ children }: { children: ReactNode }) {
   const count = Children.toArray(children).length;
   if (count === 0) return null;
   return (
-    <Paper withBorder p="md" mb="lg" bg="yellow.0" style={{ borderColor: 'var(--mantine-color-yellow-4)' }}>
+    <Paper withBorder p="md" mb="lg" bg="yellow.0" c="dark.9" style={{ borderColor: 'var(--mantine-color-yellow-4)' }}>
       <Group justify="space-between">
         <Text fw={700}>{t('mockup.questions_title', { count })}</Text>
         <Button variant="subtle" color="yellow.9" size="xs" onClick={toggle}>
@@ -48,7 +48,7 @@ export function Question({ number, about, options, recommended, children }: Ques
           {t('mockup.question', { number })}
         </Text>
         {about && (
-          <Badge variant="light" color="gray" size="sm" tt="none">
+          <Badge variant="outline" color="gray.7" size="sm" tt="none">
             {t('mockup.question_about', { about })}
           </Badge>
         )}

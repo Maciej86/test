@@ -13,10 +13,13 @@ const account: NavItem[] = [
 const publicNav: PublicNavItem[] = [{ key: 'home', path: '/', label: 'common.nav.home' }];
 const all: Areas = { public: true, account: true, admin: true };
 
+const extra = [{ key: 'login', path: '/login', label: 'common.mockup.screen_login', screen: () => <p>Ekran logowania</p> }];
+
 function renderMockup(areas: Areas = all, path = '/admin') {
   return renderWithProviders(
     <MockupApp
       areas={areas}
+      extraScreens={extra}
       navigation={nav}
       accountNavigation={account}
       publicNavigation={publicNav}
@@ -83,5 +86,19 @@ describe('mockup shell', () => {
   it('shows a placeholder for an item without a screen', async () => {
     renderMockup(all, '/admin/missing');
     expect(await screen.findByText('Ten ekran jeszcze nie powstał.')).toBeInTheDocument();
+  });
+
+  it('shows a screen outside the menu (e.g. login) with a link in the menu', async () => {
+    renderMockup(all, '/admin');
+    const nav = await screen.findByRole('navigation');
+    fireEvent.click(within(nav).getByText('Ekran logowania'));
+    expect(await screen.findByText('Ekran logowania', { selector: 'p' })).toBeInTheDocument();
+  });
+
+  it('goes to the login screen after logout when there is no public site', async () => {
+    renderMockup({ public: false, account: false, admin: true }, '/admin');
+    fireEvent.click(await screen.findByLabelText('Menu użytkownika'));
+    fireEvent.click(await screen.findByText('Wyloguj'));
+    expect(await screen.findByText('Ekran logowania', { selector: 'p' })).toBeInTheDocument();
   });
 });

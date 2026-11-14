@@ -39,8 +39,17 @@ export function defaultRole(part: Part): Role {
   return ROLES.find((r) => ROLE_HOME[r] === `/${part}`) ?? ROLES[0];
 }
 
+/** Ekran makiety spoza menu aplikacji, np. logowanie (`label` = klucz tłumaczenia z przestrzenią nazw). */
+export interface ExtraScreen {
+  key: string;
+  path: string;
+  label: string;
+  screen: ComponentType;
+}
+
 interface Props {
   areas: Areas;
+  extraScreens?: ExtraScreen[];
   navigation: NavItem[];
   accountNavigation: NavItem[];
   publicNavigation: PublicNavItem[];
@@ -77,11 +86,25 @@ function ProgressLink() {
   return <NavLink component={RouterLink} to="/progress" label={t('mockup.progress')} active={pathname === '/progress'} />;
 }
 
-export function Shell({ areas, navigation, accountNavigation, publicNavigation, role, onRoleChange, children }: Props) {
+function ExtraLinks({ screens }: { screens: ExtraScreen[] }) {
+  const { t } = useTranslation();
+  const { pathname } = useLocation();
+  return (
+    <>
+      {screens.map((s) => (
+        <NavLink key={s.key} component={RouterLink} to={s.path} label={translateKey(t, s.label)} active={pathname === s.path} />
+      ))}
+    </>
+  );
+}
+
+export function Shell({ areas, extraScreens = [], navigation, accountNavigation, publicNavigation, role, onRoleChange, children }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const current = pathname === '/progress' ? null : partOf(pathname);
+  // Bez strony dla odwiedzających wylogowanie prowadzi na ekran logowania (jak w aplikacji).
+  const logoutPath = areas.public ? PART_HOME.public : '/login';
   const parts = (['public', 'account', 'admin'] as Part[]).filter((p) => areas[p]);
   const showRoles = current === 'account' || current === 'admin' || current === null;
   const [menuOpened, { toggle: toggleMenu, close: closeMenu }] = useDisclosure(false);
@@ -157,7 +180,7 @@ export function Shell({ areas, navigation, accountNavigation, publicNavigation, 
           <Group gap="xs" wrap="nowrap">
             {COLOR_SCHEME_TOGGLE && <ColorSchemeToggle />}
             {loggedIn && (
-              <UserMenu name={mockUser.name} accountPath={accountPath} onLogout={() => navigate(PART_HOME.public)} />
+              <UserMenu name={mockUser.name} accountPath={accountPath} onLogout={() => navigate(logoutPath)} />
             )}
           </Group>
         </Group>
@@ -177,6 +200,7 @@ export function Shell({ areas, navigation, accountNavigation, publicNavigation, 
           ))}
         {current === 'account' && <MenuLinks items={accountNavigation} role={role} />}
         {(current === 'admin' || current === null) && <MenuLinks items={navigation} role={role} />}
+        <ExtraLinks screens={extraScreens} />
         <ProgressLink />
       </AppShell.Navbar>
       <AppShell.Main bg={current === 'public' ? undefined : 'var(--app-panel-background)'}>{children}</AppShell.Main>

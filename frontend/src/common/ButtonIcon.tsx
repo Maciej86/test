@@ -7,6 +7,8 @@ import {
   Download,
   Eye,
   Funnel,
+  LogIn,
+  LogOut,
   Pencil,
   Plus,
   Printer,
@@ -43,6 +45,8 @@ export const BUTTON_ICONS = {
   refresh: RefreshCw,
   details: Eye,
   copy: Copy,
+  login: LogIn,
+  logout: LogOut,
 } as const satisfies Record<string, LucideIcon>;
 
 export type ButtonAction = keyof typeof BUTTON_ICONS;

@@ -112,6 +112,7 @@ Ta sama akcja ma w całej aplikacji tę samą ikonę (`ButtonIcon` w `common/`, 
 | Odśwież | `RefreshCw` |
 | Szczegóły | `Eye` |
 | Kopiuj | `Copy` |
+| Zaloguj / wyloguj | `LogIn` / `LogOut` |
 
 ## Historia zmian wyglądu
 

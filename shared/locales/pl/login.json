@@ -1,0 +1,31 @@
+{
+  "title": "Zaloguj się",
+  "intro": "Wnioski urlopowe i tablica zadań zespołu.",
+  "login": "Login",
+  "login_hint": "Zwykle w formie adresu, np. jan.kowalski@firma.pl",
+  "password": "Hasło",
+  "submit": "Zaloguj się",
+  "forgot": "Nie pamiętasz hasła? Poproś administratora, żeby ustawił Ci nowe.",
+  "idle_logged_out": "Wylogowaliśmy Cię po {{minutes}} minutach bez żadnej czynności. Zaloguj się ponownie.",
+  "new_password_title": "Ustaw własne hasło",
+  "new_password_intro": "Administrator nadał Ci hasło tymczasowe. Ustaw własne, żeby przejść dalej. Tymczasowego nie da się już użyć.",
+  "new_password": "Nowe hasło",
+  "new_password_hint": "Co najmniej 8 znaków",
+  "repeat_password": "Powtórz nowe hasło",
+  "passwords_differ": "Hasła się różnią. Wpisz to samo hasło dwa razy.",
+  "new_password_submit": "Zapisz i przejdź dalej",
+  "idle_warning_title": "Zaraz Cię wylogujemy",
+  "idle_warning_text": "Od {{minutes}} minut nic się nie dzieje. Za {{seconds}} s wylogujemy Cię, żeby nikt nie użył Twojego konta.",
+  "idle_stay": "Zostań zalogowany",
+  "idle_logout": "Wyloguj teraz",
+  "idle_behind": "Okno pojawia się nad dowolnym ekranem panelu.",
+  "mockup_state": "Pokaż stan:",
+  "mockup_states": {
+    "normal": "Zwykły",
+    "failed": "Zły login lub hasło",
+    "too_many": "Za dużo prób",
+    "idle": "Po bezczynności",
+    "new_password": "Hasło tymczasowe",
+    "idle_warning": "Ostrzeżenie w panelu"
+  }
+}

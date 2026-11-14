@@ -15,7 +15,7 @@ import {
 import { MissingScreen } from './common/MissingScreen';
 import { MockupRoleContext } from './common/mockupRole';
 import { ProgressPage } from './progress/ProgressPage';
-import { SCREENS } from './screens';
+import { EXTRA_SCREENS, SCREENS, type ExtraScreen } from './screens';
 import { defaultRole, partOf, Shell, type Screens } from './Shell';
 
 interface Props {
@@ -24,6 +24,8 @@ interface Props {
   accountNavigation?: NavItem[];
   publicNavigation?: PublicNavItem[];
   screens?: Screens;
+  /** Ekrany spoza menu aplikacji (np. logowanie), z linkiem w menu makiety. */
+  extraScreens?: ExtraScreen[];
   /** Tylko w testach: adres startowy (pamięć zamiast paska adresu). */
   initialPath?: string;
 }
@@ -34,6 +36,7 @@ export function MockupApp({
   accountNavigation = ACCOUNT_NAVIGATION,
   publicNavigation = PUBLIC_NAVIGATION,
   screens = SCREENS,
+  extraScreens = EXTRA_SCREENS,
   initialPath,
 }: Props) {
   const startPath = initialPath ?? window.location.pathname;
@@ -51,6 +54,7 @@ export function MockupApp({
       ...(areas.public ? publicNavigation.map((i) => ({ path: i.path, element: screenFor(i.key) })) : []),
       ...(areas.account ? flattenNav(accountNavigation).map((i) => ({ path: i.path, element: screenFor(i.key, i) })) : []),
       ...(areas.admin ? flattenNav(navigation).map((i) => ({ path: i.path, element: screenFor(i.key, i) })) : []),
+      ...extraScreens.map(({ path, screen: Screen }) => ({ path, element: <Screen /> })),
       { path: '/progress', element: <ProgressPage /> },
       { path: '*', element: <MissingScreen /> },
     ];
@@ -63,6 +67,7 @@ export function MockupApp({
             navigation={navigation}
             accountNavigation={accountNavigation}
             publicNavigation={publicNavigation}
+            extraScreens={extraScreens}
             role={role}
             onRoleChange={setRole}
           >
