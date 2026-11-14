@@ -55,7 +55,7 @@ Budujemy podobnie, nie identycznie (bez nazwy, wyglądu i pozostałych funkcji A
 - **E-maile:** tylko do administratora o nowym wniosku urlopowym (gdy ma e-mail do powiadomień).
 - **Pliki:** brak na start.
 - **Raporty:** brak na start.
-- **Wygląd:** kolory w odcieniach ciemnego niebieskiego; tylko jasny motyw (bez przełącznika).
+- **Wygląd:** kolory w odcieniach ciemnego niebieskiego; tylko ciemny motyw „Nocny granat”, bez przełącznika (zmiana w module Wygląd 2026-11-14, wcześniej: tylko jasny).
 - **Języki:** tylko polski.
 - **Publikacja:** brak domeny i serwera; na końcu budowy przez OVH.
 - **Najważniejsze na start:** wnioski urlopowe.

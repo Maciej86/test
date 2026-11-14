@@ -146,7 +146,7 @@ doda moduł Logowanie jako migrację **zaraz po** `users` (ma klucz obcy do `use
 
 | # | Moduł | Folder | Zależy od | Wzorce | Dlaczego w tej kolejności |
 |---|---|---|---|---|---|
-| 1 | Wygląd | appearance | — | — | zawsze pierwszy: odcienie ciemnego niebieskiego, tylko jasny motyw |
+| 1 | Wygląd | appearance | — | — | zawsze pierwszy: odcienie ciemnego niebieskiego, tylko ciemny motyw |
 | 2 | Logowanie | login | appearance | login | `users` z loginem i e-mailem do powiadomień, `activity_log`, ekran logowania, pierwszy administrator, wylogowanie po bezczynności |
 | 3 | Pracownicy | employees | login | — | wnioski potrzebują pracowników i ich pul; zakładanie kont, ustawianie hasła, pule, „Zamknij rok”, archiwizacja |
 | 4 | Typy urlopów | leave-types | login | — | formularz wniosku potrzebuje typów; mały moduł |
@@ -168,7 +168,7 @@ wymagają.
 ## 8. Zasady wspólne
 
 - Tylko jedna firma: bez wzorca „wiele firm”. Bez „dostępu nadawanego przez administratora”.
-- Tylko język polski; tylko jasny motyw (`COLOR_SCHEME_TOGGLE = false`).
+- Tylko język polski; tylko ciemny motyw (`COLOR_SCHEME_TOGGLE = false`, `FIXED_COLOR_SCHEME = 'dark'`). Wydruk i PDF wniosku są jasne (papier).
 - **Dodatki dla wszystkich ekranów:** wyszukiwarka, filtry i sortowanie na listach (pracownicy, wnioski, historia,
   archiwum); strona „nie znaleziono” i przerwa techniczna (strona przerwy w module Publikacja).
 - **Dodatki w modułach:** pulpit z liczbami (dashboard), ustawienia własnego konta (my-account), eksport wniosku do
@@ -187,6 +187,8 @@ wymagają.
 | przeciąganie kart (np. `@dnd-kit`) | tablica zadań, także na telefonie | tasks | spoza listy: zapytać w module Zadania |
 
 ## 9. Ostatnie decyzje (archiwum)
+
+- 2026-11-14: wygląd „Nocny granat”, zawsze ciemny motyw bez przełącznika (zamiast „tylko jasny”); szczegóły w `docs/DESIGN.md`.
 
 - 2026-11-13: logowanie loginem w formie adresu e-mail, osobny nieobowiązkowy e-mail do powiadomień.
 - 2026-11-13: brak dni w puli blokuje wniosek na typ odejmujący dni [decyzja AI].

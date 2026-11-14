@@ -4,23 +4,56 @@ Jak wygląda ta aplikacja i dlaczego. Uzupełnia ją moduł „Wygląd”, a pot
 Każda makieta i każdy ekran aplikacji trzyma się tych zasad. Kolory i czcionki technicznie: `shared/src/theme.ts`
 i `shared/src/theme.css`.
 
-**Stan:** jeszcze nie ustalony (moduł „Wygląd”). Wzorce niżej to ustawienia startowe stepkit: obowiązują, dopóki
-użytkownik nie zdecyduje inaczej. Zmiana = wpis w „Historii zmian wyglądu”.
+**Stan:** ustalony 2026-11-14 (moduł „Wygląd”, wariant „Nocny granat, cały ciemny”). Zmiana = wpis w „Historii
+zmian wyglądu”.
 
 ## Charakter
 
-(2–3 zdania: dla kogo, jaki nastrój, czym ma się różnić od typowego szablonu.)
+Wewnętrzne narzędzie jednej firmy do urlopów i zadań, używane codziennie przez kilka–kilkanaście osób. Nastrój
+poważny i spokojny, „dokumentowy”: nagłówki szeryfowe jak w piśmie kadrowym, treść prostym, gęstym krojem. Zawsze
+ciemny motyw w odcieniach granatu (nie czerni ani szarości); jaśniejsze są tylko rzeczy, z którymi się pracuje:
+karty, tabele, pola i główne przyciski. Bez cieni, gradientów i ozdobników; prawie kanciaste kształty.
 
 ## Kolory
 
+Motyw jest **zawsze ciemny**, bez przełącznika (`COLOR_SCHEME_TOGGLE = false`, `FIXED_COLOR_SCHEME = 'dark'`).
+Wydruk i PDF wniosku urlopowego są jasne (papier).
+
 | Kolor (nazwa w motywie) | Do czego |
 |---|---|
+| `dark.9` | rama: górna belka i menu boczne (najciemniejsze) |
+| `dark.8` | tło panelu (`--app-panel-background`) |
+| `dark.7` | tło strony poza panelem, najechanie na pozycję menu |
+| `dark.6` | karty (`InfoCard`), tabele, pola formularzy, aktywna pozycja menu |
+| `dark.4` | obramowania |
+| `dark.0` / `dark.2` | tekst / tekst przygaszony (`c="dimmed"`) |
+| `navy` (główny, odcień 6 na ciemnym tle) | główne przyciski, linki, zaznaczenia; `navy.4` pasek aktywnej pozycji menu, `navy.3` ikony menu |
+| `blue` | to samo co `navy` (żeby `color="blue"` nie odstawał) |
+| `gray` | znaczniki neutralne (np. rola Pracownik) |
+| `green` (wypełniony: odcień 9) | zatwierdzenie, status „zatwierdzony” |
+| `red` (wypełniony: odcień 8) | odrzucenie, archiwizacja, termin po czasie |
+| `yellow` | status „czeka na decyzję” |
 
+Znaczniki i przyciski `light` / `subtle` na ciemnym tle: przezroczysty odcień koloru (20%) i jasny napis (odcień 3);
+ustawione w `theme.css` dla wszystkich kolorów Mantine.
 ## Czcionki i tekst
+
+- **Source Serif 4** (szeryfowa, 600): tytuły ekranów i nagłówki kart.
+- **Source Sans 3** (400 / 500 / 600 / 700): cała reszta, także liczby w tabelach.
+- Obie z Google Fonts z polskimi znakami (`theme.css`).
+- Znaczniki (`Badge`) zwykłymi literami, nie WIELKIMI; bez wielkich liter w etykietach.
 
 ## Odstępy, zaokrąglenia, cienie
 
+- Zaokrąglenia małe: `xs` 2 px (domyślne), `sm` 3, `md` 4, `lg` 6, `xl` 8.
+- Bez cieni (`Card` `shadow="none"`); karty odcina jaśniejsze tło i cienkie obramowanie.
+- Tabele zwarte (`verticalSpacing="xs"`), na tle karty (`--mantine-color-default`).
+- Odstępy domyślne Mantine.
+
 ## Układ
+
+**Ciemna rama:** belka i menu na `dark.9` (klasy `app-header`, `app-navbar`, `app-navlink` w `theme.css`, podpięte
+w motywie). Aktywna pozycja menu: jaśniejsze tło `dark.6`, pasek po lewej w kolorze `navy.4`, pogrubiony napis.
 
 **Panel i konto** (`AppLayout`, `AccountLayout`, oba przez `SideMenuLayout`): menu po lewej (na telefonie schowane
 pod przyciskiem w belce), treść w środku na tle `--app-panel-background` (innym niż karty).
@@ -50,6 +83,10 @@ Każda kolejna sekcja to `PageSection` z tłem na całą szerokość, na zmianę
 | Usunięcie | okno potwierdzenia z liczbą rzeczy, które znikną | szablon |
 | Data | `DateText` (`DD.MM.RRRR`, z godziną `DD.MM.RRRR GG:MM`); pusta = szare „brak” | szablon |
 | Pusta lista | ikona, jedno zdanie i przycisk „Dodaj” | |
+| Statusy | `Badge variant="light"`: czeka = `yellow`, zatwierdzony = `green`, odrzucony / anulowany = `red`, wycofany = `gray` | Wygląd |
+| Kolumny tablicy | `Paper withBorder` na tle panelu (`var(--app-panel-background)`), karty zadań na `dark.6` | Wygląd |
+| Karta z liczbą | duża liczba (40 px, 700) i przygaszony opis obok, pod spodem pasek `Progress` | Wygląd |
+| Potwierdzenie usunięcia | `Modal` z liczbą rzeczy, które znikną; przycisk `red` wypełniony, obok „Anuluj” `default` | Wygląd |
 | Kalendarz zespołu | `@mantine/schedule`, `ResourcesMonthView` / `ResourcesWeekView`: osoby w wierszach, dni w kolumnach; urlopy, wydarzenia i zadania jako paski; weekend i święta (`getPolishHolidays`) wyszarzone | |
 
 ## Ikony przycisków
@@ -78,4 +115,6 @@ Ta sama akcja ma w całej aplikacji tę samą ikonę (`ButtonIcon` w `common/`, 
 
 ## Historia zmian wyglądu
 
-- (data): (co zmieniono i dlaczego)
+- 2026-11-14: wybrany „Nocny granat, cały ciemny” (z 4 wariantów: granat klasyczny, atrament, nocny granat z jasną
+  treścią, nocny cały ciemny). Użytkownikowi podobała się ciemna rama, ale chciał ciemną także treść. Zmienia ustalenie
+  z wywiadu „tylko jasny motyw” na „tylko ciemny”.

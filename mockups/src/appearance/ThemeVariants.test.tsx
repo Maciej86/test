@@ -45,10 +45,10 @@ describe('theme variants in mockups', () => {
     expect(screen.getByText('kolor: grape')).toBeInTheDocument();
   });
 
-  it('shows a variant in its own color scheme (dark variant to compare)', () => {
-    renderWith([...variants, { key: 'd', label: 'D. Ciemny', theme: { primaryColor: 'indigo' }, colorScheme: 'dark' }]);
-    expect(screen.getByText('tryb: light')).toBeInTheDocument();
-    fireEvent.click(screen.getByText('D. Ciemny'));
+  it('shows a variant in its own color scheme (the app is dark, a light variant to compare)', () => {
+    renderWith([...variants, { key: 'l', label: 'L. Jasny', theme: { primaryColor: 'indigo' }, colorScheme: 'light' }]);
     expect(screen.getByText('tryb: dark')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('L. Jasny'));
+    expect(screen.getByText('tryb: light')).toBeInTheDocument();
   });
 });
