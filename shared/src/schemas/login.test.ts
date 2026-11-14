@@ -58,4 +58,13 @@ describe('login schemas', () => {
     const r = adminAccountSchema.parse({ name: ' Anna Nowak ', login: 'Anna.Nowak@firma.pl', email: '', password: 'Urlop-2026' });
     expect(r).toEqual({ name: 'Anna Nowak', login: 'anna.nowak@firma.pl', email: null, password: 'Urlop-2026' });
   });
+
+  it('passwords are limited to 72 bytes, because bcrypt ignores the rest', () => {
+    const fits = '1-' + 'ż'.repeat(35); // 72 bajty
+    const tooLong = '1-' + 'ż'.repeat(36); // 74 bajty, tylko 38 znaków
+    expect(newPassword.safeParse(fits).success).toBe(true);
+    expect(firstError(newPassword.safeParse(tooLong))?.message).toBe('validation.too_long');
+    expect(loginSchema.safeParse({ login: 'abc', password: fits }).success).toBe(true);
+    expect(firstError(loginSchema.safeParse({ login: 'abc', password: tooLong }))?.message).toBe('validation.too_long');
+  });
 });

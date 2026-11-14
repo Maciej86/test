@@ -23,6 +23,9 @@ export function useIdleLogout(onIdle: () => void) {
   const loggedOut = useRef(false);
 
   useEffect(() => {
+    // Wejście do panelu (np. zaraz po zalogowaniu, bez przeładowania strony) to czynność: liczymy od teraz,
+    // nie od czynności sprzed wylogowania.
+    markActivity();
     let lastMark = 0;
     const onActivity = () => {
       if (warningOpen.current) return;

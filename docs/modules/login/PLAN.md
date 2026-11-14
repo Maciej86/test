@@ -160,3 +160,10 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
 - Krok 10: kod błędu serwera czyta nowa wspólna funkcja `apiErrorKey` w `core/api/client.ts` (test zasad nie pozwala modułom importować axios).
 - Krok 11: błędy pól z serwera czyta wspólna funkcja `apiErrorFields` w `core/api/client.ts`; klucz `login.passwords_differ` z makiety zastąpiony wspólnym `validation.passwords_differ`.
 - Krok 12: potwierdzenie sesji (`GET /auth/me` z nagłówkiem aktywności) idzie co minutę przy czynności, bez śledzenia innych zapytań (prościej, koszt: jedno małe zapytanie na minutę na osobę). Testy frontu z `MantineProvider env="test"` (bez animacji okien).
+
+## Przegląd kodu (2026-11-14)
+
+- Poprawione: ponowne logowanie po wylogowaniu z bezczynności wylogowywało od razu (stara czynność) → `useIdleLogout` liczy od wejścia do panelu; test „logging in after a long break…”.
+- Poprawione: limit hasła 72 liczony w bajtach, nie znakach (bcrypt ignoruje resztę) → `fitsBcrypt` w `fields.ts`; test „passwords are limited to 72 bytes…”.
+- Poprawione: ekran „Ustaw własne hasło” też wylogowuje po bezczynności; test „logs out after inactivity like the panel”.
+- Odłożone (drobne): wylogowanie nie unieważnia skopiowanego tokenu (do 31 min); `seedE2e` sprawdza `NODE_ENV` z `process.env` zamiast modułu `env`; komentarz o przekierowaniach przy `GET /auth/me` w `useIdleLogout`; przykład `jan.kowalski@firma.pl` w polu loginu wpisany w kodzie zamiast w `login.json`.

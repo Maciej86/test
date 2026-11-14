@@ -88,7 +88,8 @@ koniec bez zmian. Hasła nigdy nie wpisuje się w rozmowie z Claude.
 
 Na ekranie logowania login ma tylko „wymagany” (bez sprawdzania formatu), żeby zły format nie zdradzał niczego
 i dawał ten sam komunikat co złe hasło. Hasło nie jest przycinane ze spacji (spacja może być częścią hasła).
-Limit 72 znaków wynika z bcrypt (sposób zapisu haseł).
+Limit 72 wynika z bcrypt (sposób zapisu haseł) i liczy się w bajtach: polska litera to 2 bajty, więc hasło z samych
+polskich liter może mieć mniej znaków. Za długie → „Za dużo znaków.”
 
 ## Dane
 

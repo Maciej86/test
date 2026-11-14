@@ -136,12 +136,15 @@ export const login = textInput()
 /** Login wpisany przy logowaniu: tylko wymagany, bez sprawdzania formatu (zły format = ten sam komunikat co złe hasło). */
 export const loginInput = textInput().trim().toLowerCase().min(1, M.required).max(LOGIN_MAX, M.tooLong);
 
+/** bcrypt bierze pod uwagę tylko pierwsze 72 bajty; polska litera to 2 bajty, więc limit liczymy w bajtach. */
+const fitsBcrypt = (v: string) => new TextEncoder().encode(v).length <= PASSWORD_MAX;
+
 /** Hasło wpisane przy logowaniu: bez obcinania spacji (spacja może być częścią hasła). */
-export const passwordInput = textInput().min(1, M.required).max(PASSWORD_MAX, M.tooLong);
+export const passwordInput = textInput().min(1, M.required).refine(fitsBcrypt, M.tooLong);
 
 /** Nowe hasło: 8–72 znaki, co najmniej jedna cyfra i jeden znak, który nie jest literą ani cyfrą. */
 export const newPassword = textInput()
   .min(1, M.required)
   .min(PASSWORD_MIN, M.passwordRules)
-  .max(PASSWORD_MAX, M.tooLong)
+  .refine(fitsBcrypt, M.tooLong)
   .refine((v) => /\d/.test(v) && /[^\p{L}\p{N}]/u.test(v), M.passwordRules);

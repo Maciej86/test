@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { AxiosError, AxiosHeaders } from 'axios';
 import type { SessionUser } from '@app/shared';
 import { api } from '../../core/api/client';
@@ -82,5 +82,16 @@ describe('ChangePasswordPage', () => {
     show();
     fireEvent.click(screen.getByRole('button', { name: 'Wyloguj' }));
     await waitFor(() => expect(auth.logout).toHaveBeenCalled());
+  });
+
+  it('logs out after inactivity like the panel', () => {
+    vi.useFakeTimers();
+    try {
+      show();
+      act(() => vi.advanceTimersByTime(30 * 60_000));
+      expect(auth.logout).toHaveBeenCalledWith('idle');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

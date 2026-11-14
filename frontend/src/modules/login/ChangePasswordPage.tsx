@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { newPasswordSchema, ROLE_HOME, type NewPasswordInput } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { IdleWarningModal } from '../../common/IdleWarningModal';
 import { apiErrorFields, apiErrorMessage } from '../../core/api/client';
 import { useAuth } from '../../core/auth/AuthProvider';
 import { notify } from '../../core/notify';
@@ -70,6 +71,7 @@ export function ChangePasswordPage() {
       <Button variant="subtle" color="gray" leftSection={<ButtonIcon action="logout" />} onClick={() => void logout()}>
         {t('logout')}
       </Button>
+      <IdleWarningModal />
     </AuthCard>
   );
 }

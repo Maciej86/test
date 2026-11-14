@@ -5,7 +5,7 @@ export const USER_NAME_MAX = 150;
 export const LOGIN_MIN = 3;
 export const LOGIN_MAX = 190;
 export const EMAIL_MAX = 190;
-/** Hasło: minimum z ustaleń, maksimum wynika z bcrypt (sposób zapisu haseł). */
+/** Hasło: minimum w znakach z ustaleń, maksimum w bajtach (UTF-8) wynika z bcrypt (sposób zapisu haseł). */
 export const PASSWORD_MIN = 8;
 export const PASSWORD_MAX = 72;
 

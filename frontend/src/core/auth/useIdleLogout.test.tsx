@@ -93,4 +93,13 @@ describe('idle logout', () => {
     expect(screen.queryByText('Zaraz Cię wylogujemy')).not.toBeInTheDocument();
     expect(logout).not.toHaveBeenCalled();
   });
+
+  it('logging in after a long break starts counting from now, not from the old activity', () => {
+    // Ostatnia czynność 45 minut temu (np. przed wylogowaniem po bezczynności), potem logowanie bez przeładowania.
+    markActivity(Date.now() - 45 * MINUTE);
+    renderWithProviders(<IdleWarningModal />);
+    advance(2000);
+    expect(logout).not.toHaveBeenCalled();
+    expect(screen.queryByText('Zaraz Cię wylogujemy')).not.toBeInTheDocument();
+  });
 });
