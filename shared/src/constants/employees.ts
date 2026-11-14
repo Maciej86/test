@@ -1,0 +1,27 @@
+/** Pracownicy i pule dni urlopu (moduł Pracownicy). */
+
+/** Imię i nazwisko: co najmniej 2 znaki (maksimum USER_NAME_MAX z constants/login.ts). */
+export const USER_NAME_MIN = 2;
+/** Pula dni na rok: 0–60, domyślnie 26. */
+export const ANNUAL_DAYS_MAX = 60;
+export const ANNUAL_DAYS_DEFAULT = 26;
+/** Zaległe dni: do 120, bo po „Zamknij rok” mogą przekroczyć roczną pulę (stare zaległe + niewykorzystane). */
+export const CARRIED_DAYS_MAX = 120;
+
+/** Kolejność listy: po nazwisku albo po liczbie pozostałych dni. */
+export const EMPLOYEE_SORTS = ['name', 'days_left'] as const;
+export type EmployeeSort = (typeof EMPLOYEE_SORTS)[number];
+
+/** Klucze błędów serwera modułu (teksty w shared/locales/pl/employees.json, sekcja server). */
+export const EMPLOYEE_MESSAGES = {
+  loginTaken: 'validation.login_taken',
+  loginTakenArchived: 'employees.server.login_taken_archived',
+  emailTaken: 'validation.email_taken',
+  emailTakenArchived: 'employees.server.email_taken_archived',
+  ownRole: 'employees.server.own_role',
+  archiveSelf: 'employees.server.archive_self',
+  alreadyArchived: 'employees.server.already_archived',
+  notArchived: 'employees.server.not_archived',
+  yearNotOpen: 'employees.server.year_not_open',
+  yearTooEarly: 'employees.server.year_too_early',
+} as const;

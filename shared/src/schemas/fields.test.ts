@@ -14,6 +14,7 @@ import {
   quantity,
   regon,
   text,
+  wholeNumber,
 } from './fields';
 
 const ok = (schema: z.ZodType, value: unknown) => schema.parse(value);
@@ -160,7 +161,22 @@ describe('field messages', () => {
 });
 
 describe('wholeNumber', () => {
-  it.todo('0 and 60 ok; -1 and 61 → validation.range');
-  it.todo('2.5 → validation.whole_number');
-  it.todo("'26' from a form → 26; empty → validation.required");
+  const days = wholeNumber(0, 60);
+  it('0 and 60 ok; -1 and 61 → validation.min / validation.max', () => {
+    expect(ok(days, 0)).toBe(0);
+    expect(ok(days, 60)).toBe(60);
+    expect(error(days, -1)).toBe(FIELD_MESSAGES.min);
+    expect(error(days, 61)).toBe(FIELD_MESSAGES.max);
+  });
+
+  it('2.5 → validation.whole_number', () => {
+    expect(error(days, 2.5)).toBe(FIELD_MESSAGES.wholeNumber);
+  });
+
+  it("'26' from a form → 26; empty → validation.required", () => {
+    expect(ok(days, '26')).toBe(26);
+    expect(error(days, '')).toBe(FIELD_MESSAGES.required);
+    expect(error(days, undefined)).toBe(FIELD_MESSAGES.required);
+    expect(error(days, 'abc')).toBe(FIELD_MESSAGES.wholeNumber);
+  });
 });

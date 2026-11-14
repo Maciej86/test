@@ -24,6 +24,7 @@ export const FIELD_MESSAGES = {
   tooShort: 'validation.too_short',
   loginFormat: 'validation.login_format',
   passwordRules: 'validation.password_rules',
+  wholeNumber: 'validation.whole_number',
 } as const;
 
 const M = FIELD_MESSAGES;
@@ -115,6 +116,19 @@ export const money = moneyField();
 export const quantityField = (min = 0, max = QUANTITY_MAX) =>
   z.number({ error: M.required }).min(min, M.min).max(max, M.max).multipleOf(0.001, M.quantity);
 export const quantity = quantityField();
+
+/**
+ * Liczba całkowita od min do max (np. dni urlopu). Przyjmuje liczbę albo tekst cyfr z formularza; puste → wymagane.
+ */
+export const wholeNumber = (min: number, max: number) =>
+  z.preprocess(
+    (v) => (v === '' || v === null ? undefined : typeof v === 'string' ? (/^\s*-?\d+(\.\d+)?\s*$/.test(v) ? Number(v) : Number.NaN) : v),
+    z
+      .number({ error: (issue) => (issue.input === undefined ? M.required : M.wholeNumber) })
+      .int(M.wholeNumber)
+      .min(min, M.min)
+      .max(max, M.max),
+  );
 
 /** Pole nieobowiązkowe: puste pole formularza (`''`, same spacje, brak) zapisuje się jako NULL. */
 export function optionalField<T extends z.ZodType>(schema: T) {

@@ -8,3 +8,4 @@ export * from './number';
 export * from './schemas/fields';
 export * from './schemas/list';
 export * from './schemas/login';
+export * from './schemas/employees';

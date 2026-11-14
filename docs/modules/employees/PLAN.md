@@ -42,7 +42,7 @@ w e2e.
   `frontend/src/modules/employees/EmployeesListPage.test.tsx`, `frontend/src/modules/employees/components/*.test.tsx`,
   `e2e/employees.spec.ts` (`test.fixme`). → `npm run check`
 
-- [ ] **1. Pola i schematy.**
+- [x] **1. Pola i schematy.**
   - `fields.ts`: `wholeNumber(min: number, max: number)` (liczba lub tekst cyfr → `number`; ułamek →
     `validation.whole_number`; poza zakresem → `validation.range` z `{ min, max }` w kluczu przez `params`; puste →
     `validation.required`). Test: 0/60 ok, −1/61 błąd, `2.5` błąd, `'26'` → 26.
@@ -146,3 +146,5 @@ w e2e.
 - [ ] **12. Przegląd kodu** (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami.
 
 ## Rozstrzygnięcia w trakcie budowy
+
+- Krok 1: zakres liczb komunikatami `validation.min` / `validation.max` (już są) zamiast nowego `validation.range` z liczbami w treści (tłumaczenie kluczy nie przekazuje liczb; zakres widać w podpowiedzi pod polem).
