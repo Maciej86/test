@@ -47,6 +47,14 @@ describe('CloseYearModal, PasswordModal, ArchiveModal', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('nobody has a pool yet → message instead of an empty table, confirm disabled', async () => {
+    vi.spyOn(api, 'get').mockResolvedValue({ data: { ...preview, rows: [] } });
+    renderWithProviders(<CloseYearModal opened onClose={vi.fn()} />);
+    expect(await screen.findByText('Nikt nie ma jeszcze puli na 2026. Ustaw pule w „Edytuj” albo dodaj pracowników.')).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Zamknij rok 2026' })).toBeDisabled();
+  });
+
   it('409 year_not_open → error notify and close', async () => {
     vi.spyOn(api, 'get').mockResolvedValue({ data: preview });
     vi.spyOn(api, 'post').mockRejectedValue(serverError(409, 'employees.server.year_not_open'));

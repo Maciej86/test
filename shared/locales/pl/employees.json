@@ -106,5 +106,6 @@
   "restore_confirm": "Przywróć konto",
   "restored": "Przywrócono konto: {{name}}.",
   "pool_missing": "brak puli",
-  "pool_missing_hint": "Ustaw pulę dni w „Edytuj”."
+  "pool_missing_hint": "Ustaw pulę dni w „Edytuj”.",
+  "close_year_empty": "Nikt nie ma jeszcze puli na {{year}}. Ustaw pule w „Edytuj” albo dodaj pracowników."
 }

@@ -40,45 +40,49 @@ export function CloseYearModal({ opened, onClose }: { opened: boolean; onClose: 
                 {t('close_year_pending', { count: data.pendingRequests, next: data.nextYear })}
               </Alert>
             )}
-            <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH}>
-              <Table verticalSpacing="xs">
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>{t('col_name')}</Table.Th>
-                    <Table.Th ta="right">{t('close_col_left', { year: data.year })}</Table.Th>
-                    <Table.Th w={150}>{t('close_col_annual', { year: data.nextYear })}</Table.Th>
-                    <Table.Th ta="right">{t('close_col_total', { year: data.nextYear })}</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {data.rows.map((r) => {
-                    const annual = annualOf(r.userId, r.annualDays);
-                    return (
-                      <Table.Tr key={r.userId}>
-                        <Table.Td fw={500}>{r.name}</Table.Td>
-                        <Table.Td ta="right">{r.left}</Table.Td>
-                        <Table.Td>
-                          <NumberInput
-                            size="xs"
-                            value={annual}
-                            onChange={(v) => setAnnuals((a) => ({ ...a, [r.userId]: Math.min(ANNUAL_DAYS_MAX, Math.max(0, Number(v) || 0)) }))}
-                            min={0}
-                            max={ANNUAL_DAYS_MAX}
-                            allowDecimal={false}
-                            allowNegative={false}
-                            aria-label={t('close_col_annual', { year: data.nextYear })}
-                          />
-                        </Table.Td>
-                        <Table.Td ta="right" fw={700}>{r.left + annual}</Table.Td>
-                      </Table.Tr>
-                    );
-                  })}
-                </Table.Tbody>
-              </Table>
-            </Table.ScrollContainer>
+            {data.rows.length === 0 ? (
+              <Text c="dimmed">{t('close_year_empty', { year: data.year })}</Text>
+            ) : (
+              <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH}>
+                <Table verticalSpacing="xs">
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>{t('col_name')}</Table.Th>
+                      <Table.Th ta="right">{t('close_col_left', { year: data.year })}</Table.Th>
+                      <Table.Th w={150}>{t('close_col_annual', { year: data.nextYear })}</Table.Th>
+                      <Table.Th ta="right">{t('close_col_total', { year: data.nextYear })}</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {data.rows.map((r) => {
+                      const annual = annualOf(r.userId, r.annualDays);
+                      return (
+                        <Table.Tr key={r.userId}>
+                          <Table.Td fw={500}>{r.name}</Table.Td>
+                          <Table.Td ta="right">{r.left}</Table.Td>
+                          <Table.Td>
+                            <NumberInput
+                              size="xs"
+                              value={annual}
+                              onChange={(v) => setAnnuals((a) => ({ ...a, [r.userId]: Math.min(ANNUAL_DAYS_MAX, Math.max(0, Number(v) || 0)) }))}
+                              min={0}
+                              max={ANNUAL_DAYS_MAX}
+                              allowDecimal={false}
+                              allowNegative={false}
+                              aria-label={t('close_col_annual', { year: data.nextYear })}
+                            />
+                          </Table.Td>
+                          <Table.Td ta="right" fw={700}>{r.left + annual}</Table.Td>
+                        </Table.Tr>
+                      );
+                    })}
+                  </Table.Tbody>
+                </Table>
+              </Table.ScrollContainer>
+            )}
             <Group justify="flex-end">
               <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-              <Button leftSection={<ButtonIcon action="close_year" />} loading={closeYear.isPending} disabled={!data.canClose} onClick={confirm}>
+              <Button leftSection={<ButtonIcon action="close_year" />} loading={closeYear.isPending} disabled={!data.canClose || data.rows.length === 0} onClick={confirm}>
                 {t('close_confirm', { year: data.year })}
               </Button>
             </Group>
