@@ -1,4 +1,4 @@
-import { variantA, variantB, variantC } from '@app/shared/theme.variants';
+import { variantA, variantB, variantC, variantD } from '@app/shared/theme.variants';
 import type { ThemeVariant } from './ThemeVariants';
 
 /**
@@ -10,4 +10,5 @@ export const THEME_VARIANTS: ThemeVariant[] = [
   { key: 'a', label: 'A. Granat klasyczny', theme: variantA },
   { key: 'b', label: 'B. Atrament', theme: variantB },
   { key: 'c', label: 'C. Nocny granat', theme: variantC },
+  { key: 'd', label: 'D. Nocny, cały ciemny', theme: variantD, colorScheme: 'dark' },
 ];

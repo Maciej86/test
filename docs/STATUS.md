@@ -36,6 +36,8 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-14: Wygląd: użytkownikowi podoba się C, ale z ciemną treścią; dodany wariant D (cały ciemny). Wybór D zmieni ustalenie „tylko jasny motyw”.
+
 - 2026-11-14: Wygląd: trzy warianty do porównania (A. Granat klasyczny, B. Atrament, C. Nocny granat); palety w `shared/src/theme.variants.ts`, bo test kolorów nie pozwala na kolory w `mockups/`.
 
 - Podgląd bazy (phpMyAdmin) na porcie 8081, bo 8080 zajmuje inny projekt.

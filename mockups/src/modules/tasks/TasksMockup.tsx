@@ -29,7 +29,7 @@ export function TasksMockup() {
         {COLUMNS.map((column) => {
           const tasks = TASKS.filter((task) => task.column === column);
           return (
-            <Paper key={column} p="sm" withBorder bg="gray.0">
+            <Paper key={column} p="sm" withBorder bg="var(--app-panel-background)">
               <Group justify="space-between" mb="sm">
                 <Text fw={600}>{t(`column.${column}`)}</Text>
                 <Badge variant="light" color="gray">{tasks.length}</Badge>

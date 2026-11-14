@@ -40,3 +40,78 @@
 .variant-c-navlink .mantine-NavLink-section {
   color: var(--mantine-color-navy-2);
 }
+
+/* D. Nocny granat, cały ciemny: rama najciemniejsza, treść nieco jaśniejsza, karty jeszcze jaśniejsze. */
+.variant-d-header,
+.variant-d-navbar {
+  background-color: var(--mantine-color-dark-9);
+  color: var(--mantine-color-dark-0);
+  border-color: var(--mantine-color-dark-6);
+}
+.variant-d-header .mantine-Burger-root {
+  --burger-color: var(--mantine-color-dark-0);
+}
+.variant-d-navlink {
+  color: var(--mantine-color-dark-1);
+  border-left: 3px solid transparent;
+}
+.variant-d-navlink:hover {
+  background-color: var(--mantine-color-dark-7);
+}
+.variant-d-navlink[data-active] {
+  --nl-bg: var(--mantine-color-dark-6);
+  --nl-color: var(--mantine-color-white);
+  --nl-hover: var(--mantine-color-dark-6);
+  border-left-color: var(--mantine-color-navy-4);
+  font-weight: 600;
+}
+.variant-d-navlink .mantine-NavLink-section {
+  color: var(--mantine-color-navy-3);
+}
+
+/* D: w ciemnym motywie Mantine robi „jasne” znaczniki i przyciski prawie czarne; na granatowych kartach
+   lepiej wygląda przezroczysty odcień danego koloru i jasny napis. */
+:root:root[data-mantine-color-scheme='dark'] {
+  --mantine-color-navy-light: color-mix(in srgb, var(--mantine-color-navy-5) 20%, transparent);
+  --mantine-color-navy-light-hover: color-mix(in srgb, var(--mantine-color-navy-5) 30%, transparent);
+  --mantine-color-navy-light-color: var(--mantine-color-navy-3);
+  --mantine-color-blue-light: color-mix(in srgb, var(--mantine-color-blue-5) 20%, transparent);
+  --mantine-color-blue-light-hover: color-mix(in srgb, var(--mantine-color-blue-5) 30%, transparent);
+  --mantine-color-blue-light-color: var(--mantine-color-blue-3);
+  --mantine-color-gray-light: color-mix(in srgb, var(--mantine-color-gray-5) 20%, transparent);
+  --mantine-color-gray-light-hover: color-mix(in srgb, var(--mantine-color-gray-5) 30%, transparent);
+  --mantine-color-gray-light-color: var(--mantine-color-gray-3);
+  --mantine-color-red-light: color-mix(in srgb, var(--mantine-color-red-5) 20%, transparent);
+  --mantine-color-red-light-hover: color-mix(in srgb, var(--mantine-color-red-5) 30%, transparent);
+  --mantine-color-red-light-color: var(--mantine-color-red-3);
+  --mantine-color-green-light: color-mix(in srgb, var(--mantine-color-green-5) 20%, transparent);
+  --mantine-color-green-light-hover: color-mix(in srgb, var(--mantine-color-green-5) 30%, transparent);
+  --mantine-color-green-light-color: var(--mantine-color-green-3);
+  --mantine-color-yellow-light: color-mix(in srgb, var(--mantine-color-yellow-5) 20%, transparent);
+  --mantine-color-yellow-light-hover: color-mix(in srgb, var(--mantine-color-yellow-5) 30%, transparent);
+  --mantine-color-yellow-light-color: var(--mantine-color-yellow-3);
+  --mantine-color-orange-light: color-mix(in srgb, var(--mantine-color-orange-5) 20%, transparent);
+  --mantine-color-orange-light-hover: color-mix(in srgb, var(--mantine-color-orange-5) 30%, transparent);
+  --mantine-color-orange-light-color: var(--mantine-color-orange-3);
+  --mantine-color-teal-light: color-mix(in srgb, var(--mantine-color-teal-5) 20%, transparent);
+  --mantine-color-teal-light-hover: color-mix(in srgb, var(--mantine-color-teal-5) 30%, transparent);
+  --mantine-color-teal-light-color: var(--mantine-color-teal-3);
+  --mantine-color-grape-light: color-mix(in srgb, var(--mantine-color-grape-5) 20%, transparent);
+  --mantine-color-grape-light-hover: color-mix(in srgb, var(--mantine-color-grape-5) 30%, transparent);
+  --mantine-color-grape-light-color: var(--mantine-color-grape-3);
+  --mantine-color-cyan-light: color-mix(in srgb, var(--mantine-color-cyan-5) 20%, transparent);
+  --mantine-color-cyan-light-hover: color-mix(in srgb, var(--mantine-color-cyan-5) 30%, transparent);
+  --mantine-color-cyan-light-color: var(--mantine-color-cyan-3);
+  --mantine-color-violet-light: color-mix(in srgb, var(--mantine-color-violet-5) 20%, transparent);
+  --mantine-color-violet-light-hover: color-mix(in srgb, var(--mantine-color-violet-5) 30%, transparent);
+  --mantine-color-violet-light-color: var(--mantine-color-violet-3);
+  --mantine-color-pink-light: color-mix(in srgb, var(--mantine-color-pink-5) 20%, transparent);
+  --mantine-color-pink-light-hover: color-mix(in srgb, var(--mantine-color-pink-5) 30%, transparent);
+  --mantine-color-pink-light-color: var(--mantine-color-pink-3);
+  --mantine-color-indigo-light: color-mix(in srgb, var(--mantine-color-indigo-5) 20%, transparent);
+  --mantine-color-indigo-light-hover: color-mix(in srgb, var(--mantine-color-indigo-5) 30%, transparent);
+  --mantine-color-indigo-light-color: var(--mantine-color-indigo-3);
+  --mantine-color-lime-light: color-mix(in srgb, var(--mantine-color-lime-5) 20%, transparent);
+  --mantine-color-lime-light-hover: color-mix(in srgb, var(--mantine-color-lime-5) 30%, transparent);
+  --mantine-color-lime-light-color: var(--mantine-color-lime-3);
+}

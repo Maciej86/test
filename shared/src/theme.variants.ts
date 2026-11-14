@@ -14,9 +14,15 @@ const grayB: MantineColorsTuple = ['#f5f6fb', '#ebedf5', '#dfe2ee', '#cdd1e0', '
 // C. Nocny granat: ciemna rama (menu i belka), jasna treść, stonowane, prawie szare odcienie.
 const navyC: MantineColorsTuple = ['#eef2f7', '#dce3ec', '#b9c6d8', '#93a6c1', '#7189ab', '#577196', '#435c7f', '#334866', '#24354d', '#172334'];
 const grayC: MantineColorsTuple = ['#f2f4f6', '#e7eaee', '#dadfe5', '#c8cfd8', '#a6afbb', '#858f9c', '#66707d', '#4c5561', '#353c45', '#21262c'];
-// Wspólne dla wariantów: znaczniki bez wielkich liter (pełne słowa się mieszczą), tabela na białym tle.
+// D. Nocny granat, cały ciemny: jaśniejszy, stalowy granat na przyciskach (czytelny na ciemnym tle)
+// i granatowe odcienie ciemnego tła (Mantine „dark”: 0 = tekst, 4 = obramowania, 6 = karty, 7–8 = tło, 9 = rama).
+const navyD: MantineColorsTuple = ['#e8eef8', '#cfdbee', '#a9bfe0', '#83a3d2', '#6189c4', '#4b77ba', '#3f68a6', '#335689', '#27436b', '#1b2f4c'];
+const darkD: MantineColorsTuple = ['#dbe2ec', '#b9c4d3', '#93a1b5', '#6c7b91', '#3c4a61', '#2f3c53', '#233047', '#1a2537', '#141d2c', '#0e1520'];
+
+// Wspólne dla wariantów: znaczniki bez wielkich liter (pełne słowa się mieszczą), tabela na tle karty
+// (w jasnym motywie białym, w ciemnym ciemnogranatowym).
 const badge = { styles: { root: { textTransform: 'none' as const, letterSpacing: 0 } } };
-const tableOnWhite = { table: { backgroundColor: 'var(--mantine-color-white)' } };
+const tableOnWhite = { table: { backgroundColor: 'var(--mantine-color-default)' } };
 
 
 export const variantA: MantineThemeOverride = {
@@ -67,5 +73,16 @@ export const variantC: MantineThemeOverride = {
     Card: { defaultProps: { shadow: 'none' } },
     Table: { defaultProps: { verticalSpacing: 'xs' }, styles: tableOnWhite },
     Badge: badge,
+  },
+};
+
+export const variantD: MantineThemeOverride = {
+  ...variantC,
+  colors: { navy: navyD, blue: navyD, gray: grayC, dark: darkD },
+  primaryShade: { light: 8, dark: 6 },
+  components: {
+    ...variantC.components,
+    AppShell: { classNames: { header: 'variant-d-header', navbar: 'variant-d-navbar' } },
+    NavLink: { classNames: { root: 'variant-d-navlink' } },
   },
 };

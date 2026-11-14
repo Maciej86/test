@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { useMantineTheme } from '@mantine/core';
+import { useComputedColorScheme, useMantineTheme } from '@mantine/core';
 import { I18nextProvider } from 'react-i18next';
 import { theme } from '@app/shared/theme';
 import { i18n } from '../test/render';
@@ -11,7 +11,12 @@ const variants: ThemeVariant[] = [
 ];
 
 function Probe() {
-  return <span>kolor: {useMantineTheme().primaryColor}</span>;
+  return (
+    <>
+      <span>kolor: {useMantineTheme().primaryColor}</span>
+      <span>tryb: {useComputedColorScheme()}</span>
+    </>
+  );
 }
 
 function renderWith(list: ThemeVariant[]) {
@@ -38,5 +43,12 @@ describe('theme variants in mockups', () => {
     expect(screen.getByText('kolor: blue')).toBeInTheDocument();
     fireEvent.click(screen.getByText('B. Kolorowy'));
     expect(screen.getByText('kolor: grape')).toBeInTheDocument();
+  });
+
+  it('shows a variant in its own color scheme (dark variant to compare)', () => {
+    renderWith([...variants, { key: 'd', label: 'D. Ciemny', theme: { primaryColor: 'indigo' }, colorScheme: 'dark' }]);
+    expect(screen.getByText('tryb: light')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('D. Ciemny'));
+    expect(screen.getByText('tryb: dark')).toBeInTheDocument();
   });
 });

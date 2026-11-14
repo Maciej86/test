@@ -8,6 +8,8 @@ export interface ThemeVariant {
   key: string;
   label: string;
   theme: MantineThemeOverride;
+  /** Wariant pokazany w stałym trybie (np. cały ciemny); bez tego jak w aplikacji (COLOR_SCHEME_TOGGLE). */
+  colorScheme?: 'light' | 'dark';
 }
 
 const VariantContext = createContext<{ variants: ThemeVariant[]; current: string; setCurrent: (key: string) => void }>({
@@ -22,7 +24,10 @@ export function ThemeVariantProvider({ variants, children }: { variants: ThemeVa
   const active = variants.find((v) => v.key === current);
   return (
     <VariantContext.Provider value={{ variants, current, setCurrent }}>
-      <MantineProvider theme={active?.theme ?? theme} {...colorSchemeProps()}>
+      <MantineProvider
+        theme={active?.theme ?? theme}
+        {...(active?.colorScheme ? { forceColorScheme: active.colorScheme } : colorSchemeProps())}
+      >
         {children}
       </MantineProvider>
     </VariantContext.Provider>
