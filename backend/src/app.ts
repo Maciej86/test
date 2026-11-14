@@ -11,6 +11,7 @@ import { mountModule } from './middleware/mountModule';
 import { requirePasswordChanged } from './middleware/requirePasswordChanged';
 import { healthRoutes } from './modules/health/health.routes';
 import { authPublicRoutes, authRoutes } from './modules/auth/auth.routes';
+import { employeesRoutes } from './modules/employees/employees.routes';
 
 interface AppOptions {
   /** Dodatkowe trasy wymagające logowania (moduły dopisują się niżej; testy podają własne). */
@@ -45,6 +46,7 @@ export function createApp(options: AppOptions = {}) {
   api.use(requirePasswordChanged); // rule-ok: blokada dla każdego modułu przy haśle tymczasowym, nie moduł z trasami
 
   // 3. Moduły, z rolami ich pozycji w navigation.config.ts: mountModule(api, 'employees', employeesRoutes);
+  mountModule(api, 'employees', employeesRoutes);
   if (options.extraRoutes) api.use(options.extraRoutes);
   app.use('/api', api);
 

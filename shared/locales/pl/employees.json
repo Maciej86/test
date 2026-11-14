@@ -88,5 +88,15 @@
     "login_taken": "Login zajęty"
   },
   "mockup_no_results_query": "Grabowski",
-  "pool_left_aria": "Zostało {{left}} z {{total}} dni"
+  "pool_left_aria": "Zostało {{left}} z {{total}} dni",
+  "server": {
+    "login_taken_archived": "Ten login ma konto w archiwum.",
+    "email_taken_archived": "Ten e-mail ma konto w archiwum.",
+    "own_role": "Własnej roli nie zmienisz.",
+    "archive_self": "Własnego konta nie przeniesiesz do archiwum.",
+    "already_archived": "To konto jest już w archiwum.",
+    "not_archived": "To konto nie jest w archiwum.",
+    "year_not_open": "Ten rok jest już zamknięty. Odśwież stronę.",
+    "year_too_early": "Tego roku nie można jeszcze zamknąć."
+  }
 }

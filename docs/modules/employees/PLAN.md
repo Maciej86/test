@@ -71,7 +71,7 @@ w e2e.
   Testy (podmieniony `pool`/`conn`): każde SQL z `?`; sort spoza mapy niemożliwy (typ); test CASCADE pul w e2e-seed
   (`npm run migrate` i usunięcie użytkownika w `seedE2e`-teście). → `npm run migrate`, `npm run check`
 
-- [ ] **3. Lista i dodawanie (trasy).** `employees.service.ts`: `getOpenYear(conn?): Promise<number>`,
+- [x] **3. Lista i dodawanie (trasy).** `employees.service.ts`: `getOpenYear(conn?): Promise<number>`,
   `getPoolUsage(userIds: number[], year: number): Promise<Map<number, { usedDays: number; pendingDays: number }>>`
   (na razie zera; komentarz: podmienia moduł my-leave), `toPool(row, usage): EmployeePool` (zaległe schodzą
   pierwsze: `leftCarried = carried − min(used, carried)`), `createEmployee(input, actor)`. Trasy:
@@ -148,3 +148,4 @@ w e2e.
 ## Rozstrzygnięcia w trakcie budowy
 
 - Krok 1: zakres liczb komunikatami `validation.min` / `validation.max` (już są) zamiast nowego `validation.range` z liczbami w treści (tłumaczenie kluczy nie przekazuje liczb; zakres widać w podpowiedzi pod polem).
+- Krok 3: `sendError` dostał nieobowiązkowy argument `extra` (do `archivedUser` w błędzie 409); klucze błędów modułu w `employees.json` w sekcji `server` (`employees.server.*`), zajęty aktywny login / e-mail używają istniejących `validation.login_taken` / `validation.email_taken`. `toPool` nie pokazuje liczby ujemnej, gdy pulę obniżono poniżej wykorzystanych dni (0 zostało).
