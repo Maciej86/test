@@ -16,7 +16,6 @@ import {
 import { CircleAlert, Clock, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ButtonIcon } from '../../common/ButtonIcon';
-import { Question, Questions } from '../../common/Question';
 import { idleMinutes, today, typedLogin, warningSeconds } from './data';
 
 const STATES = ['normal', 'failed', 'too_many', 'idle', 'new_password', 'idle_warning'] as const;
@@ -93,8 +92,8 @@ function NewPasswordForm() {
     <FormCard>
       <Title order={2}>{t('new_password_title')}</Title>
       <Text size="sm" c="dimmed">{t('new_password_intro')}</Text>
-      <PasswordInput label={t('new_password')} description={t('new_password_hint')} defaultValue="Urlop2026" size="md" />
-      <PasswordInput label={t('repeat_password')} defaultValue="Urlop2025" error={t('passwords_differ')} size="md" />
+      <PasswordInput label={t('new_password')} description={t('new_password_hint')} defaultValue="Urlop-2026" size="md" />
+      <PasswordInput label={t('repeat_password')} defaultValue="Urlop-2025" error={t('passwords_differ')} size="md" />
       <Button size="md" fullWidth leftSection={<ButtonIcon action="save" />}>{t('new_password_submit')}</Button>
     </FormCard>
   );
@@ -132,63 +131,6 @@ export function LoginMockup() {
 
   return (
     <Stack>
-      <Questions>
-        <Question
-          number={1}
-          about="Wylogowanie po bezczynności"
-          options={[
-            { id: 'a', text: 'Po 30 minutach bez żadnej czynności' },
-            { id: 'b', text: 'Po 15 minutach' },
-            { id: 'c', text: 'Po 60 minutach' },
-          ]}
-          recommended="a"
-        >
-          Po jakim czasie bez klikania i pisania aplikacja ma wylogować osobę?
-        </Question>
-        <Question
-          number={2}
-          about="Ostrzeżenie w panelu"
-          options={[
-            { id: 'a', text: 'Minutę wcześniej okno „Zaraz Cię wylogujemy” z przyciskiem „Zostań zalogowany”' },
-            { id: 'b', text: 'Bez ostrzeżenia: po czasie od razu ekran logowania z komunikatem' },
-          ]}
-          recommended="a"
-        >
-          Czy ostrzegać przed wylogowaniem? (Stan „Ostrzeżenie w panelu”). Niezapisany formularz przepadnie przy
-          wylogowaniu, więc ostrzeżenie chroni przed utratą pisanego wniosku.
-        </Question>
-        <Question
-          number={3}
-          about="Hasło tymczasowe"
-          options={[
-            { id: 'a', text: 'Po pierwszym zalogowaniu trzeba od razu ustawić własne hasło (stan „Hasło tymczasowe”)' },
-            { id: 'b', text: 'Hasłem od administratora można logować się dalej; zmiana tylko w „Moim koncie”' },
-          ]}
-          recommended="a"
-        >
-          Administrator zakłada konto albo ustawia nowe hasło, gdy ktoś zapomni swojego. Co dalej z tym hasłem?
-        </Question>
-        <Question
-          number={4}
-          about="Formularz logowania"
-          options={[
-            { id: 'a', text: 'Bez „Zapamiętaj mnie”: po bezczynności i po zamknięciu przeglądarki trzeba się zalogować' },
-            { id: 'b', text: 'Z polem „Zapamiętaj mnie” (bez wylogowania po bezczynności dla tej osoby)' },
-          ]}
-          recommended="a"
-        >
-          Czy dodać pole „Zapamiętaj mnie”? Kłóci się z wylogowaniem po bezczynności, dlatego polecam bez niego.
-        </Question>
-        <Question number={5} about="Zasady pól">
-          Propozycja (odpowiedz „ok” albo popraw pojedyncze pola): Login: wymagany, 3–190 znaków, bez spacji, wielkość
-          liter bez znaczenia (np. jan.kowalski@firma.pl). Hasło przy logowaniu: wymagane. Nowe hasło: wymagane, 8–72
-          znaki, dowolne znaki. Powtórz hasło: takie samo jak nowe.
-        </Question>
-        <Question number={6} about="Limit prób">
-          Po 10 nieudanych próbach z jednego komputera logowanie blokuje się na 15 minut (stan „Za dużo prób”), żeby
-          nikt nie zgadywał haseł. Udane logowania się nie liczą. Czy tak zostawić? (polecam „tak”)
-        </Question>
-      </Questions>
 
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">

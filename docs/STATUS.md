@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Moduł Logowanie, etap pytania: odpowiedzi na 6 pytań w makiecie (http://localhost:5174/login).
+**Następny krok:** Moduł Logowanie, etap plan: akceptacja `docs/modules/login/PLAN.md` (14 kroków).
 
 ## Start aplikacji
 
@@ -20,7 +20,7 @@
 | # | Moduł | Folder | Status | Etap | Zależy od |
 |---|---|---|---|---|---|
 | 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
-| 2 | Logowanie | login | w toku | pytania | appearance |
+| 2 | Logowanie | login | w toku | plan | appearance |
 | 3 | Pracownicy | employees | czeka | makieta | login |
 | 4 | Typy urlopów | leave-types | czeka | makieta | login |
 | 5 | E-mail | email | czeka | makieta | login |

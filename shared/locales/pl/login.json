@@ -10,7 +10,7 @@
   "new_password_title": "Ustaw własne hasło",
   "new_password_intro": "Administrator nadał Ci hasło tymczasowe. Ustaw własne, żeby przejść dalej. Tymczasowego nie da się już użyć.",
   "new_password": "Nowe hasło",
-  "new_password_hint": "Co najmniej 8 znaków",
+  "new_password_hint": "Co najmniej 8 znaków, w tym cyfra i znak specjalny (np. ! # -)",
   "repeat_password": "Powtórz nowe hasło",
   "passwords_differ": "Hasła się różnią. Wpisz to samo hasło dwa razy.",
   "new_password_submit": "Zapisz i przejdź dalej",

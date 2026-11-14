@@ -9,7 +9,7 @@ stany ekranu.
 - b) Po 15 minutach
 - c) Po 60 minutach
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-14):** 1a (30 minut).
 
 ## 2. Ostrzeżenie przed wylogowaniem
 
@@ -17,21 +17,21 @@ stany ekranu.
   utratą pisanego wniosku
 - b) Bez ostrzeżenia: po czasie od razu ekran logowania z komunikatem
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-14):** 2a (okno minutę wcześniej).
 
 ## 3. Hasło tymczasowe od administratora
 
 - a) Po pierwszym zalogowaniu trzeba od razu ustawić własne hasło (ekran „Ustaw własne hasło”) **(polecam)**
 - b) Hasłem od administratora można logować się dalej; zmiana tylko w „Moim koncie”
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-14):** 3a (hasło tymczasowe trzeba od razu zmienić).
 
 ## 4. „Zapamiętaj mnie”
 
 - a) Bez tego pola: po bezczynności i po zamknięciu przeglądarki trzeba się zalogować **(polecam)**
 - b) Z polem „Zapamiętaj mnie” (bez wylogowania po bezczynności dla tej osoby)
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-14):** 4a (bez „Zapamiętaj mnie”).
 
 ## 5. Zasady pól
 
@@ -42,11 +42,11 @@ stany ekranu.
 | Nowe hasło | tak | 8–72 znaki | dowolne znaki |
 | Powtórz nowe hasło | tak | — | takie samo jak nowe |
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-14):** Login ok. Nowe hasło: 8–72 znaki, **musi mieć co najmniej jedną cyfrę i jeden znak specjalny** (znak, który nie jest literą ani cyfrą, np. `!`, `#`, `-`).
 
 ## 6. Limit prób logowania
 
 Po 10 nieudanych próbach z jednego komputera logowanie blokuje się na 15 minut; udane logowania się nie liczą.
 Zostawić tak? **(polecam: tak)**
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-14):** tak.
