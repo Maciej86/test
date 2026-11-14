@@ -110,7 +110,7 @@ w e2e.
   archiwum; `getPool` dla admina → `null`. Test „konto zarchiwizowane w trakcie sesji → 401” na `GET /employees`
   z `findActiveUserById` → `null`.
 
-- [ ] **7. Front: dane i pasek puli.** `employees.api.ts`: `useEmployees(params)`, `useCreateEmployee()`,
+- [x] **7. Front: dane i pasek puli.** `employees.api.ts`: `useEmployees(params)`, `useCreateEmployee()`,
   `useUpdateEmployee()`, `useSetEmployeePassword()`, `useArchiveEmployee()`, `useRestoreEmployee()`,
   `useCloseYearPreview(enabled)`, `useCloseYear()` (po sukcesie `invalidateQueries(['employees'])`).
   `components/PoolMeter.tsx` i `PoolLegend` jak w makiecie (kolory `dark.4`, `navy.3`, `navy.6`). Testy: 21 z 30 →
