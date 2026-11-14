@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Moduł Wygląd, zamknięcie: użytkownik potwierdza wygląd na http://localhost:5174.
+**Następny krok:** Moduł Logowanie, etap makieta (otwórz nową rozmowę i wpisz /stepkit:dalej).
 
 ## Start aplikacji
 
@@ -19,7 +19,7 @@
 
 | # | Moduł | Folder | Status | Etap | Zależy od |
 |---|---|---|---|---|---|
-| 1 | Wygląd | appearance | w toku | zamknięcie | — |
+| 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
 | 2 | Logowanie | login | czeka | makieta | appearance |
 | 3 | Pracownicy | employees | czeka | makieta | login |
 | 4 | Typy urlopów | leave-types | czeka | makieta | login |
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-14: Moduł Wygląd zrobiony (potwierdzony przez użytkownika).
 
 - 2026-11-14: Wygląd: wybrany wariant D „Nocny granat, cały ciemny”, zawsze ciemny motyw bez przełącznika; przeniesiony do `shared/src/theme.ts` i `theme.css`, opis w `docs/DESIGN.md`.
 
