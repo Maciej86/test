@@ -136,7 +136,7 @@ w e2e.
   przelicza „Razem w 2027” (21 + 20 = 41); wysłane `pools` z wpisanymi liczbami; 409 `year_not_open` → dymek
   błędu i odświeżenie listy; okno archiwum z imieniem; dymki po sukcesie.
 
-- [ ] **11. Dokumenty i testy w przeglądarce.** `TESTS.md` (scenariusze admina; pracownik nie ma menu
+- [x] **11. Dokumenty i testy w przeglądarce.** `TESTS.md` (scenariusze admina; pracownik nie ma menu
   „Pracownicy”, `/admin/employees` → brak dostępu). `e2e/employees.spec.ts`: admin dodaje pracownika z hasłem
   wygenerowanym → wylogowanie → pracownik loguje się, ustawia własne hasło → Pulpit; admin zmienia pulę i widzi pasek;
   „Ustaw hasło”; „Do archiwum” → pracownik nie może się zalogować; dodanie tego samego loginu → „Przywróć konto”;
@@ -150,3 +150,4 @@ w e2e.
 - Krok 1: zakres liczb komunikatami `validation.min` / `validation.max` (już są) zamiast nowego `validation.range` z liczbami w treści (tłumaczenie kluczy nie przekazuje liczb; zakres widać w podpowiedzi pod polem).
 - Krok 3: `sendError` dostał nieobowiązkowy argument `extra` (do `archivedUser` w błędzie 409); klucze błędów modułu w `employees.json` w sekcji `server` (`employees.server.*`), zajęty aktywny login / e-mail używają istniejących `validation.login_taken` / `validation.email_taken`. `toPool` nie pokazuje liczby ujemnej, gdy pulę obniżono poniżej wykorzystanych dni (0 zostało).
 - Krok 9: `fieldError` przeniesiony z `modules/login/components/` do `core/fieldError.ts` (używają go dwa moduły), z testem; nowa wspólna funkcja `apiErrorBody` w `core/api/client.ts` (czyta `archivedUser`). Pola `login` i `newPassword` w `fields.ts` kończą sprawdzanie na „To pole jest wymagane.” przy pustej wartości (`abort: true`), bo formularz pokazywał ostatni błąd („Za mało znaków”) zamiast pierwszego; test w `fields.test.ts`.
+- Krok 11: testy w przeglądarce działają na lokalnej bazie, więc „Zamknij rok” sprawdzają tylko do podglądu (zatwierdzenie zamknęłoby pule na stałe; zamknięcie sprawdzają testy serwera). Pracowników zakładają same testy jako `e2e.tmp.*@test.local`, a seed usuwa ich przy następnym uruchomieniu (pule znikają razem z nimi, CASCADE). Seed nie zakłada puli dla `e2e.employee`, bo testy pracowników używają własnych kont.
