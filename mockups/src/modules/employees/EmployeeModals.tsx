@@ -155,6 +155,7 @@ export function CloseYearModal({ opened, onClose }: { opened: boolean; onClose: 
   const next = POOL_YEAR + 1;
   const staff = EMPLOYEES.filter((e) => e.pool !== null);
   const pending = staff.reduce((sum, e) => sum + e.pendingRequests, 0);
+  const [annuals, setAnnuals] = useState<Record<number, number>>({});
 
   return (
     <Modal opened={opened} onClose={onClose} title={t('close_year', { year: POOL_YEAR })} size="xl">
@@ -169,21 +170,30 @@ export function CloseYearModal({ opened, onClose }: { opened: boolean; onClose: 
               <Table.Tr>
                 <Table.Th>{t('col_name')}</Table.Th>
                 <Table.Th ta="right">{t('close_col_left', { year: POOL_YEAR })}</Table.Th>
-                <Table.Th ta="right">{t('close_col_carried', { year: next })}</Table.Th>
                 <Table.Th w={150}>{t('close_col_annual', { year: next })}</Table.Th>
+                <Table.Th ta="right">{t('close_col_total', { year: next })}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {staff.map((e) => {
                 const { left } = poolParts(e.pool!);
+                const annual = annuals[e.id] ?? e.pool!.annual;
                 return (
                   <Table.Tr key={e.id}>
                     <Table.Td fw={500}>{e.name}</Table.Td>
                     <Table.Td ta="right">{left}</Table.Td>
-                    <Table.Td ta="right" fw={600}>{left}</Table.Td>
                     <Table.Td>
-                      <NumberInput size="xs" defaultValue={e.pool!.annual} min={0} max={60} allowDecimal={false} aria-label={t('close_col_annual', { year: next })} />
+                      <NumberInput
+                        size="xs"
+                        value={annual}
+                        onChange={(v) => setAnnuals((a) => ({ ...a, [e.id]: Number(v) || 0 }))}
+                        min={0}
+                        max={60}
+                        allowDecimal={false}
+                        aria-label={t('close_col_annual', { year: next })}
+                      />
                     </Table.Td>
+                    <Table.Td ta="right" fw={700}>{left + annual}</Table.Td>
                   </Table.Tr>
                 );
               })}

@@ -27,6 +27,9 @@ Wnioski zbuduje moduł „Moje urlopy”; tu ekran tylko pokazuje ich wynik.
 
 **Odpowiedź:**
 
+**Zmiana w makiecie (2026-11-15, uwaga użytkownika):** w oknie „Zamknij rok” bez kolumny „Zaległe w 2027”
+(myląca); zamiast niej na końcu „Razem w 2027” = zostało w 2026 + pula na 2027, liczone na bieżąco przy zmianie puli.
+
 ## 4. Zamknij rok: czy da się cofnąć?
 
 Przycisk działa w dowolnym dniu (np. już w grudniu); aplikacja sama roku nie zamyka.
