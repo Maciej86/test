@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Moduł Logowanie, implementacja: krok 13 z 14 (dokumenty i testy w przeglądarce).
+**Następny krok:** Moduł Logowanie: włączyć Docker Desktop, potem `npm run migrate`, `npm run test:e2e` i etap testy.
 
 ## Start aplikacji
 
@@ -20,7 +20,7 @@
 | # | Moduł | Folder | Status | Etap | Zależy od |
 |---|---|---|---|---|---|
 | 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
-| 2 | Logowanie | login | w toku | implementacja (krok 13/14) | appearance |
+| 2 | Logowanie | login | w toku | implementacja (krok 13/14, czeka na Docker) | appearance |
 | 3 | Pracownicy | employees | czeka | makieta | login |
 | 4 | Typy urlopów | leave-types | czeka | makieta | login |
 | 5 | E-mail | email | czeka | makieta | login |
