@@ -117,7 +117,7 @@ w e2e.
   „21”, „z 30 dni zostało”; 0 → „pula wykorzystana”; dopisek „w tym 3 dni zaległe, 1 dzień czeka na decyzję”
   (odmiana); `null` → „nie dotyczy”.
 
-- [ ] **8. Front: ekran listy.** `EmployeesListPage.tsx` (wpis w `pages.ts`), `components/EmployeesTable.tsx`,
+- [x] **8. Front: ekran listy.** `EmployeesListPage.tsx` (wpis w `pages.ts`), `components/EmployeesTable.tsx`,
   `components/EmployeeCards.tsx`, `components/EmployeesFilters.tsx`: układ z makiety, `DataState`, filtry i strona
   w adresie (`employeesListQuerySchema`), `Pagination`, pusto (tylko administratorzy) i brak wyników z „Wyczyść
   wyszukiwanie”. Testy: wiersze z danymi; „(to Ty)” i wyłączone „Do archiwum” przy własnym koncie; wpisanie w

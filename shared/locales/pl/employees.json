@@ -98,5 +98,6 @@
     "not_archived": "To konto nie jest w archiwum.",
     "year_not_open": "Ten rok jest już zamknięty. Odśwież stronę.",
     "year_too_early": "Tego roku nie można jeszcze zamknąć."
-  }
+  },
+  "close_year_later": "Rok {{year}} zamkniesz w {{year}}."
 }
