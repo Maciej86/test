@@ -17,5 +17,7 @@
   "login_format": "Login nie może zawierać spacji.",
   "password_rules": "Hasło musi mieć co najmniej 8 znaków, w tym cyfrę i znak specjalny.",
   "passwords_differ": "Hasła się różnią. Wpisz to samo hasło dwa razy.",
-  "password_same_as_temporary": "Nowe hasło musi być inne niż tymczasowe."
+  "password_same_as_temporary": "Nowe hasło musi być inne niż tymczasowe.",
+  "login_taken": "Ten login jest już zajęty.",
+  "email_taken": "Ten e-mail ma już inne konto."
 }

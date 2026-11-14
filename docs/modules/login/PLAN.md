@@ -99,7 +99,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   403 przy haśle tymczasowym, 200 po zmianie; `me`, `logout`, `change-password` dostępne przy haśle tymczasowym;
   hasło ` Zażółć-1 ` zapisane i zweryfikowane bez zmian. Klucz `password_not_temporary` w `server.json`.
 
-- [ ] **7. Polecenie `npm run admin`.** `backend/src/scripts/createAdmin.ts`: czysta funkcja
+- [x] **7. Polecenie `npm run admin`.** `backend/src/scripts/createAdmin.ts`: czysta funkcja
   `createAdminAccount(input: unknown, deps: { loginTaken(login): Promise<boolean>; insert(row): Promise<number> })`
   → `{ ok: true, id } | { ok: false, errors }` (sprawdza `adminAccountSchema`, zajęty login → `login_taken`,
   rola `admin`, `must_change_password = 0`); część terminalowa (`node:readline`, hasło niewidoczne, powtórzenie)
@@ -156,3 +156,4 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
 - Krok 3: Docker niedostępny w trakcie budowy; `npm run migrate` przeniesione na koniec (przed testami e2e).
 - Krok 4: zapytania o konta w `backend/src/auth/users.queries.ts` (nie w `modules/auth/`), bo używa ich `authenticate`; `DUMMY_PASSWORD_HASH` jako funkcja `dummyPasswordHash()` liczona przy pierwszym użyciu (szybszy start i testy).
 - Kroki 5–6: trasy dla zalogowanych podpięte przez `mountModule(api, 'auth', authRoutes, ['admin', 'employee'])` (adresy `/me`, `/change-password` pod `/api/auth`), żeby test ochrony tras sprawdzał też je; `POST /auth/logout` i `api.use(requirePasswordChanged)` z `// rule-ok` (brak danych wejściowych; blokada, nie moduł). Krok 6 zrobiony razem z 5, bo test zasad wymaga testu 403 przy trasach.
+- Krok 7: polecenie sprawdza też zajęty e-mail (`validation.email_taken`), bo e-mail jest unikalny w bazie.

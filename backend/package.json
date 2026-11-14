@@ -8,7 +8,8 @@
     "start": "tsx src/server.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "migrate": "tsx src/db/migrate.ts"
+    "migrate": "tsx src/db/migrate.ts",
+    "admin": "tsx src/scripts/createAdmin.ts"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",

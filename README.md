@@ -14,6 +14,11 @@ projektu:
 2. `npm run migrate`: tabele w bazie (wystarczy po zmianach; nic nie szkodzi wpisać za każdym razem),
 3. `npm run dev`: aplikacja i makiety. Terminal zostaw otwarty; zamykasz przez `Ctrl+C`.
 
+**Pierwszy administrator** (raz, po pierwszym `npm run migrate`): `npm run admin`. Polecenie zapyta o imię
+i nazwisko, login (np. `anna.nowak@firma.pl`), e-mail do powiadomień (Enter = brak) i hasło (co najmniej 8 znaków,
+w tym cyfra i znak specjalny; podczas wpisywania nic nie widać). Hasło wpisujesz tylko w terminalu, nigdy w rozmowie
+z Claude. Potem logujesz się na http://localhost:5173/login. Kolejne konta zakłada administrator w aplikacji.
+
 Wyłączenie bazy: `npm run db:stop`. Dane zostają, przy następnym `npm run db` wszystko wróci.
 
 ## Gdzie co podejrzeć

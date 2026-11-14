@@ -27,5 +27,22 @@
     "idle": "Po bezczynności",
     "new_password": "Hasło tymczasowe",
     "idle_warning": "Ostrzeżenie w panelu"
+  },
+  "session_expired": "Sesja wygasła. Zaloguj się ponownie.",
+  "password_saved": "Hasło zapisane.",
+  "logout": "Wyloguj",
+  "admin_cli": {
+    "intro": "Zakładamy konto pierwszego administratora. Hasło nie będzie widoczne podczas wpisywania.",
+    "name": "Imię i nazwisko:",
+    "login": "Login (np. anna.nowak@firma.pl):",
+    "email": "E-mail do powiadomień (Enter = brak):",
+    "password": "Hasło (co najmniej 8 znaków, w tym cyfra i znak specjalny):",
+    "repeat_password": "Powtórz hasło:",
+    "created": "Gotowe. Administrator „{{login}}” może się zalogować na http://localhost:5173/login.",
+    "try_again": "Popraw dane i spróbuj jeszcze raz.",
+    "field_name": "Imię i nazwisko",
+    "field_login": "Login",
+    "field_email": "E-mail",
+    "field_password": "Hasło"
   }
 }
