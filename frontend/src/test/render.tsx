@@ -15,7 +15,9 @@ export function renderWithProviders(ui: ReactElement) {
   return render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
-        <MantineProvider theme={theme}>{ui}</MantineProvider>
+        <MantineProvider theme={theme} env="test">
+          {ui}
+        </MantineProvider>
       </QueryClientProvider>
     </I18nextProvider>,
   );

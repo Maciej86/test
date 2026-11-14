@@ -7,6 +7,7 @@ import { ACCOUNT_NAVIGATION, findVisibleNavItem, NAVIGATION, type NavItem } from
 import { COLOR_SCHEME_TOGGLE } from '@app/shared/theme';
 import { useAuth } from '../core/auth/AuthProvider';
 import { ColorSchemeToggle } from './ColorSchemeToggle';
+import { IdleWarningModal } from './IdleWarningModal';
 import { NavMenu } from './NavMenu';
 import { UserMenu } from './UserMenu';
 
@@ -55,6 +56,7 @@ export function SideMenuLayout({ items }: { items: NavItem[] }) {
       <AppShell.Main bg="var(--app-panel-background)">
         <Outlet />
       </AppShell.Main>
+      <IdleWarningModal />
     </AppShell>
   );
 }

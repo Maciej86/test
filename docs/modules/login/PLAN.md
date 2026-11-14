@@ -132,7 +132,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   `password_same_as_temporary` → błąd pod „Nowe hasło”; sukces → dymek „Hasło zapisane.” i `/admin`; bez hasła
   tymczasowego → `/admin`; link „Wyloguj”.
 
-- [ ] **12. Ostrzeżenie o bezczynności.** `frontend/src/core/auth/useIdleLogout.ts`: nasłuch `mousemove`,
+- [x] **12. Ostrzeżenie o bezczynności.** `frontend/src/core/auth/useIdleLogout.ts`: nasłuch `mousemove`,
   `keydown`, `pointerdown`, `scroll`, `touchstart` → `markActivity()` (nie częściej niż co 1 s); co 1 s sprawdza
   `lastActivityAt()`: po `IDLE_LOGOUT_MS − IDLE_WARNING_MS` → `warning = true` z odliczaniem sekund, po
   `IDLE_LOGOUT_MS` → `logout('idle')`; przy czynności i braku zapytań przez `SESSION_KEEPALIVE_MS` → `GET /auth/me`.
@@ -159,3 +159,4 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
 - Krok 7: polecenie sprawdza też zajęty e-mail (`validation.email_taken`), bo e-mail jest unikalny w bazie.
 - Krok 10: kod błędu serwera czyta nowa wspólna funkcja `apiErrorKey` w `core/api/client.ts` (test zasad nie pozwala modułom importować axios).
 - Krok 11: błędy pól z serwera czyta wspólna funkcja `apiErrorFields` w `core/api/client.ts`; klucz `login.passwords_differ` z makiety zastąpiony wspólnym `validation.passwords_differ`.
+- Krok 12: potwierdzenie sesji (`GET /auth/me` z nagłówkiem aktywności) idzie co minutę przy czynności, bez śledzenia innych zapytań (prościej, koszt: jedno małe zapytanie na minutę na osobę). Testy frontu z `MantineProvider env="test"` (bez animacji okien).
