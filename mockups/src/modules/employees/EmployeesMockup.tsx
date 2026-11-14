@@ -20,130 +20,12 @@ import { Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
-import { Question, Questions } from '../../common/Question';
 import { ArchiveModal, CloseYearModal, EmployeeModal, PasswordModal } from './EmployeeModals';
 import { PoolLegend, PoolMeter } from './PoolMeter';
 import { EMPLOYEES, POOL_YEAR, type MockEmployee } from './data';
 
 const STATES = ['list', 'empty', 'no_results', 'login_taken'] as const;
 type State = (typeof STATES)[number];
-
-function EmployeeQuestions() {
-  return (
-    <Questions>
-      <Question
-        number={1}
-        about="Kolumna „Urlop w 2026”"
-        options={[
-          { id: 'a', text: 'Dni odejmują tylko zatwierdzone wnioski; dni z wniosków czekających są w dopisku pod paskiem' },
-          { id: 'b', text: 'Wnioski czekające też od razu zmniejszają „zostało”' },
-        ]}
-        recommended="a"
-      >
-        Jak liczyć, ile dni zostało pracownikowi? (Wnioski zbuduje moduł „Moje urlopy”; tu tylko pokazujemy ich wynik.)
-      </Question>
-      <Question
-        number={2}
-        about="Zamknij rok"
-        options={[
-          { id: 'a', text: 'Wszystkie niewykorzystane dni, także stare zaległe, przechodzą do zaległych na nowy rok' },
-          { id: 'b', text: 'Przechodzą tylko dni z puli rocznej; niewykorzystane stare zaległe przepadają' },
-        ]}
-        recommended="a"
-      >
-        Co przechodzi na nowy rok przy „Zamknij rok”?
-      </Question>
-      <Question
-        number={3}
-        about="Zamknij rok"
-        options={[
-          { id: 'a', text: 'W oknie przy każdej osobie podpowiedź: pula taka jak w zamykanym roku, do zmiany' },
-          { id: 'b', text: 'Jedna liczba dla wszystkich, wpisana raz' },
-        ]}
-        recommended="a"
-      >
-        Skąd pula dni na nowy rok?
-      </Question>
-      <Question
-        number={4}
-        about="Zamknij rok"
-        options={[
-          { id: 'a', text: 'Bez cofania: przed zatwierdzeniem okno z podglądem, potem pojedyncze poprawki w „Edytuj”' },
-          { id: 'b', text: 'Przycisk „Cofnij zamknięcie roku”, dopóki nikt nie złożył wniosku na nowy rok' },
-        ]}
-        recommended="a"
-      >
-        Czy zamknięcie roku da się cofnąć? Przycisk działa w dowolnym dniu (np. już w grudniu); aplikacja sama roku nie
-        zamyka.
-      </Question>
-      <Question
-        number={5}
-        about="Hasło"
-        options={[
-          { id: 'a', text: 'Wpisujesz hasło sam albo klikasz „Wygeneruj”' },
-          { id: 'b', text: 'Tylko „Wygeneruj”, bez wpisywania' },
-        ]}
-        recommended="a"
-      >
-        Jak powstaje hasło przy dodawaniu i przy „Ustaw hasło”? W obu przypadkach jest tymczasowe: przy logowaniu
-        pracownik ustawia własne (ustalone w Logowaniu).
-      </Question>
-      <Question
-        number={6}
-        about="Rola i własne konto"
-        options={[
-          { id: 'a', text: 'Możesz nadać rolę Administrator innej osobie; własnej roli nie zmienisz i własnego konta nie zarchiwizujesz' },
-          { id: 'b', text: 'Administrator jest tylko jeden (Ty); pole „Rola” znika' },
-        ]}
-        recommended="a"
-      >
-        Kto może być administratorem? Administrator nie ma puli dni, więc przy tej roli pola puli znikają z okna.
-      </Question>
-      <Question
-        number={7}
-        about="Do archiwum"
-        options={[
-          { id: 'a', text: 'Wnioski czekające na decyzję wycofują się same, z wpisem w historii zmian' },
-          { id: 'b', text: 'Zostają na liście wniosków do Twojej decyzji' },
-        ]}
-        recommended="a"
-      >
-        Co z wnioskami czekającymi na decyzję, gdy przenosisz pracownika do archiwum? Przy zadaniach zostaje z dopiskiem
-        „zarchiwizowany” (ustalone).
-      </Question>
-      <Question
-        number={8}
-        about="Wyszukiwarka i filtry"
-        options={[
-          { id: 'a', text: 'Szukanie po imieniu, nazwisku i loginie, filtr roli, kolejność: nazwisko albo najmniej dni zostało' },
-          { id: 'b', text: 'To samo i dodatkowo filtr „bez e-maila do powiadomień”' },
-        ]}
-        recommended="a"
-      >
-        Czy takie szukanie i filtry wystarczą?
-      </Question>
-      <Question
-        number={9}
-        about="Szczegóły pracownika"
-        options={[
-          { id: 'a', text: 'Bez osobnego ekranu: w „Edytuj” zmieniasz pulę bieżącego roku; starsze lata widać w historii zmian' },
-          { id: 'b', text: 'Osobny ekran pracownika z pulami z kolejnych lat i jego wnioskami' },
-        ]}
-        recommended="a"
-      >
-        Czy potrzebny jest ekran z całą kartoteką jednej osoby?
-      </Question>
-      <Question number={10} about="Zasady pól">
-        Propozycja (odpowiedz „ok” albo popraw pojedyncze pola): Imię i nazwisko: wymagane, 2–150 znaków. Login:
-        wymagany, 3–190 znaków, bez spacji, zapisywany małymi literami, niepowtarzalny także wśród kont w archiwum
-        (np. jan.kowalski@firma.pl). E-mail do powiadomień: nieobowiązkowy, prawdziwy adres, do 190 znaków,
-        niepowtarzalny. Rola: wymagana, domyślnie Pracownik. Hasło tymczasowe: wymagane przy dodawaniu, 8–72 znaki,
-        co najmniej jedna cyfra i jeden znak specjalny (jak w Logowaniu). Dni na rok: wymagane, liczba całkowita 0–60,
-        domyślnie 26. Zaległe: liczba całkowita 0–60, domyślnie 0.
-      </Question>
-    </Questions>
-  );
-}
 
 interface RowActions {
   onEdit: (e: MockEmployee) => void;
@@ -269,8 +151,6 @@ export function EmployeesMockup() {
 
   return (
     <Stack>
-      <EmployeeQuestions />
-
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">
           <Text size="sm" fw={600}>{t('mockup_state')}</Text>

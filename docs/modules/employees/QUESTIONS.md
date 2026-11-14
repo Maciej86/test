@@ -11,21 +11,21 @@ Wnioski zbuduje moduł „Moje urlopy”; tu ekran tylko pokazuje ich wynik.
 - a) Dni odejmują tylko zatwierdzone wnioski; dni z wniosków czekających są w dopisku pod paskiem **(polecam)**
 - b) Wnioski czekające też od razu zmniejszają „zostało”
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-15):** 1a.
 
 ## 2. Zamknij rok: co przechodzi na nowy rok?
 
 - a) Wszystkie niewykorzystane dni, także stare zaległe, przechodzą do zaległych na nowy rok **(polecam)**
 - b) Przechodzą tylko dni z puli rocznej; niewykorzystane stare zaległe przepadają
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-15):** 2a.
 
 ## 3. Zamknij rok: skąd pula dni na nowy rok?
 
 - a) W oknie przy każdej osobie podpowiedź: pula taka jak w zamykanym roku, do zmiany **(polecam)**
 - b) Jedna liczba dla wszystkich, wpisana raz
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-15):** 3a.
 
 **Zmiana w makiecie (2026-11-15, uwaga użytkownika):** w oknie „Zamknij rok” bez kolumny „Zaległe w 2027”
 (myląca); zamiast niej na końcu „Razem w 2027” = zostało w 2026 + pula na 2027, liczone na bieżąco przy zmianie puli.
@@ -37,7 +37,7 @@ Przycisk działa w dowolnym dniu (np. już w grudniu); aplikacja sama roku nie z
 - a) Bez cofania: przed zatwierdzeniem okno z podglądem, potem pojedyncze poprawki w „Edytuj” **(polecam)**
 - b) Przycisk „Cofnij zamknięcie roku”, dopóki nikt nie złożył wniosku na nowy rok
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-15):** 4a.
 
 ## 5. Hasło przy dodawaniu i przy „Ustaw hasło”
 
@@ -46,7 +46,7 @@ W obu przypadkach hasło jest tymczasowe: przy logowaniu pracownik ustawia włas
 - a) Wpisujesz hasło sam albo klikasz „Wygeneruj” **(polecam)**
 - b) Tylko „Wygeneruj”, bez wpisywania
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-15):** 5a.
 
 ## 6. Rola i własne konto
 
@@ -56,7 +56,7 @@ Administrator nie ma puli dni, więc przy tej roli pola puli znikają z okna.
   **(polecam)**
 - b) Administrator jest tylko jeden (Ty); pole „Rola” znika
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-15):** 6a.
 
 ## 7. Do archiwum: co z wnioskami czekającymi na decyzję?
 
@@ -65,7 +65,7 @@ Przy zadaniach osoba zostaje z dopiskiem „zarchiwizowany” (ustalone w specu 
 - a) Wycofują się same, z wpisem w historii zmian **(polecam)**
 - b) Zostają na liście wniosków do decyzji administratora
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-15):** 7a.
 
 ## 8. Wyszukiwarka i filtry
 
@@ -73,14 +73,14 @@ Przy zadaniach osoba zostaje z dopiskiem „zarchiwizowany” (ustalone w specu 
   **(polecam)**
 - b) To samo i dodatkowo filtr „bez e-maila do powiadomień”
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-15):** 8a.
 
 ## 9. Ekran z kartoteką jednej osoby
 
 - a) Bez osobnego ekranu: w „Edytuj” zmieniasz pulę bieżącego roku; starsze lata widać w historii zmian **(polecam)**
 - b) Osobny ekran pracownika z pulami z kolejnych lat i jego wnioskami
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-15):** 9a.
 
 ## 10. Zasady pól
 
@@ -94,4 +94,4 @@ Przy zadaniach osoba zostaje z dopiskiem „zarchiwizowany” (ustalone w specu 
 | Dni na rok | tak (rola Pracownik) | 0–60 | liczba całkowita, domyślnie 26 |
 | Zaległe | nie | 0–60 | liczba całkowita, domyślnie 0 |
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-15):** ok (zasady pól jak w tabeli).

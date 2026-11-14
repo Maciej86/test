@@ -84,6 +84,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `/admin/leave-requests`, `/api/leave-requests` | admin | |
 | `/admin/tasks`, `/api/tasks` | admin, employee | wspólna tablica, każdy edytuje wszystko |
 | `/admin/employees`, `/api/employees` | admin | także pule i „Zamknij rok” |
+| `GET/POST /api/employees`, `PUT /api/employees/:id`, `POST /api/employees/:id/password`, `/:id/archive`, `/:id/restore`, `GET/POST /api/employees/close-year` | admin | `mountModule(api, 'employees', …)`; własnej roli i własnego konta do archiwum nie (409) |
 | `/admin/leave-types`, `/api/leave-types` | admin | lista typów do formularza wniosku: osobna trasa w `my-leave` |
 | `/admin/activity-log`, `/api/activity-log` | admin | |
 | `/admin/archive`, `/api/archive` | admin | przywrócenie i usunięcie na stałe |

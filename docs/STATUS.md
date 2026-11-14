@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Moduł Pracownicy, etap pytania: odpowiedzi na 10 pytań w makiecie (http://localhost:5181/admin/employees).
+**Następny krok:** Moduł Pracownicy, etap spec: akceptacja `docs/modules/employees/SPEC.md`.
 
 ## Start aplikacji
 
@@ -21,7 +21,7 @@
 |---|---|---|---|---|---|
 | 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
 | 2 | Logowanie | login | zrobiony | zamknięcie | appearance |
-| 3 | Pracownicy | employees | w toku | pytania | login |
+| 3 | Pracownicy | employees | w toku | spec | login |
 | 4 | Typy urlopów | leave-types | czeka | makieta | login |
 | 5 | E-mail | email | czeka | makieta | login |
 | 6 | Powiadomienia | notifications | czeka | makieta | login |
