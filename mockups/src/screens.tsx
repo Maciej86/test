@@ -8,7 +8,7 @@ import { LeaveTypesMockup } from './modules/leave-types/LeaveTypesMockup';
 import { ActivityLogMockup } from './modules/activity-log/ActivityLogMockup';
 import { ArchiveMockup } from './modules/archive/ArchiveMockup';
 import { MyAccountMockup } from './modules/my-account/MyAccountMockup';
-import { LoginMockup } from './modules/login/LoginMockup';
+import { Done } from './common/Done';
 import type { ExtraScreen } from './Shell';
 
 export type { ExtraScreen };
@@ -31,5 +31,6 @@ export const SCREENS: Record<string, ComponentType> = {
 
 /** Ekrany spoza menu aplikacji (np. logowanie); w makiecie mają link w menu nad „Postęp”. */
 export const EXTRA_SCREENS: ExtraScreen[] = [
-  { key: 'login', path: '/login', label: 'common.mockup.screen_login', screen: LoginMockup },
+  // Moduł Logowanie zrobiony; makieta zostaje w modules/login/LoginMockup.tsx.
+  { key: 'login', path: '/login', label: 'common.mockup.screen_login', screen: () => <Done labelKey="common.mockup.screen_login" /> },
 ];
