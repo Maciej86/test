@@ -63,7 +63,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   w `shared/src/date.ts` (dayjs z `dayjs/locale/pl`, strefa aplikacji). Test: `2026-11-14` → `piątek`, `14`,
   `listopada 2026`, `piątek, 14 listopada 2026`; `null` → `null`.
 
-- [ ] **3. Migracje.** `backend/migrations/001_users.sql` (kolumny ze specu, `UNIQUE (login)`, `UNIQUE (email)`,
+- [x] **3. Migracje.** `backend/migrations/001_users.sql` (kolumny ze specu, `UNIQUE (login)`, `UNIQUE (email)`,
   `fk_users_archived_by` `ON DELETE SET NULL`), `002_activity_log.sql` (kopia `db/sql/activity_log.sql`).
   → `npm run db`, `npm run migrate`, `npm run check` (test zasad sprawdza `ON DELETE`).
 
@@ -141,7 +141,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   „Zostań zalogowany” → okno znika, `GET /auth/me` z nagłówkiem; ruch myszy przy oknie → okno zostaje; czynność
   w innej karcie (wpis w `localStorage`) odsuwa ostrzeżenie.
 
-- [ ] **13. Dokumenty i testy w przeglądarce.** „Mapa dostępu” w `SPEC-GENERAL.md` (`/change-password`,
+- [x] **13. Dokumenty i testy w przeglądarce.** „Mapa dostępu” w `SPEC-GENERAL.md` (`/change-password`,
   `POST /api/auth/change-password`), `TESTS.md`. `e2e/global-setup.ts`: losowe hasło (`E2E_PASSWORD` w
   `process.env`) i skrypt `backend/src/scripts/seedE2e.ts` (konta `e2e.admin@test.local` i
   `e2e.employee@test.local` z hasłem tymczasowym; odmawia przy `NODE_ENV=production`). `e2e/login.spec.ts`:
