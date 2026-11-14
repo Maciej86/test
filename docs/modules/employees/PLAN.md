@@ -59,7 +59,7 @@ w e2e.
     `role=kot` w adresie → brak filtra; `sort=password` → błąd.
   - Teksty `validation.json`: `whole_number`, `range`, `name_too_short`.
 
-- [ ] **2. Migracja i zapytania.** `backend/migrations/003_leave_pools.sql` (kolumny ze specu, `UNIQUE (user_id, year)`,
+- [x] **2. Migracja i zapytania.** `backend/migrations/003_leave_pools.sql` (kolumny ze specu, `UNIQUE (user_id, year)`,
   `INDEX (year)`, `fk_leave_pools_user` `ON DELETE CASCADE`). `employees.queries.ts`:
   `listEmployees(q: { search, role, sort, dir, page, pageSize, year }): Promise<{ rows; total }>` (bez archiwum,
   `LEFT JOIN leave_pools` na rok, sort `name` → `SUBSTRING_INDEX(name, ' ', -1), name`, `days_left` →
