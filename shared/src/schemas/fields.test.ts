@@ -158,3 +158,9 @@ describe('field messages', () => {
     expect(translateKey(i18n.t, key)).not.toBe(key.split('.').slice(1).join('.'));
   });
 });
+
+describe('wholeNumber', () => {
+  it.todo('0 and 60 ok; -1 and 61 → validation.range');
+  it.todo('2.5 → validation.whole_number');
+  it.todo("'26' from a form → 26; empty → validation.required");
+});

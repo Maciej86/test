@@ -36,7 +36,7 @@ w e2e.
 
 ---
 
-- [ ] **0. Szkielet testów.** `it.todo` dla każdego wymagania z kroków 1–12 (nazwy jak niżej) w:
+- [x] **0. Szkielet testów.** `it.todo` dla każdego wymagania z kroków 1–12 (nazwy jak niżej) w:
   `shared/src/schemas/fields.test.ts` (dopisane), `shared/src/schemas/employees.test.ts`,
   `backend/src/modules/employees/employees.service.test.ts`, `backend/src/modules/employees/employees.routes.test.ts`,
   `frontend/src/modules/employees/EmployeesListPage.test.tsx`, `frontend/src/modules/employees/components/*.test.tsx`,
