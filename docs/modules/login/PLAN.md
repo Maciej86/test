@@ -82,7 +82,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
     bazie → nowa rola w `req.user`; token 2 min + nagłówek → `Set-Cookie`; bez nagłówka → brak `Set-Cookie`;
     token 30 s + nagłówek → brak `Set-Cookie`; wygasły token → 401.
 
-- [ ] **5. Trasy `login`, `logout`, `me`.** `backend/src/modules/auth/auth.routes.ts`: `authPublicRoutes`
+- [x] **5. Trasy `login`, `logout`, `me`.** `backend/src/modules/auth/auth.routes.ts`: `authPublicRoutes`
   (`POST /auth/login` z `loginLimiter`, `validateBody(loginSchema)`; `POST /auth/logout` → 204) i `authRoutes`
   (`GET /auth/me` → `{ user }`). Podpięcie w `app.ts`: publiczne w części 1, `authRoutes` zaraz za `requireAuth`.
   Wiersze w „Mapie dostępu”. Testy: dobre dane → 200, `{ user }` bez `password_hash`, ciasteczko; zły login,
@@ -91,7 +91,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   `me` bez logowania → 401. Osobny `auth.rateLimit.test.ts`: 10 nieudanych → 401, 11. → 429
   `server.too_many_logins`; udane nie zużywają limitu.
 
-- [ ] **6. Hasło tymczasowe.** `backend/src/middleware/requirePasswordChanged.ts`: przy `req.user.mustChangePassword`
+- [x] **6. Hasło tymczasowe.** `backend/src/middleware/requirePasswordChanged.ts`: przy `req.user.mustChangePassword`
   → 403 `server.password_change_required` (w `app.ts` za `authRoutes`, przed modułami). `POST /auth/change-password`
   w `authRoutes` z `validateBody(newPasswordSchema)`: bez hasła tymczasowego → 409 `server.password_not_temporary`;
   takie samo jak obecne → 400 `fields.newPassword = validation.password_same_as_temporary`; inaczej zapis i 200
@@ -155,3 +155,4 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
 - Krok 2: 14.11.2026 to sobota; poprawione w teście, makiecie i specu.
 - Krok 3: Docker niedostępny w trakcie budowy; `npm run migrate` przeniesione na koniec (przed testami e2e).
 - Krok 4: zapytania o konta w `backend/src/auth/users.queries.ts` (nie w `modules/auth/`), bo używa ich `authenticate`; `DUMMY_PASSWORD_HASH` jako funkcja `dummyPasswordHash()` liczona przy pierwszym użyciu (szybszy start i testy).
+- Kroki 5–6: trasy dla zalogowanych podpięte przez `mountModule(api, 'auth', authRoutes, ['admin', 'employee'])` (adresy `/me`, `/change-password` pod `/api/auth`), żeby test ochrony tras sprawdzał też je; `POST /auth/logout` i `api.use(requirePasswordChanged)` z `// rule-ok` (brak danych wejściowych; blokada, nie moduł). Krok 6 zrobiony razem z 5, bo test zasad wymaga testu 403 przy trasach.

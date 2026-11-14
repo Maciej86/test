@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Moduł Logowanie, implementacja: krok 5 z 14 (trasy login, logout, me).
+**Następny krok:** Moduł Logowanie, implementacja: krok 7 z 14 (polecenie npm run admin).
 
 ## Start aplikacji
 
@@ -20,7 +20,7 @@
 | # | Moduł | Folder | Status | Etap | Zależy od |
 |---|---|---|---|---|---|
 | 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
-| 2 | Logowanie | login | w toku | implementacja (krok 5/14) | appearance |
+| 2 | Logowanie | login | w toku | implementacja (krok 7/14) | appearance |
 | 3 | Pracownicy | employees | czeka | makieta | login |
 | 4 | Typy urlopów | leave-types | czeka | makieta | login |
 | 5 | E-mail | email | czeka | makieta | login |

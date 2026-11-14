@@ -11,6 +11,10 @@ export const SERVER_MESSAGES = {
   fileTypeNotAllowed: 'server.file_type_not_allowed',
   /** Serwer odrzuca zapytanie, bo osoba musi najpierw ustawić własne hasło (moduł Logowanie). */
   passwordChangeRequired: 'server.password_change_required',
+  /** Zły login, złe hasło albo konto w archiwum: zawsze ten sam komunikat (moduł Logowanie). */
+  loginFailed: 'server.login_failed',
+  /** Ustawienie hasła bez obecnego działa tylko przy haśle tymczasowym (moduł Logowanie). */
+  passwordNotTemporary: 'server.password_not_temporary',
 } as const;
 
 export type ServerMessage = (typeof SERVER_MESSAGES)[keyof typeof SERVER_MESSAGES];

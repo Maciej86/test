@@ -7,7 +7,10 @@ import { env } from './env';
 import { authenticate } from './middleware/authenticate';
 import { sendError } from './middleware/errors';
 import { requireAuth } from './middleware/requireRole';
+import { mountModule } from './middleware/mountModule';
+import { requirePasswordChanged } from './middleware/requirePasswordChanged';
 import { healthRoutes } from './modules/health/health.routes';
+import { authPublicRoutes, authRoutes } from './modules/auth/auth.routes';
 
 interface AppOptions {
   /** Dodatkowe trasy wymagające logowania (moduły dopisują się niżej; testy podają własne). */
@@ -31,10 +34,15 @@ export function createApp(options: AppOptions = {}) {
   // 1. Trasy PUBLICZNE (bez logowania): tylko te z „Mapy dostępu” w docs/SPEC-GENERAL.md,
   //    np. api.use('/auth', authPublicRoutes); formularze strony dla odwiedzających z limitem zapytań.
   api.use(healthRoutes);
+  api.use(authPublicRoutes);
   if (options.publicRoutes) api.use(options.publicRoutes);
 
   // 2. Od tego miejsca KAŻDA trasa wymaga logowania, także ta, przy której zapomniano requireRole.
   api.use(requireAuth);
+  // Logowanie: kto jest zalogowany, ustawienie własnego hasła (dostępne także z hasłem tymczasowym).
+  mountModule(api, 'auth', authRoutes, ['admin', 'employee']);
+  // Z hasłem tymczasowym dalej nie wolno: najpierw własne hasło (moduł Logowanie).
+  api.use(requirePasswordChanged); // rule-ok: blokada dla każdego modułu przy haśle tymczasowym, nie moduł z trasami
 
   // 3. Moduły, z rolami ich pozycji w navigation.config.ts: mountModule(api, 'employees', employeesRoutes);
   if (options.extraRoutes) api.use(options.extraRoutes);
