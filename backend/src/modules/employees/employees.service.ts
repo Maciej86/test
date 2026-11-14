@@ -1,8 +1,10 @@
 import {
   EMPLOYEE_MESSAGES,
+  SERVER_MESSAGES,
   todayIsoDate,
   type ArchivedUserHint,
   type EmployeeCreateData,
+  type EmployeeData,
   type EmployeeListItem,
   type EmployeePool,
   type EmployeesListQuery,
@@ -129,6 +131,51 @@ export async function createEmployee(input: EmployeeCreateData, actor: Actor): P
         });
       }
       return { id };
+    });
+  } catch (error) {
+    const duplicate = duplicateError(error);
+    if (duplicate) return duplicate;
+    throw error;
+  }
+}
+
+const notFound = () => fail(404, SERVER_MESSAGES.notFound);
+
+/** Konto spoza archiwum albo null. */
+async function findActiveEmployee(db: q.Db, id: number) {
+  const user = await q.findUser(db, id);
+  return user && !user.archived_at ? user : null;
+}
+
+export async function updateEmployee(id: number, input: EmployeeData, actor: Actor): Promise<Result> {
+  try {
+    return await withTransaction(async (conn) => {
+      const before = await findActiveEmployee(conn, id);
+      if (!before) return notFound();
+      if (id === actor.id && input.role !== before.role) return fail(409, EMPLOYEE_MESSAGES.ownRole);
+      const conflict = await findConflict(conn, input.login, input.email, id);
+      if (conflict) return conflict;
+
+      const log = { userId: actor.id, userName: actor.name, entityId: id };
+      const accountChanges = diffChanges(accountFields(before), accountFields(input));
+      if (Object.keys(accountChanges).length > 0) {
+        await q.updateUser(conn, id, { name: input.name, login: input.login, email: input.email, role: input.role });
+        await logActivity(conn, { ...log, action: 'update', entityType: 'users', changes: accountChanges });
+      }
+
+      if (input.role === 'employee' && input.annualDays !== undefined) {
+        const year = await getOpenYear(conn);
+        const pool = await q.findPool(conn, id, year);
+        const after = { annual_days: input.annualDays, carried_days: input.carriedDays };
+        const poolChanges = pool
+          ? diffChanges({ annual_days: pool.annual_days, carried_days: pool.carried_days }, after)
+          : diffChanges({}, { year, ...after });
+        if (Object.keys(poolChanges).length > 0) {
+          await q.upsertPool(conn, id, year, input.annualDays, input.carriedDays);
+          await logActivity(conn, { ...log, action: pool ? 'update' : 'create', entityType: 'leave_pools', changes: poolChanges });
+        }
+      }
+      return { ok: true as const };
     });
   } catch (error) {
     const duplicate = duplicateError(error);

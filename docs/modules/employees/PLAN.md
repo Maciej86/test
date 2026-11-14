@@ -85,7 +85,7 @@ w e2e.
   401 bez logowania, 403 dla `employee`; rok otwarty: brak pul → bieżący rok, pule 2026 zamknięte i 2027 otwarte →
   2027.
 
-- [ ] **4. Edycja.** `PUT /employees/:id` z `validateBody(employeeUpdateSchema)`: brak lub w archiwum → 404; zmiana
+- [x] **4. Edycja.** `PUT /employees/:id` z `validateBody(employeeUpdateSchema)`: brak lub w archiwum → 404; zmiana
   własnej roli → 409 `employees.own_role`; login/e-mail jak w kroku 3 (poza tym kontem); rola `employee` → `upsertPool`
   roku otwartego; rola `admin` → pula nietknięta; historia: `users` `update` z `diffChanges` (tylko zmienione) i
   `leave_pools` `update`/`create`, gdy pula się zmieniła. Testy: wszystkie przypadki; edycja z zaległymi 70 → 200;

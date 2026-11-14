@@ -179,11 +179,93 @@ describe('employees routes', () => {
     expect(res.body.error.fields).toMatchObject({ name: 'validation.required', password: 'validation.password_rules' });
   });
 
-  it.todo('PUT /employees/:id: missing or archived → 404');
-  it.todo('PUT /employees/:id: own role change → 409 employees.own_role');
-  it.todo('PUT /employees/:id: employee pool saved for the open year; carried 70 ok');
-  it.todo('PUT /employees/:id: employee → admin → employee keeps the same pool row');
-  it.todo('PUT /employees/:id: no changes → no history entry');
+  const janUser = { id: 2, name: 'Jan Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', archived_at: null };
+  const janEdit = { name: 'Jan Kowalski', login: 'jan.kowalski@firma.pl', email: '', role: 'employee', annualDays: 26, carriedDays: 4 };
+  const janPool = { id: 11, user_id: 2, year: 2026, annual_days: 26, carried_days: 4, closed_at: null };
+
+  it('PUT /employees/:id: missing or archived → 404', async () => {
+    vi.mocked(q.findUser).mockResolvedValue(null);
+    expect((await as(anna).put('/employees/2', janEdit)).status).toBe(404);
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, archived_at: new Date() } as never);
+    expect((await as(anna).put('/employees/2', janEdit)).status).toBe(404);
+    expect((await as(anna).put('/employees/abc', janEdit)).status).toBe(404);
+    expect(q.updateUser).not.toHaveBeenCalled();
+  });
+
+  it('PUT /employees/:id: own role change → 409 employees.own_role', async () => {
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, id: 1, name: 'Anna Nowak', role: 'admin' } as never);
+    const res = await as(anna).put('/employees/1', { ...janEdit, name: 'Anna Nowak' });
+    expect(res.status).toBe(409);
+    expect(res.body.error.message).toBe('employees.server.own_role');
+    expect(q.updateUser).not.toHaveBeenCalled();
+  });
+
+  it('PUT /employees/:id: own name can change', async () => {
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, id: 1, name: 'Anna Nowak', role: 'admin' } as never);
+    const res = await as(anna).put('/employees/1', { ...janEdit, name: 'Anna Nowak-Kowal', role: 'admin', annualDays: undefined });
+    expect(res.status).toBe(200);
+    expect(q.updateUser).toHaveBeenCalledWith(conn, 1, expect.objectContaining({ name: 'Anna Nowak-Kowal', role: 'admin' }));
+  });
+
+  it('PUT /employees/:id: login taken by another account → 409, own login is not a conflict', async () => {
+    vi.mocked(q.findUser).mockResolvedValue(janUser as never);
+    vi.mocked(q.findPool).mockResolvedValue(janPool as never);
+    await as(anna).put('/employees/2', janEdit);
+    expect(vi.mocked(q.findAccountsWithLoginOrEmail).mock.calls[0]!.slice(1)).toEqual(['jan.kowalski@firma.pl', null, 2]);
+    vi.mocked(q.findAccountsWithLoginOrEmail).mockResolvedValue([{ ...janUser, id: 5, login: 'piotr@firma.pl' }] as never);
+    const res = await as(anna).put('/employees/2', { ...janEdit, login: 'piotr@firma.pl' });
+    expect(res.status).toBe(409);
+    expect(res.body.error.fields).toEqual({ login: 'validation.login_taken' });
+  });
+
+  it('PUT /employees/:id: employee pool saved for the open year; carried 70 ok', async () => {
+    vi.mocked(q.findUser).mockResolvedValue(janUser as never);
+    vi.mocked(q.findPool).mockResolvedValue(janPool as never);
+    const res = await as(anna).put('/employees/2', { ...janEdit, annualDays: 20, carriedDays: 70 });
+    expect(res.status).toBe(200);
+    expect(q.upsertPool).toHaveBeenCalledWith(conn, 2, 2026, 20, 70);
+    expect(historyOf()).toEqual([
+      expect.objectContaining({
+        action: 'update', entityType: 'leave_pools', entityId: 2,
+        changes: { annual_days: { before: 26, after: 20 }, carried_days: { before: 4, after: 70 } },
+      }),
+    ]);
+  });
+
+  it('PUT /employees/:id: role change is saved with history; admin role leaves the pool untouched', async () => {
+    vi.mocked(q.findUser).mockResolvedValue(janUser as never);
+    const res = await as(anna).put('/employees/2', { ...janEdit, role: 'admin', annualDays: undefined });
+    expect(res.status).toBe(200);
+    expect(q.upsertPool).not.toHaveBeenCalled();
+    expect(historyOf()).toEqual([
+      expect.objectContaining({ action: 'update', entityType: 'users', changes: { role: { before: 'employee', after: 'admin' } } }),
+    ]);
+  });
+
+  it('PUT /employees/:id: employee → admin → employee keeps the same pool row', async () => {
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, role: 'admin' } as never);
+    vi.mocked(q.findPool).mockResolvedValue(janPool as never);
+    const res = await as(anna).put('/employees/2', janEdit);
+    expect(res.status).toBe(200);
+    expect(q.findPool).toHaveBeenCalledWith(conn, 2, 2026);
+    expect(q.upsertPool).not.toHaveBeenCalled();
+  });
+
+  it('PUT /employees/:id: admin → employee without a pool gets one for the open year', async () => {
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, role: 'admin' } as never);
+    vi.mocked(q.findPool).mockResolvedValue(null);
+    await as(anna).put('/employees/2', janEdit);
+    expect(q.upsertPool).toHaveBeenCalledWith(conn, 2, 2026, 26, 4);
+    expect(historyOf()).toContainEqual(expect.objectContaining({ action: 'create', entityType: 'leave_pools' }));
+  });
+
+  it('PUT /employees/:id: no changes → no history entry', async () => {
+    vi.mocked(q.findUser).mockResolvedValue(janUser as never);
+    vi.mocked(q.findPool).mockResolvedValue(janPool as never);
+    expect((await as(anna).put('/employees/2', janEdit)).status).toBe(200);
+    expect(logActivity).not.toHaveBeenCalled();
+  });
+
   it.todo('POST /employees/:id/password: temporary password, history without password or hash');
   it.todo('POST /employees/:id/archive: own account → 409 archive_self; already archived → 409');
   it.todo('POST /employees/:id/restore: active → 409 not_archived; archived → restored with history');
