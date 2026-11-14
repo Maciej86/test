@@ -3,6 +3,8 @@ import {
   SERVER_MESSAGES,
   todayIsoDate,
   type ArchivedUserHint,
+  type CloseYearInput,
+  type CloseYearPreview,
   type EmployeeCreateData,
   type EmployeeData,
   type EmployeeListItem,
@@ -182,4 +184,94 @@ export async function updateEmployee(id: number, input: EmployeeData, actor: Act
     if (duplicate) return duplicate;
     throw error;
   }
+}
+
+export async function setEmployeePassword(id: number, password: string, actor: Actor): Promise<Result> {
+  const passwordHash = await hashPassword(password);
+  return withTransaction(async (conn) => {
+    if (!(await findActiveEmployee(conn, id))) return notFound();
+    await q.setTemporaryPassword(conn, id, passwordHash);
+    // Samo zdarzenie, bez hasła i skrótu.
+    await logActivity(conn, {
+      userId: actor.id, userName: actor.name, entityId: id, action: 'update', entityType: 'users',
+      changes: { password: { before: null, after: 'reset' } },
+    });
+    return { ok: true as const };
+  });
+}
+
+/** Do archiwum: konto przestaje działać od razu (authenticate czyta bazę przy każdym żądaniu). */
+export async function archiveEmployee(id: number, actor: Actor): Promise<Result> {
+  return withTransaction(async (conn) => {
+    const user = await q.findUser(conn, id);
+    if (!user) return notFound();
+    if (id === actor.id) return fail(409, EMPLOYEE_MESSAGES.archiveSelf);
+    if (user.archived_at) return fail(409, EMPLOYEE_MESSAGES.alreadyArchived);
+    await q.setArchived(conn, id, actor.id);
+    await logActivity(conn, { userId: actor.id, userName: actor.name, entityId: id, action: 'archive', entityType: 'users', changes: {} });
+    return { ok: true as const };
+  });
+}
+
+/** Przywrócenie z archiwum (link „Przywróć konto” i później moduł Archiwum). */
+export async function restoreEmployee(id: number, actor: Actor): Promise<Result> {
+  return withTransaction(async (conn) => {
+    const user = await q.findUser(conn, id);
+    if (!user) return notFound();
+    if (!user.archived_at) return fail(409, EMPLOYEE_MESSAGES.notArchived);
+    await q.setArchived(conn, id, null);
+    await logActivity(conn, { userId: actor.id, userName: actor.name, entityId: id, action: 'restore', entityType: 'users', changes: {} });
+    return { ok: true as const };
+  });
+}
+
+async function leftDaysByUser(pools: q.YearPoolRow[], year: number): Promise<Map<number, number>> {
+  const usage = await getPoolUsage(pools.map((p) => p.user_id), year);
+  return new Map(
+    pools.map((p) => [p.user_id, toPool(year, p.annual_days, p.carried_days, usage.get(p.user_id) ?? { usedDays: 0, pendingDays: 0 }).leftDays]),
+  );
+}
+
+/** Podgląd okna „Zamknij rok”: pracownicy spoza archiwum z pulą roku otwartego. */
+export async function getCloseYearPreview(): Promise<CloseYearPreview> {
+  const year = await getOpenYear();
+  const pools = (await q.findOpenPoolsForYear(pool, year)).filter((p) => p.role === 'employee' && !p.archived_at);
+  const left = await leftDaysByUser(pools, year);
+  return {
+    year,
+    nextYear: year + 1,
+    canClose: year <= currentYear(),
+    // Wnioski czekające na decyzję policzy moduł „Moje urlopy”.
+    pendingRequests: 0,
+    rows: pools.map((p) => ({ userId: p.user_id, name: p.name, left: left.get(p.user_id) ?? 0, annualDays: p.annual_days })),
+  };
+}
+
+/**
+ * Zamknięcie roku otwartego: każda jego pula (także osób w archiwum) dostaje closed_at, a na następny rok powstaje
+ * pula z zaległymi = wszystkie niewykorzystane dni i pulą roczną z okna (brak w oknie → jak w zamykanym roku).
+ */
+export async function closeYear(input: CloseYearInput, actor: Actor): Promise<Result> {
+  return withTransaction(async (conn) => {
+    const year = await getOpenYear(conn);
+    if (input.year !== year) return fail(409, EMPLOYEE_MESSAGES.yearNotOpen);
+    if (year > currentYear()) return fail(409, EMPLOYEE_MESSAGES.yearTooEarly);
+    const pools = await q.findOpenPoolsForYear(conn, year);
+    const left = await leftDaysByUser(pools, year);
+    const typed = new Map(input.pools.map((p) => [p.userId, p.annualDays]));
+    for (const p of pools) {
+      const annual = typed.get(p.user_id) ?? p.annual_days;
+      const carried = left.get(p.user_id) ?? 0;
+      await q.closePool(conn, p.id);
+      await q.upsertPool(conn, p.user_id, year + 1, annual, carried);
+      await logActivity(conn, {
+        userId: actor.id, userName: actor.name, entityId: p.user_id, action: 'update', entityType: 'leave_pools',
+        changes: {
+          closed_year: { before: null, after: year },
+          ...diffChanges({ annual_days: p.annual_days, carried_days: p.carried_days }, { annual_days: annual, carried_days: carried }),
+        },
+      });
+    }
+    return { ok: true as const };
+  });
 }

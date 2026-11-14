@@ -1,17 +1,32 @@
 import { Router, type Response } from 'express';
 import {
   SERVER_MESSAGES,
+  closeYearSchema,
   employeeCreateSchema,
+  employeePasswordSchema,
   employeeUpdateSchema,
   employeesListQuerySchema,
+  type CloseYearInput,
   type EmployeeCreateData,
+  type EmployeePasswordInput,
   type EmployeeData,
   type EmployeesListQuery,
 } from '@app/shared';
 import { sendError } from '../../middleware/errors';
 import { validateBody } from '../../middleware/validateBody';
 import { validateQuery } from '../../middleware/validateQuery';
-import { createEmployee, listEmployeesPage, updateEmployee, type Actor, type Result } from './employees.service';
+import {
+  archiveEmployee,
+  closeYear,
+  createEmployee,
+  getCloseYearPreview,
+  listEmployeesPage,
+  restoreEmployee,
+  setEmployeePassword,
+  updateEmployee,
+  type Actor,
+  type Result,
+} from './employees.service';
 
 /** Moduł Pracownicy: podpięty w app.ts przez mountModule (rola admin z nawigacji). */
 export const employeesRoutes = Router();
@@ -46,4 +61,27 @@ employeesRoutes.post('/', validateBody(employeeCreateSchema), async (req, res) =
 employeesRoutes.put('/:id', validateBody(employeeUpdateSchema), async (req, res) => {
   const id = idParam(res, req.params.id);
   if (id !== null) reply(res, await updateEmployee(id, req.body as EmployeeData, actorOf(req.user)));
+});
+
+employeesRoutes.post('/:id/password', validateBody(employeePasswordSchema), async (req, res) => {
+  const id = idParam(res, req.params.id);
+  if (id !== null) reply(res, await setEmployeePassword(id, (req.body as EmployeePasswordInput).password, actorOf(req.user)));
+});
+
+employeesRoutes.post('/:id/archive', async (req, res) => { // rule-ok: bez danych wejściowych, tylko numer z adresu
+  const id = idParam(res, req.params.id);
+  if (id !== null) reply(res, await archiveEmployee(id, actorOf(req.user)));
+});
+
+employeesRoutes.post('/:id/restore', async (req, res) => { // rule-ok: bez danych wejściowych, tylko numer z adresu
+  const id = idParam(res, req.params.id);
+  if (id !== null) reply(res, await restoreEmployee(id, actorOf(req.user)));
+});
+
+employeesRoutes.get('/close-year', async (_req, res) => {
+  res.json(await getCloseYearPreview());
+});
+
+employeesRoutes.post('/close-year', validateBody(closeYearSchema), async (req, res) => {
+  reply(res, await closeYear(req.body as CloseYearInput, actorOf(req.user)));
 });

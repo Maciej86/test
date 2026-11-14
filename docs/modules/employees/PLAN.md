@@ -92,7 +92,7 @@ w e2e.
   pracownik → admin → pracownik: jedno `upsertPool` na ten sam rok, bez nowego wiersza; brak zmian → brak wpisu
   historii.
 
-- [ ] **5. Hasło, archiwum, przywrócenie, zamknięcie roku.**
+- [x] **5. Hasło, archiwum, przywrócenie, zamknięcie roku.**
   - `POST /:id/password` (`employeePasswordSchema`): 404 dla brakującego/archiwum; `setPassword`; historia
     `password: { before: null, after: 'reset' }`. Test: w odpowiedzi i historii nie ma hasła ani skrótu.
   - `POST /:id/archive`: własne → 409 `employees.archive_self`; już w archiwum → 409 `employees.already_archived`;

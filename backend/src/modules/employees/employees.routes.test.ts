@@ -266,13 +266,115 @@ describe('employees routes', () => {
     expect(logActivity).not.toHaveBeenCalled();
   });
 
-  it.todo('POST /employees/:id/password: temporary password, history without password or hash');
-  it.todo('POST /employees/:id/archive: own account → 409 archive_self; already archived → 409');
-  it.todo('POST /employees/:id/restore: active → 409 not_archived; archived → restored with history');
-  it.todo('GET /employees/close-year: preview with left days, canClose');
-  it.todo('POST /employees/close-year: 26+4-9 → new pool 26 with 21 carried; archived get last annual');
-  it.todo('POST /employees/close-year twice for the same year → 409 year_not_open');
-  it.todo('POST /employees/close-year for a year after the current one → 409 year_too_early');
-  it.todo('POST /employees/close-year ignores unknown userIds');
+  it('POST /employees/:id/password: temporary password, history without password or hash', async () => {
+    vi.mocked(q.findUser).mockResolvedValue(janUser as never);
+    const res = await as(anna).post('/employees/2/password', { password: 'Sosna-48-Kruk!' });
+    expect(res.status).toBe(200);
+    expect(q.setTemporaryPassword).toHaveBeenCalledWith(conn, 2, 'hash(Sosna-48-Kruk!)');
+    expect(historyOf()).toEqual([
+      expect.objectContaining({ action: 'update', entityType: 'users', entityId: 2, changes: { password: { before: null, after: 'reset' } } }),
+    ]);
+    expect(JSON.stringify([res.body, historyOf()])).not.toMatch(/Sosna|hash\(/);
+  });
+
+  it('POST /employees/:id/password: weak password → 400, archived → 404', async () => {
+    expect((await as(anna).post('/employees/2/password', { password: 'krotkie' })).status).toBe(400);
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, archived_at: new Date() } as never);
+    expect((await as(anna).post('/employees/2/password', { password: 'Sosna-48-Kruk!' })).status).toBe(404);
+  });
+
+  it('POST /employees/:id/archive: own account → 409 archive_self; already archived → 409', async () => {
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, id: 1, role: 'admin' } as never);
+    let res = await as(anna).post('/employees/1/archive');
+    expect(res.status).toBe(409);
+    expect(res.body.error.message).toBe('employees.server.archive_self');
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, archived_at: new Date() } as never);
+    res = await as(anna).post('/employees/2/archive');
+    expect(res.status).toBe(409);
+    expect(res.body.error.message).toBe('employees.server.already_archived');
+    vi.mocked(q.findUser).mockResolvedValue(null);
+    expect((await as(anna).post('/employees/2/archive')).status).toBe(404);
+    expect(q.setArchived).not.toHaveBeenCalled();
+  });
+
+  it('POST /employees/:id/archive: archives with the author and history', async () => {
+    vi.mocked(q.findUser).mockResolvedValue(janUser as never);
+    expect((await as(anna).post('/employees/2/archive')).status).toBe(200);
+    expect(q.setArchived).toHaveBeenCalledWith(conn, 2, 1);
+    expect(historyOf()).toEqual([expect.objectContaining({ action: 'archive', entityType: 'users', entityId: 2 })]);
+  });
+
+  it('POST /employees/:id/restore: active → 409 not_archived; archived → restored with history', async () => {
+    vi.mocked(q.findUser).mockResolvedValue(janUser as never);
+    let res = await as(anna).post('/employees/2/restore');
+    expect(res.status).toBe(409);
+    expect(res.body.error.message).toBe('employees.server.not_archived');
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, archived_at: new Date() } as never);
+    res = await as(anna).post('/employees/2/restore');
+    expect(res.status).toBe(200);
+    expect(q.setArchived).toHaveBeenCalledWith(conn, 2, null);
+    expect(historyOf()).toEqual([expect.objectContaining({ action: 'restore', entityType: 'users', entityId: 2 })]);
+  });
+
+  const yearPool = (o: Record<string, unknown>) => ({
+    id: 11, user_id: 2, year: 2026, annual_days: 26, carried_days: 4, closed_at: null, name: 'Jan Kowalski', role: 'employee', archived_at: null, ...o,
+  });
+
+  it('GET /employees/close-year: preview with left days, canClose', async () => {
+    vi.mocked(q.findOpenPoolsForYear).mockResolvedValue([
+      yearPool({}),
+      yearPool({ id: 12, user_id: 9, name: 'Ewa Mazur', archived_at: new Date() }),
+      yearPool({ id: 13, user_id: 1, name: 'Anna Nowak', role: 'admin' }),
+    ] as never);
+    const res = await as(anna).get('/employees/close-year');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      year: 2026, nextYear: 2027, canClose: 2026 <= thisYear, pendingRequests: 0,
+      rows: [{ userId: 2, name: 'Jan Kowalski', left: 30, annualDays: 26 }],
+    });
+  });
+
+  it('POST /employees/close-year: 26+4 → new pool with typed annual and 30 carried; archived get last annual', async () => {
+    vi.mocked(q.minOpenYear).mockResolvedValue(thisYear);
+    vi.mocked(q.findOpenPoolsForYear).mockResolvedValue([
+      yearPool({ year: thisYear }),
+      yearPool({ id: 12, user_id: 9, year: thisYear, annual_days: 20, carried_days: 0, name: 'Ewa Mazur', archived_at: new Date() }),
+    ] as never);
+    const res = await as(anna).post('/employees/close-year', { year: thisYear, pools: [{ userId: 2, annualDays: 24 }] });
+    expect(res.status).toBe(200);
+    expect(q.closePool).toHaveBeenCalledWith(conn, 11);
+    expect(q.closePool).toHaveBeenCalledWith(conn, 12);
+    expect(q.upsertPool).toHaveBeenCalledWith(conn, 2, thisYear + 1, 24, 30);
+    expect(q.upsertPool).toHaveBeenCalledWith(conn, 9, thisYear + 1, 20, 20);
+    expect(withTransaction).toHaveBeenCalledTimes(1);
+    expect(historyOf()).toContainEqual(expect.objectContaining({
+      action: 'update', entityType: 'leave_pools', entityId: 2,
+      changes: { closed_year: { before: null, after: thisYear }, annual_days: { before: 26, after: 24 }, carried_days: { before: 4, after: 30 } },
+    }));
+  });
+
+  it('POST /employees/close-year twice for the same year → 409 year_not_open', async () => {
+    vi.mocked(q.minOpenYear).mockResolvedValue(thisYear + 1);
+    const res = await as(anna).post('/employees/close-year', { year: thisYear, pools: [] });
+    expect(res.status).toBe(409);
+    expect(res.body.error.message).toBe('employees.server.year_not_open');
+    expect(q.closePool).not.toHaveBeenCalled();
+  });
+
+  it('POST /employees/close-year for a year after the current one → 409 year_too_early', async () => {
+    vi.mocked(q.minOpenYear).mockResolvedValue(thisYear + 1);
+    const res = await as(anna).post('/employees/close-year', { year: thisYear + 1, pools: [] });
+    expect(res.status).toBe(409);
+    expect(res.body.error.message).toBe('employees.server.year_too_early');
+  });
+
+  it('POST /employees/close-year ignores unknown userIds', async () => {
+    vi.mocked(q.minOpenYear).mockResolvedValue(thisYear);
+    vi.mocked(q.findOpenPoolsForYear).mockResolvedValue([yearPool({ year: thisYear })] as never);
+    await as(anna).post('/employees/close-year', { year: thisYear, pools: [{ userId: 77, annualDays: 10 }] });
+    expect(q.upsertPool).toHaveBeenCalledTimes(1);
+    expect(q.upsertPool).toHaveBeenCalledWith(conn, 2, thisYear + 1, 26, 30);
+  });
+
   it.todo('account archived during the session → 401 on the next request');
 });
