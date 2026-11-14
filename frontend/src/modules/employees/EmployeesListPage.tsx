@@ -6,7 +6,10 @@ import { useSearchParams } from 'react-router';
 import { employeesListQuerySchema, todayIsoDate, type EmployeeListItem, type EmployeesListQuery } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
+import { ArchiveModal } from './components/ArchiveModal';
+import { CloseYearModal } from './components/CloseYearModal';
 import { EmployeeFormModal } from './components/EmployeeFormModal';
+import { PasswordModal } from './components/PasswordModal';
 import { EmployeesFilters } from './components/EmployeesFilters';
 import { EmployeeCards, EmployeesTable } from './components/EmployeesTable';
 import { useEmployees } from './employees.api';
@@ -116,6 +119,9 @@ export function EmployeesListPage() {
       {dialog?.kind === 'form' && (
         <EmployeeFormModal key={dialog.employee?.id ?? 'new'} opened employee={dialog.employee} year={year} onClose={close} />
       )}
+      {dialog?.kind === 'password' && <PasswordModal employee={dialog.employee} onClose={close} />}
+      {dialog?.kind === 'archive' && <ArchiveModal employee={dialog.employee} onClose={close} />}
+      {dialog?.kind === 'close-year' && <CloseYearModal opened onClose={close} />}
     </Stack>
   );
 }

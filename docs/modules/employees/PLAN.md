@@ -131,7 +131,7 @@ w e2e.
   → błąd pod loginem z linkiem „Przywróć konto…”, kliknięcie → potwierdzenie → `useRestoreEmployee` → dymek;
   `generateTemporaryPassword()` 100× przechodzi `newPassword`; sukces → dymek i zamknięcie.
 
-- [ ] **10. Front: okna hasła, archiwum, zamknięcia roku.** `components/PasswordModal.tsx`,
+- [x] **10. Front: okna hasła, archiwum, zamknięcia roku.** `components/PasswordModal.tsx`,
   `components/ArchiveModal.tsx`, `components/CloseYearModal.tsx` jak w makiecie. Testy: zmiana „Pula na 2027” na 20
   przelicza „Razem w 2027” (21 + 20 = 41); wysłane `pools` z wpisanymi liczbami; 409 `year_not_open` → dymek
   błędu i odświeżenie listy; okno archiwum z imieniem; dymki po sukcesie.
