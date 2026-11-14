@@ -1,1 +1,42 @@
 /* Import czcionek wariantów wyglądu (tylko w trakcie modułu „Wygląd”). */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Onest:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap');
+
+/* B. Atrament: zwarte, mocne nagłówki; aktywna pozycja menu jak pigułka. */
+.variant-b-title {
+  letter-spacing: -0.02em;
+}
+.variant-b-navlink {
+  border-radius: var(--mantine-radius-xl);
+  margin-bottom: 2px;
+}
+
+/* C. Nocny granat: ciemna rama (belka i menu), jasna treść. */
+.variant-c-header,
+.variant-c-navbar {
+  background-color: var(--mantine-color-navy-9);
+  color: var(--mantine-color-navy-0);
+  border-color: var(--mantine-color-navy-8);
+}
+.variant-c-header .mantine-Burger-root {
+  --burger-color: var(--mantine-color-navy-0);
+}
+.variant-c-navbar .mantine-Divider-root {
+  border-color: var(--mantine-color-navy-8);
+}
+.variant-c-navlink {
+  color: var(--mantine-color-navy-1);
+  border-left: 3px solid transparent;
+}
+.variant-c-navlink:hover {
+  background-color: var(--mantine-color-navy-8);
+}
+.variant-c-navlink[data-active] {
+  --nl-bg: var(--mantine-color-navy-8);
+  --nl-color: var(--mantine-color-white);
+  --nl-hover: var(--mantine-color-navy-8);
+  border-left-color: var(--mantine-color-navy-2);
+  font-weight: 600;
+}
+.variant-c-navlink .mantine-NavLink-section {
+  color: var(--mantine-color-navy-2);
+}

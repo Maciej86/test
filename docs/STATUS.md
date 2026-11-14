@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Moduł Wygląd, etap makieta (otwórz nową rozmowę i wpisz /stepkit:dalej).
+**Następny krok:** Moduł Wygląd, etap pytania: użytkownik wybiera wariant (A, B, C albo mieszankę) na http://localhost:5174.
 
 ## Start aplikacji
 
@@ -19,7 +19,7 @@
 
 | # | Moduł | Folder | Status | Etap | Zależy od |
 |---|---|---|---|---|---|
-| 1 | Wygląd | appearance | czeka | makieta | — |
+| 1 | Wygląd | appearance | w toku | pytania | — |
 | 2 | Logowanie | login | czeka | makieta | appearance |
 | 3 | Pracownicy | employees | czeka | makieta | login |
 | 4 | Typy urlopów | leave-types | czeka | makieta | login |
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-14: Wygląd: trzy warianty do porównania (A. Granat klasyczny, B. Atrament, C. Nocny granat); palety w `shared/src/theme.variants.ts`, bo test kolorów nie pozwala na kolory w `mockups/`.
 
 - Podgląd bazy (phpMyAdmin) na porcie 8081, bo 8080 zajmuje inny projekt.
 - 2026-11-13: Plan aplikacji zaakceptowany (docs/OVERVIEW.md, docs/SPEC-GENERAL.md).
