@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import request from 'supertest';
 import express from 'express';
 import jwt from 'jsonwebtoken';
@@ -40,6 +40,19 @@ function appWithTestRoutes() {
 
 const cookie = (token: string) => `${AUTH_COOKIE_NAME}=${token}`;
 
+// Konta w „bazie”: authenticate czyta osobę z tabeli users przy każdym żądaniu.
+const USERS: Record<number, { id: number; name: string; role: string; must_change_password: number }> = {
+  1: { id: 1, name: 'Anna', role: 'admin', must_change_password: 0 },
+  2: { id: 2, name: 'Jan', role: 'employee', must_change_password: 0 },
+  9: { id: 9, name: 'Ktoś', role: 'hacker', must_change_password: 0 },
+};
+beforeEach(() => {
+  vi.mocked(pool.query).mockImplementation((async (_sql: string, params?: unknown[]) => {
+    const user = USERS[Number(params?.[0])];
+    return [user ? [user] : [], []];
+  }) as never);
+});
+
 describe('health', () => {
   it('answers on /api/health', async () => {
     const res = await request(createApp()).get('/api/health');
@@ -71,7 +84,7 @@ describe('behind a proxy (Caddy on the server)', () => {
 
 describe('unknown address', () => {
   it('returns 404 with a message key to a logged-in user', async () => {
-    const token = signToken({ id: 2, name: 'Jan', role: 'employee' });
+    const token = signToken({ id: 2 });
     const res = await request(createApp()).get('/api/does-not-exist').set('Cookie', cookie(token));
     expect(res.status).toBe(404);
     expect(res.body.error.message).toBe('server.not_found');
@@ -91,7 +104,7 @@ describe('protected by default', () => {
   });
 
   it('lets any logged-in user through such a route', async () => {
-    const token = signToken({ id: 2, name: 'Jan', role: 'employee' });
+    const token = signToken({ id: 2 });
     const res = await request(appWithTestRoutes()).get('/api/test/forgotten').set('Cookie', cookie(token));
     expect(res.status).toBe(200);
   });
@@ -114,14 +127,14 @@ describe('mountModule', () => {
   }
 
   it('takes the roles of the navigation item (dashboard: admin and employee)', async () => {
-    const user = signToken({ id: 2, name: 'Jan', role: 'employee' });
-    const admin = signToken({ id: 1, name: 'Anna', role: 'admin' });
+    const user = signToken({ id: 2 });
+    const admin = signToken({ id: 1 });
     expect((await request(appWithModule()).get('/api/dashboard').set('Cookie', cookie(user))).status).toBe(200);
     expect((await request(appWithModule()).get('/api/dashboard').set('Cookie', cookie(admin))).status).toBe(200);
   });
 
   it('accepts explicit roles for a module without a navigation item', async () => {
-    const user = signToken({ id: 2, name: 'Jan', role: 'employee' });
+    const user = signToken({ id: 2 });
     const res = await request(appWithModule(['admin'])).get('/api/dashboard').set('Cookie', cookie(user));
     expect(res.status).toBe(403);
   });
@@ -144,26 +157,26 @@ describe('requireRole', () => {
   });
 
   it('rejects a user with the wrong role', async () => {
-    const token = signToken({ id: 2, name: 'Jan', role: 'employee' });
+    const token = signToken({ id: 2 });
     const res = await request(app).get('/api/test/admin-only').set('Cookie', cookie(token));
     expect(res.status).toBe(403);
     expect(res.body.error.message).toBe('server.no_access');
   });
 
   it('lets the right role in', async () => {
-    const token = signToken({ id: 1, name: 'Anna', role: 'admin' });
+    const token = signToken({ id: 1 });
     const res = await request(app).get('/api/test/admin-only').set('Cookie', cookie(token));
     expect(res.status).toBe(200);
   });
 
   it('treats a token signed with another secret as logged out', async () => {
-    const token = jwt.sign({ id: 1, name: 'Anna', role: 'admin' }, 'another-secret');
+    const token = jwt.sign({ id: 1 }, 'another-secret');
     const res = await request(app).get('/api/test/admin-only').set('Cookie', cookie(token));
     expect(res.status).toBe(401);
   });
 
-  it('treats a token with an unknown role as logged out', async () => {
-    const token = jwt.sign({ id: 1, name: 'Anna', role: 'hacker' }, SECRET);
+  it('treats an account with an unknown role in the database as logged out', async () => {
+    const token = signToken({ id: 9 });
     const res = await request(app).get('/api/test/admin-only').set('Cookie', cookie(token));
     expect(res.status).toBe(401);
   });

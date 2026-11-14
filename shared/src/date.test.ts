@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDate, formatDateTime, formatTime, toIsoDate, todayIsoDate } from './date';
+import { formatDate, formatDateParts, formatDateTime, formatTime, toIsoDate, todayIsoDate } from './date';
 
 describe('date formatting', () => {
   it('formats a DATE column without shifting the day', () => {
@@ -26,5 +26,22 @@ describe('date formatting', () => {
 
   it('gives today as YYYY-MM-DD', () => {
     expect(todayIsoDate()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe('formatDateParts', () => {
+  it('2026-11-14 gives sobota, 14, listopada 2026 and the full form', () => {
+    expect(formatDateParts('2026-11-14')).toEqual({
+      weekday: 'sobota',
+      day: '14',
+      monthYear: 'listopada 2026',
+      full: 'sobota, 14 listopada 2026',
+    });
+    expect(formatDateParts('2026-03-01')?.monthYear).toBe('marca 2026');
+  });
+
+  it('empty value gives null', () => {
+    expect(formatDateParts(null)).toBeNull();
+    expect(formatDateParts('')).toBeNull();
   });
 });

@@ -1,7 +1,9 @@
 /** Stałe serwera. Zmieniane tylko w kodzie (sekrety i adresy są w .env). */
-export const TOKEN_TTL = '7d';
+/** Token ważny 31 minut: minuta zapasu ponad wylogowanie po 30 minutach bezczynności w przeglądarce. */
+export const TOKEN_TTL = '31m';
+/** Token starszy niż minuta jest odnawiany przy żądaniu po czynności człowieka (nagłówek USER_ACTIVITY_HEADER). */
+export const TOKEN_RENEW_AFTER_MS = 60_000;
 export const AUTH_COOKIE_NAME = 'token';
-export const AUTH_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 export const LOGIN_RATE_LIMIT = { windowMs: 15 * 60 * 1000, max: 10 };
 export const BCRYPT_COST = 12;
 export const PAGE_SIZE = 25;

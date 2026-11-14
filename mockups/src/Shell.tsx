@@ -61,7 +61,7 @@ interface Props {
 function MenuLinks({ items, role }: { items: NavItem[]; role: Role }) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const visible = visibleNav(items, { id: 0, name: 'Makieta', role });
+  const visible = visibleNav(items, { id: 0, name: 'Makieta', role, mustChangePassword: false });
   const activeKey = activeNavKey(flattenNav(visible), pathname);
   const render = (list: NavItem[]): ReactNode =>
     list.map((item) => (
@@ -139,7 +139,7 @@ export function Shell({ areas, extraScreens = [], navigation, accountNavigation,
       />
     </Group>
   ) : null;
-  const mockUser = { id: 0, name: mockUserName(role, t), role };
+  const mockUser = { id: 0, name: mockUserName(role, t), role, mustChangePassword: false };
   const accountPath = findVisibleNavItem('my-account', [accountNavigation, navigation], mockUser)?.path ?? null;
   const loggedIn = current === 'account' || current === 'admin' || current === null;
 

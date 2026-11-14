@@ -34,7 +34,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
 
 ---
 
-- [ ] **0. Szkielet testów.** Pliki z `it.todo` dla każdego wymagania z kroków 1–13 (nazwy testów jak niżej):
+- [x] **0. Szkielet testów.** Pliki z `it.todo` dla każdego wymagania z kroków 1–13 (nazwy testów jak niżej):
   `shared/src/schemas/fields.test.ts` (dopisane), `shared/src/schemas/login.test.ts`, `shared/src/date.test.ts`
   (dopisane), `backend/src/auth/password.test.ts`, `backend/src/auth/token.test.ts`,
   `backend/src/middleware/authenticate.test.ts`, `backend/src/modules/auth/auth.routes.test.ts`,
@@ -44,7 +44,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   `frontend/src/modules/login/ChangePasswordPage.test.tsx`, `frontend/src/core/routes/buildRoutes.test.tsx`
   (dopisane), `e2e/login.spec.ts` (`test.fixme`). → `npm run check`
 
-- [ ] **1. Pola i schematy.**
+- [x] **1. Pola i schematy.**
   - `fields.ts`: `login` (trim, małe litery, `LOGIN_MIN`–`LOGIN_MAX`, bez białych znaków → `validation.login_format`),
     `loginInput` (trim, małe litery, 1–`LOGIN_MAX`, bez sprawdzania formatu), `passwordInput` (bez trim,
     1–`PASSWORD_MAX`), `newPassword` (bez trim, `PASSWORD_MIN`–`PASSWORD_MAX`, `/\d/` i `/[^\p{L}\p{N}]/u` →
@@ -58,7 +58,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
     `Urlop-2026` ok, ` Zażółć-1 ` zostaje ze spacjami; `repeatPassword` różne → błąd na tym polu; puste → `required`.
   - Teksty `validation.json`: `login_format`, `password_rules`, `passwords_differ`, `password_same_as_temporary`.
 
-- [ ] **2. Stałe i data na ekran.** `shared/src/constants/login.ts` (stałe z „Zasad”), eksport z `@app/shared`.
+- [x] **2. Stałe i data na ekran.** `shared/src/constants/login.ts` (stałe z „Zasad”), eksport z `@app/shared`.
   `formatDateParts(value: DateInput): { weekday: string; day: string; monthYear: string; full: string } | null`
   w `shared/src/date.ts` (dayjs z `dayjs/locale/pl`, strefa aplikacji). Test: `2026-11-14` → `piątek`, `14`,
   `listopada 2026`, `piątek, 14 listopada 2026`; `null` → `null`.
@@ -67,7 +67,7 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   `fk_users_archived_by` `ON DELETE SET NULL`), `002_activity_log.sql` (kopia `db/sql/activity_log.sql`).
   → `npm run db`, `npm run migrate`, `npm run check` (test zasad sprawdza `ON DELETE`).
 
-- [ ] **4. Hasła, token, `authenticate` z bazy.**
+- [x] **4. Hasła, token, `authenticate` z bazy.**
   - `backend/src/auth/password.ts`: `hashPassword(plain): Promise<string>` (`BCRYPT_COST`),
     `verifyPassword(plain, hash): Promise<boolean>`, `DUMMY_PASSWORD_HASH` (skrót liczony raz przy starcie, do
     porównania przy braku konta). Testy: zgodne / niezgodne hasło, skrót ≠ hasło.
@@ -148,3 +148,10 @@ aktywność, bezczynność), `common/IdleWarningModal.tsx` w `SideMenuLayout`.
   logowanie admina → Pulpit; złe hasło → komunikat; pracownik z hasłem tymczasowym → ustawia hasło → Pulpit;
   wylogowanie → `/login`. `e2e/start.spec.ts`: „/” prowadzi na ekran logowania (zamiast „Witaj!”).
   → `npm run check`, `npm run test:e2e`.
+
+## Rozstrzygnięcia w trakcie budowy
+
+- Krok 1: stałe z kroku 2 (`shared/src/constants/login.ts`) powstały już w kroku 1, bo potrzebują ich pola.
+- Krok 2: 14.11.2026 to sobota; poprawione w teście, makiecie i specu.
+- Krok 3: Docker niedostępny w trakcie budowy; `npm run migrate` przeniesione na koniec (przed testami e2e).
+- Krok 4: zapytania o konta w `backend/src/auth/users.queries.ts` (nie w `modules/auth/`), bo używa ich `authenticate`; `DUMMY_PASSWORD_HASH` jako funkcja `dummyPasswordHash()` liczona przy pierwszym użyciu (szybszy start i testy).

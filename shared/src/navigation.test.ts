@@ -21,8 +21,8 @@ import {
   type SessionUser,
 } from './index';
 
-const admin: SessionUser = { id: 1, name: 'Anna', role: 'admin' };
-const user: SessionUser = { id: 2, name: 'Jan', role: 'employee' };
+const admin: SessionUser = { id: 1, name: 'Anna', role: 'admin', mustChangePassword: false };
+const user: SessionUser = { id: 2, name: 'Jan', role: 'employee', mustChangePassword: false };
 
 const item = (key: string, roles: NavItem['roles'], children?: NavItem[]): NavItem => ({
   key,

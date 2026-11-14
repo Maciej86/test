@@ -44,7 +44,7 @@ export function MockupApp({
 
   const router = useMemo(() => {
     const screenFor = (key: string, item?: NavItem) => {
-      if (item && !canSee(item, { id: 0, name: 'Makieta', role })) {
+      if (item && !canSee(item, { id: 0, name: 'Makieta', role, mustChangePassword: false })) {
         return <MissingScreen messageKey="mockup.role_cannot_see" />;
       }
       const Screen = screens[key];

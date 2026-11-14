@@ -2,6 +2,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import 'dayjs/locale/pl';
 import {
   APP_TIME_ZONE,
   DATE_FORMAT,
@@ -59,6 +60,22 @@ export function toIsoDate(value: DateInput): string | null {
 /** Dzisiejszy dzień w strefie aplikacji, `RRRR-MM-DD`. */
 export function todayIsoDate(): string {
   return dayjs().tz(APP_TIME_ZONE).format(ISO_DATE_FORMAT);
+}
+
+/** Części daty do dużego zapisu (ekran logowania): `piątek`, `14`, `listopada 2026`, `piątek, 14 listopada 2026`. */
+export function formatDateParts(
+  value: DateInput,
+): { weekday: string; day: string; monthYear: string; full: string } | null {
+  const day = toDayjs(value)?.locale('pl');
+  if (!day) return null;
+  // „D MMMM” daje miesiąc w dopełniaczu („14 listopada”), samo „MMMM” w mianowniku („listopad”).
+  const dayMonthYear = day.format('D MMMM YYYY');
+  return {
+    weekday: day.format('dddd'),
+    day: day.format('D'),
+    monthYear: dayMonthYear.slice(dayMonthYear.indexOf(' ') + 1),
+    full: `${day.format('dddd')}, ${dayMonthYear}`,
+  };
 }
 
 export { dayjs };

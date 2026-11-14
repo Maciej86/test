@@ -13,7 +13,7 @@ describe('NavMenu', () => {
   it('shows only items the role may see', () => {
     renderWithProviders(
       <MemoryRouter>
-        <NavMenu items={items} user={{ id: 2, name: 'Jan', role: 'employee' }} />
+        <NavMenu items={items} user={{ id: 2, name: 'Jan', role: 'employee', mustChangePassword: false }} />
       </MemoryRouter>,
     );
     expect(screen.getByText('Pulpit')).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe('NavMenu highlighting', () => {
   it('keeps the module highlighted on its subpages', () => {
     renderWithProviders(
       <MemoryRouter initialEntries={['/admin/orders/5']}>
-        <NavMenu items={nav} user={{ id: 1, name: 'Ala', role: 'admin' }} />
+        <NavMenu items={nav} user={{ id: 1, name: 'Ala', role: 'admin', mustChangePassword: false }} />
       </MemoryRouter>,
     );
     expect(screen.getByText('Moje konto').closest('a')).toHaveAttribute('data-active', 'true');

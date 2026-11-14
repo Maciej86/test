@@ -4,6 +4,8 @@ export interface SessionUser {
   id: number;
   name: string;
   role: Role;
+  /** Konto ma hasło tymczasowe od administratora: najpierw musi ustawić własne (moduł Logowanie). */
+  mustChangePassword: boolean;
 }
 
 /** Pozycja nawigacji konta lub panelu. `key` = nazwa folderu modułu, `label` = klucz tekstu. */

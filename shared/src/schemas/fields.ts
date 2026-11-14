@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { LOGIN_MAX, LOGIN_MIN, PASSWORD_MAX, PASSWORD_MIN } from '../constants/login';
 
 /**
  * Gotowe pola formularzy. Moduł składa z nich swój schemat (shared/src/schemas/<module>.ts), a ten sam schemat
@@ -20,6 +21,9 @@ export const FIELD_MESSAGES = {
   quantity: 'validation.quantity',
   min: 'validation.min',
   max: 'validation.max',
+  tooShort: 'validation.too_short',
+  loginFormat: 'validation.login_format',
+  passwordRules: 'validation.password_rules',
 } as const;
 
 const M = FIELD_MESSAGES;
@@ -119,3 +123,25 @@ export function optionalField<T extends z.ZodType>(schema: T) {
     schema.nullable(),
   );
 }
+
+/** Login konta: 3–190 znaków bez spacji, zapisywany małymi literami (może wyglądać jak e-mail). */
+export const login = textInput()
+  .trim()
+  .toLowerCase()
+  .min(1, M.required)
+  .min(LOGIN_MIN, M.tooShort)
+  .max(LOGIN_MAX, M.tooLong)
+  .refine((v) => !/\s/.test(v), M.loginFormat);
+
+/** Login wpisany przy logowaniu: tylko wymagany, bez sprawdzania formatu (zły format = ten sam komunikat co złe hasło). */
+export const loginInput = textInput().trim().toLowerCase().min(1, M.required).max(LOGIN_MAX, M.tooLong);
+
+/** Hasło wpisane przy logowaniu: bez obcinania spacji (spacja może być częścią hasła). */
+export const passwordInput = textInput().min(1, M.required).max(PASSWORD_MAX, M.tooLong);
+
+/** Nowe hasło: 8–72 znaki, co najmniej jedna cyfra i jeden znak, który nie jest literą ani cyfrą. */
+export const newPassword = textInput()
+  .min(1, M.required)
+  .min(PASSWORD_MIN, M.passwordRules)
+  .max(PASSWORD_MAX, M.tooLong)
+  .refine((v) => /\d/.test(v) && /[^\p{L}\p{N}]/u.test(v), M.passwordRules);

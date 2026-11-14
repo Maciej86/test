@@ -23,7 +23,7 @@ Układ z makiety (`mockups/src/modules/login/LoginMockup.tsx`, bez paska „Poka
 - **Komputer:** dwie kolumny na tle panelu. Po lewej „kartka z kalendarza”: dzień tygodnia, duży numer dnia (krój
   szeryfowy), miesiąc i rok, pod spodem nazwa aplikacji i zdanie „Wnioski urlopowe i tablica zadań zespołu.”, z
   granatowym paskiem po lewej. Po prawej karta z formularzem.
-- **Telefon:** jedna kolumna: nazwa aplikacji i pełna data („piątek, 14 listopada 2026”), pod spodem formularz.
+- **Telefon:** jedna kolumna: nazwa aplikacji i pełna data („sobota, 14 listopada 2026”), pod spodem formularz.
 - Formularz: „Login” (podpowiedź „Zwykle w formie adresu, np. jan.kowalski@firma.pl”), „Hasło” (z przyciskiem
   pokaż / ukryj), przycisk „Zaloguj się” (ikona `LogIn`, na całą szerokość), pod nim „Nie pamiętasz hasła? Poproś
   administratora, żeby ustawił Ci nowe.” Bez „Zapamiętaj mnie” (pytanie 4).

@@ -4,8 +4,8 @@ import { buildAppRoutes } from './buildAppRoutes';
 import { buildRoutes } from './buildRoutes';
 import { renderRoutes } from '../../test/render';
 
-const admin: SessionUser = { id: 1, name: 'Anna', role: 'admin' };
-const user: SessionUser = { id: 2, name: 'Jan', role: 'employee' };
+const admin: SessionUser = { id: 1, name: 'Anna', role: 'admin', mustChangePassword: false };
+const user: SessionUser = { id: 2, name: 'Jan', role: 'employee', mustChangePassword: false };
 const Page = () => <p>Strona testowa</p>;
 
 const adminOnly: NavItem = { key: 'reports', path: '/admin/reports', label: 'common.nav.dashboard', icon: 'house', roles: ['admin'] };
@@ -61,4 +61,10 @@ describe('buildAppRoutes', () => {
     renderRoutes(buildAppRoutes({ public: false, account: false, admin: true }, {}, user), '/admin');
     expect(await screen.findByText('Ten ekran jeszcze nie powstał.')).toBeInTheDocument();
   });
+});
+
+describe('login guard', () => {
+  it.todo('a logged-out person on /admin/tasks sees the login screen');
+  it.todo('a person with a temporary password on /admin/tasks sees the change password screen');
+  it.todo('a logged-in person sees the dashboard');
 });
