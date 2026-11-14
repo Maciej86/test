@@ -11,7 +11,7 @@ import { useAuth } from '../../core/auth/AuthProvider';
 import { notify } from '../../core/notify';
 import { PASSWORD_CHANGE_PATH } from '../../config/constants';
 import { AuthCard } from './components/AuthCard';
-import { fieldError } from './components/fieldError';
+import { fieldError } from '../../core/fieldError';
 import { useLogin } from './login.api';
 
 /** Dokąd po zalogowaniu: najpierw własne hasło, jeśli administrator nadał tymczasowe. */

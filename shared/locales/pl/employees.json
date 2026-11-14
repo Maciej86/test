@@ -52,7 +52,7 @@
   "pool_section_hint": "Liczba dni roboczych. Zaległe dni schodzą z puli jako pierwsze.",
   "annual": "Dni na rok",
   "carried": "Zaległe z {{year}}",
-  "days_hint": "Liczba całkowita od 0 do 60.",
+  "days_hint": "Liczba całkowita od 0 do {{max}}.",
   "cancel": "Anuluj",
   "save": "Zapisz",
   "saved": "Zapisano dane pracownika.",
@@ -99,5 +99,10 @@
     "year_not_open": "Ten rok jest już zamknięty. Odśwież stronę.",
     "year_too_early": "Tego roku nie można jeszcze zamknąć."
   },
-  "close_year_later": "Rok {{year}} zamkniesz w {{year}}."
+  "close_year_later": "Rok {{year}} zamkniesz w {{year}}.",
+  "email_taken_archived": "Ten e-mail ma konto w archiwum: {{name}}.",
+  "restore_title": "Przywrócić konto: {{name}}?",
+  "restore_text": "Konto wróci na listę pracowników i znowu będzie mogło się logować dotychczasowym hasłem.",
+  "restore_confirm": "Przywróć konto",
+  "restored": "Przywrócono konto: {{name}}."
 }

@@ -6,6 +6,7 @@ import { useSearchParams } from 'react-router';
 import { employeesListQuerySchema, todayIsoDate, type EmployeeListItem, type EmployeesListQuery } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
+import { EmployeeFormModal } from './components/EmployeeFormModal';
 import { EmployeesFilters } from './components/EmployeesFilters';
 import { EmployeeCards, EmployeesTable } from './components/EmployeesTable';
 import { useEmployees } from './employees.api';
@@ -46,7 +47,8 @@ export function EmployeesListPage() {
   const { t } = useTranslation('employees');
   const [params, setParams] = useListParams();
   const employees = useEmployees(params);
-  const [, setDialog] = useState<EmployeeDialog | null>(null);
+  const [dialog, setDialog] = useState<EmployeeDialog | null>(null);
+  const close = () => setDialog(null);
   const data = employees.data;
   const year = data?.openYear ?? Number(todayIsoDate().slice(0, 4));
   const canCloseYear = year <= Number(todayIsoDate().slice(0, 4));
@@ -110,6 +112,10 @@ export function EmployeesListPage() {
           )
         )}
       </DataState>
+
+      {dialog?.kind === 'form' && (
+        <EmployeeFormModal key={dialog.employee?.id ?? 'new'} opened employee={dialog.employee} year={year} onClose={close} />
+      )}
     </Stack>
   );
 }

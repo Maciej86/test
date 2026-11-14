@@ -124,7 +124,7 @@ w e2e.
   wyszukiwarkę zmienia adres i zapytanie; tylko administrator → ramka „Nie masz jeszcze pracowników”; brak wyników
   → tekst z frazą; przycisk „Zamknij rok 2027” wyłączony przy `canClose = false`.
 
-- [ ] **9. Front: okno pracownika.** `components/EmployeeFormModal.tsx` (`useForm` + `zodResolver` z tym samym
+- [x] **9. Front: okno pracownika.** `components/EmployeeFormModal.tsx` (`useForm` + `zodResolver` z tym samym
   schematem), `components/PasswordField.tsx` (z „Wygeneruj”: `generateTemporaryPassword()` w
   `frontend/src/core/password.ts`, z `crypto.getRandomValues`, zawsze spełnia `newPassword`). Testy: puste →
   „To pole jest wymagane.”; rola Administrator chowa pulę; własna rola wyłączona z opisem; 409 `login_taken_archived`
@@ -149,3 +149,4 @@ w e2e.
 
 - Krok 1: zakres liczb komunikatami `validation.min` / `validation.max` (już są) zamiast nowego `validation.range` z liczbami w treści (tłumaczenie kluczy nie przekazuje liczb; zakres widać w podpowiedzi pod polem).
 - Krok 3: `sendError` dostał nieobowiązkowy argument `extra` (do `archivedUser` w błędzie 409); klucze błędów modułu w `employees.json` w sekcji `server` (`employees.server.*`), zajęty aktywny login / e-mail używają istniejących `validation.login_taken` / `validation.email_taken`. `toPool` nie pokazuje liczby ujemnej, gdy pulę obniżono poniżej wykorzystanych dni (0 zostało).
+- Krok 9: `fieldError` przeniesiony z `modules/login/components/` do `core/fieldError.ts` (używają go dwa moduły), z testem; nowa wspólna funkcja `apiErrorBody` w `core/api/client.ts` (czyta `archivedUser`). Pola `login` i `newPassword` w `fields.ts` kończą sprawdzanie na „To pole jest wymagane.” przy pustej wartości (`abort: true`), bo formularz pokazywał ostatni błąd („Za mało znaków”) zamiast pierwszego; test w `fields.test.ts`.

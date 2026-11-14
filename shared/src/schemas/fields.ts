@@ -142,7 +142,7 @@ export function optionalField<T extends z.ZodType>(schema: T) {
 export const login = textInput()
   .trim()
   .toLowerCase()
-  .min(1, M.required)
+  .min(1, { error: M.required, abort: true })
   .min(LOGIN_MIN, M.tooShort)
   .max(LOGIN_MAX, M.tooLong)
   .refine((v) => !/\s/.test(v), M.loginFormat);
@@ -158,7 +158,7 @@ export const passwordInput = textInput().min(1, M.required).refine(fitsBcrypt, M
 
 /** Nowe hasło: 8–72 znaki, co najmniej jedna cyfra i jeden znak, który nie jest literą ani cyfrą. */
 export const newPassword = textInput()
-  .min(1, M.required)
+  .min(1, { error: M.required, abort: true })
   .min(PASSWORD_MIN, M.passwordRules)
   .refine(fitsBcrypt, M.tooLong)
   .refine((v) => /\d/.test(v) && /[^\p{L}\p{N}]/u.test(v), M.passwordRules);

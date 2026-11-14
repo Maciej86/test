@@ -10,7 +10,7 @@ import { apiErrorFields, apiErrorMessage } from '../../core/api/client';
 import { useAuth } from '../../core/auth/AuthProvider';
 import { notify } from '../../core/notify';
 import { AuthCard } from './components/AuthCard';
-import { fieldError } from './components/fieldError';
+import { fieldError } from '../../core/fieldError';
 import { useChangePassword } from './login.api';
 
 /** Własne hasło zamiast tymczasowego od administratora; bez tego aplikacja nie pokaże żadnego innego ekranu. */

@@ -19,6 +19,12 @@ export function apiErrorFields(err: unknown): Record<string, string> | null {
   return (err.response.data as { error?: { fields?: Record<string, string> } } | undefined)?.error?.fields ?? null;
 }
 
+/** Cały obiekt błędu z odpowiedzi (np. `archivedUser` przy 409), do danych dodatkowych dla ekranu; brak = null. */
+export function apiErrorBody(err: unknown): Record<string, unknown> | null {
+  if (!isAxiosError(err) || !err.response) return null;
+  return (err.response.data as { error?: Record<string, unknown> } | undefined)?.error ?? null;
+}
+
 /** Tekst błędu dla człowieka: tłumaczy klucz z odpowiedzi serwera. */
 export function apiErrorMessage(err: unknown, t: TFunction): string {
   if (isAxiosError(err) && err.response) {

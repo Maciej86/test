@@ -180,3 +180,12 @@ describe('wholeNumber', () => {
     expect(error(days, 'abc')).toBe(FIELD_MESSAGES.wholeNumber);
   });
 });
+
+describe('empty required fields stop at "required"', () => {
+  const all = (schema: z.ZodType, value: unknown) => schema.safeParse(value).error?.issues.map((i) => i.message);
+  it('login and newPassword report only validation.required when empty', async () => {
+    const { login, newPassword } = await import('./fields');
+    expect(all(login, '')).toEqual([FIELD_MESSAGES.required]);
+    expect(all(newPassword, '')).toEqual([FIELD_MESSAGES.required]);
+  });
+});
