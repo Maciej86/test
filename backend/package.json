@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "migrate": "tsx src/db/migrate.ts",
-    "admin": "tsx src/scripts/createAdmin.ts"
+    "admin": "tsx src/scripts/createAdmin.ts",
+    "seed:e2e": "tsx src/scripts/seedE2e.ts"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",

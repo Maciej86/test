@@ -13,6 +13,7 @@ export const urls = { FRONTEND, MOCKUPS };
 
 export default defineConfig({
   testDir: '.',
+  globalSetup: './global-setup.ts',
   timeout: 30_000,
   use: { baseURL: FRONTEND },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],

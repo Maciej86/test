@@ -78,6 +78,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `POST /api/auth/login` | każdy | `loginLimiter`, `validateBody`; ten sam komunikat przy złym loginie i haśle |
 | `POST /api/auth/logout` | każdy | |
 | `GET /api/auth/me` | zalogowany | 401 dla konta w archiwum |
+| `/change-password`, `POST /api/auth/change-password` | zalogowany | tylko z hasłem tymczasowym (inaczej 409); z hasłem tymczasowym każda inna trasa za logowaniem daje 403 `server.password_change_required` |
 | `/admin`, `/api/dashboard` | admin, employee | treść zależna od roli; employee tylko własne dane |
 | `/admin/my-leave`, `/api/my-leave` | employee | tylko własne wnioski i pule (`req.user.id`) |
 | `/admin/leave-requests`, `/api/leave-requests` | admin | |

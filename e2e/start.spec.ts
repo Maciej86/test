@@ -12,7 +12,8 @@ test('makieta ma stronę Postęp', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Postęp budowy' })).toBeVisible();
 });
 
-test('aplikacja otwiera stronę główną', async ({ page }) => {
+test('aplikacja bez logowania otwiera ekran logowania', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Witaj!' })).toBeVisible();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole('heading', { name: 'Zaloguj się' })).toBeVisible();
 });
