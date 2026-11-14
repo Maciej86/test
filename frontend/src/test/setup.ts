@@ -20,3 +20,6 @@ class ResizeObserverStub {
   disconnect() {}
 }
 window.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
+
+// jsdom nie ma przewijania do elementu; Mantine woła je przy wyborze opcji z listy (Select).
+Element.prototype.scrollIntoView = () => {};

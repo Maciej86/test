@@ -104,5 +104,7 @@
   "restore_title": "Przywrócić konto: {{name}}?",
   "restore_text": "Konto wróci na listę pracowników i znowu będzie mogło się logować dotychczasowym hasłem.",
   "restore_confirm": "Przywróć konto",
-  "restored": "Przywrócono konto: {{name}}."
+  "restored": "Przywrócono konto: {{name}}.",
+  "pool_missing": "brak puli",
+  "pool_missing_hint": "Ustaw pulę dni w „Edytuj”."
 }

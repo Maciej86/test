@@ -84,6 +84,24 @@ describe('EmployeeFormModal', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('switching to Administrator with an empty pool field still saves', async () => {
+    const put = vi.spyOn(api, 'put').mockResolvedValue({ data: { ok: true } });
+    show(jan);
+    fill('Dni na rok', '');
+    fireEvent.click(screen.getByDisplayValue('Pracownik'));
+    fireEvent.click(await screen.findByRole('option', { name: 'Administrator' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
+    await waitFor(() => expect(put).toHaveBeenCalledWith('/employees/2', expect.objectContaining({ role: 'admin' })));
+  });
+
+  it('edit dialog: archived login shows the error without the restore link', async () => {
+    vi.spyOn(api, 'put').mockRejectedValue(conflict({ login: 'employees.server.login_taken_archived' }, { id: 9, name: 'Ewa Mazur' }));
+    show(jan);
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
+    expect(await screen.findByText('Ten login ma konto w archiwum: Ewa Mazur.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Przywróć konto zamiast zakładać nowe' })).not.toBeInTheDocument();
+  });
+
   it('409 login_taken → plain error under login', async () => {
     vi.spyOn(api, 'put').mockRejectedValue(conflict({ login: 'validation.login_taken' }));
     show(jan);

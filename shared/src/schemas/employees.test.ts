@@ -29,10 +29,10 @@ describe('employee schemas', () => {
     expect(employeeUpdateSchema.parse({ ...noPool, annualDays: 20 }).carriedDays).toBe(0);
   });
 
-  it('carriedDays 120 ok, 121 → max; carried 70 ok', () => {
+  it('carriedDays 999 ok, 1000 → max; carried 70 ok', () => {
     expect(employeeUpdateSchema.safeParse({ ...base, carriedDays: 70 }).success).toBe(true);
-    expect(employeeUpdateSchema.safeParse({ ...base, carriedDays: 120 }).success).toBe(true);
-    expect(issue(employeeUpdateSchema.safeParse({ ...base, carriedDays: 121 }), 'carriedDays')).toBe('validation.max');
+    expect(employeeUpdateSchema.safeParse({ ...base, carriedDays: 999 }).success).toBe(true);
+    expect(issue(employeeUpdateSchema.safeParse({ ...base, carriedDays: 1000 }), 'carriedDays')).toBe('validation.max');
     expect(issue(employeeUpdateSchema.safeParse({ ...base, annualDays: 61 }), 'annualDays')).toBe('validation.max');
   });
 
@@ -51,5 +51,16 @@ describe('employee schemas', () => {
     expect(employeesListQuerySchema.parse({ role: 'admin' }).role).toBe('admin');
     expect(employeesListQuerySchema.parse({}).sort).toBe('name');
     expect(employeesListQuerySchema.safeParse({ sort: 'password' }).error?.issues[0]?.message).toBe('validation.list_sort');
+  });
+
+  it('administrator: hidden pool fields are ignored, even empty or too big', () => {
+    const admin = { ...base, role: 'admin' };
+    expect(employeeUpdateSchema.safeParse({ ...admin, annualDays: '' }).success).toBe(true);
+    expect(employeeUpdateSchema.safeParse({ ...admin, annualDays: 99, carriedDays: 500 }).success).toBe(true);
+    expect(employeeCreateSchema.safeParse({ ...admin, annualDays: '', password: 'Urlop-2026' }).success).toBe(true);
+  });
+
+  it('carried days after many closed years (e.g. 300) still save in the edit form', () => {
+    expect(employeeUpdateSchema.safeParse({ ...base, carriedDays: 300 }).success).toBe(true);
   });
 });

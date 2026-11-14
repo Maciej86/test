@@ -1,18 +1,20 @@
 import { Group, Progress, Stack, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import type { EmployeePool } from '@app/shared';
+import type { EmployeePool, Role } from '@app/shared';
 
 /**
  * Pula dni jednym paskiem: wykorzystane (przygaszone), zostało z zaległych (jaśniejszy granat, schodzą pierwsze)
  * i zostało z puli rocznej (granat). Nad paskiem liczba dni, które zostały.
  */
-export function PoolMeter({ pool }: { pool: EmployeePool | null }) {
+export function PoolMeter({ pool, role }: { pool: EmployeePool | null; role: Role }) {
   const { t } = useTranslation('employees');
 
   if (!pool) {
+    // Administrator nie ma puli; pracownik bez puli (np. konto sprzed modułu) dostaje ją w „Edytuj”.
+    const admin = role === 'admin';
     return (
-      <Tooltip label={t('pool_none_hint')}>
-        <Text size="sm" c="dimmed" w="fit-content">{t('pool_none')}</Text>
+      <Tooltip label={t(admin ? 'pool_none_hint' : 'pool_missing_hint')}>
+        <Text size="sm" c="dimmed" w="fit-content">{t(admin ? 'pool_none' : 'pool_missing')}</Text>
       </Tooltip>
     );
   }

@@ -75,8 +75,26 @@ describe('EmployeesListPage', () => {
   it('no results → text with the phrase and "Wyczyść wyszukiwanie"', async () => {
     const { router } = show(list([], { counts: { all: 2, admins: 1 } }), '/admin/employees?search=Grabowski');
     expect(await screen.findByText('Nikt nie pasuje do „Grabowski”. Sprawdź pisownię albo wyczyść wyszukiwanie.')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Szukaj po imieniu, nazwisku albo loginie')).toHaveValue('Grabowski');
     fireEvent.click(screen.getByRole('button', { name: 'Wyczyść wyszukiwanie' }));
     await waitFor(() => expect(router.state.location.search).not.toContain('Grabowski'));
+    expect(screen.getByPlaceholderText('Szukaj po imieniu, nazwisku albo loginie')).toHaveValue('');
+  });
+
+  it('clearing right after typing does not bring the old search back', async () => {
+    const { router } = show(list([], { counts: { all: 2, admins: 1 } }), '/admin/employees?search=Grabowski');
+    await screen.findByText(/Nikt nie pasuje/);
+    fireEvent.change(screen.getByPlaceholderText('Szukaj po imieniu, nazwisku albo loginie'), { target: { value: 'Grabowskix' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Wyczyść wyszukiwanie' }));
+    await new Promise((r) => setTimeout(r, 400));
+    expect(router.state.location.search).toBe('');
+    expect(screen.getByPlaceholderText('Szukaj po imieniu, nazwisku albo loginie')).toHaveValue('');
+  });
+
+  it('a broken sort in the address falls back to the default list instead of a blank page', async () => {
+    const { get } = show(list([anna, jan]), '/admin/employees?sort=foo&search=jan');
+    await screen.findByRole('table');
+    expect(get).toHaveBeenCalledWith('/employees', { params: expect.objectContaining({ sort: 'name', search: 'jan' }) });
   });
 
   it('close year button disabled when the open year is later than this year', async () => {

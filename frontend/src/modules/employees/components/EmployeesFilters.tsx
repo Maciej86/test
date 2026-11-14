@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Box, Group, Select, TextInput } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { Search } from 'lucide-react';
@@ -16,7 +16,18 @@ type Filters = Pick<EmployeesListQuery, 'search' | 'role' | 'sort' | 'dir'>;
 export function EmployeesFilters({ value, onChange }: { value: Filters; onChange: (next: Partial<Filters>) => void }) {
   const { t } = useTranslation('employees');
   const [search, setSearch] = useState(value.search);
-  const sendSearch = useDebouncedCallback((s: string) => onChange({ search: s }), SEARCH_DELAY_MS);
+  // Ostatnie wyszukiwanie wysłane z tego pola; inna wartość w adresie = zmiana z zewnątrz („Wyczyść”, wstecz).
+  const sent = useRef(value.search);
+  const sendSearch = useDebouncedCallback((s: string) => {
+    sent.current = s;
+    onChange({ search: s });
+  }, SEARCH_DELAY_MS);
+  useEffect(() => {
+    if (value.search === sent.current) return;
+    sendSearch.cancel();
+    sent.current = value.search;
+    setSearch(value.search);
+  }, [value.search, sendSearch]);
   const sort = value.sort === 'days_left' ? 'left' : 'name';
 
   return (

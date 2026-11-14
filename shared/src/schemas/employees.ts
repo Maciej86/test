@@ -24,13 +24,24 @@ function requirePool(v: { role: Role; annualDays?: number }, ctx: z.RefinementCt
 /** Brak zaległych dni = 0. */
 const defaultCarried = <T extends { carriedDays?: number }>(v: T) => ({ ...v, carriedDays: v.carriedDays ?? 0 });
 
-/** Okno „Edytuj” (PUT /api/employees/:id). */
-export const employeeUpdateSchema = z.object(employeeFields).superRefine(requirePool).transform(defaultCarried);
-/** Okno „Dodaj pracownika” (POST /api/employees): to samo i hasło tymczasowe. */
-export const employeeCreateSchema = z
+/** Administrator nie ma puli: ukryte pola puli nie są sprawdzane ani zapisywane. */
+function skipPoolForAdmin(value: unknown): unknown {
+  if (value && typeof value === 'object' && (value as { role?: unknown }).role === 'admin') {
+    return { ...value, annualDays: undefined, carriedDays: undefined };
+  }
+  return value;
+}
+
+const employeeUpdateObject = z.object(employeeFields).superRefine(requirePool).transform(defaultCarried);
+const employeeCreateObject = z
   .object({ ...employeeFields, password: newPassword })
   .superRefine(requirePool)
   .transform(defaultCarried);
+
+/** Okno „Edytuj” (PUT /api/employees/:id). */
+export const employeeUpdateSchema = z.preprocess(skipPoolForAdmin, employeeUpdateObject);
+/** Okno „Dodaj pracownika” (POST /api/employees): to samo i hasło tymczasowe. */
+export const employeeCreateSchema = z.preprocess(skipPoolForAdmin, employeeCreateObject);
 /** Okno „Nowe hasło” (POST /api/employees/:id/password). */
 export const employeePasswordSchema = z.object({ password: newPassword });
 /** Okno „Zamknij rok” (POST /api/employees/close-year). */
@@ -43,10 +54,10 @@ export const employeesListQuerySchema = listQuerySchema(EMPLOYEE_SORTS).extend({
   role: z.enum(ROLES).optional().catch(undefined),
 });
 
-export type EmployeeInput = z.input<typeof employeeUpdateSchema>;
-export type EmployeeData = z.output<typeof employeeUpdateSchema>;
-export type EmployeeCreateInput = z.input<typeof employeeCreateSchema>;
-export type EmployeeCreateData = z.output<typeof employeeCreateSchema>;
+export type EmployeeInput = z.input<typeof employeeUpdateObject>;
+export type EmployeeData = z.output<typeof employeeUpdateObject>;
+export type EmployeeCreateInput = z.input<typeof employeeCreateObject>;
+export type EmployeeCreateData = z.output<typeof employeeCreateObject>;
 export type EmployeePasswordInput = z.infer<typeof employeePasswordSchema>;
 export type CloseYearInput = z.infer<typeof closeYearSchema>;
 export type EmployeesListQuery = { page: number; search: string; sort: EmployeeSort; dir: 'asc' | 'desc'; role?: Role };

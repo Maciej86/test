@@ -85,7 +85,7 @@ export function EmployeeFormModal({ opened, employee, year, onClose }: {
   const errorOf = (field: 'login' | 'email'): ReactNode => {
     const key = form.errors[field];
     const archivedKey = field === 'login' ? EMPLOYEE_MESSAGES.loginTakenArchived : EMPLOYEE_MESSAGES.emailTakenArchived;
-    if (archived && key === archivedKey) {
+    if (isNew && archived && key === archivedKey) {
       return (
         <>
           {t(`${field}_taken_archived`, { name: archived.name })}{' '}
@@ -95,6 +95,8 @@ export function EmployeeFormModal({ opened, employee, year, onClose }: {
         </>
       );
     }
+    // W „Edytuj” przywracanie innego konta nie ma sensu: sam tekst z imieniem, bez linku.
+    if (archived && key === archivedKey) return t(`${field}_taken_archived`, { name: archived.name });
     return fieldError(t, key);
   };
 

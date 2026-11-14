@@ -27,7 +27,7 @@ export function EmployeesTable({ rows, year, ...actions }: RowActions & { rows: 
             <Table.Tr key={e.id}>
               <Table.Td><NameCell e={e} /></Table.Td>
               <Table.Td><RoleBadge role={e.role} /></Table.Td>
-              <Table.Td><PoolMeter pool={e.pool} /></Table.Td>
+              <Table.Td><PoolMeter pool={e.pool} role={e.role} /></Table.Td>
               <Table.Td>{e.email ?? <Text span inherit c="dimmed">{t('no_email')}</Text>}</Table.Td>
               <Table.Td><RowButtons e={e} {...actions} /></Table.Td>
             </Table.Tr>
@@ -50,7 +50,7 @@ export function EmployeeCards({ rows, ...actions }: RowActions & { rows: Employe
               <NameCell e={e} />
               <RoleBadge role={e.role} />
             </Group>
-            <PoolMeter pool={e.pool} />
+            <PoolMeter pool={e.pool} role={e.role} />
             <Text size="sm" c="dimmed">{t('col_notify')}: {e.email ?? t('no_email')}</Text>
             <RowButtons e={e} {...actions} />
           </Stack>

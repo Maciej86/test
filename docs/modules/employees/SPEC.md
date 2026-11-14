@@ -87,12 +87,12 @@ przywrócisz w „Archiwum”.” Przyciski Anuluj / „Do archiwum” (czerwony
 | Pracownik | Rola | tak | `admin` / `employee` | domyślnie `employee` | `z.enum(ROLES)` |
 | Pracownik (dodawanie) | Hasło tymczasowe | tak | 8–72 znaki | cyfra i znak specjalny | `newPassword` |
 | Pracownik (rola Pracownik) | Dni na rok | tak | 0–60 | liczba całkowita, domyślnie 26 | `wholeNumber(0, 60)` (nowe) |
-| Pracownik (rola Pracownik) | Zaległe | tak | 0–120 | liczba całkowita, domyślnie 0 | `wholeNumber(0, 120)` (nowe) |
+| Pracownik (rola Pracownik) | Zaległe | tak | 0–999 | liczba całkowita, domyślnie 0 | `wholeNumber(0, CARRIED_DAYS_MAX)` (nowe) |
 | Nowe hasło | Hasło tymczasowe | tak | 8–72 znaki | cyfra i znak specjalny | `newPassword` |
 | Zamknij rok | Pula na nowy rok (każda osoba) | tak | 0–60 | liczba całkowita | `wholeNumber(0, 60)` |
 
-**[decyzja AI]** Zaległe do 120, nie do 60: po „Zamknij rok” zaległe mogą przekroczyć 60 (stare zaległe + niewykorzystana
-pula), a okno „Edytuj” musi dać się wtedy zapisać. Pule są wymagane tylko przy roli Pracownik (schemat z `refine`).
+**[decyzja AI]** Zaległe do 999 (po przeglądzie kodu; wcześniej 120), nie do 60: po „Zamknij rok” zaległe mogą przekroczyć 60 (stare zaległe + niewykorzystana
+pula), a „Zamknij rok” przenosi wszystkie dni bez limitu, więc po kilku latach zaległe przekraczają też 120; okno „Edytuj” musi dać się wtedy zapisać. Przy roli Administrator ukryte pola puli nie są sprawdzane. Pule są wymagane tylko przy roli Pracownik (schemat z `refine`).
 Nowe pole `wholeNumber(min, max)` w `fields.ts` (z testem i kluczami `validation.whole_number`, `validation.range`).
 
 ## Dane

@@ -23,10 +23,15 @@ export type EmployeeDialog =
 /** Adres → parametry listy (ten sam schemat sprawdza je na serwerze). */
 function useListParams(): [EmployeesListQuery, (next: Partial<EmployeesListQuery>) => void] {
   const [searchParams, setSearchParams] = useSearchParams();
-  const params = employeesListQuerySchema.parse(Object.fromEntries(searchParams)) as EmployeesListQuery;
+  const raw = Object.fromEntries(searchParams);
+  // Zły parametr (np. stara zakładka z ?sort=foo) → domyślna kolejność zamiast pustego ekranu.
+  const parsed = employeesListQuerySchema.safeParse(raw);
+  const params = (parsed.success ? parsed.data : employeesListQuerySchema.parse({ ...raw, sort: undefined, dir: undefined })) as EmployeesListQuery;
   const update = (next: Partial<EmployeesListQuery>) => {
     const merged = { ...params, page: 1, ...next };
-    const entries = Object.entries(merged).filter(([k, v]) => v !== undefined && v !== '' && !(k === 'page' && v === 1));
+    const defaults: Record<string, unknown> = { page: 1, sort: 'name', dir: 'asc', search: '' };
+    // W adresie tylko to, co różni się od domyślnych.
+    const entries = Object.entries(merged).filter(([k, v]) => v !== undefined && defaults[k] !== v);
     setSearchParams(new URLSearchParams(entries.map(([k, v]) => [k, String(v)])));
   };
   return [params, update];

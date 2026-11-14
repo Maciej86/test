@@ -143,7 +143,7 @@ w e2e.
   „Zamknij rok” (na osobnej bazie e2e, po nim seed przywraca stan). Seed e2e: pule dla `e2e.employee`.
   → `npm run check`, `npm run test:e2e`.
 
-- [ ] **12. Przegląd kodu** (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami.
+- [x] **12. Przegląd kodu** (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami.
 
 ## Rozstrzygnięcia w trakcie budowy
 
@@ -151,3 +151,14 @@ w e2e.
 - Krok 3: `sendError` dostał nieobowiązkowy argument `extra` (do `archivedUser` w błędzie 409); klucze błędów modułu w `employees.json` w sekcji `server` (`employees.server.*`), zajęty aktywny login / e-mail używają istniejących `validation.login_taken` / `validation.email_taken`. `toPool` nie pokazuje liczby ujemnej, gdy pulę obniżono poniżej wykorzystanych dni (0 zostało).
 - Krok 9: `fieldError` przeniesiony z `modules/login/components/` do `core/fieldError.ts` (używają go dwa moduły), z testem; nowa wspólna funkcja `apiErrorBody` w `core/api/client.ts` (czyta `archivedUser`). Pola `login` i `newPassword` w `fields.ts` kończą sprawdzanie na „To pole jest wymagane.” przy pustej wartości (`abort: true`), bo formularz pokazywał ostatni błąd („Za mało znaków”) zamiast pierwszego; test w `fields.test.ts`.
 - Krok 11: testy w przeglądarce działają na lokalnej bazie, więc „Zamknij rok” sprawdzają tylko do podglądu (zatwierdzenie zamknęłoby pule na stałe; zamknięcie sprawdzają testy serwera). Pracowników zakładają same testy jako `e2e.tmp.*@test.local`, a seed usuwa ich przy następnym uruchomieniu (pule znikają razem z nimi, CASCADE). Seed nie zakłada puli dla `e2e.employee`, bo testy pracowników używają własnych kont.
+
+## Przegląd kodu (2026-11-15)
+
+- Poprawione: przy roli Administrator ukryte pola puli blokowały „Zapisz” bez widocznego błędu → schemat pomija pulę administratora (`skipPoolForAdmin`); testy w `employees.test.ts` i `EmployeeFormModal.test.tsx`.
+- Poprawione: po kilku „Zamknij rok” zaległe przekraczały 120 i „Edytuj” nie dawało się zapisać → `CARRIED_DAYS_MAX = 999` (spec zaktualizowany); test „carried days after many closed years”.
+- Poprawione: wyszukiwarka zostawała z tekstem po „Wyczyść wyszukiwanie” i mogła przywrócić stare szukanie → pole śledzi adres i anuluje czekające wyszukiwanie; dwa testy w `EmployeesListPage.test.tsx`. Adres zawiera tylko wartości inne niż domyślne.
+- Poprawione: zły parametr w adresie (`?sort=foo`) dawał pusty ekran → domyślna kolejność; test.
+- Poprawione: link „Przywróć konto zamiast zakładać nowe” pokazywał się też w „Edytuj” → tylko przy dodawaniu; test.
+- Poprawione: pracownik bez puli miał opis administratora → „brak puli” z podpowiedzią „Ustaw pulę dni w „Edytuj”.”; test.
+- Testy frontu: zastępnik `scrollIntoView` w `frontend/src/test/setup.ts` (jsdom go nie ma, a Mantine woła go przy wyborze opcji).
+- Odłożone (drobne): zapis pracownika równocześnie z „Zamknij rok” może utworzyć pulę zamkniętego roku (wymaga dwóch jednoczesnych akcji administratora; naprawia ją kolejne zamknięcie); podwójne równoczesne „Zamknij rok” zwraca 200 zamiast 409 (bez szkody: dni nie przechodzą dwa razy); sortowanie „Najmniej dni zostało” liczy `annual + carried` bez wykorzystanych dni, a `getPoolUsage` nie przyjmuje połączenia transakcji: oba do poprawienia w module „Moje urlopy”, gdy wykorzystane dni przestaną być zerem; wpisy historii pul mają `entityId` = numer osoby (nie puli), do uwzględnienia na ekranie Historii zmian; „Zamknij rok” wyłączony przy samych administratorach bez dymka; wyczyszczenie liczby w oknie roku od razu wpisuje 0; po archiwizacji ostatniej osoby na dalszej stronie lista jest pusta; wyszukiwanie dłuższe niż 100 znaków jest pomijane; odstęp `mb={22}` w `PasswordField`; brak testów na prawdziwej bazie poza e2e.

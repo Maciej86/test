@@ -5,8 +5,11 @@ export const USER_NAME_MIN = 2;
 /** Pula dni na rok: 0–60, domyślnie 26. */
 export const ANNUAL_DAYS_MAX = 60;
 export const ANNUAL_DAYS_DEFAULT = 26;
-/** Zaległe dni: do 120, bo po „Zamknij rok” mogą przekroczyć roczną pulę (stare zaległe + niewykorzystane). */
-export const CARRIED_DAYS_MAX = 120;
+/**
+ * Zaległe dni: górna granica tylko przeciw literówce. „Zamknij rok” przenosi wszystkie niewykorzystane dni bez limitu,
+ * więc po kilku latach zaległe mogą przekroczyć 120, a okno „Edytuj” musi dać się zapisać (SMALLINT w bazie).
+ */
+export const CARRIED_DAYS_MAX = 999;
 
 /** Kolejność listy: po nazwisku albo po liczbie pozostałych dni. */
 export const EMPLOYEE_SORTS = ['name', 'days_left'] as const;
