@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Moduł Pracownicy, etap testy: użytkownik sprawdza zmianę (imię i nazwisko osobno) i `docs/modules/employees/TESTS.md`, potem potwierdza „działa”.
+**Następny krok:** Moduł Typy urlopów, etap makieta (otwórz nową rozmowę i wpisz /stepkit:dalej).
 
 ## Start aplikacji
 
@@ -21,7 +21,7 @@
 |---|---|---|---|---|---|
 | 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
 | 2 | Logowanie | login | zrobiony | zamknięcie | appearance |
-| 3 | Pracownicy | employees | w toku | testy | login |
+| 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
 | 4 | Typy urlopów | leave-types | czeka | makieta | login |
 | 5 | E-mail | email | czeka | makieta | login |
 | 6 | Powiadomienia | notifications | czeka | makieta | login |
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-15: Moduł Pracownicy zrobiony (potwierdzony przez użytkownika): lista z paskiem puli, dodawanie i edycja (imię i nazwisko osobno), hasło tymczasowe, archiwum i przywracanie, „Zamknij rok” z kolumną „Razem”.
 
 - 2026-11-15: Pracownicy: na etapie testów użytkownik chce osobnych pól „Imię” (2–60) i „Nazwisko” (2–80); `name` w bazie staje się kolumną wyliczaną, `npm run admin` pyta o oba.
 
@@ -51,10 +53,6 @@
 - 2026-11-14: Moduł Wygląd zrobiony (potwierdzony przez użytkownika).
 
 - 2026-11-14: Wygląd: wybrany wariant D „Nocny granat, cały ciemny”, zawsze ciemny motyw bez przełącznika; przeniesiony do `shared/src/theme.ts` i `theme.css`, opis w `docs/DESIGN.md`.
-
-- 2026-11-14: Wygląd: użytkownikowi podoba się C, ale z ciemną treścią; dodany wariant D (cały ciemny). Wybór D zmieni ustalenie „tylko jasny motyw”.
-
-- 2026-11-14: Wygląd: trzy warianty do porównania (A. Granat klasyczny, B. Atrament, C. Nocny granat); palety w `shared/src/theme.variants.ts`, bo test kolorów nie pozwala na kolory w `mockups/`.
 
 - Podgląd bazy (phpMyAdmin) na porcie 8081, bo 8080 zajmuje inny projekt.
 - 2026-11-13: Plan aplikacji zaakceptowany (docs/OVERVIEW.md, docs/SPEC-GENERAL.md).

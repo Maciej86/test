@@ -3,7 +3,6 @@ import { DashboardMockup } from './modules/dashboard/DashboardMockup';
 import { MyLeaveMockup } from './modules/my-leave/MyLeaveMockup';
 import { LeaveRequestsMockup } from './modules/leave-requests/LeaveRequestsMockup';
 import { TasksMockup } from './modules/tasks/TasksMockup';
-import { EmployeesMockup } from './modules/employees/EmployeesMockup';
 import { LeaveTypesMockup } from './modules/leave-types/LeaveTypesMockup';
 import { ActivityLogMockup } from './modules/activity-log/ActivityLogMockup';
 import { ArchiveMockup } from './modules/archive/ArchiveMockup';
@@ -22,7 +21,8 @@ export const SCREENS: Record<string, ComponentType> = {
   'my-leave': MyLeaveMockup,
   'leave-requests': LeaveRequestsMockup,
   'tasks': TasksMockup,
-  'employees': EmployeesMockup,
+  // Moduł Pracownicy zrobiony; makieta zostaje w modules/employees/EmployeesMockup.tsx.
+  'employees': () => <Done labelKey="common.nav.employees" />,
   'leave-types': LeaveTypesMockup,
   'activity-log': ActivityLogMockup,
   'archive': ArchiveMockup,

@@ -190,6 +190,8 @@ wymagają.
 
 ## 9. Ostatnie decyzje (archiwum)
 
+- 2026-11-14: Wygląd: użytkownikowi podoba się C, ale z ciemną treścią; dodany wariant D (cały ciemny). Wybór D zmieni ustalenie „tylko jasny motyw”.
+- 2026-11-14: Wygląd: trzy warianty do porównania (A. Granat klasyczny, B. Atrament, C. Nocny granat); palety w `shared/src/theme.variants.ts`, bo test kolorów nie pozwala na kolory w `mockups/`.
 - 2026-11-14: wygląd „Nocny granat”, zawsze ciemny motyw bez przełącznika (zamiast „tylko jasny”); szczegóły w `docs/DESIGN.md`.
 
 - 2026-11-13: logowanie loginem w formie adresu e-mail, osobny nieobowiązkowy e-mail do powiadomień.
