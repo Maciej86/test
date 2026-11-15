@@ -28,7 +28,8 @@ type FormValues = Omit<EmployeeCreateInput, 'email'> & { email: string };
 
 function initialValues(employee: EmployeeListItem | null): FormValues {
   return {
-    name: employee?.name ?? '',
+    firstName: employee?.firstName ?? '',
+    lastName: employee?.lastName ?? '',
     login: employee?.login ?? '',
     email: employee?.email ?? '',
     role: employee?.role ?? 'employee',
@@ -104,7 +105,22 @@ export function EmployeeFormModal({ opened, employee, year, onClose }: {
     <Modal opened={opened} onClose={onClose} title={isNew ? t('add') : t('edit_title', { name: employee.name })} size="lg">
       <form onSubmit={submit} noValidate>
         <Stack>
-          <TextInput label={t('name')} withAsterisk {...form.getInputProps('name')} error={fieldError(t, form.errors.name)} />
+          <SimpleGrid cols={{ base: 1, xs: 2 }}>
+            <TextInput
+              label={t('first_name')}
+              withAsterisk
+              autoComplete="off"
+              {...form.getInputProps('firstName')}
+              error={fieldError(t, form.errors.firstName)}
+            />
+            <TextInput
+              label={t('last_name')}
+              withAsterisk
+              autoComplete="off"
+              {...form.getInputProps('lastName')}
+              error={fieldError(t, form.errors.lastName)}
+            />
+          </SimpleGrid>
           <TextInput
             label={t('login')}
             withAsterisk

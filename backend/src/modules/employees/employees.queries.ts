@@ -7,7 +7,10 @@ export type Db = Pick<typeof pool, 'query'>;
 
 export interface EmployeeRow extends RowDataPacket {
   id: number;
+  /** Wyliczane przez bazę z first_name i last_name. */
   name: string;
+  first_name: string;
+  last_name: string;
   login: string;
   email: string | null;
   role: Role;
@@ -18,6 +21,8 @@ export interface EmployeeRow extends RowDataPacket {
 export interface UserRow extends RowDataPacket {
   id: number;
   name: string;
+  first_name: string;
+  last_name: string;
   login: string;
   email: string | null;
   role: Role;
@@ -36,12 +41,12 @@ export interface PoolRow extends RowDataPacket {
 /** Kolejność listy: tylko z tej mapy (nazwa z adresu nigdy nie trafia do SQL). */
 const ORDER_BY: Record<EmployeeSort, Record<'asc' | 'desc', string>> = {
   name: {
-    asc: "SUBSTRING_INDEX(u.name, ' ', -1) ASC, u.name ASC",
-    desc: "SUBSTRING_INDEX(u.name, ' ', -1) DESC, u.name DESC",
+    asc: 'u.last_name ASC, u.first_name ASC',
+    desc: 'u.last_name DESC, u.first_name DESC',
   },
   days_left: {
-    asc: "u.role = 'admin', p.annual_days + p.carried_days ASC, u.name ASC",
-    desc: "u.role = 'admin', p.annual_days + p.carried_days DESC, u.name ASC",
+    asc: "u.role = 'admin', p.annual_days + p.carried_days ASC, u.last_name ASC, u.first_name ASC",
+    desc: "u.role = 'admin', p.annual_days + p.carried_days DESC, u.last_name ASC, u.first_name ASC",
   },
 };
 
@@ -55,8 +60,10 @@ export async function listEmployees(
   const where = ['u.archived_at IS NULL'];
   const params: unknown[] = [];
   if (q.search) {
-    where.push('(u.name LIKE ? OR u.login LIKE ?)');
-    params.push(likePattern(q.search), likePattern(q.search));
+    // Całe „Imię Nazwisko” (name) też, żeby „jan kow” znalazło Jana Kowalskiego.
+    where.push('(u.first_name LIKE ? OR u.last_name LIKE ? OR u.name LIKE ? OR u.login LIKE ?)');
+    const pattern = likePattern(q.search);
+    params.push(pattern, pattern, pattern, pattern);
   }
   if (q.role) {
     where.push('u.role = ?');
@@ -64,7 +71,7 @@ export async function listEmployees(
   }
   const from = `FROM users u LEFT JOIN leave_pools p ON p.user_id = u.id AND p.year = ? WHERE ${where.join(' AND ')}`;
   const [rows] = await db.query<EmployeeRow[]>(
-    `SELECT u.id, u.name, u.login, u.email, u.role, p.annual_days, p.carried_days ${from} ORDER BY ${ORDER_BY[q.sort][q.dir]} LIMIT ? OFFSET ?`, // rule-ok: ORDER BY tylko z mapy ORDER_BY, WHERE z gotowych kawałków z ?
+    `SELECT u.id, u.name, u.first_name, u.last_name, u.login, u.email, u.role, p.annual_days, p.carried_days ${from} ORDER BY ${ORDER_BY[q.sort][q.dir]} LIMIT ? OFFSET ?`, // rule-ok: ORDER BY tylko z mapy ORDER_BY, WHERE z gotowych kawałków z ?
     [q.year, ...params, q.pageSize, (q.page - 1) * q.pageSize],
   );
   const [count] = await db.query<RowDataPacket[]>(`SELECT COUNT(*) AS total ${from}`, [q.year, ...params]); // rule-ok: WHERE z gotowych kawałków z ?
@@ -82,28 +89,47 @@ export async function countEmployees(db: Db): Promise<{ all: number; admins: num
 /** Konta (także w archiwum) z tym loginem albo e-mailem, poza kontem `exceptId`. */
 export async function findAccountsWithLoginOrEmail(db: Db, login: string, email: string | null, exceptId: number | null): Promise<UserRow[]> {
   const [rows] = await db.query<UserRow[]>(
-    'SELECT id, name, login, email, role, archived_at FROM users WHERE (login = ? OR (? IS NOT NULL AND email = ?)) AND id <> ?',
+    'SELECT id, name, first_name, last_name, login, email, role, archived_at FROM users WHERE (login = ? OR (? IS NOT NULL AND email = ?)) AND id <> ?',
     [login, email, email, exceptId ?? 0],
   );
   return rows;
 }
 
 export async function findUser(db: Db, id: number): Promise<UserRow | null> {
-  const [rows] = await db.query<UserRow[]>('SELECT id, name, login, email, role, archived_at FROM users WHERE id = ?', [id]);
+  const [rows] = await db.query<UserRow[]>(
+    'SELECT id, name, first_name, last_name, login, email, role, archived_at FROM users WHERE id = ?',
+    [id],
+  );
   return rows[0] ?? null;
 }
 
+/** Dane konta z formularza (name składa baza z imienia i nazwiska). */
+export interface AccountData {
+  firstName: string;
+  lastName: string;
+  login: string;
+  email: string | null;
+  role: Role;
+}
+
 /** Nowe konto zawsze z hasłem tymczasowym. */
-export async function insertUser(db: Db, u: { name: string; login: string; email: string | null; role: Role; passwordHash: string }): Promise<number> {
+export async function insertUser(db: Db, u: AccountData & { passwordHash: string }): Promise<number> {
   const [result] = await db.query<ResultSetHeader>(
-    'INSERT INTO users (name, login, email, role, password_hash, must_change_password) VALUES (?, ?, ?, ?, ?, 1)',
-    [u.name, u.login, u.email, u.role, u.passwordHash],
+    'INSERT INTO users (first_name, last_name, login, email, role, password_hash, must_change_password) VALUES (?, ?, ?, ?, ?, ?, 1)',
+    [u.firstName, u.lastName, u.login, u.email, u.role, u.passwordHash],
   );
   return result.insertId;
 }
 
-export async function updateUser(db: Db, id: number, u: { name: string; login: string; email: string | null; role: Role }): Promise<void> {
-  await db.query('UPDATE users SET name = ?, login = ?, email = ?, role = ? WHERE id = ?', [u.name, u.login, u.email, u.role, id]);
+export async function updateUser(db: Db, id: number, u: AccountData): Promise<void> {
+  await db.query('UPDATE users SET first_name = ?, last_name = ?, login = ?, email = ?, role = ? WHERE id = ?', [
+    u.firstName,
+    u.lastName,
+    u.login,
+    u.email,
+    u.role,
+    id,
+  ]);
 }
 
 /** Hasło ustawione przez administratora jest tymczasowe: przy następnym kliknięciu osoba ustawia własne. */
@@ -152,7 +178,7 @@ export async function findOpenPoolsForYear(db: Db, year: number): Promise<YearPo
   const [rows] = await db.query<YearPoolRow[]>(
     `SELECT p.id, p.user_id, p.year, p.annual_days, p.carried_days, p.closed_at, u.name, u.role, u.archived_at
      FROM leave_pools p JOIN users u ON u.id = p.user_id
-     WHERE p.year = ? AND p.closed_at IS NULL ORDER BY SUBSTRING_INDEX(u.name, ' ', -1), u.name FOR UPDATE`,
+     WHERE p.year = ? AND p.closed_at IS NULL ORDER BY u.last_name, u.first_name FOR UPDATE`,
     [year],
   );
   return rows;
@@ -165,7 +191,7 @@ export async function closePool(db: Db, id: number): Promise<void> {
 /** Osoby spoza archiwum (np. do przypisania zadania). */
 export async function listActiveUsers(db: Db): Promise<{ id: number; name: string }[]> {
   const [rows] = await db.query<RowDataPacket[]>(
-    "SELECT id, name FROM users WHERE archived_at IS NULL ORDER BY SUBSTRING_INDEX(name, ' ', -1), name",
+    'SELECT id, name FROM users WHERE archived_at IS NULL ORDER BY last_name, first_name',
   );
   return rows.map((r) => ({ id: r.id as number, name: r.name as string }));
 }

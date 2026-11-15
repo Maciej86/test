@@ -5,7 +5,7 @@ const { createAdminAccount } = await import('./createAdmin');
 type AdminRow = import('./createAdmin').AdminRow;
 const { verifyPassword } = await import('../auth/password');
 
-const good = { name: 'Anna Nowak', login: 'Anna.Nowak@firma.pl', email: '', password: 'Urlop-2026' };
+const good = { firstName: 'Anna', lastName: 'Nowak', login: 'Anna.Nowak@firma.pl', email: '', password: 'Urlop-2026' };
 const deps = () => ({
   loginTaken: vi.fn(async (_login: string) => false),
   emailTaken: vi.fn(async (_email: string) => false),
@@ -17,7 +17,7 @@ describe('createAdminAccount', () => {
     const d = deps();
     expect(await createAdminAccount(good, d)).toEqual({ ok: true, id: 1 });
     const row = d.insert.mock.calls[0]![0]!;
-    expect(row).toMatchObject({ name: 'Anna Nowak', login: 'anna.nowak@firma.pl', email: null, role: 'admin' });
+    expect(row).toMatchObject({ firstName: 'Anna', lastName: 'Nowak', login: 'anna.nowak@firma.pl', email: null, role: 'admin' });
     expect(JSON.stringify(row)).not.toContain('Urlop-2026');
     expect(await verifyPassword('Urlop-2026', row.passwordHash)).toBe(true);
   });

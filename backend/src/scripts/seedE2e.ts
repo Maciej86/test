@@ -10,7 +10,8 @@ export const E2E_ACCOUNTS = { admin: 'e2e.admin@test.local', employee: 'e2e.empl
 export const E2E_TEMP_LOGIN_LIKE = 'e2e.tmp.%@test.local';
 
 export interface E2eAccount {
-  name: string;
+  firstName: string;
+  lastName: string;
   login: string;
   role: Role;
   mustChangePassword: boolean;
@@ -25,16 +26,16 @@ export async function seedE2eAccounts(
   const password = env.E2E_PASSWORD;
   if (!password) throw new Error('Brak E2E_PASSWORD (ustawia je e2e/global-setup.ts).');
   const passwordHash = await hashPassword(password);
-  await save({ name: 'Test Administrator', login: E2E_ACCOUNTS.admin, role: 'admin', mustChangePassword: false, passwordHash });
-  await save({ name: 'Test Pracownik', login: E2E_ACCOUNTS.employee, role: 'employee', mustChangePassword: true, passwordHash });
+  await save({ firstName: 'Test', lastName: 'Administrator', login: E2E_ACCOUNTS.admin, role: 'admin', mustChangePassword: false, passwordHash });
+  await save({ firstName: 'Test', lastName: 'Pracownik', login: E2E_ACCOUNTS.employee, role: 'employee', mustChangePassword: true, passwordHash });
 }
 
 async function saveToDb(account: E2eAccount): Promise<void> {
   await pool.query(
-    `INSERT INTO users (name, login, password_hash, role, must_change_password) VALUES (?, ?, ?, ?, ?)
-     ON DUPLICATE KEY UPDATE name = VALUES(name), password_hash = VALUES(password_hash), role = VALUES(role),
+    `INSERT INTO users (first_name, last_name, login, password_hash, role, must_change_password) VALUES (?, ?, ?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE first_name = VALUES(first_name), last_name = VALUES(last_name), password_hash = VALUES(password_hash), role = VALUES(role),
        must_change_password = VALUES(must_change_password), archived_at = NULL, archived_by = NULL`,
-    [account.name, account.login, account.passwordHash, account.role, account.mustChangePassword ? 1 : 0],
+    [account.firstName, account.lastName, account.login, account.passwordHash, account.role, account.mustChangePassword ? 1 : 0],
   );
 }
 

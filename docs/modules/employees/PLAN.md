@@ -145,6 +145,14 @@ w e2e.
 
 - [x] **12. Przegląd kodu** (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami.
 
+## Zmiana po testach (2026-11-15): imię i nazwisko osobno
+
+- [x] **13. Makieta:** w oknie pracownika pola „Imię” i „Nazwisko” obok siebie (`SimpleGrid`), dane makiety z `firstName`/`lastName`.
+- [x] **14. Migracje** `004_users_first_last_name.sql`, `005_users_split_name.sql`, `006_users_name_generated.sql` → `npm run migrate`; sprawdzenie w bazie: „Maciej Rościszewski” → `Maciej` + `Rościszewski`.
+- [x] **15. Schematy:** `FIRST_NAME_MAX = 60`, `LAST_NAME_MAX = 80`, `NAME_PART_MIN = 2`; `employeeFields` i `adminAccountSchema` z `firstName`, `lastName` zamiast `name`; `EmployeeListItem` + `firstName`, `lastName` (i `name` do wyświetlania). Testy: 1/2/60/61 i 1/2/80/81 znaków, spacje obcięte.
+- [x] **16. Serwer:** `insertUser`/`updateUser` zapisują `first_name`, `last_name` (bez `name`); lista zwraca oba; sortowanie `last_name, first_name`; szukanie po `first_name`, `last_name`, `login` i całym `name`; historia z `first_name`/`last_name`; `createAdmin` (pyta o imię i nazwisko) i `seedE2e` zapisują oba pola. Testy tras, zapytań, `createAdmin`, `seedE2e`.
+- [x] **17. Front i e2e:** okno z dwoma polami; testy okna (błędy obu pól, zapis wysyła `firstName`, `lastName`); `e2e/employees.spec.ts` wypełnia oba pola. → `npm run check`, `npm run test:e2e`.
+
 ## Rozstrzygnięcia w trakcie budowy
 
 - Krok 1: zakres liczb komunikatami `validation.min` / `validation.max` (już są) zamiast nowego `validation.range` z liczbami w treści (tłumaczenie kluczy nie przekazuje liczb; zakres widać w podpowiedzi pod polem).
@@ -163,3 +171,5 @@ w e2e.
 - Testy frontu: zastępnik `scrollIntoView` w `frontend/src/test/setup.ts` (jsdom go nie ma, a Mantine woła go przy wyborze opcji).
 - Odłożone (drobne): zapis pracownika równocześnie z „Zamknij rok” może utworzyć pulę zamkniętego roku (wymaga dwóch jednoczesnych akcji administratora; naprawia ją kolejne zamknięcie); podwójne równoczesne „Zamknij rok” zwraca 200 zamiast 409 (bez szkody: dni nie przechodzą dwa razy); sortowanie „Najmniej dni zostało” liczy `annual + carried` bez wykorzystanych dni, a `getPoolUsage` nie przyjmuje połączenia transakcji: oba do poprawienia w module „Moje urlopy”, gdy wykorzystane dni przestaną być zerem; wpisy historii pul mają `entityId` = numer osoby (nie puli), do uwzględnienia na ekranie Historii zmian; „Zamknij rok” wyłączony przy samych administratorach bez dymka; wyczyszczenie liczby w oknie roku od razu wpisuje 0; po archiwizacji ostatniej osoby na dalszej stronie lista jest pusta; wyszukiwanie dłuższe niż 100 znaków jest pomijane; odstęp `mb={22}` w `PasswordField`; brak testów na prawdziwej bazie poza e2e.
 - Poprawione przy sprawdzaniu w przeglądarce: „Zamknij rok” bez żadnej puli pokazywał pustą tabelę z aktywnym przyciskiem → komunikat „Nikt nie ma jeszcze puli…” i wyłączony przycisk; test w `CloseYearModal.test.tsx`.
+- Krok 15: wspólne pole `personName(max)` w `fields.ts` (imię i nazwisko: trim, wymagane, 2–max); `USER_NAME_MIN` i `validation.name_too_short` usunięte (zastąpione przez `validation.too_short`). Zasady pól imienia i nazwiska obowiązują też w `npm run admin`.
+- Krok 16: wyszukiwanie po `first_name`, `last_name`, całym `name` i loginie (żeby „jan kow” znalazło Jana Kowalskiego).

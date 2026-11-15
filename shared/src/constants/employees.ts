@@ -1,7 +1,5 @@
 /** Pracownicy i pule dni urlopu (moduł Pracownicy). */
 
-/** Imię i nazwisko: co najmniej 2 znaki (maksimum USER_NAME_MAX z constants/login.ts). */
-export const USER_NAME_MIN = 2;
 /** Pula dni na rok: 0–60, domyślnie 26. */
 export const ANNUAL_DAYS_MAX = 60;
 export const ANNUAL_DAYS_DEFAULT = 26;

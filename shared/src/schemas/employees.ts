@@ -1,12 +1,13 @@
 import { z } from 'zod';
 import { ROLES, type Role } from '../constants/roles';
-import { USER_NAME_MAX } from '../constants/login';
-import { ANNUAL_DAYS_MAX, CARRIED_DAYS_MAX, EMPLOYEE_SORTS, USER_NAME_MIN, type EmployeeSort } from '../constants/employees';
-import { email, login, newPassword, optionalField, text, wholeNumber } from './fields';
+import { FIRST_NAME_MAX, LAST_NAME_MAX } from '../constants/login';
+import { ANNUAL_DAYS_MAX, CARRIED_DAYS_MAX, EMPLOYEE_SORTS, type EmployeeSort } from '../constants/employees';
+import { email, login, newPassword, optionalField, personName, wholeNumber } from './fields';
 import { listQuerySchema, type ListResponse } from './list';
 
 const employeeFields = {
-  name: text(USER_NAME_MAX).pipe(z.string().min(USER_NAME_MIN, 'validation.name_too_short')),
+  firstName: personName(FIRST_NAME_MAX),
+  lastName: personName(LAST_NAME_MAX),
   login,
   email: optionalField(email),
   role: z.enum(ROLES, { error: 'validation.required' }),
@@ -75,7 +76,10 @@ export interface EmployeePool {
 
 export interface EmployeeListItem {
   id: number;
+  /** „Imię Nazwisko” do wyświetlania. */
   name: string;
+  firstName: string;
+  lastName: string;
   login: string;
   email: string | null;
   role: Role;

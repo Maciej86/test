@@ -9,7 +9,8 @@ import { hashPassword } from '../auth/password';
 import { pool } from '../db/pool';
 
 export interface AdminRow {
-  name: string;
+  firstName: string;
+  lastName: string;
   login: string;
   email: string | null;
   passwordHash: string;
@@ -32,10 +33,10 @@ export async function createAdminAccount(input: unknown, deps: AdminDeps): Promi
     for (const issue of parsed.error.issues) errors[String(issue.path[0])] ??= issue.message;
     return { ok: false, errors };
   }
-  const { name, login, email, password } = parsed.data;
+  const { firstName, lastName, login, email, password } = parsed.data;
   if (await deps.loginTaken(login)) return { ok: false, errors: { login: 'validation.login_taken' } };
   if (email && (await deps.emailTaken(email))) return { ok: false, errors: { email: 'validation.email_taken' } };
-  const id = await deps.insert({ name, login, email, passwordHash: await hashPassword(password), role: 'admin' });
+  const id = await deps.insert({ firstName, lastName, login, email, passwordHash: await hashPassword(password), role: 'admin' });
   return { ok: true, id };
 }
 
@@ -51,8 +52,8 @@ const dbDeps: AdminDeps = {
   },
   async insert(row) {
     const [result] = await pool.query<ResultSetHeader>(
-      'INSERT INTO users (name, login, email, password_hash, role, must_change_password) VALUES (?, ?, ?, ?, ?, 0)',
-      [row.name, row.login, row.email, row.passwordHash, row.role],
+      'INSERT INTO users (first_name, last_name, login, email, password_hash, role, must_change_password) VALUES (?, ?, ?, ?, ?, ?, 0)',
+      [row.firstName, row.lastName, row.login, row.email, row.passwordHash, row.role],
     );
     return result.insertId;
   },
@@ -86,7 +87,8 @@ async function main() {
   try {
     for (;;) {
       const input = {
-        name: await ask('admin_cli.name'),
+        firstName: await ask('admin_cli.first_name'),
+        lastName: await ask('admin_cli.last_name'),
         login: await ask('admin_cli.login'),
         email: await ask('admin_cli.email'),
         password: await askHidden('admin_cli.password'),

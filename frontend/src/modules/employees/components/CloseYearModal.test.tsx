@@ -16,7 +16,7 @@ const preview: CloseYearPreview = {
   ],
 };
 const jan: EmployeeListItem = {
-  id: 2, name: 'Jan Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', isMe: false, pool: null,
+  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', isMe: false, pool: null,
 };
 
 function serverError(status: number, message: string) {

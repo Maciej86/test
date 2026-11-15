@@ -7,8 +7,8 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180 i zalog
 1. Kliknij w menu „Pracownicy” → widzisz listę kont, pod tytułem „Osób z kontem: …”, przy swoim koncie „(to Ty)”
    i wyłączony przycisk „Do archiwum”. Jeśli są tylko konta administratorów, pod tabelą jest ramka „Nie masz jeszcze
    pracowników”.
-2. Kliknij „Dodaj pracownika”, nic nie wpisuj, kliknij „Zapisz” → pod polami „To pole jest wymagane.”
-3. Wpisz imię i nazwisko, login (np. `jan.test@firma.pl`), kliknij „Wygeneruj” → w polu widać hasło (zapisz je
+2. Kliknij „Dodaj pracownika”, nic nie wpisuj, kliknij „Zapisz” → pod polami „To pole jest wymagane.” Wpisz w „Imię” jedną literę → „Za mało znaków.”
+3. Wpisz imię i nazwisko (dwa osobne pola), login (np. `jan.test@firma.pl`), kliknij „Wygeneruj” → w polu widać hasło (zapisz je
    sobie). Zmień „Dni na rok” na 20, kliknij „Zapisz” → zielony dymek, nowa osoba na liście z „20 z 20 dni zostało”.
 4. Przy tej osobie kliknij „Edytuj”, ustaw „Zaległe z …” na 4, zapisz → pasek ma jaśniejszą część, a pod nim
    „w tym 4 dni zaległe”.

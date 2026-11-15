@@ -70,6 +70,8 @@ export async function listEmployeesPage(query: EmployeesListQuery, me: Actor): P
   const items: EmployeeListItem[] = rows.map((r) => ({
     id: r.id,
     name: r.name,
+    firstName: r.first_name,
+    lastName: r.last_name,
     login: r.login,
     email: r.email,
     role: r.role,
@@ -106,8 +108,26 @@ function duplicateError(error: unknown): { error: ServiceError } | null {
   return fail(409, key, { fields: { [field]: key } });
 }
 
-const accountFields = (d: { name: string; login: string; email: string | null; role: string }) => ({
-  name: d.name,
+/** Pola konta do historii zmian (nazwy kolumn w bazie). */
+const accountFields = (d: q.AccountData) => ({
+  first_name: d.firstName,
+  last_name: d.lastName,
+  login: d.login,
+  email: d.email,
+  role: d.role,
+});
+
+const accountOf = (u: q.UserRow): q.AccountData => ({
+  firstName: u.first_name,
+  lastName: u.last_name,
+  login: u.login,
+  email: u.email,
+  role: u.role,
+});
+
+const accountInput = (d: EmployeeData): q.AccountData => ({
+  firstName: d.firstName,
+  lastName: d.lastName,
   login: d.login,
   email: d.email,
   role: d.role,
@@ -119,9 +139,9 @@ export async function createEmployee(input: EmployeeCreateData, actor: Actor): P
     return await withTransaction(async (conn) => {
       const conflict = await findConflict(conn, input.login, input.email, null);
       if (conflict) return conflict;
-      const id = await q.insertUser(conn, { name: input.name, login: input.login, email: input.email, role: input.role, passwordHash });
+      const id = await q.insertUser(conn, { ...accountInput(input), passwordHash });
       const log = { userId: actor.id, userName: actor.name, entityId: id };
-      await logActivity(conn, { ...log, action: 'create', entityType: 'users', changes: diffChanges({}, accountFields(input)) });
+      await logActivity(conn, { ...log, action: 'create', entityType: 'users', changes: diffChanges({}, accountFields(accountInput(input))) });
       if (input.role === 'employee' && input.annualDays !== undefined) {
         const year = await getOpenYear(conn);
         await q.upsertPool(conn, id, year, input.annualDays, input.carriedDays);
@@ -159,9 +179,9 @@ export async function updateEmployee(id: number, input: EmployeeData, actor: Act
       if (conflict) return conflict;
 
       const log = { userId: actor.id, userName: actor.name, entityId: id };
-      const accountChanges = diffChanges(accountFields(before), accountFields(input));
+      const accountChanges = diffChanges(accountFields(accountOf(before)), accountFields(accountInput(input)));
       if (Object.keys(accountChanges).length > 0) {
-        await q.updateUser(conn, id, { name: input.name, login: input.login, email: input.email, role: input.role });
+        await q.updateUser(conn, id, accountInput(input));
         await logActivity(conn, { ...log, action: 'update', entityType: 'users', changes: accountChanges });
       }
 

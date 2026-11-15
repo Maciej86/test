@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { USER_NAME_MAX } from '../constants/login';
-import { email, login, loginInput, newPassword, optionalField, passwordInput, text } from './fields';
+import { FIRST_NAME_MAX, LAST_NAME_MAX } from '../constants/login';
+import { email, login, loginInput, newPassword, optionalField, passwordInput, personName } from './fields';
 
 /** Formularz logowania (ekran /login i POST /api/auth/login). */
 export const loginSchema = z.object({ login: loginInput, password: passwordInput });
@@ -14,7 +14,8 @@ export type NewPasswordInput = z.infer<typeof newPasswordSchema>;
 
 /** Konto pierwszego administratora (npm run admin). */
 export const adminAccountSchema = z.object({
-  name: text(USER_NAME_MAX),
+  firstName: personName(FIRST_NAME_MAX),
+  lastName: personName(LAST_NAME_MAX),
   login,
   email: optionalField(email),
   password: newPassword,

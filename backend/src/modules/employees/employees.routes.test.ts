@@ -54,9 +54,9 @@ function as(user: SessionUser | null) {
 }
 
 const row = (o: Partial<Record<string, unknown>>) => ({
-  id: 2, name: 'Jan Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', annual_days: 26, carried_days: 4, ...o,
+  id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', annual_days: 26, carried_days: 4, ...o,
 });
-const newJan = { name: 'Jan Kowalski', login: 'Jan.Kowalski@Firma.pl', email: '', role: 'employee', password: 'Urlop-2026', annualDays: 26, carriedDays: 0 };
+const newJan = { firstName: 'Jan', lastName: 'Kowalski', login: 'Jan.Kowalski@Firma.pl', email: '', role: 'employee', password: 'Urlop-2026', annualDays: 26, carriedDays: 0 };
 const historyOf = () => vi.mocked(logActivity).mock.calls.map((c) => c[1]);
 
 beforeEach(() => {
@@ -77,7 +77,7 @@ describe('employees routes', () => {
 
   it('GET /employees: items without password_hash, isMe for req.user, pool null for admin, openYear and counts', async () => {
     vi.mocked(q.listEmployees).mockResolvedValue({
-      rows: [row({ id: 1, name: 'Anna Nowak', role: 'admin', annual_days: null, carried_days: null }), row({})] as never,
+      rows: [row({ id: 1, name: 'Anna Nowak', first_name: 'Anna', last_name: 'Nowak', role: 'admin', annual_days: null, carried_days: null }), row({})] as never,
       total: 2,
     });
     const res = await as(anna).get('/employees');
@@ -87,7 +87,7 @@ describe('employees routes', () => {
     expect(res.body.total).toBe(2);
     expect(res.body.items[0]).toMatchObject({ id: 1, isMe: true, pool: null });
     expect(res.body.items[1]).toMatchObject({
-      id: 2, isMe: false,
+      id: 2, isMe: false, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski',
       pool: { year: 2026, annualDays: 26, carriedDays: 4, usedDays: 0, pendingDays: 0, leftDays: 30, leftCarriedDays: 4 },
     });
     expect(JSON.stringify(res.body)).not.toContain('password');
@@ -113,7 +113,7 @@ describe('employees routes', () => {
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ id: 7 });
     expect(q.insertUser).toHaveBeenCalledWith(conn, {
-      name: 'Jan Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', passwordHash: 'hash(Urlop-2026)',
+      firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', passwordHash: 'hash(Urlop-2026)',
     });
     expect(q.upsertPool).toHaveBeenCalledWith(conn, 7, 2026, 26, 0);
     expect(withTransaction).toHaveBeenCalledTimes(1);
@@ -121,6 +121,8 @@ describe('employees routes', () => {
       expect.objectContaining({ userId: 1, userName: 'Anna Nowak', action: 'create', entityType: 'users', entityId: 7 }),
       expect.objectContaining({ action: 'create', entityType: 'leave_pools', entityId: 7 }),
     ]);
+    expect(historyOf()[0]!.changes).toMatchObject({ first_name: { before: undefined, after: 'Jan' }, last_name: { before: undefined, after: 'Kowalski' } });
+    expect(historyOf()[0]!.changes).not.toHaveProperty('name');
     expect(JSON.stringify(historyOf())).not.toContain('Urlop-2026');
     expect(JSON.stringify(historyOf())).not.toContain('hash(');
   });
@@ -174,13 +176,13 @@ describe('employees routes', () => {
   });
 
   it('POST /employees: wrong data → 400 with field keys', async () => {
-    const res = await as(anna).post('/employees', { ...newJan, name: '', password: 'krotkie' });
+    const res = await as(anna).post('/employees', { ...newJan, firstName: '', lastName: 'K', password: 'krotkie' });
     expect(res.status).toBe(400);
-    expect(res.body.error.fields).toMatchObject({ name: 'validation.required', password: 'validation.password_rules' });
+    expect(res.body.error.fields).toMatchObject({ firstName: 'validation.required', lastName: 'validation.too_short', password: 'validation.password_rules' });
   });
 
-  const janUser = { id: 2, name: 'Jan Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', archived_at: null };
-  const janEdit = { name: 'Jan Kowalski', login: 'jan.kowalski@firma.pl', email: '', role: 'employee', annualDays: 26, carriedDays: 4 };
+  const janUser = { id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', archived_at: null };
+  const janEdit = { firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: '', role: 'employee', annualDays: 26, carriedDays: 4 };
   const janPool = { id: 11, user_id: 2, year: 2026, annual_days: 26, carried_days: 4, closed_at: null };
 
   it('PUT /employees/:id: missing or archived → 404', async () => {
@@ -193,18 +195,19 @@ describe('employees routes', () => {
   });
 
   it('PUT /employees/:id: own role change → 409 employees.own_role', async () => {
-    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, id: 1, name: 'Anna Nowak', role: 'admin' } as never);
-    const res = await as(anna).put('/employees/1', { ...janEdit, name: 'Anna Nowak' });
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, id: 1, name: 'Anna Nowak', first_name: 'Anna', last_name: 'Nowak', role: 'admin' } as never);
+    const res = await as(anna).put('/employees/1', { ...janEdit, firstName: 'Anna', lastName: 'Nowak' });
     expect(res.status).toBe(409);
     expect(res.body.error.message).toBe('employees.server.own_role');
     expect(q.updateUser).not.toHaveBeenCalled();
   });
 
   it('PUT /employees/:id: own name can change', async () => {
-    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, id: 1, name: 'Anna Nowak', role: 'admin' } as never);
-    const res = await as(anna).put('/employees/1', { ...janEdit, name: 'Anna Nowak-Kowal', role: 'admin', annualDays: undefined });
+    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, id: 1, name: 'Anna Nowak', first_name: 'Anna', last_name: 'Nowak', role: 'admin' } as never);
+    const res = await as(anna).put('/employees/1', { ...janEdit, firstName: 'Anna', lastName: 'Nowak-Kowal', role: 'admin', annualDays: undefined });
     expect(res.status).toBe(200);
-    expect(q.updateUser).toHaveBeenCalledWith(conn, 1, expect.objectContaining({ name: 'Anna Nowak-Kowal', role: 'admin' }));
+    expect(q.updateUser).toHaveBeenCalledWith(conn, 1, expect.objectContaining({ firstName: 'Anna', lastName: 'Nowak-Kowal', role: 'admin' }));
+    expect(historyOf()[0]!.changes).toEqual({ last_name: { before: 'Nowak', after: 'Nowak-Kowal' } });
   });
 
   it('PUT /employees/:id: login taken by another account → 409, own login is not a conflict', async () => {

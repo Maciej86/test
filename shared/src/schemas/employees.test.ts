@@ -1,16 +1,24 @@
 import { describe, expect, it } from 'vitest';
 import { closeYearSchema, employeeCreateSchema, employeeUpdateSchema, employeesListQuerySchema } from './employees';
 
-const base = { name: 'Jan Kowalski', login: 'jan.kowalski@firma.pl', email: '', role: 'employee', annualDays: 26, carriedDays: 0 };
+const base = { firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: '', role: 'employee', annualDays: 26, carriedDays: 0 };
 const issue = (r: { error?: { issues: { message: string; path: PropertyKey[] }[] } }, field: string) =>
   r.error?.issues.find((i) => i.path.join('.') === field)?.message;
 
 describe('employee schemas', () => {
-  it('name: 1 character → name_too_short, 2 and 150 ok, 151 → too_long', () => {
-    expect(issue(employeeUpdateSchema.safeParse({ ...base, name: 'J' }), 'name')).toBe('validation.name_too_short');
-    expect(employeeUpdateSchema.safeParse({ ...base, name: 'Jo' }).success).toBe(true);
-    expect(employeeUpdateSchema.safeParse({ ...base, name: 'a'.repeat(150) }).success).toBe(true);
-    expect(issue(employeeUpdateSchema.safeParse({ ...base, name: 'a'.repeat(151) }), 'name')).toBe('validation.too_long');
+  it('first name: 1 character → too_short, 2 and 60 ok, 61 → too_long; empty → required', () => {
+    expect(issue(employeeUpdateSchema.safeParse({ ...base, firstName: 'J' }), 'firstName')).toBe('validation.too_short');
+    expect(employeeUpdateSchema.safeParse({ ...base, firstName: 'Jo' }).success).toBe(true);
+    expect(employeeUpdateSchema.safeParse({ ...base, firstName: 'a'.repeat(60) }).success).toBe(true);
+    expect(issue(employeeUpdateSchema.safeParse({ ...base, firstName: 'a'.repeat(61) }), 'firstName')).toBe('validation.too_long');
+    expect(issue(employeeUpdateSchema.safeParse({ ...base, firstName: '  ' }), 'firstName')).toBe('validation.required');
+  });
+
+  it('last name: 1 character → too_short, 2 and 80 ok, 81 → too_long; spaces trimmed', () => {
+    expect(issue(employeeUpdateSchema.safeParse({ ...base, lastName: 'K' }), 'lastName')).toBe('validation.too_short');
+    expect(employeeUpdateSchema.safeParse({ ...base, lastName: 'a'.repeat(80) }).success).toBe(true);
+    expect(issue(employeeUpdateSchema.safeParse({ ...base, lastName: 'a'.repeat(81) }), 'lastName')).toBe('validation.too_long');
+    expect(employeeUpdateSchema.parse({ ...base, lastName: ' Nowak-Kowalska ' }).lastName).toBe('Nowak-Kowalska');
   });
 
   it('login with capitals and spaces around is saved lowercase', () => {
@@ -23,7 +31,7 @@ describe('employee schemas', () => {
   });
 
   it('role employee without annualDays → required on annualDays; admin without pool ok', () => {
-    const noPool = { name: 'Anna Nowak', login: 'anna@firma.pl', email: '', role: 'employee' };
+    const noPool = { firstName: 'Anna', lastName: 'Nowak', login: 'anna@firma.pl', email: '', role: 'employee' };
     expect(issue(employeeUpdateSchema.safeParse(noPool), 'annualDays')).toBe('validation.required');
     expect(employeeUpdateSchema.safeParse({ ...noPool, role: 'admin' }).success).toBe(true);
     expect(employeeUpdateSchema.parse({ ...noPool, annualDays: 20 }).carriedDays).toBe(0);

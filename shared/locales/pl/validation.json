@@ -20,6 +20,5 @@
   "password_same_as_temporary": "Nowe hasło musi być inne niż tymczasowe.",
   "login_taken": "Ten login jest już zajęty.",
   "email_taken": "Ten e-mail ma już inne konto.",
-  "whole_number": "Podaj liczbę całkowitą, np. 26.",
-  "name_too_short": "Podaj imię i nazwisko (co najmniej 2 znaki)."
+  "whole_number": "Podaj liczbę całkowitą, np. 26."
 }

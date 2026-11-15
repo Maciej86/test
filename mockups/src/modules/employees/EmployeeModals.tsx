@@ -62,7 +62,10 @@ export function EmployeeModal({ opened, onClose, employee, loginTaken = false }:
   return (
     <Modal opened={opened} onClose={onClose} title={isNew ? t('add') : t('edit_title', { name: employee.name })} size="lg">
       <Stack>
-        <TextInput label={t('name')} withAsterisk defaultValue={employee?.name ?? (loginTaken ? 'Ewa Mazur' : '')} />
+        <SimpleGrid cols={{ base: 1, xs: 2 }}>
+          <TextInput label={t('first_name')} withAsterisk defaultValue={employee?.name.split(' ')[0] ?? (loginTaken ? 'Ewa' : '')} />
+          <TextInput label={t('last_name')} withAsterisk defaultValue={employee?.name.split(' ').slice(1).join(' ') ?? (loginTaken ? 'Mazur' : '')} />
+        </SimpleGrid>
         <TextInput
           label={t('login')}
           withAsterisk

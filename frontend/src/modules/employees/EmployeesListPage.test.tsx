@@ -7,10 +7,10 @@ import { EmployeesListPage } from './EmployeesListPage';
 
 const thisYear = Number(todayIsoDate().slice(0, 4));
 const anna: EmployeeListItem = {
-  id: 1, name: 'Anna Nowak', login: 'anna.nowak@firma.pl', email: 'anna.nowak@firma.pl', role: 'admin', isMe: true, pool: null,
+  id: 1, name: 'Anna Nowak', firstName: 'Anna', lastName: 'Nowak', login: 'anna.nowak@firma.pl', email: 'anna.nowak@firma.pl', role: 'admin', isMe: true, pool: null,
 };
 const jan: EmployeeListItem = {
-  id: 2, name: 'Jan Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', isMe: false,
+  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', isMe: false,
   pool: { year: thisYear, annualDays: 26, carriedDays: 4, usedDays: 9, pendingDays: 0, leftDays: 21, leftCarriedDays: 0 },
 };
 const list = (items: EmployeeListItem[], o: Partial<EmployeesListResponse> = {}): EmployeesListResponse => ({

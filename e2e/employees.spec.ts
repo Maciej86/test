@@ -21,11 +21,13 @@ async function logOut(page: Page) {
 
 /** Dodaje pracownika przez okno; zwraca login i wygenerowane hasło tymczasowe. */
 async function addEmployee(page: Page, name: string) {
+  const [firstName, lastName] = name.split(' ') as [string, string];
   const login = `e2e.tmp.${Date.now()}${Math.floor(Math.random() * 1000)}@test.local`;
   await page.goto('/admin/employees');
   await page.getByRole('button', { name: 'Dodaj pracownika' }).first().click();
   const dialog = page.getByRole('dialog', { name: 'Dodaj pracownika' });
-  await dialog.getByLabel('Imię i nazwisko').fill(name);
+  await dialog.getByLabel(/^Imię/).fill(firstName);
+  await dialog.getByLabel(/^Nazwisko/).fill(lastName);
   await dialog.getByLabel('Login').fill(login);
   await dialog.getByRole('button', { name: 'Wygeneruj' }).click();
   const temporary = await dialog.getByLabel('Hasło tymczasowe').inputValue();
@@ -90,7 +92,8 @@ test('Do archiwum blokuje logowanie, a ten sam login proponuje przywrócenie', a
 
   await page.getByRole('button', { name: 'Dodaj pracownika' }).first().click();
   const dialog = page.getByRole('dialog', { name: 'Dodaj pracownika' });
-  await dialog.getByLabel('Imię i nazwisko').fill('Ewa Mazurek');
+  await dialog.getByLabel(/^Imię/).fill('Ewa');
+  await dialog.getByLabel(/^Nazwisko/).fill('Mazurek');
   await dialog.getByLabel('Login').fill(login.toUpperCase());
   await dialog.getByRole('button', { name: 'Wygeneruj' }).click();
   await dialog.getByRole('button', { name: 'Zapisz' }).click();

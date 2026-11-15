@@ -43,7 +43,7 @@ Układ z makiety (`EmployeesMockup.tsx`, bez paska „Pokaż stan”):
 
 ### Okno „Dodaj pracownika” / „Edytuj: <imię>” (admin)
 
-Pola (zasady w „Pola formularzy”): Imię i nazwisko, Login (podpowiedź), E-mail do powiadomień (podpowiedź), Rola
+Pola (zasady w „Pola formularzy”): Imię i Nazwisko (dwa pola obok siebie, na telefonie jedno pod drugim; zmiana 2026-11-15), Login (podpowiedź), E-mail do powiadomień (podpowiedź), Rola
 (domyślnie Pracownik), przy dodawaniu Hasło tymczasowe z przyciskiem „Wygeneruj” (pokazuje wygenerowane hasło
 jawnie, pytanie 5). Przy roli Pracownik sekcja „Pula urlopu na 2026”: Dni na rok (domyślnie 26), Zaległe z 2025
 (domyślnie 0); przy roli Administrator sekcja znika (pula w bazie zostaje). Własna rola: pole wyłączone z opisem
@@ -81,7 +81,8 @@ przywrócisz w „Archiwum”.” Przyciski Anuluj / „Do archiwum” (czerwony
 
 | Formularz | Pole | Wymagane | Min–maks | Format (przykład) | Pole z `fields.ts` |
 |---|---|---|---|---|---|
-| Pracownik | Imię i nazwisko | tak | 2–150 znaków | — | `text(USER_NAME_MAX)` + min 2 |
+| Pracownik | Imię | tak | 2–60 znaków | — | `text(FIRST_NAME_MAX)` + min 2 |
+| Pracownik | Nazwisko | tak | 2–80 znaków | np. `Nowak-Kowalska` | `text(LAST_NAME_MAX)` + min 2 |
 | Pracownik | Login | tak | 3–190 znaków | bez spacji, małe litery, `jan.kowalski@firma.pl` | `login` |
 | Pracownik | E-mail do powiadomień | nie | do 190 znaków | `jan.kowalski@gmail.com` | `optionalField(email)` |
 | Pracownik | Rola | tak | `admin` / `employee` | domyślnie `employee` | `z.enum(ROLES)` |
@@ -96,6 +97,15 @@ pula), a „Zamknij rok” przenosi wszystkie dni bez limitu, więc po kilku lat
 Nowe pole `wholeNumber(min, max)` w `fields.ts` (z testem i kluczami `validation.whole_number`, `validation.range`).
 
 ## Dane
+
+### Imię i nazwisko osobno (zmiana 2026-11-15, prośba użytkownika na etapie testów)
+
+- `004_users_first_last_name.sql`: kolumny `first_name VARCHAR(60) NOT NULL DEFAULT ''`, `last_name VARCHAR(80) NOT NULL DEFAULT ''`.
+- `005_users_split_name.sql`: istniejące konta: ostatni wyraz `name` → `last_name`, reszta → `first_name` (jeden wyraz → całość do nazwiska).
+- `006_users_name_generated.sql`: `name` = kolumna wyliczana przez bazę `CONCAT_WS(' ', first_name, last_name)` (STORED), więc belka, historia zmian i logowanie dalej czytają `name`.
+- Lista pokazuje „Imię Nazwisko”; sortowanie „Nazwisko A–Z” po `last_name`, potem `first_name`; wyszukiwanie po imieniu, nazwisku i loginie.
+- `npm run admin` (moduł Logowanie) pyta osobno o imię i nazwisko; konta testowe e2e też zapisują oba pola.
+- Historia zmian zapisuje `first_name` i `last_name` zamiast `name`.
 
 ### Migracja `003_leave_pools.sql`
 

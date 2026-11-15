@@ -7,10 +7,10 @@ import { renderWithProviders } from '../../../test/render';
 import { EmployeeFormModal } from './EmployeeFormModal';
 
 const jan: EmployeeListItem = {
-  id: 2, name: 'Jan Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', isMe: false,
+  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', isMe: false,
   pool: { year: 2026, annualDays: 26, carriedDays: 4, usedDays: 9, pendingDays: 0, leftDays: 21, leftCarriedDays: 0 },
 };
-const anna: EmployeeListItem = { ...jan, id: 1, name: 'Anna Nowak', login: 'anna.nowak@firma.pl', role: 'admin', isMe: true, pool: null };
+const anna: EmployeeListItem = { ...jan, id: 1, name: 'Anna Nowak', firstName: 'Anna', lastName: 'Nowak', login: 'anna.nowak@firma.pl', role: 'admin', isMe: true, pool: null };
 
 function conflict(fields: Record<string, string>, archivedUser?: { id: number; name: string }) {
   const config = { url: '/employees', headers: new AxiosHeaders() };
@@ -35,8 +35,22 @@ describe('EmployeeFormModal', () => {
     const post = vi.spyOn(api, 'post');
     show(null);
     fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
-    expect((await screen.findAllByText('To pole jest wymagane.')).length).toBeGreaterThanOrEqual(3);
+    expect((await screen.findAllByText('To pole jest wymagane.')).length).toBeGreaterThanOrEqual(4);
     expect(post).not.toHaveBeenCalled();
+  });
+
+  it('first and last name are separate fields filled from the employee and sent separately', async () => {
+    const put = vi.spyOn(api, 'put').mockResolvedValue({ data: { ok: true } });
+    show(jan);
+    expect(screen.getByLabelText('Imię', { exact: false })).toHaveValue('Jan');
+    expect(screen.getByLabelText('Nazwisko', { exact: false })).toHaveValue('Kowalski');
+    fill('Nazwisko', 'Nowak-Kowalska');
+    fill('Imię', 'J');
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
+    expect(await screen.findByText('Za mało znaków.')).toBeInTheDocument();
+    fill('Imię', 'Joanna');
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
+    await waitFor(() => expect(put).toHaveBeenCalledWith('/employees/2', expect.objectContaining({ firstName: 'Joanna', lastName: 'Nowak-Kowalska' })));
   });
 
   it('role Administrator hides the pool section', async () => {
@@ -72,7 +86,8 @@ describe('EmployeeFormModal', () => {
     });
     const success = vi.spyOn(notify, 'success');
     const { onClose } = show(null);
-    fill('Imię i nazwisko', 'Ewa Mazur');
+    fill('Imię', 'Ewa');
+    fill('Nazwisko', 'Mazur');
     fill('Login', 'ewa.mazur@firma.pl');
     fill('Hasło tymczasowe', 'Urlop-2026');
     fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));

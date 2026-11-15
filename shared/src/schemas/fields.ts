@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LOGIN_MAX, LOGIN_MIN, PASSWORD_MAX, PASSWORD_MIN } from '../constants/login';
+import { LOGIN_MAX, LOGIN_MIN, NAME_PART_MIN, PASSWORD_MAX, PASSWORD_MIN } from '../constants/login';
 
 /**
  * Gotowe pola formularzy. Moduł składa z nich swój schemat (shared/src/schemas/<module>.ts), a ten sam schemat
@@ -129,6 +129,14 @@ export const wholeNumber = (min: number, max: number) =>
       .min(min, M.min)
       .max(max, M.max),
   );
+
+/** Imię albo nazwisko: obcięte spacje, od 2 do max znaków; puste → wymagane. */
+export const personName = (max: number) =>
+  textInput()
+    .trim()
+    .min(1, { error: M.required, abort: true })
+    .min(NAME_PART_MIN, M.tooShort)
+    .max(max, M.tooLong);
 
 /** Pole nieobowiązkowe: puste pole formularza (`''`, same spacje, brak) zapisuje się jako NULL. */
 export function optionalField<T extends z.ZodType>(schema: T) {

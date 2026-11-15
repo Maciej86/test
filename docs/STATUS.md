@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.22
 
-**Następny krok:** Moduł Pracownicy, etap testy: użytkownik przechodzi `docs/modules/employees/TESTS.md` i potwierdza „działa”.
+**Następny krok:** Moduł Pracownicy, etap testy: użytkownik sprawdza zmianę (imię i nazwisko osobno) i `docs/modules/employees/TESTS.md`, potem potwierdza „działa”.
 
 ## Start aplikacji
 
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-15: Pracownicy: na etapie testów użytkownik chce osobnych pól „Imię” (2–60) i „Nazwisko” (2–80); `name` w bazie staje się kolumną wyliczaną, `npm run admin` pyta o oba.
 
 - 2026-11-15: Pracownicy: zbudowane (kroki 0–12, przegląd kodu z poprawkami), testy e2e zielone; zaległe dni do 999 (zamiast 120), bo „Zamknij rok” przenosi wszystkie dni bez limitu.
 

@@ -55,8 +55,8 @@ describe('login schemas', () => {
   });
 
   it('adminAccountSchema accepts a missing e-mail as null', () => {
-    const r = adminAccountSchema.parse({ name: ' Anna Nowak ', login: 'Anna.Nowak@firma.pl', email: '', password: 'Urlop-2026' });
-    expect(r).toEqual({ name: 'Anna Nowak', login: 'anna.nowak@firma.pl', email: null, password: 'Urlop-2026' });
+    const r = adminAccountSchema.parse({ firstName: ' Anna ', lastName: 'Nowak ', login: 'Anna.Nowak@firma.pl', email: '', password: 'Urlop-2026' });
+    expect(r).toEqual({ firstName: 'Anna', lastName: 'Nowak', login: 'anna.nowak@firma.pl', email: null, password: 'Urlop-2026' });
   });
 
   it('passwords are limited to 72 bytes, because bcrypt ignores the rest', () => {
