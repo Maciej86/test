@@ -115,7 +115,7 @@ spoza menu dopięta w `buildAppRoutes.tsx`. Wygląd 1:1 z makiety (`mockups/src/
   grupy „Dzisiaj”/„Wczoraj”/data; `?unread=1` wysyła `unread: '1'`; pusto przy filtrze → `empty_unread`; druga strona
   z `Pagination`; „Pokaż wszystkie” w dzwonku prowadzi tutaj. → `npm run check`
 
-- [ ] **7. Polecenie `npm run notifications:test`.** `backend/src/scripts/sendTestNotifications.ts`: dla każdego
+- [x] **7. Polecenie `npm run notifications:test`.** `backend/src/scripts/sendTestNotifications.ts`: dla każdego
   aktywnego admina po jednym `leave_request_new` i `leave_request_withdrawn`, dla każdego aktywnego pracownika po
   jednym `leave_approved`, `leave_rejected`, `leave_cancelled`, `task_assigned`; przez `notifyUsers` w
   `withTransaction`, `actor` = `{ id: 0, name: 'Powiadomienie testowe' }` (tekst z `notifications.json`, klucz

@@ -1,5 +1,5 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
-import type { NotificationItem, NotificationType } from '@app/shared';
+import type { NotificationItem, NotificationType, Role } from '@app/shared';
 import { pool } from '../../db/pool';
 
 /** Pula połączeń albo połączenie transakcji: oba mają `query`. */
@@ -37,9 +37,9 @@ export const activeUserIds = async (db: Db, ids: number[]): Promise<number[]> =>
   return rows.map((r) => r.id as number);
 };
 
-/** Aktywni administratorzy. */
-export const activeAdminIds = async (db: Db): Promise<number[]> => {
-  const [rows] = await db.query<RowDataPacket[]>('SELECT id FROM users WHERE role = ? AND archived_at IS NULL ORDER BY id', ['admin']);
+/** Aktywne konta w danej roli (np. wszyscy administratorzy). */
+export const activeIdsByRole = async (db: Db, role: Role): Promise<number[]> => {
+  const [rows] = await db.query<RowDataPacket[]>('SELECT id FROM users WHERE role = ? AND archived_at IS NULL ORDER BY id', [role]);
   return rows.map((r) => r.id as number);
 };
 

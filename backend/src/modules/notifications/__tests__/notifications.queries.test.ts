@@ -47,9 +47,9 @@ describe('notifications queries', () => {
     expect(none.query).not.toHaveBeenCalled();
   });
 
-  it('activeAdminIds: active admins only', async () => {
+  it('activeIdsByRole: active accounts of the role only', async () => {
     const spy = db([{ id: 1 }, { id: 3 }]);
-    expect(await q.activeAdminIds(spy)).toEqual([1, 3]);
+    expect(await q.activeIdsByRole(spy, 'admin')).toEqual([1, 3]);
     expect(sqlOf(spy)).toMatch(/FROM users WHERE role = \? AND archived_at IS NULL/);
     expect(paramsOf(spy)).toEqual(['admin']);
   });

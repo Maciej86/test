@@ -22,6 +22,9 @@ z Claude. Potem logujesz się na http://localhost:5180/login. Kolejne konta zak�
 **E-mail testowy:** `npm run email:test` wysyła przykładowy e-mail „Nowy wniosek urlopowy” do skrzynki testowej
 (http://localhost:8026). Możesz podać adres: `npm run email:test -- ania@firma.pl`.
 
+**Powiadomienia testowe:** `npm run notifications:test` dopisuje każdemu aktywnemu kontu przykładowe powiadomienia
+(administratorom o wnioskach, pracownikom o decyzjach i zadaniu). Zobaczysz je w dzwonku w górnej belce panelu.
+
 Wyłączenie bazy: `npm run db:stop`. Dane zostają, przy następnym `npm run db` wszystko wróci.
 
 ## Gdzie co podejrzeć

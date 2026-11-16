@@ -5,6 +5,8 @@
   "mark_all_read": "Oznacz wszystkie jako przeczytane",
   "show_all": "Pokaż wszystkie",
   "close": "Zamknij powiadomienia",
+  "test_actor": "Powiadomienie testowe",
+  "test_sent": "Dodano przykładowe powiadomienia: administratorom {{admins}}, pracownikom {{employees}}. Zobacz dzwonek na {{url}} (odświeża się co minutę).",
   "unread_label": "Nieprzeczytane",
   "filter_all": "Wszystkie",
   "filter_unread": "Nieprzeczytane ({{count}})",

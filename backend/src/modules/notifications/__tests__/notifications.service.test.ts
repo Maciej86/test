@@ -5,7 +5,7 @@ vi.mock('../notifications.queries', () => ({
   insertNotifications: vi.fn(),
   deleteOldRead: vi.fn(),
   activeUserIds: vi.fn(),
-  activeAdminIds: vi.fn(),
+  activeIdsByRole: vi.fn(),
   countUnread: vi.fn(),
   listForUser: vi.fn(),
   markRead: vi.fn(),
@@ -61,10 +61,11 @@ describe('notifications service', () => {
   });
 
   it('notifyAdmins sends to active admins, not to the actor', async () => {
-    vi.mocked(q.activeAdminIds).mockResolvedValue([1, 3]);
+    vi.mocked(q.activeIdsByRole).mockResolvedValue([1, 3]);
     const input = { type: 'leave_request_new' as const, params: { employee: 'Jan Kowalski' }, link: '/admin/leave-requests', actor: { id: 2, name: 'Jan Kowalski' } };
     expect(await s.notifyAdmins(conn, input)).toBe(2);
     expect(vi.mocked(q.insertNotifications).mock.calls[0]![1].map((r) => r.userId)).toEqual([1, 3]);
+    expect(q.activeIdsByRole).toHaveBeenCalledWith(conn, 'admin');
     expect(await s.notifyAdmins(conn, { ...input, actor: anna })).toBe(1);
   });
 

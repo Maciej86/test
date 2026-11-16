@@ -11,6 +11,7 @@
     "migrate": "tsx src/db/migrate.ts",
     "admin": "tsx src/scripts/createAdmin.ts",
     "email:test": "tsx src/scripts/sendTestEmail.ts",
+    "notifications:test": "tsx src/scripts/sendTestNotifications.ts",
     "seed:e2e": "tsx src/scripts/seedE2e.ts"
   },
   "devDependencies": {

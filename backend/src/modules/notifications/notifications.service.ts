@@ -12,7 +12,7 @@ import { PAGE_SIZE } from '../../config/constants';
 import { pool } from '../../db/pool';
 import { fail, type Result } from '../../middleware/routeHelpers';
 import {
-  activeAdminIds,
+  activeIdsByRole,
   activeUserIds,
   countUnread,
   deleteOldRead,
@@ -52,7 +52,7 @@ export const notifyUsers = async (conn: Db, input: NotifyInput & { userIds: numb
 
 /** Powiadomienie dla każdego aktywnego administratora (np. nowy wniosek). */
 export const notifyAdmins = async (conn: Db, input: NotifyInput): Promise<number> => {
-  return notifyUsers(conn, { ...input, userIds: await activeAdminIds(conn) });
+  return notifyUsers(conn, { ...input, userIds: await activeIdsByRole(conn, 'admin') });
 };
 
 /** Dzwonek: liczba nieprzeczytanych i ostatnie powiadomienia tej osoby. */
