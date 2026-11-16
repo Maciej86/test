@@ -36,6 +36,19 @@ test('administrator zmienia pulę i widzi pasek', async ({ page }) => {
   await expect(row(page, 'Halina Bąk')).toContainText('w tym 4 dni zaległe');
 });
 
+test('administrator wpisuje datę zatrudnienia i rodzaj umowy, a lista je pokazuje', async ({ page }) => {
+  await addEmployee(page, 'Iwona Kruk');
+  await row(page, 'Iwona Kruk').getByRole('button', { name: 'Edytuj' }).click();
+  const dialog = page.getByRole('dialog', { name: /Edytuj/ });
+  await dialog.getByLabel('Data zatrudnienia').fill('01.03.2024');
+  await dialog.getByRole('combobox', { name: 'Rodzaj umowy' }).click();
+  await page.getByRole('option', { name: 'Umowa zlecenie' }).click();
+  await dialog.getByRole('button', { name: 'Zapisz' }).click();
+  await expect(page.getByText('Zapisano dane pracownika.')).toBeVisible();
+  await expect(row(page, 'Iwona Kruk')).toContainText('01.03.2024');
+  await expect(row(page, 'Iwona Kruk')).toContainText('Umowa zlecenie');
+});
+
 test('Ustaw hasło daje nowe hasło tymczasowe', async ({ page }) => {
   const { login } = await addEmployee(page, 'Robert Sowa');
   await row(page, 'Robert Sowa').getByRole('button', { name: 'Ustaw hasło' }).click();

@@ -63,6 +63,15 @@ export const todayIsoDate = (): string => {
   return dayjs().tz(APP_TIME_ZONE).format(ISO_DATE_FORMAT);
 };
 
+/** Data wpisana ręcznie w polu daty: `01.03.2024` albo `1.3.2024` → `2024-03-01`; inna lub nieistniejąca → null. */
+export const parseTypedDate = (text: string): string | null => {
+  const parts = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(text.trim());
+  if (!parts) return null;
+  const [, d, m, y] = parts;
+  const day = dayjs(`${y}-${m!.padStart(2, '0')}-${d!.padStart(2, '0')}`, ISO_DATE_FORMAT, true);
+  return day.isValid() ? day.format(ISO_DATE_FORMAT) : null;
+};
+
 /** Części daty do dużego zapisu (ekran logowania): `piątek`, `14`, `listopada 2026`, `piątek, 14 listopada 2026`. */
 export const formatDateParts = (
   value: DateInput,

@@ -7,6 +7,8 @@ import {
   ANNUAL_DAYS_DEFAULT,
   ANNUAL_DAYS_MAX,
   CARRIED_DAYS_MAX,
+  CONTRACT_TYPE_LABELS,
+  CONTRACT_TYPES,
   EMPLOYEE_MESSAGES,
   ROLE_LABELS,
   ROLES,
@@ -18,13 +20,18 @@ import {
   type EmployeeListItem,
 } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
+import { DateField } from '../../../common/DateField';
 import { apiErrorBody, apiErrorFields, apiErrorMessage } from '../../../core/api/client';
 import { fieldError } from '../../../core/fieldError';
 import { notify } from '../../../core/notify';
 import { useCreateEmployee, useRestoreEmployee, useUpdateEmployee } from '../employees.api';
 import { PasswordField } from './PasswordField';
 
-type FormValues = Omit<EmployeeCreateInput, 'email'> & { email: string };
+type FormValues = Omit<EmployeeCreateInput, 'email' | 'hiredOn' | 'contractType'> & {
+  email: string;
+  hiredOn: string | null;
+  contractType: string | null;
+};
 
 const initialValues = (employee: EmployeeListItem | null): FormValues => {
   return {
@@ -33,6 +40,8 @@ const initialValues = (employee: EmployeeListItem | null): FormValues => {
     login: employee?.login ?? '',
     email: employee?.email ?? '',
     role: employee?.role ?? 'employee',
+    hiredOn: employee?.hiredOn ?? null,
+    contractType: employee?.contractType ?? null,
     password: '',
     annualDays: employee?.pool?.annualDays ?? ANNUAL_DAYS_DEFAULT,
     carriedDays: employee?.pool?.carriedDays ?? 0,
@@ -140,6 +149,21 @@ export const EmployeeFormModal = ({ opened, employee, year, onClose }: {
             {...form.getInputProps('role')}
             error={fieldError(t, form.errors.role)}
           />
+          <SimpleGrid cols={{ base: 1, xs: 2 }}>
+            <DateField
+              label={t('hired_on')}
+              value={form.values.hiredOn}
+              onChange={(v) => form.setFieldValue('hiredOn', v)}
+              error={fieldError(t, form.errors.hiredOn)}
+            />
+            <Select
+              label={t('contract_type')}
+              data={CONTRACT_TYPES.map((c) => ({ value: c, label: translateKey(t, CONTRACT_TYPE_LABELS[c]) }))}
+              clearable
+              {...form.getInputProps('contractType')}
+              error={fieldError(t, form.errors.contractType)}
+            />
+          </SimpleGrid>
           {isNew && (
             <PasswordField
               value={form.values.password}

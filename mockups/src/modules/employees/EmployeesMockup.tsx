@@ -18,7 +18,8 @@ import {
 } from '@mantine/core';
 import { Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { TABLE_MIN_WIDTH } from '@app/shared';
+import { CONTRACT_TYPE_LABELS, TABLE_MIN_WIDTH, translateKey } from '@app/shared';
+import { DateText } from '../../common/DateText';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { ArchiveModal, CloseYearModal, EmployeeModal, PasswordModal } from './EmployeeModals';
 import { PoolLegend, PoolMeter } from './PoolMeter';
@@ -66,15 +67,24 @@ const Actions = ({ e, onEdit, onPassword, onArchive }: RowActions & { e: MockEmp
   );
 };
 
+/** Rodzaj umowy albo szare „brak”. */
+const ContractText = ({ e }: { e: MockEmployee }) => {
+  const { t } = useTranslation('employees');
+  if (!e.contractType) return <Text span inherit c="dimmed">{t('no_email')}</Text>;
+  return <>{translateKey(t, CONTRACT_TYPE_LABELS[e.contractType])}</>;
+};
+
 const EmployeesTable = ({ rows, ...actions }: RowActions & { rows: MockEmployee[] }) => {
   const { t } = useTranslation('employees');
   return (
-    <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH + 260} visibleFrom="sm">
+    <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH + 480} visibleFrom="sm">
       <Table verticalSpacing="sm" highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>{t('col_name')}</Table.Th>
             <Table.Th>{t('col_role')}</Table.Th>
+            <Table.Th>{t('col_hired')}</Table.Th>
+            <Table.Th>{t('col_contract')}</Table.Th>
             <Table.Th>{t('col_pool', { year: POOL_YEAR })}</Table.Th>
             <Table.Th>{t('col_notify')}</Table.Th>
             <Table.Th />
@@ -85,6 +95,8 @@ const EmployeesTable = ({ rows, ...actions }: RowActions & { rows: MockEmployee[
             <Table.Tr key={e.id}>
               <Table.Td><NameCell e={e} /></Table.Td>
               <Table.Td><RoleBadge role={e.role} /></Table.Td>
+              <Table.Td><DateText value={e.hiredOn} /></Table.Td>
+              <Table.Td><ContractText e={e} /></Table.Td>
               <Table.Td><PoolMeter pool={e.pool} /></Table.Td>
               <Table.Td>{e.notifyEmail ?? <Text span inherit c="dimmed">{t('no_email')}</Text>}</Table.Td>
               <Table.Td><Actions e={e} {...actions} /></Table.Td>
@@ -109,6 +121,9 @@ const EmployeeCards = ({ rows, ...actions }: RowActions & { rows: MockEmployee[]
               <RoleBadge role={e.role} />
             </Group>
             <PoolMeter pool={e.pool} />
+            <Text size="sm" c="dimmed">
+              {t('col_hired')}: <DateText value={e.hiredOn} /> · {t('col_contract')}: <ContractText e={e} />
+            </Text>
             <Text size="sm" c="dimmed">{t('col_notify')}: {e.notifyEmail ?? t('no_email')}</Text>
             <Actions e={e} {...actions} />
           </Stack>

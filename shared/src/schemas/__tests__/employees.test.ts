@@ -71,4 +71,23 @@ describe('employee schemas', () => {
   it('carried days after many closed years (e.g. 300) still save in the edit form', () => {
     expect(employeeUpdateSchema.safeParse({ ...base, carriedDays: 300 }).success).toBe(true);
   });
+
+  it('hire date and contract type are optional: empty → null', () => {
+    const r = employeeUpdateSchema.parse({ ...base, hiredOn: '', contractType: '' });
+    expect(r.hiredOn).toBeNull();
+    expect(r.contractType).toBeNull();
+    expect(employeeUpdateSchema.parse(base).hiredOn).toBeNull();
+  });
+
+  it('hire date 2024-03-01 and contract b2b saved; 2024-02-30 → validation.date; contract kot → error', () => {
+    const r = employeeCreateSchema.parse({ ...base, password: 'Urlop-2026', hiredOn: '2024-03-01', contractType: 'b2b' });
+    expect(r).toMatchObject({ hiredOn: '2024-03-01', contractType: 'b2b' });
+    expect(issue(employeeUpdateSchema.safeParse({ ...base, hiredOn: '2024-02-30' }), 'hiredOn')).toBe('validation.date');
+    expect(employeeUpdateSchema.safeParse({ ...base, contractType: 'kot' }).success).toBe(false);
+  });
+
+  it('administrator also keeps hire date and contract type', () => {
+    const r = employeeUpdateSchema.parse({ ...base, role: 'admin', hiredOn: '2020-01-02', contractType: 'employment' });
+    expect(r).toMatchObject({ hiredOn: '2020-01-02', contractType: 'employment' });
+  });
 });

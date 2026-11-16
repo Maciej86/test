@@ -61,6 +61,8 @@ export const listEmployeesPage = async (query: EmployeesListQuery, me: Actor): P
     login: r.login,
     email: r.email,
     role: r.role,
+    hiredOn: r.hired_on,
+    contractType: r.contract_type,
     isMe: r.id === me.id,
     pool:
       r.role === 'employee' && r.annual_days !== null
@@ -101,6 +103,8 @@ const accountFields = (d: q.AccountData) => ({
   login: d.login,
   email: d.email,
   role: d.role,
+  hired_on: d.hiredOn,
+  contract_type: d.contractType,
 });
 
 const accountOf = (u: q.UserRow): q.AccountData => ({
@@ -109,6 +113,8 @@ const accountOf = (u: q.UserRow): q.AccountData => ({
   login: u.login,
   email: u.email,
   role: u.role,
+  hiredOn: u.hired_on ?? null,
+  contractType: u.contract_type ?? null,
 });
 
 const accountInput = (d: EmployeeData): q.AccountData => ({
@@ -117,6 +123,8 @@ const accountInput = (d: EmployeeData): q.AccountData => ({
   login: d.login,
   email: d.email,
   role: d.role,
+  hiredOn: d.hiredOn,
+  contractType: d.contractType,
 });
 
 export const createEmployee = async (input: EmployeeCreateData, actor: Actor): Promise<Result<{ id: number }>> => {

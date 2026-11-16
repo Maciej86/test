@@ -7,10 +7,10 @@ import { EmployeesListPage } from '../EmployeesListPage';
 
 const thisYear = Number(todayIsoDate().slice(0, 4));
 const anna: EmployeeListItem = {
-  id: 1, name: 'Anna Nowak', firstName: 'Anna', lastName: 'Nowak', login: 'anna.nowak@firma.pl', email: 'anna.nowak@firma.pl', role: 'admin', isMe: true, pool: null,
+  id: 1, name: 'Anna Nowak', firstName: 'Anna', lastName: 'Nowak', login: 'anna.nowak@firma.pl', email: 'anna.nowak@firma.pl', role: 'admin', hiredOn: null, contractType: null, isMe: true, pool: null,
 };
 const jan: EmployeeListItem = {
-  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', isMe: false,
+  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hiredOn: '2024-03-01', contractType: 'b2b', isMe: false,
   pool: { year: thisYear, annualDays: 26, carriedDays: 4, usedDays: 9, pendingDays: 0, leftDays: 21, leftCarriedDays: 0 },
 };
 const list = (items: EmployeeListItem[], o: Partial<EmployeesListResponse> = {}): EmployeesListResponse => ({
@@ -35,7 +35,11 @@ describe('EmployeesListPage', () => {
     const janRow = within(table).getByText('Jan Kowalski').closest('tr')!;
     expect(within(janRow).getByText('Pracownik')).toBeInTheDocument();
     expect(within(janRow).getByText('21')).toBeInTheDocument();
-    expect(within(janRow).getByText('brak')).toBeInTheDocument();
+    expect(within(janRow).getAllByText('brak').length).toBeGreaterThanOrEqual(1);
+    expect(within(janRow).getByText('01.03.2024')).toBeInTheDocument();
+    expect(within(janRow).getByText('B2B')).toBeInTheDocument();
+    expect(within(table).getByText('Zatrudniony od')).toBeInTheDocument();
+    expect(within(table).getByText('Umowa')).toBeInTheDocument();
     expect(within(table).getByText(`Urlop w ${thisYear}`)).toBeInTheDocument();
     expect(screen.getByText('Osób z kontem: 2, w tym administratorów: 1')).toBeInTheDocument();
   });

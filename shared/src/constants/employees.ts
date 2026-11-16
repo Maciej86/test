@@ -9,6 +9,16 @@ export const ANNUAL_DAYS_DEFAULT = 26;
  */
 export const CARRIED_DAYS_MAX = 999;
 
+/** Rodzaj umowy pracownika (nieobowiązkowy); teksty w employees.json, `contract_types`. */
+export const CONTRACT_TYPES = ['employment', 'mandate', 'specific_work', 'b2b'] as const;
+export type ContractType = (typeof CONTRACT_TYPES)[number];
+export const CONTRACT_TYPE_LABELS: Record<ContractType, string> = {
+  employment: 'employees.contract_types.employment',
+  mandate: 'employees.contract_types.mandate',
+  specific_work: 'employees.contract_types.specific_work',
+  b2b: 'employees.contract_types.b2b',
+};
+
 /** Kolejność listy: po nazwisku albo po liczbie pozostałych dni. */
 export const EMPLOYEE_SORTS = ['name', 'days_left'] as const;
 export type EmployeeSort = (typeof EMPLOYEE_SORTS)[number];

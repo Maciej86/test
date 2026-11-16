@@ -6,6 +6,7 @@ import {
   formatDateTime,
   formatRelativeDateTime,
   formatRelativeDay,
+  parseTypedDate,
   formatTime,
   toIsoDate,
   todayIsoDate,
@@ -87,5 +88,16 @@ describe('relative dates', () => {
   it('returns null for an empty value', () => {
     expect(formatRelativeDateTime(null, t, now)).toBeNull();
     expect(formatRelativeDay('', t, now)).toBeNull();
+  });
+});
+
+describe('parseTypedDate', () => {
+  it('01.03.2024 and 1.3.2024 → 2024-03-01; 30.02.2024, 2024-03-01 and text → null', () => {
+    expect(parseTypedDate('01.03.2024')).toBe('2024-03-01');
+    expect(parseTypedDate(' 1.3.2024 ')).toBe('2024-03-01');
+    expect(parseTypedDate('30.02.2024')).toBeNull();
+    expect(parseTypedDate('2024-03-01')).toBeNull();
+    expect(parseTypedDate('kot')).toBeNull();
+    expect(parseTypedDate('')).toBeNull();
   });
 });

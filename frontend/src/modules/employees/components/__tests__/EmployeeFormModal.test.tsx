@@ -7,7 +7,7 @@ import { renderWithProviders } from '../../../../test/render';
 import { EmployeeFormModal } from '../EmployeeFormModal';
 
 const jan: EmployeeListItem = {
-  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', isMe: false,
+  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hiredOn: '2024-03-01', contractType: 'employment', isMe: false,
   pool: { year: 2026, annualDays: 26, carriedDays: 4, usedDays: 9, pendingDays: 0, leftDays: 21, leftCarriedDays: 0 },
 };
 const anna: EmployeeListItem = { ...jan, id: 1, name: 'Anna Nowak', firstName: 'Anna', lastName: 'Nowak', login: 'anna.nowak@firma.pl', role: 'admin', isMe: true, pool: null };
@@ -31,6 +31,24 @@ const fill = (label: string, value: string) => fireEvent.change(screen.getByLabe
 afterEach(() => vi.restoreAllMocks());
 
 describe('EmployeeFormModal', () => {
+  it('hire date and contract type are filled from the employee and sent', async () => {
+    const put = vi.spyOn(api, 'put').mockResolvedValue({ data: { ok: true } });
+    show(jan);
+    expect(screen.getByLabelText('Data zatrudnienia')).toHaveValue('01.03.2024');
+    expect(screen.getByLabelText('Rodzaj umowy', { selector: 'input:not([type=hidden])' })).toHaveValue('Umowa o pracę');
+    fireEvent.change(screen.getByLabelText('Data zatrudnienia'), { target: { value: '15.04.2025' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
+    await waitFor(() =>
+      expect(put).toHaveBeenCalledWith('/employees/2', expect.objectContaining({ hiredOn: '2025-04-15', contractType: 'employment' })),
+    );
+  });
+
+  it('new employee: hire date and contract type are optional and empty', () => {
+    show(null);
+    expect(screen.getByLabelText('Data zatrudnienia')).toHaveValue('');
+    expect(screen.getByLabelText('Rodzaj umowy', { selector: 'input:not([type=hidden])' })).toHaveValue('');
+  });
+
   it('empty form → "To pole jest wymagane."', async () => {
     const post = vi.spyOn(api, 'post');
     show(null);

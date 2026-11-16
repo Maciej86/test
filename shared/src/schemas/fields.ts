@@ -25,6 +25,7 @@ export const FIELD_MESSAGES = {
   loginFormat: 'validation.login_format',
   passwordRules: 'validation.password_rules',
   wholeNumber: 'validation.whole_number',
+  date: 'validation.date',
 } as const;
 
 const M = FIELD_MESSAGES;
@@ -145,6 +146,12 @@ export const optionalField = <T extends z.ZodType>(schema: T) => {
     schema.nullable(),
   );
 };
+
+/** Dzień `RRRR-MM-DD` (kolumna DATE), np. z kalendarza w formularzu; nieistniejący dzień (30.02) → validation.date. */
+export const isoDate = textInput()
+  .trim()
+  .min(1, { error: M.required, abort: true })
+  .pipe(z.iso.date(M.date));
 
 /** Login konta: 3–190 znaków bez spacji, zapisywany małymi literami (może wyglądać jak e-mail). */
 export const login = textInput()

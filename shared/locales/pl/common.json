@@ -87,5 +87,6 @@
     "yesterday": "Wczoraj",
     "today_at": "dzisiaj, {{time}}",
     "yesterday_at": "wczoraj, {{time}}"
-  }
+  },
+  "date_placeholder": "DD.MM.RRRR"
 }

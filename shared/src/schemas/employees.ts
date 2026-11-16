@@ -1,8 +1,15 @@
 import { z } from 'zod';
 import { ROLES, type Role } from '../constants/roles';
 import { FIRST_NAME_MAX, LAST_NAME_MAX } from '../constants/login';
-import { ANNUAL_DAYS_MAX, CARRIED_DAYS_MAX, EMPLOYEE_SORTS, type EmployeeSort } from '../constants/employees';
-import { email, login, newPassword, optionalField, personName, wholeNumber } from './fields';
+import {
+  ANNUAL_DAYS_MAX,
+  CARRIED_DAYS_MAX,
+  CONTRACT_TYPES,
+  EMPLOYEE_SORTS,
+  type ContractType,
+  type EmployeeSort,
+} from '../constants/employees';
+import { email, isoDate, login, newPassword, optionalField, personName, wholeNumber } from './fields';
 import { listQuerySchema, type ListResponse } from './list';
 
 const employeeFields = {
@@ -11,6 +18,8 @@ const employeeFields = {
   login,
   email: optionalField(email),
   role: z.enum(ROLES, { error: 'validation.required' }),
+  hiredOn: optionalField(isoDate),
+  contractType: optionalField(z.enum(CONTRACT_TYPES, { error: 'validation.required' })),
   annualDays: wholeNumber(0, ANNUAL_DAYS_MAX).optional(),
   carriedDays: wholeNumber(0, CARRIED_DAYS_MAX).optional(),
 };
@@ -83,6 +92,9 @@ export interface EmployeeListItem {
   login: string;
   email: string | null;
   role: Role;
+  /** Data zatrudnienia `RRRR-MM-DD` albo null. */
+  hiredOn: string | null;
+  contractType: ContractType | null;
   isMe: boolean;
   /** null dla administratora. */
   pool: EmployeePool | null;

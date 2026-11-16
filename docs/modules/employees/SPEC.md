@@ -27,7 +27,7 @@ Układ z makiety (`EmployeesMockup.tsx`, bez paska „Pokaż stan”):
   kolejność („Nazwisko A–Z”, „Najmniej dni zostało”), po prawej legenda kolorów paska. Wszystko w adresie
   (`?search=…&role=…&sort=…&dir=…&page=…`).
 - Tabela (komputer): Pracownik (imię i nazwisko pogrubione, „(to Ty)” przy własnym koncie, pod spodem login),
-  Rola (znacznik: Administrator `navy`, Pracownik `gray`), „Urlop w 2026” (pasek puli), E-mail do powiadomień
+  Rola (znacznik: Administrator `navy`, Pracownik `gray`), Zatrudniony od (`DateText`), Umowa („brak” przygaszone; zmiana 2026-11-16), „Urlop w 2026” (pasek puli), E-mail do powiadomień
   („brak” przygaszone), akcje: Edytuj, Ustaw hasło, Do archiwum (czerwone; przy własnym koncie wyłączone z dymkiem
   „Własnego konta nie przeniesiesz do archiwum.”).
 - Telefon (poniżej `sm`): karty z tymi samymi danymi i przyciskami.
@@ -43,7 +43,8 @@ Układ z makiety (`EmployeesMockup.tsx`, bez paska „Pokaż stan”):
 
 ### Okno „Dodaj pracownika” / „Edytuj: <imię>” (admin)
 
-Pola (zasady w „Pola formularzy”): Imię i Nazwisko (dwa pola obok siebie, na telefonie jedno pod drugim; zmiana 2026-11-15), Login (podpowiedź), E-mail do powiadomień (podpowiedź), Rola
+Pola (zasady w „Pola formularzy”): Imię i Nazwisko (dwa pola obok siebie, na telefonie jedno pod drugim; zmiana 2026-11-15), Login (podpowiedź), E-mail do powiadomień (podpowiedź), Rola,
+Data zatrudnienia i Rodzaj umowy (dwa pola obok siebie, oba nieobowiązkowe; zmiana 2026-11-16)
 (domyślnie Pracownik), przy dodawaniu Hasło tymczasowe z przyciskiem „Wygeneruj” (pokazuje wygenerowane hasło
 jawnie, pytanie 5). Przy roli Pracownik sekcja „Pula urlopu na 2026”: Dni na rok (domyślnie 26), Zaległe z 2025
 (domyślnie 0); przy roli Administrator sekcja znika (pula w bazie zostaje). Własna rola: pole wyłączone z opisem
@@ -86,6 +87,8 @@ przywrócisz w „Archiwum”.” Przyciski Anuluj / „Do archiwum” (czerwony
 | Pracownik | Login | tak | 3–190 znaków | bez spacji, małe litery, `jan.kowalski@firma.pl` | `login` |
 | Pracownik | E-mail do powiadomień | nie | do 190 znaków | `jan.kowalski@gmail.com` | `optionalField(email)` |
 | Pracownik | Rola | tak | `admin` / `employee` | domyślnie `employee` | `z.enum(ROLES)` |
+| Pracownik | Data zatrudnienia | nie | istniejący dzień | kalendarz albo wpisane `01.03.2024`, zapis `RRRR-MM-DD` | `optionalField(isoDate)` (nowe) |
+| Pracownik | Rodzaj umowy | nie | `employment` / `mandate` / `specific_work` / `b2b` | Umowa o pracę, Umowa zlecenie, Umowa o dzieło, B2B | `optionalField(z.enum(CONTRACT_TYPES))` |
 | Pracownik (dodawanie) | Hasło tymczasowe | tak | 8–72 znaki | cyfra i znak specjalny | `newPassword` |
 | Pracownik (rola Pracownik) | Dni na rok | tak | 0–60 | liczba całkowita, domyślnie 26 | `wholeNumber(0, 60)` (nowe) |
 | Pracownik (rola Pracownik) | Zaległe | tak | 0–999 | liczba całkowita, domyślnie 0 | `wholeNumber(0, CARRIED_DAYS_MAX)` (nowe) |
@@ -106,6 +109,14 @@ Nowe pole `wholeNumber(min, max)` w `fields.ts` (z testem i kluczami `validation
 - Lista pokazuje „Imię Nazwisko”; sortowanie „Nazwisko A–Z” po `last_name`, potem `first_name`; wyszukiwanie po imieniu, nazwisku i loginie.
 - `npm run admin` (moduł Logowanie) pyta osobno o imię i nazwisko; konta testowe e2e też zapisują oba pola.
 - Historia zmian zapisuje `first_name` i `last_name` zamiast `name`.
+
+### Data zatrudnienia i rodzaj umowy (zmiana 2026-11-16, prośba użytkownika)
+
+- `011_users_employment.sql`: `users.hired_on DATE NULL`, `users.contract_type ENUM('employment','mandate','specific_work','b2b') NULL`.
+- Oba pola nieobowiązkowe (obecne konta mają je puste), także dla administratora. Lista ma kolumny „Zatrudniony od” i „Umowa”
+  (na telefonie jedna linijka w karcie).
+- Pole daty: wspólne `DateField` (`common/`, Mantine `DateInput`, format `DD.MM.RRRR`, wpisaną datę czyta `parseTypedDate`).
+- Historia zmian zapisuje `hired_on` i `contract_type` razem z innymi polami konta.
 
 ### Migracja `003_leave_pools.sql`
 
@@ -151,7 +162,7 @@ jest tutaj, bo potrzebuje jej link „Przywróć konto zamiast zakładać nowe�
 
 | Zdarzenie | `entityType` | `action` | Zmiany |
 |---|---|---|---|
-| dodanie pracownika | `users` | `create` | name, login, email, role (bez hasła) |
+| dodanie pracownika | `users` | `create` | first_name, last_name, login, email, role, hired_on, contract_type (bez hasła) |
 | edycja danych, zmiana roli | `users` | `update` | `diffChanges` tylko zmienionych pól |
 | zmiana puli w „Edytuj” | `leave_pools` | `update` / `create` | annual_days, carried_days, year |
 | ustawienie hasła | `users` | `update` | `password: { before: null, after: 'reset' }` (bez hasła) **[decyzja AI]** |

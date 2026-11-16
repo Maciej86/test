@@ -12,6 +12,7 @@
   "dependencies": {
     "@app/shared": "*",
     "@mantine/core": "^9.8.0",
+    "@mantine/dates": "^9.8.0",
     "@mantine/form": "^9.8.0",
     "@mantine/hooks": "^9.8.0",
     "@mantine/notifications": "^9.8.0",

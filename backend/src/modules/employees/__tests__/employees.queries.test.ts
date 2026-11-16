@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn() } }));
-const { insertUser, listEmployees, setTemporaryPassword } = await import('../employees.queries');
+const { insertUser, listEmployees, setTemporaryPassword, updateUser } = await import('../employees.queries');
 
 const fakeDb = (rows: unknown[][]) => {
   const query = vi.fn();
@@ -20,10 +20,26 @@ describe('employees queries', () => {
 
   it('inserts first and last name, never the generated name column', async () => {
     const db = { query: vi.fn().mockResolvedValue([{ insertId: 5 }]) };
-    await insertUser(db, { firstName: 'Jan', lastName: 'Kowalski', login: 'jan@firma.pl', email: null, role: 'employee', passwordHash: 'h' });
+    await insertUser(db, {
+      firstName: 'Jan', lastName: 'Kowalski', login: 'jan@firma.pl', email: null, role: 'employee', hiredOn: '2024-03-01', contractType: 'b2b', passwordHash: 'h',
+    });
     const [sql, params] = db.query.mock.calls[0]!;
-    expect(sql).toContain('INSERT INTO users (first_name, last_name, login, email, role, password_hash, must_change_password)');
-    expect(params).toEqual(['Jan', 'Kowalski', 'jan@firma.pl', null, 'employee', 'h']);
+    expect(sql).toContain('INSERT INTO users (first_name, last_name, login, email, role, hired_on, contract_type, password_hash, must_change_password)');
+    expect(params).toEqual(['Jan', 'Kowalski', 'jan@firma.pl', null, 'employee', '2024-03-01', 'b2b', 'h']);
+  });
+
+  it('updates hire date and contract type with the account', async () => {
+    const db = { query: vi.fn().mockResolvedValue([{}]) };
+    await updateUser(db, 2, { firstName: 'Jan', lastName: 'Kowalski', login: 'jan@firma.pl', email: null, role: 'employee', hiredOn: null, contractType: 'employment' });
+    const [sql, params] = db.query.mock.calls[0]!;
+    expect(sql).toContain('hired_on = ?, contract_type = ?');
+    expect(params).toEqual(['Jan', 'Kowalski', 'jan@firma.pl', null, 'employee', null, 'employment', 2]);
+  });
+
+  it('the list reads hire date and contract type', async () => {
+    const db = fakeDb([[], [{ total: 0 }]]);
+    await listEmployees(db, { search: '', sort: 'name', dir: 'asc', page: 1, pageSize: 20, year: 2026 });
+    expect(db.query.mock.calls[0]![0]).toContain('u.hired_on, u.contract_type');
   });
 
   it('searches by name and login with parameters and filters by role', async () => {

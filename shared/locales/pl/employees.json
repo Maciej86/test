@@ -108,5 +108,15 @@
   "restored": "Przywrócono konto: {{name}}.",
   "pool_missing": "brak puli",
   "pool_missing_hint": "Ustaw pulę dni w „Edytuj”.",
-  "close_year_empty": "Nikt nie ma jeszcze puli na {{year}}. Ustaw pule w „Edytuj” albo dodaj pracowników."
+  "close_year_empty": "Nikt nie ma jeszcze puli na {{year}}. Ustaw pule w „Edytuj” albo dodaj pracowników.",
+  "col_hired": "Zatrudniony od",
+  "col_contract": "Umowa",
+  "hired_on": "Data zatrudnienia",
+  "contract_type": "Rodzaj umowy",
+  "contract_types": {
+    "employment": "Umowa o pracę",
+    "mandate": "Umowa zlecenie",
+    "specific_work": "Umowa o dzieło",
+    "b2b": "B2B"
+  }
 }

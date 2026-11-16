@@ -54,7 +54,7 @@ const as = (user: SessionUser | null) => {
 };
 
 const row = (o: Partial<Record<string, unknown>>) => ({
-  id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', annual_days: 26, carried_days: 4, ...o,
+  id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hired_on: '2024-03-01', contract_type: 'employment', annual_days: 26, carried_days: 4, ...o,
 });
 const newJan = { firstName: 'Jan', lastName: 'Kowalski', login: 'Jan.Kowalski@Firma.pl', email: '', role: 'employee', password: 'Urlop-2026', annualDays: 26, carriedDays: 0 };
 const historyOf = () => vi.mocked(logActivity).mock.calls.map((c) => c[1]);
@@ -87,7 +87,7 @@ describe('employees routes', () => {
     expect(res.body.total).toBe(2);
     expect(res.body.items[0]).toMatchObject({ id: 1, isMe: true, pool: null });
     expect(res.body.items[1]).toMatchObject({
-      id: 2, isMe: false, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski',
+      id: 2, isMe: false, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', hiredOn: '2024-03-01', contractType: 'employment',
       pool: { year: 2026, annualDays: 26, carriedDays: 4, usedDays: 0, pendingDays: 0, leftDays: 30, leftCarriedDays: 4 },
     });
     expect(JSON.stringify(res.body)).not.toContain('password');
@@ -113,7 +113,8 @@ describe('employees routes', () => {
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ id: 7 });
     expect(q.insertUser).toHaveBeenCalledWith(conn, {
-      firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', passwordHash: 'hash(Urlop-2026)',
+      firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hiredOn: null, contractType: null,
+      passwordHash: 'hash(Urlop-2026)',
     });
     expect(q.upsertPool).toHaveBeenCalledWith(conn, 7, 2026, 26, 0);
     expect(withTransaction).toHaveBeenCalledTimes(1);
@@ -181,7 +182,7 @@ describe('employees routes', () => {
     expect(res.body.error.fields).toMatchObject({ firstName: 'validation.required', lastName: 'validation.too_short', password: 'validation.password_rules' });
   });
 
-  const janUser = { id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', archived_at: null };
+  const janUser = { id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hired_on: null, contract_type: null, archived_at: null };
   const janEdit = { firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: '', role: 'employee', annualDays: 26, carriedDays: 4 };
   const janPool = { id: 11, user_id: 2, year: 2026, annual_days: 26, carried_days: 4, closed_at: null };
 
@@ -260,6 +261,24 @@ describe('employees routes', () => {
     await as(anna).put('/employees/2', janEdit);
     expect(q.upsertPool).toHaveBeenCalledWith(conn, 2, 2026, 26, 4);
     expect(historyOf()).toContainEqual(expect.objectContaining({ action: 'create', entityType: 'leave_pools' }));
+  });
+
+  it('PUT /employees/:id: hire date and contract type saved with history', async () => {
+    vi.mocked(q.findUser).mockResolvedValue(janUser as never);
+    vi.mocked(q.findPool).mockResolvedValue(janPool as never);
+    const res = await as(anna).put('/employees/2', { ...janEdit, hiredOn: '2024-03-01', contractType: 'mandate' });
+    expect(res.status).toBe(200);
+    expect(q.updateUser).toHaveBeenCalledWith(conn, 2, expect.objectContaining({ hiredOn: '2024-03-01', contractType: 'mandate' }));
+    expect(historyOf()[0]!.changes).toEqual({
+      hired_on: { before: null, after: '2024-03-01' },
+      contract_type: { before: null, after: 'mandate' },
+    });
+  });
+
+  it('PUT /employees/:id: hire date 2024-02-30 or contract kot → 400', async () => {
+    expect((await as(anna).put('/employees/2', { ...janEdit, hiredOn: '2024-02-30' })).status).toBe(400);
+    expect((await as(anna).put('/employees/2', { ...janEdit, contractType: 'kot' })).status).toBe(400);
+    expect(q.updateUser).not.toHaveBeenCalled();
   });
 
   it('PUT /employees/:id: no changes → no history entry', async () => {
