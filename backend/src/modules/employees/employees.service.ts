@@ -2,7 +2,6 @@ import {
   EMPLOYEE_MESSAGES,
   SERVER_MESSAGES,
   todayIsoDate,
-  type ArchivedUserHint,
   type CloseYearInput,
   type CloseYearPreview,
   type EmployeeCreateData,
@@ -17,7 +16,9 @@ import { PAGE_SIZE } from '../../config/constants';
 import { diffChanges, logActivity } from '../../db/activityLog';
 import { pool } from '../../db/pool';
 import { withTransaction } from '../../db/transaction';
+import { fail, type Result, type ServiceError } from '../../middleware/routeHelpers';
 import * as q from './employees.queries';
+
 
 /** Kto wykonuje zmianę (z `req.user`). */
 export interface Actor {
@@ -25,19 +26,6 @@ export interface Actor {
   name: string;
 }
 
-/** Błąd do odesłania przez trasę: status, klucz, ewentualnie błędy pól i podpowiedź „Przywróć konto”. */
-export interface ServiceError {
-  status: number;
-  message: string;
-  fields?: Record<string, string>;
-  archivedUser?: ArchivedUserHint;
-}
-
-export type Result<T = { ok: true }> = T | { error: ServiceError };
-
-const fail = (status: number, message: string, extra: Omit<ServiceError, 'status' | 'message'> = {}) => ({
-  error: { status, message, ...extra },
-});
 
 /** Bieżący rok kalendarzowy w strefie aplikacji. */
 export const currentYear = () => Number(todayIsoDate().slice(0, 4));

@@ -72,7 +72,7 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
   (ukryty → `null`). Testy (podmieniony `db`): każde SQL z `?`; `listLeaveTypes` zamienia wiersze na `LeaveTypeItem`
   z `requestsCount: 0`; `findSelectableLeaveType` dla ukrytego → `null`; `lockVisible` ma `FOR UPDATE`.
 
-- [ ] **3. Wspólne pomocniki, lista, dodawanie, edycja.**
+- [x] **3. Wspólne pomocniki, lista, dodawanie, edycja.**
   - `backend/src/middleware/routeHelpers.ts`: `idParam(res, raw): number | null`, `reply<T>(res, result: Result<T>,
     status = 200)`, `ServiceError`, `Result<T>`, `fail(status, message, extra?)` przeniesione z Pracowników (`extra`
     obejmuje `archivedUser` i `hiddenType`); Pracownicy importują stąd. Testy: `idParam('0'|'-1'|'abc'|'1.5')` →
@@ -124,4 +124,5 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
 
 ## Rozstrzygnięcia w trakcie budowy
 
-(uzupełniane w trakcie)
+- Krok 2: lista kolumn wpisana wprost w każde zapytanie (test zasad nie przepuszcza `${…}` w SQL, nawet stałej).
+- Krok 3: `ServiceError` w `routeHelpers.ts` ma dowolne dodatkowe dane (`archivedUser`, `hiddenType`), a `reply` przekazuje je wszystkie do `sendError`. Dodawanie typu w `withTransaction`, `maxPosition` z `FOR UPDATE`, żeby dwa nowe typy dodane w tej samej chwili nie dostały tej samej pozycji. Testy tras podmieniają usługę modułu (reguły sprawdzają testy usługi).

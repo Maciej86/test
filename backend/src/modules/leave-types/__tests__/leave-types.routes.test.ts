@@ -1,12 +1,95 @@
-import { describe, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import request from 'supertest';
+import type { SessionUser } from '@app/shared';
+
+vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn(), getConnection: vi.fn() } }));
+vi.mock('../../../auth/users.queries', () => ({ findActiveUserById: vi.fn() }));
+vi.mock('../leave-types.service', () => ({
+  listTypes: vi.fn(),
+  createType: vi.fn(),
+  updateType: vi.fn(),
+  moveType: vi.fn(),
+  hideType: vi.fn(),
+  unhideType: vi.fn(),
+}));
+process.env.JWT_SECRET = 'test-secret-test-secret-test-secret';
+
+const users = await import('../../../auth/users.queries');
+const s = await import('../leave-types.service');
+const { createApp } = await import('../../../app');
+const { signToken } = await import('../../../auth/token');
+const { AUTH_COOKIE_NAME } = await import('../../../config/constants');
+const { LEAVE_TYPE_MESSAGES: M } = await import('@app/shared');
+
+const anna: SessionUser = { id: 1, name: 'Anna Nowak', role: 'admin', mustChangePassword: false };
+const jan: SessionUser = { id: 2, name: 'Jan Kowalski', role: 'employee', mustChangePassword: false };
+
+const as = (user: SessionUser | null) => {
+  vi.mocked(users.findActiveUserById).mockResolvedValue(user);
+  const app = createApp();
+  const cookie = user ? `${AUTH_COOKIE_NAME}=${signToken(user, 0)}` : '';
+  return {
+    get: (url: string) => request(app).get(`/api${url}`).set('Cookie', cookie),
+    post: (url: string, body?: object) => request(app).post(`/api${url}`).set('Cookie', cookie).send(body),
+    put: (url: string, body?: object) => request(app).put(`/api${url}`).set('Cookie', cookie).send(body),
+  };
+};
+
+const body = { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: '' };
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(s.updateType).mockResolvedValue({ ok: true });
+});
 
 describe('leave types routes', () => {
-  it.todo('GET /leave-types without login → 401');
-  it.todo('GET /leave-types as employee → 403');
-  it.todo('GET /leave-types → items in order');
-  it.todo('POST /leave-types → 201 with id; bad data → 400');
-  it.todo('POST /leave-types with taken name → 409 with fields.name');
-  it.todo('PUT /leave-types/:id → ok; missing → 404; bad id → 404');
+  it('GET /leave-types without login → 401', async () => {
+    expect((await as(null).get('/leave-types')).status).toBe(401);
+  });
+
+  it('GET /leave-types as employee → 403', async () => {
+    expect((await as(jan).get('/leave-types')).status).toBe(403);
+    expect((await as(jan).post('/leave-types', body)).status).toBe(403);
+  });
+
+  it('GET /leave-types → items in order', async () => {
+    const items = [{ id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, hidden: false, requestsCount: 0 }];
+    vi.mocked(s.listTypes).mockResolvedValue({ items });
+    const res = await as(anna).get('/leave-types');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ items });
+  });
+
+  it('POST /leave-types → 201 with id, data after the schema; bad data → 400', async () => {
+    vi.mocked(s.createType).mockResolvedValue({ id: 6 });
+    const res = await as(anna).post('/leave-types', { ...body, name: ' Szkoleniowy ', position: 1 });
+    expect(res.status).toBe(201);
+    expect(res.body).toEqual({ id: 6 });
+    expect(s.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null });
+
+    const bad = await as(anna).post('/leave-types', { name: 'S', deductsPool: true, yearlyLimit: 0 });
+    expect(bad.status).toBe(400);
+    expect(bad.body.error.fields).toEqual({ name: 'validation.too_short', yearlyLimit: 'validation.min' });
+  });
+
+  it('POST /leave-types with taken name → 409 with fields.name and hiddenType', async () => {
+    vi.mocked(s.createType).mockResolvedValue({
+      error: { status: 409, message: M.nameTakenHidden, fields: { name: M.nameTakenHidden }, hiddenType: { id: 7, name: 'Szkoleniowy' } },
+    });
+    const res = await as(anna).post('/leave-types', body);
+    expect(res.status).toBe(409);
+    expect(res.body.error).toEqual({ message: M.nameTakenHidden, fields: { name: M.nameTakenHidden }, hiddenType: { id: 7, name: 'Szkoleniowy' } });
+  });
+
+  it('PUT /leave-types/:id → ok; missing → 404; bad id → 404', async () => {
+    const res = await as(anna).put('/leave-types/3', body);
+    expect(res.status).toBe(200);
+    expect(s.updateType).toHaveBeenCalledWith(3, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null });
+    vi.mocked(s.updateType).mockResolvedValueOnce({ error: { status: 404, message: 'server.not_found' } });
+    expect((await as(anna).put('/leave-types/99', body)).status).toBe(404);
+    expect((await as(anna).put('/leave-types/abc', body)).status).toBe(404);
+  });
+
   it.todo('POST /leave-types/:id/move → ok; bad direction → 400');
   it.todo('POST /leave-types/:id/hide and /unhide → ok and 409 rules');
 });

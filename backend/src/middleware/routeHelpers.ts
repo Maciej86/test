@@ -1,0 +1,38 @@
+import type { Response } from 'express';
+import { SERVER_MESSAGES } from '@app/shared';
+import { sendError } from './errors';
+
+/**
+ * Błąd z usługi modułu do odesłania przez trasę: status, klucz tekstu, błędy pól i dodatkowe dane dla ekranu
+ * (np. `archivedUser` w Pracownikach, `hiddenType` w Typach urlopów).
+ */
+export interface ServiceError {
+  status: number;
+  message: string;
+  fields?: Record<string, string>;
+  [extra: string]: unknown;
+}
+
+/** Wynik usługi: dane albo błąd. */
+export type Result<T = { ok: true }> = T | { error: ServiceError };
+
+export const fail = (status: number, message: string, extra: Omit<ServiceError, 'status' | 'message'> = {}): { error: ServiceError } => ({
+  error: { ...extra, status, message },
+});
+
+/** Numer z adresu: tylko dodatnia liczba całkowita, inaczej 404. */
+export const idParam = (res: Response, raw: unknown): number | null => {
+  const id = Number(raw);
+  if (Number.isInteger(id) && id > 0) return id;
+  sendError(res, 404, SERVER_MESSAGES.notFound);
+  return null;
+};
+
+/** Wynik usługi → odpowiedź: błąd jednym formatem, sukces jako JSON. */
+export const reply = <T>(res: Response, result: Result<T>, status = 200) => {
+  if (typeof result === 'object' && result !== null && 'error' in result) {
+    const { status: code, message, fields, ...extra } = result.error as ServiceError;
+    return sendError(res, code, message, fields, Object.keys(extra).length > 0 ? extra : undefined);
+  }
+  res.status(status).json(result);
+};

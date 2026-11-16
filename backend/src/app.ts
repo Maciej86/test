@@ -13,6 +13,7 @@ import { sameOrigin } from './middleware/sameOrigin';
 import { healthRoutes } from './modules/health/health.routes';
 import { authPublicRoutes, authRoutes } from './modules/auth/auth.routes';
 import { employeesRoutes } from './modules/employees/employees.routes';
+import { leaveTypesRoutes } from './modules/leave-types/leave-types.routes';
 
 interface AppOptions {
   /** Dodatkowe trasy wymagające logowania (moduły dopisują się niżej; testy podają własne). */
@@ -50,6 +51,7 @@ export const createApp = (options: AppOptions = {}) => {
 
   // 3. Moduły, z rolami ich pozycji w navigation.config.ts: mountModule(api, 'employees', employeesRoutes);
   mountModule(api, 'employees', employeesRoutes);
+  mountModule(api, 'leave-types', leaveTypesRoutes);
   if (options.extraRoutes) api.use(options.extraRoutes);
   app.use('/api', api);
 

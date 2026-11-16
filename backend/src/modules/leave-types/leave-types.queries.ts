@@ -45,9 +45,9 @@ export const findByName = async (db: Db, name: string, exceptId: number | null):
   return r ? { id: r.id, name: r.name, hidden: r.hidden_at !== null } : null;
 };
 
-/** Największa pozycja (0 przy pustej tabeli). */
+/** Największa pozycja (0 przy pustej tabeli); w transakcji blokuje tabelę, żeby dwa nowe typy nie dostały tej samej. */
 export const maxPosition = async (db: Db): Promise<number> => {
-  const [rows] = await db.query<RowDataPacket[]>('SELECT MAX(position) AS max FROM leave_types');
+  const [rows] = await db.query<RowDataPacket[]>('SELECT MAX(position) AS max FROM leave_types FOR UPDATE');
   return Number(rows[0]?.max ?? 0);
 };
 

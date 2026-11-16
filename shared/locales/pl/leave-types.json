@@ -58,5 +58,12 @@
     "with_hidden": "Z ukrytymi",
     "name_taken": "Nazwa zajęta",
     "edit_used": "Edycja typu we wnioskach"
+  },
+  "server": {
+    "name_taken": "Typ o tej nazwie już jest.",
+    "name_taken_hidden": "Typ o tej nazwie już jest, ukryty.",
+    "last_visible": "To ostatni typ w formularzu wniosku. Najpierw dodaj albo przywróć inny.",
+    "already_hidden": "Ten typ jest już ukryty. Odśwież stronę.",
+    "not_hidden": "Ten typ jest już w formularzu wniosku. Odśwież stronę."
   }
 }

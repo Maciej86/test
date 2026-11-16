@@ -86,6 +86,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `/admin/employees`, `/api/employees` | admin | także pule i „Zamknij rok” |
 | `GET/POST /api/employees`, `PUT /api/employees/:id`, `POST /api/employees/:id/password`, `/:id/archive`, `/:id/restore`, `GET/POST /api/employees/close-year` | admin | `mountModule(api, 'employees', …)`; własnej roli i własnego konta do archiwum nie (409) |
 | `/admin/leave-types`, `/api/leave-types` | admin | lista typów do formularza wniosku: osobna trasa w `my-leave` |
+| `GET/POST /api/leave-types`, `PUT /api/leave-types/:id`, `POST /api/leave-types/:id/move`, `/:id/hide`, `/:id/unhide` | admin | `mountModule(api, 'leave-types', …)`; ostatniego widocznego typu nie ukryjesz (409) |
 | `/admin/activity-log`, `/api/activity-log` | admin | |
 | `/admin/archive`, `/api/archive` | admin | przywrócenie i usunięcie na stałe |
 | `/admin/my-account`, `/api/my-account` | admin, employee | tylko własne konto |
