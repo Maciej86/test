@@ -1,6 +1,8 @@
 import { Box, Button, CloseButton, Group, ScrollArea, Stack, Title } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { apiErrorMessage } from '../../../core/api/client';
+import { notify } from '../../../core/notify';
 import { NOTIFICATIONS_PATH } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DataState } from '../../../common/DataState';
@@ -30,7 +32,7 @@ export const BellPanel = ({ onClose, phone }: { onClose(): void; phone: boolean 
             variant="subtle"
             size="compact-xs"
             leftSection={<ButtonIcon action="confirm" size={14} />}
-            onClick={() => markAll.mutate()}
+            onClick={() => markAll.mutate(undefined, { onError: (error) => notify.error(apiErrorMessage(error, t)) })}
             loading={markAll.isPending}
             style={{ order: phone ? 3 : 2 }}
           >

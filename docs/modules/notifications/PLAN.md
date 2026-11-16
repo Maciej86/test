@@ -123,8 +123,29 @@ spoza menu dopięta w `buildAppRoutes.tsx`. Wygląd 1:1 z makiety (`mockups/src/
   i głównym `package.json`; wiersz w `README.md`. Testy: produkcja → błąd; rodzaje trafiają do właściwych ról.
   → `npm run check`
 
-- [ ] **8. E2E i dokumenty.** `seedE2e.ts`: usuwa powiadomienia kont e2e i dodaje adminowi e2e dwa nieprzeczytane
+- [x] **8. E2E i dokumenty.** `seedE2e.ts`: usuwa powiadomienia kont e2e i dodaje adminowi e2e dwa nieprzeczytane
   (`leave_request_new`, link `/admin/leave-requests`) i jedno przeczytane. `e2e/notifications.spec.ts` ze scenariuszy
   `TESTS.md` (admin: licznik 2, kliknięcie → przejście i licznik 1, strona i filtr, „Oznacz wszystkie” → bez
   licznika; pracownik: dzwonek pusty). `docs/DESIGN.md`: wzorzec „Dzwonek powiadomień” w tabeli wzorców. Przegląd
   kodu całego modułu (lista kontrolna z `CONVENTIONS.md`), poprawki z testem. → `npm run check`, `npm run test:e2e`
+
+## Decyzje w trakcie budowy
+
+- Baza w Dockerze liczy `NOW()` w UTC, a mysql2 czytał godziny jako czas polski (przesunięcie 1–2 h):
+  `timezone: 'Z'` w `backend/src/db/pool.ts` (osobna poprawka z testem). Koszt pomyłki: złe godziny w całej aplikacji.
+- `activeNavKey`: pozycja z adresem części (`/`, `/admin`, `/account`) podświetla się tylko dokładnie; test
+  `/admin/settings → dashboard` zmieniony na `null`.
+- Wstawianie wielu powiadomień przez `VALUES ?` (mysql2), bo test zasad nie przepuszcza składania SQL.
+- `activeAdminIds` uogólnione do `activeIdsByRole(db, role)` (potrzebne też w `npm run notifications:test`).
+- `isPanelLink` w `shared/src/schemas/notifications.ts`, wspólne dla serwera i ekranu.
+- Lista na stronie zostawia poprzednie dane podczas wczytywania (`keepPreviousData`), bo licznik
+  „Nieprzeczytane (N)” spadał na chwilę do 0.
+
+## Przegląd kodu (2026-11-16)
+
+Bez uwag krytycznych. Poprawione: brak komunikatu, gdy „Oznacz wszystkie jako przeczytane” się nie uda (test
+w `NotificationBell.test.tsx` i `NotificationsPage.test.tsx`). Próby nadużyć: na etapie testy (`describe('abuse')`).
+Drobne, odłożone: zdublowany komentarz nad `activeNavKey`; „wczoraj” liczone jako „teraz − 24 h” myli się przez
+godzinę po zmianie czasu na letni; strona `?page=99` pokazuje „Nie masz jeszcze powiadomień”; dane przykładowe po
+polsku w skryptach; brak testu panelu na telefonie w testach automatycznych; własny schemat listy zamiast
+`listQuerySchema` (bez sortowania).

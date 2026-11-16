@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import type { NotificationItem, NotificationsSummary } from '@app/shared';
 import { api } from '../../../core/api/client';
+import { notify } from '../../../core/notify';
 import { renderRoutes } from '../../../test/render';
 import { NotificationBell } from '../NotificationBell';
 
@@ -83,6 +84,15 @@ describe('NotificationBell', () => {
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/notifications/read-all'));
     fireEvent.click(screen.getByRole('button', { name: 'Pokaż wszystkie' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/admin/notifications'));
+  });
+
+  it('mark all read failing → error message', async () => {
+    show({ unread: 2, latest: [item({})] });
+    vi.mocked(api.post).mockRejectedValue(new Error('network'));
+    const error = vi.spyOn(notify, 'error').mockImplementation(() => {});
+    fireEvent.click(await bell());
+    fireEvent.click(await screen.findByRole('button', { name: 'Oznacz wszystkie jako przeczytane' }));
+    await waitFor(() => expect(error).toHaveBeenCalled());
   });
 
   it('empty → empty text', async () => {

@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { formatDate, type NotificationItem, type NotificationsListResponse } from '@app/shared';
 import { api } from '../../../core/api/client';
+import { notify } from '../../../core/notify';
 import { renderRoutes } from '../../../test/render';
 import { NotificationsPage } from '../NotificationsPage';
 
@@ -69,6 +70,14 @@ describe('NotificationsPage', () => {
     show(page({}));
     expect(await screen.findByText('Nie masz jeszcze powiadomień. Pojawią się tu, gdy coś będzie dotyczyć Ciebie.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Oznacz wszystkie jako przeczytane' })).not.toBeInTheDocument();
+  });
+
+  it('mark all read failing → error message', async () => {
+    show(page({ total: 1, unread: 1, items: [item({})] }));
+    vi.mocked(api.post).mockRejectedValue(new Error('network'));
+    const error = vi.spyOn(notify, 'error').mockImplementation(() => {});
+    fireEvent.click(await screen.findByRole('button', { name: 'Oznacz wszystkie jako przeczytane' }));
+    await waitFor(() => expect(error).toHaveBeenCalled());
   });
 
   it('second page via Pagination', async () => {

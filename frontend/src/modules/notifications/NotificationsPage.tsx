@@ -1,6 +1,8 @@
 import { Button, Group, Pagination, Paper, SegmentedControl, Stack, Text, Title } from '@mantine/core';
 import { useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { apiErrorMessage } from '../../core/api/client';
+import { notify } from '../../core/notify';
 import { notificationsQuerySchema, type NotificationItem as Item, type NotificationsQuery } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
@@ -57,7 +59,7 @@ export const NotificationsPage = () => {
           <Text size="sm" c="dimmed">{t('page_hint')}</Text>
         </Stack>
         {unread > 0 && (
-          <Button variant="default" leftSection={<ButtonIcon action="confirm" />} onClick={() => markAll.mutate()} loading={markAll.isPending}>
+          <Button variant="default" leftSection={<ButtonIcon action="confirm" />} onClick={() => markAll.mutate(undefined, { onError: (error) => notify.error(apiErrorMessage(error, t)) })} loading={markAll.isPending}>
             {t('mark_all_read')}
           </Button>
         )}
