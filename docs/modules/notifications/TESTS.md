@@ -31,4 +31,17 @@ powiadomienia), potem otwórz http://localhost:5180.
 
 ## Próby nadużyć
 
-(uzupełniane na etapie testy według `abuse.md`)
+Sprawdzone 2026-11-16 (`describe('abuse')` w `notifications.routes.test.ts`, testy schematu i dzwonka):
+
+- Oznaczenie cudzego powiadomienia (inna osoba, także administrator) → 404 jak nieistniejące; na prawdziwej bazie
+  wiersz bez zmian: przeszła
+- Podrobione numery w adresie (`0`, `-1`, `1.5`, `abc`, `0x10`, `007`, ogromny) → 404 bez zapytania do bazy: przeszła
+- Podrobiony właściciel (`userId`, `user_id`) w adresie i w treści, podrobione `readAt` → zawsze konto z sesji: przeszła
+- Dwa kliknięcia naraz („przeczytane”, „oznacz wszystkie”) → obie odpowiedzi poprawne, pierwsza data odczytu
+  zostaje: przeszła
+- Usunięcie osoby → jej powiadomienia znikają (klucz obcy `ON DELETE CASCADE`), imię autora w cudzych zostaje: przeszła
+- Ogromny i ujemny numer strony → strona 1, bez błędu bazy: przeszła
+- HTML i `<script>` w tytule zadania → na ekranie zwykły tekst, nic się nie wykonuje: przeszła
+- Adres powiadomienia poza panelem (`https://…`, `//…`, `javascript:`) → serwer nie zapisze, ekran nie przejdzie:
+  przeszła (testy z kroku 2 i 5)
+- Pracownik nie widzi powiadomień administratora (e2e): przeszła

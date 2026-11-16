@@ -95,6 +95,14 @@ describe('NotificationBell', () => {
     await waitFor(() => expect(error).toHaveBeenCalled());
   });
 
+  it('abuse: HTML in a task title is shown as plain text', async () => {
+    show({ unread: 1, latest: [item({ type: 'task_assigned', params: { task: '<img src=x onerror=alert(1)><script>alert(1)</script>' }, link: '/admin/tasks' })] });
+    fireEvent.click(await bell());
+    expect(await screen.findByText('„<img src=x onerror=alert(1)><script>alert(1)</script>”')).toBeInTheDocument();
+    expect(document.querySelector('img[src="x"]')).toBeNull();
+    expect(document.querySelector('script')).toBeNull();
+  });
+
   it('empty → empty text', async () => {
     show({ unread: 0, latest: [] });
     fireEvent.click(await bell());

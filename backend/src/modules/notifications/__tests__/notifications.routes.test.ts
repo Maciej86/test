@@ -90,3 +90,50 @@ describe('notifications routes', () => {
     expect(s.readAll).toHaveBeenCalledWith(2);
   });
 });
+
+describe('abuse', () => {
+  it('someone else\'s notification: marking it gives 404 like a missing one', async () => {
+    vi.mocked(s.readOne).mockResolvedValue({ error: { status: 404, message: 'server.not_found' } });
+    const res = await as(anna).post('/notifications/9/read');
+    expect(res.status).toBe(404);
+    expect(s.readOne).toHaveBeenCalledWith(1, 9);
+  });
+
+  it('forged ids in the address → 404 without touching the database', async () => {
+    for (const id of ['0', '-1', '1.5', 'abc', '0x10', '007', '99999999999']) {
+      expect((await as(jan).post(`/notifications/${id}/read`)).status).toBe(404);
+    }
+    expect(s.readOne).not.toHaveBeenCalled();
+  });
+
+  it('forged owner in the address or body is ignored: always req.user', async () => {
+    await as(jan).get('/notifications/summary?userId=1');
+    expect(s.getSummary).toHaveBeenCalledWith(2);
+    await as(jan).get('/notifications?userId=1&user_id=1');
+    expect(s.getList).toHaveBeenCalledWith(2, { page: 1, unread: '0' });
+    await as(jan).post('/notifications/read-all', { userId: 1, user_id: 1 });
+    expect(s.readAll).toHaveBeenCalledWith(2);
+    await as(jan).post('/notifications/7/read', { userId: 1, readAt: '2000-01-01' });
+    expect(s.readOne).toHaveBeenCalledWith(2, 7);
+  });
+
+  it('clicking twice at once: both answers are fine', async () => {
+    const e = as(jan);
+    const [a, b] = await Promise.all([e.post('/notifications/7/read'), e.post('/notifications/7/read')]);
+    expect([a.status, b.status]).toEqual([204, 204]);
+    const [c, d] = await Promise.all([e.post('/notifications/read-all'), e.post('/notifications/read-all')]);
+    expect([c.status, d.status]).toEqual([200, 200]);
+  });
+
+  it('deleting a person deletes their notifications (ON DELETE CASCADE), nothing else', async () => {
+    const { readFileSync } = await import('node:fs');
+    const sql = readFileSync(new URL('../../../../migrations/010_notifications.sql', import.meta.url), 'utf8');
+    expect(sql).toMatch(/FOREIGN KEY \(user_id\) REFERENCES users \(id\) ON DELETE CASCADE/);
+    expect(sql).not.toMatch(/actor_name[^\n]*REFERENCES/);
+  });
+
+  it('a huge page number does not break the list', async () => {
+    const res = await as(jan).get('/notifications?page=99999999999999999999');
+    expect(res.status).toBe(200);
+  });
+});

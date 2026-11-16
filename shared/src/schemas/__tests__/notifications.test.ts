@@ -12,6 +12,9 @@ describe('notificationsQuerySchema', () => {
   it('page=abc → page 1', () => {
     expect(notificationsQuerySchema.parse({ page: 'abc', unread: '1' })).toEqual({ page: 1, unread: '1' });
     expect(notificationsQuerySchema.parse({ page: '3' }).page).toBe(3);
+    // Próba nadużycia: liczba poza zakresem bezpiecznych liczb całkowitych → pierwsza strona, nie błąd bazy.
+    expect(notificationsQuerySchema.parse({ page: '99999999999999999999' }).page).toBe(1);
+    expect(notificationsQuerySchema.parse({ page: '-3' }).page).toBe(1);
   });
 
   it('unread=2 → error', () => {
