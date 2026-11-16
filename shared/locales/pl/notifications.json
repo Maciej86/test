@@ -1,0 +1,49 @@
+{
+  "title": "Powiadomienia",
+  "bell": "Powiadomienia",
+  "bell_unread": "Powiadomienia, nieprzeczytane: {{count}}",
+  "mark_all_read": "Oznacz wszystkie jako przeczytane",
+  "show_all": "Pokaż wszystkie",
+  "unread_label": "Nieprzeczytane",
+  "filter_all": "Wszystkie",
+  "filter_unread": "Nieprzeczytane ({{count}})",
+  "today": "Dzisiaj",
+  "yesterday": "Wczoraj",
+  "today_at": "dzisiaj, {{time}}",
+  "yesterday_at": "wczoraj, {{time}}",
+  "empty": "Nie masz jeszcze powiadomień. Pojawią się tu, gdy coś będzie dotyczyć Ciebie.",
+  "empty_unread": "Wszystko przeczytane.",
+  "page_hint": "Kliknij powiadomienie, żeby przejść do wniosku albo zadania. Kliknięte oznacza się jako przeczytane.",
+  "types": {
+    "leave_request_new": {
+      "title": "Nowy wniosek: {{employee}}",
+      "detail": "{{leaveType}}, {{dateFrom}} – {{dateTo}}, dni robocze: {{days}}"
+    },
+    "leave_request_withdrawn": {
+      "title": "Wniosek wycofany: {{employee}}",
+      "detail": "{{leaveType}}, {{dateFrom}} – {{dateTo}}"
+    },
+    "leave_approved": {
+      "title": "Urlop zatwierdzony",
+      "detail": "{{leaveType}}, {{dateFrom}} – {{dateTo}}"
+    },
+    "leave_rejected": {
+      "title": "Urlop odrzucony",
+      "detail": "{{leaveType}}, {{dateFrom}} – {{dateTo}}. Powód: {{reason}}"
+    },
+    "leave_cancelled": {
+      "title": "Urlop anulowany",
+      "detail": "{{leaveType}}, {{dateFrom}} – {{dateTo}}. Dni wróciły do puli."
+    },
+    "task_assigned": {
+      "title": "Nowe zadanie dla Ciebie",
+      "detail": "„{{task}}”, termin: {{dueDate}}",
+      "detail_no_due": "„{{task}}”"
+    }
+  },
+  "mockup_state": "Pokaż stan:",
+  "mockup_states": {
+    "list": "Lista",
+    "empty": "Brak powiadomień"
+  }
+}

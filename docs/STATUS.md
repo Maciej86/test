@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.29
 
-**Następny krok:** Moduł Powiadomienia, etap makieta (wpisz `/stepkit:dalej` w nowej rozmowie).
+**Następny krok:** Moduł Powiadomienia, etap pytania: odpowiedzi na 6 pytań w makiecie (http://localhost:5181).
 
 ## Start aplikacji
 
@@ -24,7 +24,7 @@
 | 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
-| 6 | Powiadomienia | notifications | czeka | makieta | login |
+| 6 | Powiadomienia | notifications | w toku | pytania | login |
 | 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 8 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 9 | Zadania | tasks | czeka | makieta | employees, notifications |
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-16: Powiadomienia: makieta dzwonka w belce (licznik nieprzeczytanych, 8 ostatnich, „Oznacz wszystkie jako przeczytane”) i strony „wszystkie” (grupy po dniach, filtr „Nieprzeczytane”); 6 pytań.
 
 - 2026-11-16: Moduł E-mail zrobiony (potwierdzony przez użytkownika): e-mail „Nowy wniosek urlopowy” do administratorów z e-mailem (`emailAdminsAboutNewRequest`, woła go „Moje urlopy” bez czekania), skrzynka testowa Mailpit (port 8026), `npm run email:test`, po zalogowaniu powrót na otwierany adres w panelu (`?next=`, `safeNextPath`).
 

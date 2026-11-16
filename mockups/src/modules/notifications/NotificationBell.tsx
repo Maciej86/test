@@ -1,0 +1,86 @@
+import { useState } from 'react';
+import { ActionIcon, Button, Group, Indicator, Popover, ScrollArea, Stack, Text, Title } from '@mantine/core';
+import { Bell, BellOff } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import type { Role } from '@app/shared';
+import { ButtonIcon } from '../../common/ButtonIcon';
+import { NotificationItem } from './NotificationItem';
+import { mockNotificationsStore, useMockNotifications, type MockNotification } from './data';
+
+export const NOTIFICATIONS_PAGE = '/admin/notifications';
+/** Ile ostatnich powiadomień widać w dzwonku; resztę na stronie „Pokaż wszystkie”. */
+const BELL_LIMIT = 8;
+
+export const EmptyNotifications = ({ messageKey }: { messageKey: 'empty' | 'empty_unread' }) => {
+  const { t } = useTranslation('notifications');
+  return (
+    <Stack align="center" gap="xs" py="xl" px="md">
+      <BellOff size={28} strokeWidth={1.5} aria-hidden color="var(--mantine-color-dark-2)" />
+      <Text size="sm" c="dimmed" ta="center">{t(messageKey)}</Text>
+    </Stack>
+  );
+};
+
+/** Dzwonek w górnej belce: liczba nieprzeczytanych, a po kliknięciu ostatnie powiadomienia. */
+export const NotificationBell = ({ role }: { role: Role }) => {
+  const { t } = useTranslation('notifications');
+  const navigate = useNavigate();
+  const [opened, setOpened] = useState(false);
+  const { items, unread } = useMockNotifications(role);
+
+  const open = (n: MockNotification) => {
+    mockNotificationsStore.markRead(role, n.id);
+    setOpened(false);
+    navigate(n.link);
+  };
+
+  return (
+    <Popover opened={opened} onChange={setOpened} position="bottom-end" width="min(420px, calc(100vw - 32px))" withinPortal shadow="none">
+      <Popover.Target>
+        <Indicator label={unread} size={18} color="red.8" offset={6} disabled={unread === 0} inline>
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            size="lg"
+            onClick={() => setOpened((o) => !o)}
+            aria-label={unread > 0 ? t('bell_unread', { count: unread }) : t('bell')}
+          >
+            <Bell size={20} strokeWidth={1.75} aria-hidden />
+          </ActionIcon>
+        </Indicator>
+      </Popover.Target>
+      <Popover.Dropdown p={0} bg="dark.7">
+        <Group justify="space-between" px="sm" py="xs" gap={4} style={{ borderBottom: '1px solid var(--mantine-color-dark-4)' }}>
+          <Title order={5} style={{ flexShrink: 0 }}>{t('title')}</Title>
+          {unread > 0 && (
+            <Button variant="subtle" size="compact-xs" leftSection={<ButtonIcon action="confirm" size={14} />} onClick={() => mockNotificationsStore.markAllRead(role)}>
+              {t('mark_all_read')}
+            </Button>
+          )}
+        </Group>
+        {items.length === 0 ? (
+          <EmptyNotifications messageKey="empty" />
+        ) : (
+          <ScrollArea.Autosize mah={440} type="auto">
+            {items.slice(0, BELL_LIMIT).map((n) => (
+              <NotificationItem key={n.id} n={n} onOpen={open} compact />
+            ))}
+          </ScrollArea.Autosize>
+        )}
+        <Button
+          variant="subtle"
+          fullWidth
+          radius={0}
+          leftSection={<ButtonIcon action="details" />}
+          onClick={() => {
+            setOpened(false);
+            navigate(NOTIFICATIONS_PAGE);
+          }}
+        >
+          {t('show_all')}
+        </Button>
+      </Popover.Dropdown>
+    </Popover>
+  );
+};

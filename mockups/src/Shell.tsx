@@ -6,6 +6,7 @@ import { ColorSchemeToggle } from './common/ColorSchemeToggle';
 import { NavIcon } from './common/icons';
 import { mockUserName } from './common/mockUsers';
 import { UserMenu } from './common/UserMenu';
+import { NotificationBell } from './modules/notifications/NotificationBell';
 import { VariantSwitch } from './appearance/ThemeVariants';
 import { NavLink as RouterLink, useLocation, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -179,6 +180,7 @@ export const Shell = ({ areas, extraScreens = [], navigation, accountNavigation,
           </Group>
           <Group gap="xs" wrap="nowrap">
             {COLOR_SCHEME_TOGGLE && <ColorSchemeToggle />}
+            {loggedIn && <NotificationBell role={role} />}
             {loggedIn && (
               <UserMenu name={mockUser.name} accountPath={accountPath} onLogout={() => navigate(logoutPath)} />
             )}

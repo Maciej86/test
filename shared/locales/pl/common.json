@@ -32,6 +32,7 @@
     "progress": "Postęp",
     "screen_login": "Ekran logowania",
     "screen_email": "E-mail: nowy wniosek",
+    "screen_notifications": "Powiadomienia: wszystkie",
     "question": "Pytanie {{number}}",
     "recommended": "(polecam)",
     "questions_title": "Pytania do tej makiety ({{count}})",
