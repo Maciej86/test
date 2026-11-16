@@ -75,7 +75,7 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
   - `it('escapes the comment and the names in html, keeps them as typed in text')` (Na co uważać 1)
   - `it('no untranslated {{…}} and no missing keys in subject, html and text')`
 
-- [ ] 4. **Adresaci i wysyłka do administratorów.** `recipients.ts`:
+- [x] 4. **Adresaci i wysyłka do administratorów.** `recipients.ts`:
   `listAdminEmails(db = pool): Promise<{ name: string; email: string }[]>` z SQL
   `WHERE role = 'admin' AND archived_at IS NULL AND email IS NOT NULL`. `notifyAdmins.ts`:
   `emailAdminsAboutNewRequest(data, deps = { listAdminEmails, sendEmail }): Promise<number>`; każdy adresat osobno,
