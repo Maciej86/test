@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { notify } from '../../common/notify';
-import { Question, Questions } from '../../common/Question';
 import { ContractTypeModal, HideModal } from './ContractTypeModals';
 import { CONTRACT_TYPES, type MockContractType } from './data';
 
@@ -143,59 +142,6 @@ const EmployeeFieldPreview = () => {
   );
 };
 
-const MockupQuestions = () => (
-  <Questions>
-    <Question
-      number={1}
-      about="Ukryty typ u pracownika"
-      options={[
-        { id: 'a', text: 'Pracownicy, którzy już mają ukryty typ, zachowują go (na liście pracowników bez zmian, w oknie pracownika z dopiskiem „ukryty”). Nowej osobie nie da się go wybrać' },
-        { id: 'b', text: 'Przy ukryciu typ znika też u pracowników (pole „Rodzaj umowy” robi się puste)' },
-      ]}
-      recommended="a"
-    >
-      Co z pracownikami, którzy mają typ umowy, który ukryjesz? (stan „Okno pracownika”)
-    </Question>
-    <Question
-      number={2}
-      about="Kolejność typów"
-      options={[
-        { id: 'a', text: 'Własna kolejność ustawiana strzałkami, jak w Typach urlopów; nowy typ trafia na koniec. Ta sama kolejność jest na liście w oknie pracownika' },
-        { id: 'b', text: 'Alfabetycznie' },
-      ]}
-      recommended="a"
-    >
-      W jakiej kolejności pokazywać typy umów?
-    </Question>
-    <Question
-      number={3}
-      about="Kolumna „Pracownicy”"
-      options={[
-        { id: 'a', text: 'Zostaje: ile osób (także w archiwum) ma ten typ' },
-        { id: 'b', text: 'Bez tej kolumny' },
-      ]}
-      recommended="a"
-    >
-      Czy potrzebna jest kolumna z liczbą pracowników?
-    </Question>
-    <Question
-      number={4}
-      about="Okno dodaj / edytuj"
-      options={[
-        { id: 'a', text: 'Tylko nazwa. Inne ustawienia (np. „czy umowa daje pulę urlopu”) można dodać później' },
-        { id: 'b', text: 'Nazwa i przełącznik „Daje prawo do urlopu”: pracownik z umową bez tego prawa nie dostaje puli dni (zmieni to Pracowników i Moje urlopy)' },
-      ]}
-      recommended="a"
-    >
-      Czy typ umowy ma mieć coś poza nazwą?
-    </Question>
-    <Question number={5} about="Zasady pól">
-      Nazwa: wymagana, 2–60 znaków, niepowtarzalna także wśród ukrytych, bez względu na wielkość liter (np. „Umowa
-      zlecenie”). Odpowiedz „ok” albo popraw.
-    </Question>
-  </Questions>
-);
-
 export const ContractTypesMockup = () => {
   const { t } = useTranslation('contract-types');
   const [state, setState] = useState<State>('list');
@@ -218,8 +164,6 @@ export const ContractTypesMockup = () => {
 
   return (
     <Stack>
-      <MockupQuestions />
-
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">
           <Text size="sm" fw={600}>{t('mockup_state')}</Text>

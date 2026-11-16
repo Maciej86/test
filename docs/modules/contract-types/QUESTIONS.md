@@ -15,7 +15,7 @@ dotychczasowe rodzaje umowy (Umowa o pracę, Umowa zlecenie, Umowa o dzieło, B2
   z dopiskiem „ukryty”). Nowej osobie nie da się go wybrać **(polecam)**
 - b) Przy ukryciu typ znika też u pracowników (pole „Rodzaj umowy” robi się puste)
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 1a.
 
 ## 2. Kolejność typów
 
@@ -23,14 +23,14 @@ dotychczasowe rodzaje umowy (Umowa o pracę, Umowa zlecenie, Umowa o dzieło, B2
   liście w oknie pracownika **(polecam)**
 - b) Alfabetycznie
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 2a.
 
 ## 3. Kolumna „Pracownicy”
 
 - a) Zostaje: ile osób (także w archiwum) ma ten typ **(polecam)**
 - b) Bez tej kolumny
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 3a.
 
 ## 4. Czy typ umowy ma mieć coś poza nazwą?
 
@@ -38,7 +38,7 @@ dotychczasowe rodzaje umowy (Umowa o pracę, Umowa zlecenie, Umowa o dzieło, B2
 - b) Nazwa i przełącznik „Daje prawo do urlopu”: pracownik z umową bez tego prawa nie dostaje puli dni (zmieni to
   Pracowników i Moje urlopy)
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 4a.
 
 ## 5. Zasady pól
 
@@ -46,4 +46,4 @@ dotychczasowe rodzaje umowy (Umowa o pracę, Umowa zlecenie, Umowa o dzieło, B2
 |---|---|---|---|
 | Nazwa | tak | 2–60 znaków | niepowtarzalna także wśród ukrytych, bez względu na wielkość liter, np. `Umowa zlecenie` |
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** ok.
