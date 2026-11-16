@@ -115,6 +115,7 @@ Ta sama akcja ma w całej aplikacji tę samą ikonę (`ButtonIcon` w `common/`, 
 | Zaloguj / wyloguj | `LogIn` / `LogOut` |
 | Ustaw hasło | `KeyRound` (klucz) |
 | Zamknij rok | `CalendarCheck` |
+| Ukryj (np. typ urlopu) / przywróć ukryty | `EyeOff` / `Undo2` |
 
 ## Historia zmian wyglądu
 

@@ -7,6 +7,7 @@ import {
   Copy,
   Download,
   Eye,
+  EyeOff,
   Funnel,
   KeyRound,
   LogIn,
@@ -19,6 +20,7 @@ import {
   Search,
   Send,
   Trash2,
+  Undo2,
   Upload,
   X,
   type LucideIcon,
@@ -51,6 +53,8 @@ export const BUTTON_ICONS = {
   logout: LogOut,
   password: KeyRound,
   close_year: CalendarCheck,
+  hide: EyeOff,
+  unhide: Undo2,
 } as const satisfies Record<string, LucideIcon>;
 
 export type ButtonAction = keyof typeof BUTTON_ICONS;
