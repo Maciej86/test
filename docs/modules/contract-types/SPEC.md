@@ -1,6 +1,6 @@
 # Spec: Typy umów
 
-**Data:** 2026-11-16 · **Status:** do akceptacji
+**Data:** 2026-11-16 · **Status:** zaakceptowany przez użytkownika 2026-11-16
 **Podstawa:** `QUESTIONS.md` (odpowiedzi 2026-11-16: 1a, 2a, 3a, 4a, 5 ok), `docs/IDEAS.md` (1a 2a 3a: tylko
 administrator, „Ustawienia”, dodaj / zmień nazwę / ukryj), `SPEC-GENERAL.md`, makieta `mockups/src/modules/contract-types/`
 
