@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
+import type { EmailMessage } from '../sendEmail';
 import type { NewLeaveRequestEmailData } from '../templates/newLeaveRequest';
 
 vi.mock('../../db/pool', () => ({ pool: { query: vi.fn() } }));
@@ -22,10 +23,11 @@ const admins = [
   { name: 'Piotr Zieliński', email: 'piotr@firma.pl' },
 ];
 
-const deps = (over: Partial<{ listAdminEmails: () => Promise<typeof admins>; sendEmail: ReturnType<typeof vi.fn> }> = {}) => ({
-  listAdminEmails: vi.fn(async () => admins),
-  sendEmail: vi.fn(async () => ({})),
-  ...over,
+type SendEmail = (message: EmailMessage) => Promise<unknown>;
+
+const deps = (over: { listAdminEmails?: () => Promise<typeof admins>; sendEmail?: Mock<SendEmail> } = {}) => ({
+  listAdminEmails: over.listAdminEmails ?? vi.fn(async () => admins),
+  sendEmail: over.sendEmail ?? vi.fn<SendEmail>(async () => ({})),
 });
 
 describe('emailAdminsAboutNewRequest', () => {
@@ -40,7 +42,7 @@ describe('emailAdminsAboutNewRequest', () => {
   });
 
   it('a failing recipient does not stop the others and does not throw', async () => {
-    const sendEmail = vi.fn().mockRejectedValueOnce(new Error('SMTP down')).mockResolvedValueOnce({});
+    const sendEmail = vi.fn<SendEmail>().mockRejectedValueOnce(new Error('SMTP down')).mockResolvedValueOnce({});
     const d = deps({ sendEmail });
     expect(await emailAdminsAboutNewRequest(data, d)).toBe(1);
     expect(sendEmail).toHaveBeenCalledTimes(2);

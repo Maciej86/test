@@ -16,6 +16,7 @@ import {
   activeNavKey,
   findVisibleNavItem,
   initials,
+  safeNextPath,
   visibleNav,
   type NavItem,
   type SessionUser,
@@ -207,6 +208,30 @@ describe('findVisibleNavItem', () => {
 });
 
 describe('safeNextPath', () => {
-  it.todo('accepts /admin, /admin/leave-requests/128 and /admin/employees?search=jan');
-  it.todo('rejects //obca.pl, https://obca.pl, /admin/../login, /admin\\x, /administrator, /login, empty and null');
+  it('accepts /admin, /admin/leave-requests/128 and /admin/employees?search=jan', () => {
+    for (const path of ['/admin', '/admin/', '/admin/leave-requests/128', '/admin/employees?search=jan', '/admin?tab=1']) {
+      expect(safeNextPath(path)).toBe(path);
+    }
+  });
+
+  it('rejects //obca.pl, https://obca.pl, /admin/../login, /admin\\x, /administrator, /login, empty and null', () => {
+    const bad = [
+      '//obca.pl',
+      'https://obca.pl',
+      '/admin/../login',
+      '/admin/..',
+      '/admin\\x',
+      '/admin//obca.pl',
+      '/administrator',
+      '/login',
+      '/admin/x#y',
+      '/admin/\nx',
+      ' /admin',
+      'javascript:alert(1)',
+      '',
+      null,
+      undefined,
+    ];
+    for (const path of bad) expect(safeNextPath(path)).toBeNull();
+  });
 });

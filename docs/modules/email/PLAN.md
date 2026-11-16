@@ -87,7 +87,7 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
   - `it('no admins with an email → nothing sent, returns 0')` (Na co uważać 3)
   - `it('a database error is logged and returns 0')`
 
-- [ ] 5. **`safeNextPath`** w `shared/src/navigation.ts`: `safeNextPath(raw: string | null | undefined): string | null`
+- [x] 5. **`safeNextPath`** w `shared/src/navigation.ts`: `safeNextPath(raw: string | null | undefined): string | null`
   — zwraca `raw`, gdy pasuje do `/^\/admin(\/[^?#]*)?(\?[^#]*)?$/`, nie zawiera `//`, `\`, `..` ani znaków
   sterujących; inaczej `null`. Testy:
   - `it('accepts /admin, /admin/leave-requests/128 and /admin/employees?search=jan')`
