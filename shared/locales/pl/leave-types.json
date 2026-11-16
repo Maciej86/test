@@ -65,5 +65,6 @@
     "last_visible": "To ostatni typ w formularzu wniosku. Najpierw dodaj albo przywróć inny.",
     "already_hidden": "Ten typ jest już ukryty. Odśwież stronę.",
     "not_hidden": "Ten typ jest już w formularzu wniosku. Odśwież stronę."
-  }
+  },
+  "empty": "Nie ma jeszcze typów urlopów. Dodaj pierwszy."
 }

@@ -96,7 +96,7 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
   jedno po drugim przy dwóch widocznych → 200, potem 409 `last_visible` (blokada sprawdzona przez `FOR UPDATE`
   w zapytaniu); przywrócony ląduje na końcu.
 
-- [ ] **5. Front: dane i lista.** `leave-types.api.ts`: `useLeaveTypes()`, `useCreateLeaveType()`,
+- [x] **5. Front: dane i lista.** `leave-types.api.ts`: `useLeaveTypes()`, `useCreateLeaveType()`,
   `useUpdateLeaveType()`, `useMoveLeaveType()`, `useHideLeaveType()`, `useUnhideLeaveType()` (po sukcesie
   `invalidateQueries(['leave-types'])`). `LeaveTypesPage.tsx` (wpis `'leave-types'` w `pages.ts`),
   `components/LeaveTypesTable.tsx`, `components/LeaveTypeCards.tsx` (`hiddenFrom="sm"`) jak w makiecie, `DataState`
@@ -107,7 +107,7 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
   widocznym z dymkiem `hide_last`; „Przywróć” woła `unhide` i pokazuje dymek `unhidden_done`; pracownik pod adresem
   → brak dostępu.
 
-- [ ] **6. Front: okna.** `components/LeaveTypeFormModal.tsx` (`useForm` + `zodResolver(leaveTypeSchema)`),
+- [x] **6. Front: okna.** `components/LeaveTypeFormModal.tsx` (`useForm` + `zodResolver(leaveTypeSchema)`),
   `components/HideLeaveTypeModal.tsx`. Testy: dodawanie z włączonym „Odejmuje dni z puli”; pusta nazwa → „To pole
   jest wymagane.”; limit 0 i 366 → błąd pod polem; wyczyszczony limit wysyła `yearlyLimit: null`; edycja typu
   z `requestsCount: 3` → żółta ramka z liczbą, przy 0 bez ramki; 409 `name_taken` → błąd pod nazwą; 409
@@ -126,3 +126,4 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
 
 - Krok 2: lista kolumn wpisana wprost w każde zapytanie (test zasad nie przepuszcza `${…}` w SQL, nawet stałej).
 - Krok 3: `ServiceError` w `routeHelpers.ts` ma dowolne dodatkowe dane (`archivedUser`, `hiddenType`), a `reply` przekazuje je wszystkie do `sendError`. Dodawanie typu w `withTransaction`, `maxPosition` z `FOR UPDATE`, żeby dwa nowe typy dodane w tej samej chwili nie dostały tej samej pozycji. Testy tras podmieniają usługę modułu (reguły sprawdzają testy usługi).
+- Kroki 5–6 zrobione razem (ekran używa okien). Pole „Limit dni w roku” ma `clampBehavior="none"`: domyślnie Mantine po cichu poprawiał 0 na 1 i kasował błąd pod polem. Formularz wysyła wartości jak w Pracownikach (pusty limit jako `''`), serwer zamienia je schematem na `null`. Brak dostępu pracownika pod adresem sprawdza wspólne prowadzenie tras i test e2e (krok 7), nie test ekranu.
