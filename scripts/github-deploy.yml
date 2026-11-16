@@ -1,0 +1,51 @@
+# Wdrożenie z GitHuba. Kopiowane do .github/workflows/deploy.yml tylko w wariancie „z GitHuba” (deploy-ovh.md, sekcja 9).
+# Uruchamia się WYŁĄCZNIE ręcznie: zakładka Actions → „Wdróż” → Run workflow (albo `gh workflow run deploy.yml`).
+# Nigdy samo po zapisie na GitHubie: stepkit zapisuje po każdym module i poprawce, a wdrożenie ma być decyzją.
+# Najpierw testy na czystym komputerze GitHuba, potem scripts/deploy.sh na serwerze (kopia, nowa wersja, test dymny).
+# Sekrety repozytorium: DEPLOY_HOST (adres IP), DEPLOY_SSH_KEY (osobny klucz tylko do wdrożeń; na serwerze może
+# uruchomić wyłącznie scripts/deploy.sh), DEPLOY_KNOWN_HOSTS (odcisk serwera z ssh-keyscan).
+name: Wdróż
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Testy
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - name: Luki bezpieczeństwa w bibliotekach (high i critical zatrzymują wdrożenie)
+        run: npm audit --omit=dev --audit-level=high
+
+  deploy:
+    name: Wgranie na serwer
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Klucz do serwera
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Wdrożenie (scripts/deploy.sh na serwerze)
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: ssh -i ~/.ssh/deploy "app@$DEPLOY_HOST" deploy
