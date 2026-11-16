@@ -179,6 +179,17 @@ export const EmailMockup = () => {
         >
           Kiedy włączyć prawdziwą wysyłkę e-maili?
         </Question>
+        <Question
+          number={6}
+          about="Przycisk „Otwórz wniosek”"
+          options={[
+            { id: 'a', text: 'Niezalogowany widzi ekran logowania, a po zalogowaniu wraca od razu do tego wniosku (tylko adresy w obrębie aplikacji)' },
+            { id: 'b', text: 'Po zalogowaniu zawsze Pulpit (jak dziś); wniosek szukasz na liście „Wnioski urlopowe”' },
+          ]}
+          recommended="a"
+        >
+          Przycisk prowadzi do wniosku w aplikacji. Co, gdy nie jesteś zalogowany?
+        </Question>
       </Questions>
 
       <Paper p="xs" bg="yellow.4" c="dark.9">

@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.29
 
-**Następny krok:** Moduł E-mail, etap pytania: odpowiedzi na 5 pytań w makiecie http://localhost:5181/email.
+**Następny krok:** Moduł E-mail, etap pytania: odpowiedzi na 6 pytań w makiecie http://localhost:5181/email.
 
 ## Start aplikacji
 
@@ -36,7 +36,7 @@
 
 ## Ostatnie decyzje
 
-- 2026-11-16: E-mail: makieta podglądu e-maila „Nowy wniosek urlopowy” (jasna treść, wersja tekstowa, widok na telefonie); 5 pytań.
+- 2026-11-16: E-mail: makieta podglądu e-maila „Nowy wniosek urlopowy” (jasna treść, wersja tekstowa, widok na telefonie); 6 pytań (w tym powrót do wniosku po zalogowaniu).
 
 - 2026-11-16: Aktualizacja stepkit 0.1.28 → 0.1.29: test zasad pilnuje, że numer z adresu idzie tylko przez `idParam` (nigdy `Number(req.params…)`); `routeHelpers.ts`, `errors.ts` i ich testy wyrównane z szablonem.
 

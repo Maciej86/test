@@ -47,3 +47,14 @@ z e-mailem do powiadomień (spec ogólny).
   tylko na adresy, które sam zatwierdzisz)
 
 **Odpowiedź:**
+
+## 6. Przycisk „Otwórz wniosek”: co, gdy nie jesteś zalogowany?
+
+Przycisk prowadzi do wniosku w aplikacji (`/admin/leave-requests/<numer>`, ekran z modułu Wnioski urlopowe). Dziś po
+zalogowaniu aplikacja zawsze przenosi na Pulpit.
+
+- a) Niezalogowany widzi ekran logowania, a po zalogowaniu wraca od razu do tego wniosku; przyjmowane są tylko adresy
+  w obrębie aplikacji (zaczynające się od `/admin`), żeby link nie mógł przenieść na obcą stronę **(polecam)**
+- b) Po zalogowaniu zawsze Pulpit (jak dziś); wniosek szukasz na liście „Wnioski urlopowe”
+
+**Odpowiedź:**
