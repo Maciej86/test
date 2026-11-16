@@ -3,7 +3,6 @@ import { DashboardMockup } from './modules/dashboard/DashboardMockup';
 import { MyLeaveMockup } from './modules/my-leave/MyLeaveMockup';
 import { LeaveRequestsMockup } from './modules/leave-requests/LeaveRequestsMockup';
 import { TasksMockup } from './modules/tasks/TasksMockup';
-import { LeaveTypesMockup } from './modules/leave-types/LeaveTypesMockup';
 import { ActivityLogMockup } from './modules/activity-log/ActivityLogMockup';
 import { ArchiveMockup } from './modules/archive/ArchiveMockup';
 import { MyAccountMockup } from './modules/my-account/MyAccountMockup';
@@ -23,7 +22,8 @@ export const SCREENS: Record<string, ComponentType> = {
   'tasks': TasksMockup,
   // Moduł Pracownicy zrobiony; makieta zostaje w modules/employees/EmployeesMockup.tsx.
   'employees': () => <Done labelKey="common.nav.employees" />,
-  'leave-types': LeaveTypesMockup,
+  // Moduł Typy urlopów zrobiony; makieta zostaje w modules/leave-types/LeaveTypesMockup.tsx.
+  'leave-types': () => <Done labelKey="common.nav.leave_types" />,
   'activity-log': ActivityLogMockup,
   'archive': ArchiveMockup,
   'my-account': MyAccountMockup,
