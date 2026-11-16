@@ -13,6 +13,7 @@
   "quantity": "Ilość może mieć najwyżej 3 miejsca po przecinku.",
   "min": "Wartość jest za mała.",
   "max": "Wartość jest za duża.",
+  "list_filter": "Nieznany filtr listy.",
   "list_sort": "Nie można sortować po tej kolumnie.",
   "login_format": "Login nie może zawierać spacji.",
   "password_rules": "Hasło musi mieć co najmniej 8 znaków, w tym cyfrę i znak specjalny.",

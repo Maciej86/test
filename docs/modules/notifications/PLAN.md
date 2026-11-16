@@ -53,7 +53,7 @@ spoza menu dopięta w `buildAppRoutes.tsx`. Wygląd 1:1 z makiety (`mockups/src/
   `frontend/src/modules/notifications/__tests__/NotificationsPage.test.tsx`,
   `shared/src/__tests__/navigation.test.ts` (dopisane), `e2e/notifications.spec.ts` (`test.fixme`). → `npm run check`
 
-- [ ] **1. Stałe, schematy, migracja.** Stałe wyżej. `shared/src/schemas/notifications.ts`:
+- [x] **1. Stałe, schematy, migracja.** Stałe wyżej. `shared/src/schemas/notifications.ts`:
   `notificationsQuerySchema = z.object({ page: z.coerce.number().int().min(1).catch(1).default(1), unread:
   z.enum(['0', '1'], { error: 'validation.invalid' }).default('0') })`; typy `NotificationItem = { id: number; type:
   NotificationType; params: Record<string, string | number>; actorName: string | null; link: string | null; readAt:

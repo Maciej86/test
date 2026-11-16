@@ -10,3 +10,4 @@ export * from './schemas/list';
 export * from './schemas/login';
 export * from './schemas/employees';
 export * from './schemas/leaveTypes';
+export * from './schemas/notifications';
