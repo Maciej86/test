@@ -8,6 +8,8 @@ import { pool } from '../db/pool';
 export const E2E_ACCOUNTS = { admin: 'e2e.admin@test.local', employee: 'e2e.employee@test.local' } as const;
 /** Konta zakładane przez testy w przeglądarce (np. e2e.tmp.1731600000000@test.local); usuwane przy każdym seedzie. */
 export const E2E_TEMP_LOGIN_LIKE = 'e2e.tmp.%@test.local';
+/** Typy urlopów dodawane przez testy w przeglądarce (np. „E2E 1731600000000”); bez wniosków, więc można je usunąć. */
+export const E2E_TEMP_LEAVE_TYPE_LIKE = 'E2E %';
 
 export interface E2eAccount {
   firstName: string;
@@ -39,13 +41,14 @@ const saveToDb = async (account: E2eAccount): Promise<void> => {
   );
 };
 
-/** Porządek przed testami: bez kont tymczasowych z poprzednich uruchomień (pule znikają z nimi, CASCADE). */
-const removeTemporaryAccounts = async (): Promise<void> => {
+/** Porządek przed testami: bez kont i typów urlopów z poprzednich uruchomień (pule znikają z kontami, CASCADE). */
+export const removeTemporaryData = async (): Promise<void> => {
   await pool.query('DELETE FROM users WHERE login LIKE ?', [E2E_TEMP_LOGIN_LIKE]);
+  await pool.query('DELETE FROM leave_types WHERE name LIKE ?', [E2E_TEMP_LEAVE_TYPE_LIKE]);
 };
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  removeTemporaryAccounts()
+  removeTemporaryData()
     .then(() => seedE2eAccounts(process.env, saveToDb))
     .then(() => pool.end())
     .catch(async (error: unknown) => {

@@ -114,7 +114,7 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
   `name_taken_hidden` → link „Przywróć go”, kliknięcie → `unhide`, zamknięcie okna i dymek; sukces → dymek
   `added`/`saved` i zamknięcie; okno ukrycia z nazwą i liczbą wniosków, „Ukryj” → dymek `hidden_done`.
 
-- [ ] **7. Dokumenty i testy w przeglądarce.** `TESTS.md` (scenariusze administratora; pracownik nie ma pozycji
+- [x] **7. Dokumenty i testy w przeglądarce.** `TESTS.md` (scenariusze administratora; pracownik nie ma pozycji
   „Typy urlopów”, adres → brak dostępu). `e2e/leave-types.spec.ts`: admin dodaje typ `E2E <znacznik czasu>`,
   edytuje limit, przesuwa wyżej, ukrywa, widzi go po „Pokaż ukryte”, przywraca; dodanie tej samej nazwy → błąd;
   pracownik → brak dostępu. Seed e2e usuwa typy `E2E %` (bez wniosków to bezpieczne). → `npm run check`,
@@ -127,3 +127,4 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
 - Krok 2: lista kolumn wpisana wprost w każde zapytanie (test zasad nie przepuszcza `${…}` w SQL, nawet stałej).
 - Krok 3: `ServiceError` w `routeHelpers.ts` ma dowolne dodatkowe dane (`archivedUser`, `hiddenType`), a `reply` przekazuje je wszystkie do `sendError`. Dodawanie typu w `withTransaction`, `maxPosition` z `FOR UPDATE`, żeby dwa nowe typy dodane w tej samej chwili nie dostały tej samej pozycji. Testy tras podmieniają usługę modułu (reguły sprawdzają testy usługi).
 - Kroki 5–6 zrobione razem (ekran używa okien). Pole „Limit dni w roku” ma `clampBehavior="none"`: domyślnie Mantine po cichu poprawiał 0 na 1 i kasował błąd pod polem. Formularz wysyła wartości jak w Pracownikach (pusty limit jako `''`), serwer zamienia je schematem na `null`. Brak dostępu pracownika pod adresem sprawdza wspólne prowadzenie tras i test e2e (krok 7), nie test ekranu.
+- Krok 7: wspólne kroki testów w przeglądarce (`logIn`, `logOut`, `addEmployee`, nowe `logInWithOwnPassword`) przeniesione do `e2e/helpers.ts`; testy Pracowników importują je stamtąd. Seed e2e (`removeTemporaryData`) usuwa też typy `E2E %`.

@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../db/pool', () => ({ pool: { query: vi.fn(), end: vi.fn() } }));
-const { E2E_ACCOUNTS, seedE2eAccounts } = await import('../seedE2e');
+const { E2E_ACCOUNTS, removeTemporaryData, seedE2eAccounts } = await import('../seedE2e');
+const { pool } = await import('../../db/pool');
 const { verifyPassword } = await import('../../auth/password');
 
 describe('seedE2eAccounts', () => {
@@ -23,5 +24,14 @@ describe('seedE2eAccounts', () => {
     expect(admin).toMatchObject({ login: E2E_ACCOUNTS.admin, role: 'admin', mustChangePassword: false });
     expect(employee).toMatchObject({ login: E2E_ACCOUNTS.employee, role: 'employee', mustChangePassword: true });
     expect(await verifyPassword('Test-123', String(admin!.passwordHash))).toBe(true);
+  });
+
+  it('removes temporary accounts and leave types added by browser tests', async () => {
+    vi.mocked(pool.query).mockResolvedValue([{}] as never);
+    await removeTemporaryData();
+    expect(vi.mocked(pool.query).mock.calls).toEqual([
+      ['DELETE FROM users WHERE login LIKE ?', ['e2e.tmp.%@test.local']],
+      ['DELETE FROM leave_types WHERE name LIKE ?', ['E2E %']],
+    ]);
   });
 });

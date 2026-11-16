@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.28
 
-**Następny krok:** Moduł Typy urlopów, implementacja krok 7/8: `TESTS.md` i test w przeglądarce `e2e/leave-types.spec.ts`, potem przegląd kodu.
+**Następny krok:** Moduł Typy urlopów, implementacja krok 8/8: przegląd kodu, potem etap testy (próby nadużyć, `TESTS.md` z użytkownikiem).
 
 ## Start aplikacji
 
@@ -22,7 +22,7 @@
 | 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
 | 2 | Logowanie | login | zrobiony | zamknięcie | appearance |
 | 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
-| 4 | Typy urlopów | leave-types | w toku | implementacja (krok 7/8) | login |
+| 4 | Typy urlopów | leave-types | w toku | implementacja (krok 8/8) | login |
 | 5 | E-mail | email | czeka | makieta | login |
 | 6 | Powiadomienia | notifications | czeka | makieta | login |
 | 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
