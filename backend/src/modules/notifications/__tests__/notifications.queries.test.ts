@@ -16,12 +16,12 @@ describe('notifications queries', () => {
       { userId: 5, type: 'task_assigned', params: { task: "Robert'); DROP TABLE users; --" }, actorName: null, link: '/admin/tasks' },
     ]);
     expect(spy.query).toHaveBeenCalledTimes(1);
-    expect(sqlOf(spy)).toMatch(/^INSERT INTO notifications \(user_id, type, params, actor_name, link\) VALUES \(\?, \?, \?, \?, \?\), \(\?, \?, \?, \?, \?\)$/);
+    expect(sqlOf(spy)).toBe('INSERT INTO notifications (user_id, type, params, actor_name, link) VALUES ?');
     expect(sqlOf(spy)).not.toMatch(/Wypoczynkowy|DROP/);
-    expect(paramsOf(spy)).toEqual([
-      4, 'leave_approved', JSON.stringify({ leaveType: 'Wypoczynkowy', dateFrom: '2027-02-08' }), 'Anna Nowak', '/admin/my-leave',
-      5, 'task_assigned', JSON.stringify({ task: "Robert'); DROP TABLE users; --" }), null, '/admin/tasks',
-    ]);
+    expect(paramsOf(spy)).toEqual([[
+      [4, 'leave_approved', JSON.stringify({ leaveType: 'Wypoczynkowy', dateFrom: '2027-02-08' }), 'Anna Nowak', '/admin/my-leave'],
+      [5, 'task_assigned', JSON.stringify({ task: "Robert'); DROP TABLE users; --" }), null, '/admin/tasks'],
+    ]]);
   });
 
   it('insertNotifications with no rows does not query', async () => {

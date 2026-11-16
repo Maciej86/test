@@ -16,9 +16,9 @@ export interface NewNotification {
 /** Wszystkie nowe powiadomienia jednym INSERT. */
 export const insertNotifications = async (db: Db, rows: NewNotification[]): Promise<void> => {
   if (rows.length === 0) return;
-  const placeholders = rows.map(() => '(?, ?, ?, ?, ?)').join(', ');
-  const values = rows.flatMap((r) => [r.userId, r.type, JSON.stringify(r.params), r.actorName, r.link]);
-  await db.query(`INSERT INTO notifications (user_id, type, params, actor_name, link) VALUES ${placeholders}`, values);
+  // mysql2 zamienia `VALUES ?` z tablicą wierszy na (…), (…) z parametrami.
+  const values = rows.map((r) => [r.userId, r.type, JSON.stringify(r.params), r.actorName, r.link]);
+  await db.query('INSERT INTO notifications (user_id, type, params, actor_name, link) VALUES ?', [values]);
 };
 
 /** Usuwa przeczytane powiadomienia tych osób starsze niż `days` dni; nieprzeczytane zostają. */
