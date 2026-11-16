@@ -97,5 +97,24 @@ describe('login guard', () => {
 });
 
 describe('return address after login', () => {
-  it.todo('a guest opening /admin/leave-requests/128 lands on /login?next=%2Fadmin%2Fleave-requests%2F128');
+  const areas = { public: false, account: false, admin: true };
+  const Login = () => <p>Logowanie</p>;
+
+  it('a guest opening /admin/leave-requests/128 lands on /login?next=%2Fadmin%2Fleave-requests%2F128', async () => {
+    const { router } = renderRoutes(buildAppRoutes(areas, { login: Login }, null), '/admin/leave-requests/128?tab=1');
+    expect(await screen.findByText('Logowanie')).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/login');
+    expect(router.state.location.search).toBe('?next=%2Fadmin%2Fleave-requests%2F128%3Ftab%3D1');
+  });
+
+  it('a guest opening /admin goes to /login without next', async () => {
+    const { router } = renderRoutes(buildAppRoutes(areas, { login: Login }, null), '/admin');
+    expect(await screen.findByText('Logowanie')).toBeInTheDocument();
+    expect(router.state.location.search).toBe('');
+  });
+
+  it('a logged-in user on an unknown panel address sees the missing screen, not the login', async () => {
+    renderRoutes(buildAppRoutes(areas, { login: Login }, admin), '/admin/nie-ma');
+    expect(await screen.findByText('Ten ekran jeszcze nie powstał.')).toBeInTheDocument();
+  });
 });

@@ -4,7 +4,7 @@ import { CircleAlert, Clock } from 'lucide-react';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate, useSearchParams } from 'react-router';
-import { IDLE_LOGOUT_MS, loginSchema, ROLE_HOME, SERVER_MESSAGES, translateKey, type LoginInput, type SessionUser } from '@app/shared';
+import { IDLE_LOGOUT_MS, loginSchema, ROLE_HOME, safeNextPath, SERVER_MESSAGES, translateKey, type LoginInput, type SessionUser } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { apiErrorKey, apiErrorMessage } from '../../core/api/client';
 import { useAuth } from '../../core/auth/AuthProvider';
@@ -14,9 +14,13 @@ import { AuthCard } from './components/AuthCard';
 import { fieldError } from '../../core/fieldError';
 import { useLogin } from './login.api';
 
-/** Dokąd po zalogowaniu: najpierw własne hasło, jeśli administrator nadał tymczasowe. */
-const homeOf = (user: SessionUser): string => {
-  return user.mustChangePassword ? PASSWORD_CHANGE_PATH : ROLE_HOME[user.role];
+/**
+ * Dokąd po zalogowaniu: najpierw własne hasło, jeśli administrator nadał tymczasowe; potem bezpieczny adres powrotu
+ * (`?next=`, np. z linku w e-mailu), a bez niego ekran startowy roli.
+ */
+const homeOf = (user: SessionUser, next: string | null): string => {
+  if (user.mustChangePassword) return PASSWORD_CHANGE_PATH;
+  return next ?? ROLE_HOME[user.role];
 };
 
 /** Komunikat serwera, który ekran pokazuje w ramce nad polami (zły login lub hasło, za dużo prób). */
@@ -31,15 +35,16 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const login = useLogin();
+  const next = safeNextPath(params.get('next'));
   const form = useForm<LoginInput>({ initialValues: { login: '', password: '' }, validate: zod4Resolver(loginSchema) });
 
-  if (user) return <Navigate to={homeOf(user)} replace />;
+  if (user) return <Navigate to={homeOf(user, next)} replace />;
 
   const submit = form.onSubmit((values) => {
     login.mutate(loginSchema.parse(values), {
       onSuccess: async (loggedIn) => {
         await refresh();
-        navigate(homeOf(loggedIn), { replace: true });
+        navigate(homeOf(loggedIn, next), { replace: true });
       },
       onError: (error) => {
         if (!loginProblem(error)) notify.error(apiErrorMessage(error, t));

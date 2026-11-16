@@ -93,7 +93,7 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
   - `it('accepts /admin, /admin/leave-requests/128 and /admin/employees?search=jan')`
   - `it('rejects //obca.pl, https://obca.pl, /admin/../login, /admin\\x, /administrator, /login, empty and null')`
 
-- [ ] 6. **Powrót po zalogowaniu.** `guarded()` w `buildAppRoutes.tsx`: niezalogowany →
+- [x] 6. **Powrót po zalogowaniu.** `guarded()` w `buildAppRoutes.tsx`: niezalogowany →
   `<Navigate to={'/login?next=' + encodeURIComponent(pathname + search)} replace />` (komponent `RedirectToLogin`
   z `useLocation`); dla samego `/admin` bez `next`. `LoginPage`: `next = safeNextPath(params.get('next'))`; po
   zalogowaniu i dla już zalogowanego: hasło tymczasowe → `PASSWORD_CHANGE_PATH`, inaczej `next ?? ROLE_HOME[role]`.
@@ -103,6 +103,10 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
   - `LoginPage`: `it('ignores an unsafe next and goes to the Dashboard')` (`next=https://obca.pl`)
   - `LoginPage`: `it('a temporary password goes to the password change, not to next')` (Na co uważać 5)
   - `LoginPage`: `it('an already logged-in user opening /login?next=… goes straight to next')`
+  - **Ustalenie przy budowie:** trasy panelu to tylko dokładne adresy z menu, więc niezalogowany na
+    `/admin/leave-requests/128` widziałby „ekran nie powstał” zamiast logowania. Dla niezalogowanego dochodzi trasa
+    `/admin/*` → logowanie z `next` (testy: `a guest opening /admin/leave-requests/128…`, `a logged-in user on an
+    unknown panel address sees the missing screen`).
 
 - [ ] 7. **`npm run email:test`.** `backend/src/scripts/sendTestEmail.ts`:
   `sendTestEmail(to: string, send = sendEmail): Promise<void>` z danymi jak w makiecie (`mockups/src/modules/email/

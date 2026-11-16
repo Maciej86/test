@@ -30,6 +30,7 @@ const show = (path = '/login') => {
       { path: '/login', element: <LoginPage /> },
       { path: '/admin', element: <p>Pulpit</p> },
       { path: '/change-password', element: <p>Ustawianie hasła</p> },
+      { path: '/admin/leave-requests/128', element: <p>Wniosek 128</p> },
     ],
     path,
   );
@@ -111,5 +112,41 @@ describe('LoginPage', () => {
     show();
     expect(screen.getAllByText('Urlopy i zadania').length).toBeGreaterThan(0);
     expect(screen.getByText('Wnioski urlopowe i tablica zadań zespołu.')).toBeInTheDocument();
+  });
+});
+
+describe('LoginPage: return address', () => {
+  const NEXT = '/login?next=%2Fadmin%2Fleave-requests%2F128';
+
+  beforeEach(() => {
+    auth.user = null;
+    vi.restoreAllMocks();
+  });
+
+  it('after logging in goes to a safe next address', async () => {
+    vi.spyOn(api, 'post').mockResolvedValue({ data: { user: jan } });
+    show(NEXT);
+    fillAndSubmit();
+    expect(await screen.findByText('Wniosek 128')).toBeInTheDocument();
+  });
+
+  it('ignores an unsafe next and goes to the Dashboard', async () => {
+    vi.spyOn(api, 'post').mockResolvedValue({ data: { user: jan } });
+    show('/login?next=https%3A%2F%2Fobca.pl');
+    fillAndSubmit();
+    expect(await screen.findByText('Pulpit')).toBeInTheDocument();
+  });
+
+  it('a temporary password goes to the password change, not to next', async () => {
+    vi.spyOn(api, 'post').mockResolvedValue({ data: { user: { ...jan, mustChangePassword: true } } });
+    show(NEXT);
+    fillAndSubmit();
+    expect(await screen.findByText('Ustawianie hasła')).toBeInTheDocument();
+  });
+
+  it('an already logged-in user opening /login?next=… goes straight to next', async () => {
+    auth.user = jan;
+    show(NEXT);
+    expect(await screen.findByText('Wniosek 128')).toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import { Navigate, type RouteObject } from 'react-router';
+import { Navigate, useLocation, type RouteObject } from 'react-router';
 import {
   ACCOUNT_NAVIGATION,
   NAVIGATION,
@@ -16,11 +16,22 @@ import { PASSWORD_CHANGE_PATH } from '../../config/constants';
 import type { ReactElement } from 'react';
 
 /**
+ * Niezalogowany → /login z adresem powrotu (`?next=`), np. po kliknięciu linku w e-mailu. Sam panel (`/admin`)
+ * bez `next`, bo i tak jest domyślnym ekranem po zalogowaniu. Czy adres jest bezpieczny, sprawdza ekran logowania.
+ */
+const RedirectToLogin = () => {
+  const { pathname, search } = useLocation();
+  const target = pathname + search;
+  const home = pathname === '/admin' || pathname === '/admin/';
+  return <Navigate to={home ? '/login' : `/login?next=${encodeURIComponent(target)}`} replace />;
+};
+
+/**
  * Konto i panel tylko dla zalogowanych: niezalogowany trafia na /login, osoba z hasłem tymczasowym na ustawienie
  * własnego hasła (serwer i tak odrzuci jej zapytania, ale tak nie zobaczy nawet pustych ekranów).
  */
 const guarded = (layout: ReactElement, user: SessionUser | null): ReactElement => {
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <RedirectToLogin />;
   if (user.mustChangePassword) return <Navigate to={PASSWORD_CHANGE_PATH} replace />;
   return layout;
 };
@@ -51,6 +62,8 @@ export const buildAppRoutes = (areas: Areas, pages: Pages, user: SessionUser | n
   }
   if (areas.admin) {
     routes.push({ element: guarded(<AppLayout />, user), children: buildRoutes(NAVIGATION, pages, user) });
+    // Każdy inny adres w panelu (np. /admin/leave-requests/128 z e-maila): niezalogowany też trafia na logowanie.
+    if (!user) routes.push({ path: '/admin/*', element: <RedirectToLogin /> });
   }
 
   if (areas.account || areas.admin) {
