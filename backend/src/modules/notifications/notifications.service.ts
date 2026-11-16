@@ -1,7 +1,7 @@
 import {
   NOTIFICATION_BELL_LIMIT,
   NOTIFICATION_KEEP_DAYS,
-  NOTIFICATION_LINK_PREFIX,
+  isPanelLink,
   SERVER_MESSAGES,
   type NotificationsListResponse,
   type NotificationsQuery,
@@ -30,9 +30,6 @@ export interface NotifyInput {
   link: string;
   actor: { id: number; name: string };
 }
-
-/** Adres w panelu: zaczyna się od /admin/ i nie prowadzi na inny serwer (`//`). */
-const isPanelLink = (link: string): boolean => link.startsWith(NOTIFICATION_LINK_PREFIX) && !link.includes('//');
 
 /**
  * Powiadomienia dla wybranych osób. Wołaj w transakcji modułu, który zmienia dane (np. zatwierdzenie wniosku).

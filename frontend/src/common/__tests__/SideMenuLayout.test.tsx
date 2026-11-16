@@ -1,5 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react';
 import type { NavItem } from '@app/shared';
+import { api } from '../../core/api/client';
 import { renderRoutes } from '../../test/render';
 import { SideMenuLayout } from '../SideMenuLayout';
 
@@ -14,6 +15,7 @@ const items: NavItem[] = [
 ];
 
 const show = () => {
+  vi.spyOn(api, 'get').mockResolvedValue({ data: { unread: 2, latest: [] } });
   return renderRoutes(
     [{ path: '/admin', element: <SideMenuLayout items={items} />, children: [
       { index: true, element: <p>Pulpit treść</p> },
@@ -24,6 +26,14 @@ const show = () => {
 };
 
 describe('SideMenuLayout', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('shows the notification bell with the unread count', async () => {
+    show();
+    expect(await screen.findByRole('button', { name: 'Powiadomienia, nieprzeczytane: 2' })).toBeInTheDocument();
+    expect(api.get).toHaveBeenCalledWith('/notifications/summary');
+  });
+
   it('shows the company name, the user menu, the menu and the page content', () => {
     show();
     expect(screen.getByText('Urlopy i zadania')).toBeInTheDocument();

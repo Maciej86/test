@@ -97,7 +97,7 @@ spoza menu dopięta w `buildAppRoutes.tsx`. Wygląd 1:1 z makiety (`mockups/src/
   `dayLabel(iso, now, t)` („Dzisiaj” / „Wczoraj” / `formatDate`); porównanie dni przez `formatDate`. Testy: dziś,
   wczoraj 23:50, przedwczoraj, przełom roku (01.01 vs 31.12). → `npm run check`
 
-- [ ] **5. Dzwonek.** `notifications.api.ts`: `useNotificationsSummary()` (`refetchInterval:
+- [x] **5. Dzwonek.** `notifications.api.ts`: `useNotificationsSummary()` (`refetchInterval:
   NOTIFICATION_REFRESH_MS`, `refetchOnWindowFocus: true`), `useNotificationsList(query)`, `useMarkRead()`,
   `useMarkAllRead()` (oba unieważniają `['notifications']`). `components/NotificationItem.tsx` i
   `components/BellPanel.tsx` jak w makiecie; `NotificationBell.tsx`: komputer `Popover` 420 px, telefon `Drawer`

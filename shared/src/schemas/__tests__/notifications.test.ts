@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { notificationsQuerySchema } from '../notifications';
+import { isPanelLink, notificationsQuerySchema } from '../notifications';
 import { NOTIFICATION_TYPES, NOTIFICATION_KEEP_DAYS, NOTIFICATION_BELL_LIMIT } from '../../constants/notifications';
 import pl from '../../../locales/pl/notifications.json';
 import validation from '../../../locales/pl/validation.json';
@@ -30,5 +30,14 @@ describe('notification constants', () => {
     }
     expect(NOTIFICATION_KEEP_DAYS).toBe(90);
     expect(NOTIFICATION_BELL_LIMIT).toBe(8);
+  });
+});
+
+describe('isPanelLink', () => {
+  it('only links inside /admin/, never to another server', () => {
+    expect(isPanelLink('/admin/tasks')).toBe(true);
+    for (const link of [null, '/login', 'https://evil.example/admin/', '//evil.example', '/admin//evil.example', 'javascript:alert(1)']) {
+      expect(isPanelLink(link)).toBe(false);
+    }
   });
 });

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { NotificationType } from '../constants/notifications';
+import { NOTIFICATION_LINK_PREFIX, type NotificationType } from '../constants/notifications';
 import type { ListResponse } from './list';
 
 /** Parametry strony „Powiadomienia” z adresu: `?page=2&unread=1` (front i GET /api/notifications). */
@@ -29,3 +29,8 @@ export interface NotificationsSummary {
 
 /** Strona „Powiadomienia” (GET /api/notifications). */
 export type NotificationsListResponse = ListResponse<NotificationItem> & { unread: number };
+
+/** Adres w panelu: zaczyna się od /admin/ i nie prowadzi na inny serwer (`//`). Serwer zapisuje, ekran przechodzi tylko na takie. */
+export const isPanelLink = (link: string | null): link is string => {
+  return link !== null && link.startsWith(NOTIFICATION_LINK_PREFIX) && !link.includes('//');
+};

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ACCOUNT_NAVIGATION, findVisibleNavItem, NAVIGATION, type NavItem } from '@app/shared';
 import { COLOR_SCHEME_TOGGLE } from '@app/shared/theme';
 import { useAuth } from '../core/auth/AuthProvider';
+import { NotificationBell } from '../modules/notifications/NotificationBell';
 import { ColorSchemeToggle } from './ColorSchemeToggle';
 import { IdleWarningModal } from './IdleWarningModal';
 import { NavMenu } from './NavMenu';
@@ -14,7 +15,7 @@ import { UserMenu } from './UserMenu';
 /**
  * Układ panelu i konta: górna belka (nazwa firmy po lewej; motyw i menu użytkownika po prawej), menu z boku, treść na
  * tle panelu. Na telefonie menu jest schowane pod przyciskiem w belce i chowa się samo po wybraniu pozycji.
- * Dzwonek powiadomień dodaje moduł powiadomień, obok przełącznika motywu.
+ * Dzwonek powiadomień (moduł Powiadomienia) stoi między przełącznikiem motywu a menu użytkownika.
  */
 export const SideMenuLayout = ({ items }: { items: NavItem[] }) => {
   const { t } = useTranslation();
@@ -46,6 +47,7 @@ export const SideMenuLayout = ({ items }: { items: NavItem[] }) => {
           </Group>
           <Group gap="xs" wrap="nowrap">
             {COLOR_SCHEME_TOGGLE && <ColorSchemeToggle />}
+            {user && <NotificationBell />}
             {user && <UserMenu name={user.name} accountPath={accountPath} onLogout={() => void logout()} />}
           </Group>
         </Group>
