@@ -53,7 +53,7 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
   `EMAIL_FROM` (domyślnie `no-reply@localhost`). `npm install -w @app/backend nodemailer` i
   `-D @types/nodemailer`. README: wiersz Mailpit i `npm run email:test`. `npm run db` (Mailpit startuje).
 
-- [ ] 2. **`sendEmail`** (`backend/src/email/sendEmail.ts`):
+- [x] 2. **`sendEmail`** (`backend/src/email/sendEmail.ts`):
   `interface EmailMessage { to: string; subject: string; html: string; text: string }`,
   `createTransport(): Transporter` (z `env`: `secure: port === 465`, `auth` tylko gdy `SMTP_USER`),
   `sendEmail(message: EmailMessage, transport?: Transporter): Promise<void>`; nadawca
@@ -62,7 +62,7 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
   - `it('sets the sender name to the app name and the address from EMAIL_FROM')` → `"Urlopy i zadania"`
   - `it('logs in to SMTP only when SMTP_USER is set')` (sprawdza opcje `createTransport` dla pustego i ustawionego)
 
-- [ ] 3. **Wzór e-maila.** `escapeHtml(value: string): string` (`& < > " '`); `emailLayout({ appName, heading,
+- [x] 3. **Wzór e-maila.** `escapeHtml(value: string): string` (`& < > " '`); `emailLayout({ appName, heading,
   bodyHtml, footer }): string` (rama: pasek `navy[8]`, tło `gray[1]`, kartka biała, `max-width:560px`, kolory
   z `theme.ts`); `newLeaveRequestEmail(data: NewLeaveRequestEmailData): { subject: string; html: string; text: string }`.
   Testy:
