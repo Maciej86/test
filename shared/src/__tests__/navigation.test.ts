@@ -205,3 +205,8 @@ describe('findVisibleNavItem', () => {
     expect(findVisibleNavItem('my-account', [account], null)).toBeNull();
   });
 });
+
+describe('safeNextPath', () => {
+  it.todo('accepts /admin, /admin/leave-requests/128 and /admin/employees?search=jan');
+  it.todo('rejects //obca.pl, https://obca.pl, /admin/../login, /admin\\x, /administrator, /login, empty and null');
+});

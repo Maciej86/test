@@ -39,11 +39,12 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
 
 ## Kroki
 
-- [ ] 0. **Szkielet testów** (`it.todo`, nazwy jak niżej) w: `backend/src/email/__tests__/sendEmail.test.ts`,
+- [x] 0. **Szkielet testów** (`it.todo`, nazwy jak niżej) w: `backend/src/email/__tests__/sendEmail.test.ts`,
   `escapeHtml.test.ts`, `newLeaveRequest.test.ts`, `recipients.test.ts`, `notifyAdmins.test.ts`,
   `backend/src/scripts/__tests__/sendTestEmail.test.ts`, `shared/src/__tests__/navigation.test.ts` (dopisane),
   `frontend/src/core/routes/__tests__/buildRoutes.test.tsx` (dopisane),
-  `frontend/src/modules/login/__tests__/LoginPage.test.tsx` (dopisane), `e2e/email.spec.ts` → `npm run check`.
+  `e2e/email.spec.ts` (`test.fixme`) → `npm run check`. Testy `LoginPage` od razu prawdziwe w kroku 6, bo test zasad
+  nie przepuszcza `it.todo` w zrobionym module Logowanie.
 
 - [ ] 1. **Mailpit i ustawienia.** `docker-compose.yml`: usługa `mailpit` (`image: axllent/mailpit`, porty
   `127.0.0.1:1025:1025` i `127.0.0.1:8025:8025`). `.env` i `.env.example`: `EMAIL_TRANSPORT=mailpit`,

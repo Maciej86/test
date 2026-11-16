@@ -95,3 +95,7 @@ describe('login guard', () => {
     expect(router.state.location.pathname).toBe('/login');
   });
 });
+
+describe('return address after login', () => {
+  it.todo('a guest opening /admin/leave-requests/128 lands on /login?next=%2Fadmin%2Fleave-requests%2F128');
+});
