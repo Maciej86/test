@@ -1,0 +1,13 @@
+# Godziny kopii w czasie polskim. Muszą być te same co BACKUP_SLOTS w .env serwera: zmieniaj razem.
+[Unit]
+Description=Kopia zapasowa aplikacji o 0:00, 11:00 i 16:30 (czas polski)
+
+[Timer]
+OnCalendar=*-*-* 00:00:00 Europe/Warsaw
+OnCalendar=*-*-* 11:00:00 Europe/Warsaw
+OnCalendar=*-*-* 16:30:00 Europe/Warsaw
+# Przebieg, który wypadł przy wyłączonym serwerze, wykona się po starcie (jako kopia „w ciągu dnia”).
+Persistent=true
+
+[Install]
+WantedBy=timers.target

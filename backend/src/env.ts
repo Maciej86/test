@@ -23,4 +23,8 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV ?? 'development',
   /** Folder plików od użytkowników: domyślnie uploads/ w głównym folderze projektu (na serwerze wolumen Dockera). */
   UPLOAD_DIR: process.env.UPLOAD_DIR ?? fileURLToPath(new URL('../../uploads', import.meta.url)),
+  /** Godziny kopii zapasowych w czasie polskim (te same co w scripts/backup/app-backup.timer); pusto = domyślne. */
+  BACKUP_SLOTS: process.env.BACKUP_SLOTS ?? '',
+  /** Adres alarmu o kopiach (tylko na serwerze, gdy aplikacja wysyła e-maile); pusto = bez alarmu. */
+  BACKUP_ALERT_EMAIL: process.env.BACKUP_ALERT_EMAIL ?? '',
 };

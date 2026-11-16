@@ -56,6 +56,17 @@ describe('mockup shell', () => {
     expect(screen.queryByText('Oglądam jako:')).not.toBeInTheDocument();
   });
 
+  it('opens the admin panel at / when it is the only part', async () => {
+    renderMockup({ public: false, account: false, admin: true }, '/');
+    expect(await screen.findByText('Ekran pulpitu')).toBeInTheDocument();
+    expect(screen.getByText('Oglądam jako:')).toBeInTheDocument();
+  });
+
+  it('opens the account at / when there is no public site', async () => {
+    renderMockup({ public: false, account: true, admin: true }, '/');
+    expect(await screen.findByText('Ekran konta')).toBeInTheDocument();
+  });
+
   it('shows the account for the user role', async () => {
     renderMockup(all, '/account');
     expect(await screen.findByText('Ekran konta')).toBeInTheDocument();
