@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.29
 
-**Następny krok:** Moduł Powiadomienia, etap plan: akceptacja `docs/modules/notifications/PLAN.md`.
+**Następny krok:** Moduł Powiadomienia, implementacja: krok 1 z 8 (stałe, schematy, migracja).
 
 ## Start aplikacji
 
@@ -24,7 +24,7 @@
 | 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
-| 6 | Powiadomienia | notifications | w toku | plan | login |
+| 6 | Powiadomienia | notifications | w toku | implementacja (krok 1/8) | login |
 | 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 8 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 9 | Zadania | tasks | czeka | makieta | employees, notifications |

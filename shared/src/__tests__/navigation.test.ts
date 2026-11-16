@@ -170,6 +170,8 @@ describe('activeNavKey', () => {
     expect(activeNavKey(items, '/admin/settings')).toBe('dashboard');
   });
 
+  it.todo('a part home item (/admin) matches only exactly: /admin/notifications → null');
+
   it('returns null outside the menu', () => {
     expect(activeNavKey(items, '/login')).toBeNull();
   });

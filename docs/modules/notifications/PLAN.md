@@ -42,7 +42,7 @@ spoza menu dopięta w `buildAppRoutes.tsx`. Wygląd 1:1 z makiety (`mockups/src/
 
 ---
 
-- [ ] **0. Szkielet testów.** `it.todo` dla każdego wymagania z kroków 1–8 w:
+- [x] **0. Szkielet testów.** `it.todo` dla każdego wymagania z kroków 1–8 w:
   `shared/src/schemas/__tests__/notifications.test.ts`,
   `backend/src/modules/notifications/__tests__/notifications.queries.test.ts`,
   `backend/src/modules/notifications/__tests__/notifications.service.test.ts`,
