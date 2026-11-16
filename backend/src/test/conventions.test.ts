@@ -80,6 +80,12 @@ export const foreignKeyWithoutOnDelete = (sql: string): number[] => {
   return found;
 };
 
+/** 8. Numer z adresu przez `Number(…)` / `parseInt(…)` zamiast `idParam` (przepuszcza `1e3`, `0x10`, `" 7"`). */
+export const rawParamNumber = (text: string): number[] =>
+  text
+    .split('\n')
+    .flatMap((l, i) => (/\b(Number|parseInt|parseFloat)\(\s*req\.params\b/.test(l) && !ALLOWED.test(l) ? [i + 1] : []));
+
 describe('convention checks catch violations', () => {
   it('1. SQL with a value pasted into the text', () => {
     expect(sqlInterpolation('pool.query(`SELECT * FROM t WHERE id = ${id}`)')).toEqual([1]);
@@ -106,6 +112,12 @@ describe('convention checks catch violations', () => {
   it('5. modules mounted without mountModule', () => {
     const app = "api.use(health);\napi.use(requireAuth);\nmountModule(api, 'orders', ordersRoutes);\napi.use('/x', xRoutes);";
     expect(mountedWithoutMountModule(app)).toEqual([4]);
+  });
+
+  it('8. number from the address without idParam', () => {
+    expect(rawParamNumber('const id = Number(req.params.id);')).toEqual([1]);
+    expect(rawParamNumber('const id = parseInt(req.params.id, 10);')).toEqual([1]);
+    expect(rawParamNumber('const id = idParam(res, req.params.id);')).toEqual([]);
   });
 
   it('7. foreign keys without ON DELETE', () => {
@@ -141,6 +153,10 @@ describe('backend follows the conventions', () => {
 
   it.each(sources.map(name))('%s: who and which role come from req.user, not from the body', (f) => {
     expect(identityFromBody(read(resolve(root, '..', f)))).toEqual([]);
+  });
+
+  it.each(sources.map(name))('%s: numbers from the address only through idParam', (f) => {
+    expect(rawParamNumber(read(resolve(root, '..', f)))).toEqual([]);
   });
 
   it('app.ts: modules behind login are mounted with mountModule', () => {

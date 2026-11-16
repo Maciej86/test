@@ -9,8 +9,8 @@ const fakeRes = () => {
 };
 
 describe('route helpers', () => {
-  it('idParam: 0, -1, abc, 1.5, 1e3, 0x10, " 7", 007 → 404; 7 → 7', () => {
-    for (const raw of ['0', '-1', 'abc', '1.5', '1e3', '0x10', ' 7', '007', '']) {
+  it('idParam: 0, -1, abc, 1.5, 1e3, 0x10, " 7", 007, empty, too long → 404; 7 → 7', () => {
+    for (const raw of ['0', '-1', 'abc', '1.5', '1e3', '0x10', ' 7', '007', '', '12345678901', undefined]) {
       const res = fakeRes();
       expect(idParam(res, raw)).toBeNull();
       expect(res.status).toHaveBeenCalledWith(404);
@@ -20,11 +20,17 @@ describe('route helpers', () => {
     expect(res.status).not.toHaveBeenCalled();
   });
 
-  it('reply: error → sendError with fields and extra data; success → JSON with status', () => {
+  it('reply: error → one error format with fields and extra data; success → JSON with status', () => {
     const res = fakeRes();
-    reply(res, fail(409, 'x.taken', { fields: { name: 'x.taken' }, hiddenType: { id: 4, name: 'Szkoleniowy' } }));
+    reply(res, fail(409, 'x.taken', { fields: { name: 'x.taken' }, archivedUser: { id: 4, name: 'Jan Kowalski' } }));
     expect(res.status).toHaveBeenCalledWith(409);
-    expect(res.json).toHaveBeenCalledWith({ error: { message: 'x.taken', fields: { name: 'x.taken' }, hiddenType: { id: 4, name: 'Szkoleniowy' } } });
+    expect(res.json).toHaveBeenCalledWith({
+      error: { message: 'x.taken', fields: { name: 'x.taken' }, archivedUser: { id: 4, name: 'Jan Kowalski' } },
+    });
+
+    const plain = fakeRes();
+    reply(plain, fail(404, 'server.not_found'));
+    expect(plain.json).toHaveBeenCalledWith({ error: { message: 'server.not_found' } });
 
     const ok = fakeRes();
     reply(ok, { id: 3 }, 201);

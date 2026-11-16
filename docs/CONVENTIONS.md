@@ -291,6 +291,11 @@ więc backend sprawdza wszystko sam, nawet jeśli formularz już to sprawdził:
   w `useForm`).
 - Format błędu jest jeden: `{ error: { message: <klucz>, fields?: { pole: <klucz> } } }`, kody 400/401/403/404/409/503.
   Na froncie: `notify.error(apiErrorMessage(err, t))` (`apiErrorMessage` z `frontend/src/core/api/client.ts`).
+- **Trasa → usługa → odpowiedź** przez `backend/src/middleware/routeHelpers.ts`: usługa modułu zwraca dane albo
+  `fail(409, klucz, { fields, …dane dla ekranu })` (typ `Result`), trasa odsyła wynik przez `reply(res, wynik, 201)`.
+- **Numer z adresu tylko przez `idParam`**: `const id = idParam(res, req.params.id); if (id === null) return;`. Przyjmuje
+  same cyfry, inaczej 404. Nigdy `Number(...)` ani `parseInt(...)` na `req.params` (`Number('1e3')` to 1000,
+  `Number('0x10')` to 16). Pilnuje tego test zasad.
 - SQL **tylko z parametrami** `?`: `pool.query('SELECT * FROM orders WHERE id = ?', [id])`. Nigdy nie sklejaj SQL
   z danymi od użytkownika.
 - Kilka zapisów, które muszą się udać razem (także każdy zapis z historią zmian): `withTransaction(async (conn) => { … })`
@@ -476,7 +481,7 @@ w całości). Czerwony test zasad znaczy: popraw kod, nie test.
 
 | Plik | Pilnuje |
 |---|---|
-| `backend/src/test/conventions.test.ts` | SQL tylko z `?`; transakcje tylko przez `withTransaction`; `validateBody` przy każdej trasie zapisu; kto i jaka rola tylko z `req.user`; moduły za logowaniem tylko przez `mountModule`; w `__tests__` obok każdego `*.routes.ts` test z 401 i 403; pliki `*.test.ts(x)` tylko w `__tests__` albo `src/test/` (backend, front, shared, makiety); każdy klucz obcy z `ON DELETE`; w module `zrobiony` (według `docs/STATUS.md`) żadnego `it.todo`; funkcje tylko strzałkowe (backend, front, shared, makiety, e2e) |
+| `backend/src/test/conventions.test.ts` | SQL tylko z `?`; transakcje tylko przez `withTransaction`; `validateBody` przy każdej trasie zapisu; kto i jaka rola tylko z `req.user`; moduły za logowaniem tylko przez `mountModule`; w `__tests__` obok każdego `*.routes.ts` test z 401 i 403; pliki `*.test.ts(x)` tylko w `__tests__` albo `src/test/` (backend, front, shared, makiety); każdy klucz obcy z `ON DELETE`; w module `zrobiony` (według `docs/STATUS.md`) żadnego `it.todo`; funkcje tylko strzałkowe (backend, front, shared, makiety, e2e); numer z adresu tylko przez `idParam` |
 | `backend/src/test/routeProtection.test.ts` | każdy moduł z `mountModule`: bez logowania 401, rola spoza modułu 403 |
 | `frontend/src/test/conventions.test.ts` | zapytania tylko przez `api`; w modułach `api` tylko w `*.api.ts`; brak importów z innego modułu; dymki przez `notify`; brak polskich tekstów w kodzie; schematy w `shared/src/schemas/` bez własnych `.regex(` |
 | `frontend/src/test/colors.test.ts`, `formatting.test.ts`, `tables.test.ts` | kolory z motywu; daty i liczby przez `@app/shared`; tabele w `Table.ScrollContainer` |
@@ -521,6 +526,7 @@ Używaj jej, gdy nie ma `superpowers:requesting-code-review`:
 - [ ] pola formularzy zgodne z tabelą w specu, formaty z `fields.ts`, testy wartości granicznych
 - [ ] dane na froncie przez hooki `<module>.api.ts` i `DataState`; brak `useEffect` z pobieraniem i `fetch`
 - [ ] funkcje strzałkowe, bez `function`
+- [ ] numer z adresu przez `idParam`, odpowiedź usługi przez `reply`
 - [ ] listy: `validateQuery(listQuerySchema(...))`, sortowanie tylko po kolumnach z listy, stan w adresie
 - [ ] kilka zapisów naraz przez `withTransaction`
 - [ ] nic skopiowanego między modułami: wspólne w `common/` albo `core/`

@@ -4,7 +4,7 @@ import { sendError } from './errors';
 
 /**
  * Błąd z usługi modułu do odesłania przez trasę: status, klucz tekstu, błędy pól i dodatkowe dane dla ekranu
- * (np. `archivedUser` w Pracownikach, `hiddenType` w Typach urlopów).
+ * (np. `archivedUser`, gdy login jest zajęty przez konto w archiwum).
  */
 export interface ServiceError {
   status: number;
@@ -20,7 +20,10 @@ export const fail = (status: number, message: string, extra: Omit<ServiceError, 
   error: { ...extra, status, message },
 });
 
-/** Numer z adresu: tylko same cyfry bez zera na początku (np. 7, nie 1e3, 0x10 ani 007), inaczej 404. */
+/**
+ * Numer rekordu z adresu: tylko same cyfry bez zera na początku (7, nie 1e3, 0x10, " 7" ani 007), inaczej 404.
+ * Nie zamieniaj numeru z adresu przez `Number`: `Number('1e3')` to 1000, a `Number('0x10')` to 16.
+ */
 export const idParam = (res: Response, raw: unknown): number | null => {
   const id = typeof raw === 'string' && /^[1-9]\d{0,9}$/.test(raw) ? Number(raw) : Number.NaN;
   if (Number.isSafeInteger(id)) return id;
@@ -28,7 +31,7 @@ export const idParam = (res: Response, raw: unknown): number | null => {
   return null;
 };
 
-/** Wynik usługi → odpowiedź: błąd jednym formatem, sukces jako JSON. */
+/** Wynik usługi → odpowiedź: błąd jednym formatem (`sendError`), sukces jako JSON. */
 export const reply = <T>(res: Response, result: Result<T>, status = 200) => {
   if (typeof result === 'object' && result !== null && 'error' in result) {
     const { status: code, message, fields, ...extra } = result.error as ServiceError;
