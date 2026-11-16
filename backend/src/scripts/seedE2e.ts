@@ -47,9 +47,31 @@ export const removeTemporaryData = async (): Promise<void> => {
   await pool.query('DELETE FROM leave_types WHERE name LIKE ?', [E2E_TEMP_LEAVE_TYPE_LIKE]);
 };
 
+/** Dzwonek administratora e2e: dwa nieprzeczytane i jedno przeczytane powiadomienie, za każdym razem od nowa. */
+export const seedE2eNotifications = async (): Promise<void> => {
+  await pool.query('DELETE FROM notifications WHERE user_id IN (SELECT id FROM users WHERE login IN (?))', [[E2E_ACCOUNTS.admin, E2E_ACCOUNTS.employee]]);
+  const add = (readSql: 'NULL' | 'NOW() - INTERVAL 1 DAY', employee: string, dateFrom: string) =>
+    pool.query(
+      readSql === 'NULL'
+        ? 'INSERT INTO notifications (user_id, type, params, actor_name, link, read_at) SELECT id, ?, ?, ?, ?, NULL FROM users WHERE login = ?'
+        : 'INSERT INTO notifications (user_id, type, params, actor_name, link, read_at) SELECT id, ?, ?, ?, ?, NOW() - INTERVAL 1 DAY FROM users WHERE login = ?',
+      [
+        'leave_request_new',
+        JSON.stringify({ employee, leaveType: 'Wypoczynkowy', dateFrom, dateTo: dateFrom, days: 1 }),
+        employee,
+        '/admin/leave-requests',
+        E2E_ACCOUNTS.admin,
+      ],
+    );
+  await add('NOW() - INTERVAL 1 DAY', 'Ewa Przeczytana', '2027-01-04');
+  await add('NULL', 'Adam Pierwszy', '2027-01-05');
+  await add('NULL', 'Basia Druga', '2027-01-06');
+};
+
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   removeTemporaryData()
     .then(() => seedE2eAccounts(process.env, saveToDb))
+    .then(() => seedE2eNotifications())
     .then(() => pool.end())
     .catch(async (error: unknown) => {
       console.error(error);
