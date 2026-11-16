@@ -6,7 +6,6 @@ import { TasksMockup } from './modules/tasks/TasksMockup';
 import { ActivityLogMockup } from './modules/activity-log/ActivityLogMockup';
 import { ArchiveMockup } from './modules/archive/ArchiveMockup';
 import { MyAccountMockup } from './modules/my-account/MyAccountMockup';
-import { ContractTypesMockup } from './modules/contract-types/ContractTypesMockup';
 import { Done } from './common/Done';
 import type { ExtraScreen } from './Shell';
 
@@ -25,7 +24,8 @@ export const SCREENS: Record<string, ComponentType> = {
   'employees': () => <Done labelKey="common.nav.employees" />,
   // Moduł Typy urlopów zrobiony; makieta zostaje w modules/leave-types/LeaveTypesMockup.tsx.
   'leave-types': () => <Done labelKey="common.nav.leave_types" />,
-  'contract-types': ContractTypesMockup,
+  // Moduł Typy umów zrobiony; makieta zostaje w modules/contract-types/ContractTypesMockup.tsx.
+  'contract-types': () => <Done labelKey="common.nav.contract_types" />,
   'activity-log': ActivityLogMockup,
   'archive': ArchiveMockup,
   'my-account': MyAccountMockup,

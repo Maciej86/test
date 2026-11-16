@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.34
 
-**Następny krok:** Typy umów: użytkownik przechodzi `docs/modules/contract-types/TESTS.md` i pisze „działa”.
+**Następny krok:** Moje urlopy: makieta (`/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -25,7 +25,7 @@
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
-| 7 | Typy umów | contract-types | w toku | testy (czeka na użytkownika) | employees |
+| 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
 | 8 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
@@ -36,6 +36,8 @@
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-16: Moduł Typy umów zrobiony (potwierdzony przez użytkownika): słownik typów umów w „Ustawieniach” (kolejność strzałkami, dodawanie, zmiana nazwy, ukrywanie i przywracanie, 4 typy na start), pole „Rodzaj umowy” u pracownika z typów (`users.contract_type_id`), pracownik zachowuje ukryty typ.
 
 - 2026-11-16: Typy umów: zbudowane (kroki 0–9, przegląd kodu z poprawkami), `npm run check` i wszystkie testy e2e zielone; umowy pracowników przepisane na typy ze słownika (1 z 12 kont miało umowę, po zmianie tak samo).
 
