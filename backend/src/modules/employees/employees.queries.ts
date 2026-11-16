@@ -1,5 +1,5 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
-import type { ContractType, EmployeeSort, Role } from '@app/shared';
+import type { EmployeeSort, Role } from '@app/shared';
 import { pool } from '../../db/pool';
 
 /** Pula połączeń albo połączenie transakcji: oba mają `query`. */
@@ -16,7 +16,9 @@ export interface EmployeeRow extends RowDataPacket {
   role: Role;
   /** Kolumna DATE: tekst RRRR-MM-DD. */
   hired_on: string | null;
-  contract_type: ContractType | null;
+  contract_type_id: number | null;
+  contract_type_name: string | null;
+  contract_type_hidden_at: Date | null;
   annual_days: number | null;
   carried_days: number | null;
 }
@@ -30,7 +32,7 @@ export interface UserRow extends RowDataPacket {
   email: string | null;
   role: Role;
   hired_on: string | null;
-  contract_type: ContractType | null;
+  contract_type_id: number | null;
   archived_at: Date | null;
 }
 
@@ -74,9 +76,9 @@ export const listEmployees = async (
     where.push('u.role = ?');
     params.push(q.role);
   }
-  const from = `FROM users u LEFT JOIN leave_pools p ON p.user_id = u.id AND p.year = ? WHERE ${where.join(' AND ')}`;
+  const from = `FROM users u LEFT JOIN leave_pools p ON p.user_id = u.id AND p.year = ? LEFT JOIN contract_types ct ON ct.id = u.contract_type_id WHERE ${where.join(' AND ')}`;
   const [rows] = await db.query<EmployeeRow[]>(
-    `SELECT u.id, u.name, u.first_name, u.last_name, u.login, u.email, u.role, u.hired_on, u.contract_type, p.annual_days, p.carried_days ${from} ORDER BY ${ORDER_BY[q.sort][q.dir]} LIMIT ? OFFSET ?`, // rule-ok: ORDER BY tylko z mapy ORDER_BY, WHERE z gotowych kawałków z ?
+    `SELECT u.id, u.name, u.first_name, u.last_name, u.login, u.email, u.role, u.hired_on, u.contract_type_id, ct.name AS contract_type_name, ct.hidden_at AS contract_type_hidden_at, p.annual_days, p.carried_days ${from} ORDER BY ${ORDER_BY[q.sort][q.dir]} LIMIT ? OFFSET ?`, // rule-ok: ORDER BY tylko z mapy ORDER_BY, WHERE z gotowych kawałków z ?
     [q.year, ...params, q.pageSize, (q.page - 1) * q.pageSize],
   );
   const [count] = await db.query<RowDataPacket[]>(`SELECT COUNT(*) AS total ${from}`, [q.year, ...params]); // rule-ok: WHERE z gotowych kawałków z ?
@@ -94,7 +96,7 @@ export const countEmployees = async (db: Db): Promise<{ all: number; admins: num
 /** Konta (także w archiwum) z tym loginem albo e-mailem, poza kontem `exceptId`. */
 export const findAccountsWithLoginOrEmail = async (db: Db, login: string, email: string | null, exceptId: number | null): Promise<UserRow[]> => {
   const [rows] = await db.query<UserRow[]>(
-    'SELECT id, name, first_name, last_name, login, email, role, hired_on, contract_type, archived_at FROM users WHERE (login = ? OR (? IS NOT NULL AND email = ?)) AND id <> ?',
+    'SELECT id, name, first_name, last_name, login, email, role, hired_on, contract_type_id, archived_at FROM users WHERE (login = ? OR (? IS NOT NULL AND email = ?)) AND id <> ?',
     [login, email, email, exceptId ?? 0],
   );
   return rows;
@@ -102,7 +104,7 @@ export const findAccountsWithLoginOrEmail = async (db: Db, login: string, email:
 
 export const findUser = async (db: Db, id: number): Promise<UserRow | null> => {
   const [rows] = await db.query<UserRow[]>(
-    'SELECT id, name, first_name, last_name, login, email, role, hired_on, contract_type, archived_at FROM users WHERE id = ?',
+    'SELECT id, name, first_name, last_name, login, email, role, hired_on, contract_type_id, archived_at FROM users WHERE id = ?',
     [id],
   );
   return rows[0] ?? null;
@@ -116,22 +118,22 @@ export interface AccountData {
   email: string | null;
   role: Role;
   hiredOn: string | null;
-  contractType: ContractType | null;
+  contractTypeId: number | null;
 }
 
 /** Nowe konto zawsze z hasłem tymczasowym. */
 export const insertUser = async (db: Db, u: AccountData & { passwordHash: string }): Promise<number> => {
   const [result] = await db.query<ResultSetHeader>(
-    'INSERT INTO users (first_name, last_name, login, email, role, hired_on, contract_type, password_hash, must_change_password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)',
-    [u.firstName, u.lastName, u.login, u.email, u.role, u.hiredOn, u.contractType, u.passwordHash],
+    'INSERT INTO users (first_name, last_name, login, email, role, hired_on, contract_type_id, password_hash, must_change_password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)',
+    [u.firstName, u.lastName, u.login, u.email, u.role, u.hiredOn, u.contractTypeId, u.passwordHash],
   );
   return result.insertId;
 };
 
 export const updateUser = async (db: Db, id: number, u: AccountData): Promise<void> => {
   await db.query(
-    'UPDATE users SET first_name = ?, last_name = ?, login = ?, email = ?, role = ?, hired_on = ?, contract_type = ? WHERE id = ?',
-    [u.firstName, u.lastName, u.login, u.email, u.role, u.hiredOn, u.contractType, id],
+    'UPDATE users SET first_name = ?, last_name = ?, login = ?, email = ?, role = ?, hired_on = ?, contract_type_id = ? WHERE id = ?',
+    [u.firstName, u.lastName, u.login, u.email, u.role, u.hiredOn, u.contractTypeId, id],
   );
 };
 

@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { AxiosError, AxiosHeaders } from 'axios';
 import type { EmployeeListItem } from '@app/shared';
 import { api } from '../../../../core/api/client';
@@ -7,7 +7,7 @@ import { renderWithProviders } from '../../../../test/render';
 import { EmployeeFormModal } from '../EmployeeFormModal';
 
 const jan: EmployeeListItem = {
-  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hiredOn: '2024-03-01', contractType: 'employment', isMe: false,
+  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hiredOn: '2024-03-01', contractType: { id: 1, name: 'Umowa o pracę', hidden: false }, isMe: false,
   pool: { year: 2026, annualDays: 26, carriedDays: 4, usedDays: 9, pendingDays: 0, leftDays: 21, leftCarriedDays: 0 },
 };
 const anna: EmployeeListItem = { ...jan, id: 1, name: 'Anna Nowak', firstName: 'Anna', lastName: 'Nowak', login: 'anna.nowak@firma.pl', role: 'admin', isMe: true, pool: null };
@@ -28,25 +28,30 @@ const show = (employee: EmployeeListItem | null) => {
 
 const fill = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label, { exact: false }), { target: { value } });
 
+const options = [{ id: 1, name: 'Umowa o pracę' }, { id: 2, name: 'Umowa zlecenie' }, { id: 4, name: 'B2B' }];
+const mockOptions = (items = options) => vi.spyOn(api, 'get').mockResolvedValue({ data: { items } });
+const contractField = () => screen.getByLabelText('Rodzaj umowy', { selector: 'input:not([type=hidden])' });
+
+beforeEach(() => { mockOptions(); });
 afterEach(() => vi.restoreAllMocks());
 
 describe('EmployeeFormModal', () => {
-  it('hire date and contract type are filled from the employee and sent', async () => {
+  it('hire date and contract type are filled from the employee and sent as a number', async () => {
     const put = vi.spyOn(api, 'put').mockResolvedValue({ data: { ok: true } });
     show(jan);
     expect(screen.getByLabelText('Data zatrudnienia')).toHaveValue('01.03.2024');
-    expect(screen.getByLabelText('Rodzaj umowy', { selector: 'input:not([type=hidden])' })).toHaveValue('Umowa o pracę');
+    await waitFor(() => expect(contractField()).toHaveValue('Umowa o pracę'));
     fireEvent.change(screen.getByLabelText('Data zatrudnienia'), { target: { value: '15.04.2025' } });
     fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
     await waitFor(() =>
-      expect(put).toHaveBeenCalledWith('/employees/2', expect.objectContaining({ hiredOn: '2025-04-15', contractType: 'employment' })),
+      expect(put).toHaveBeenCalledWith('/employees/2', expect.objectContaining({ hiredOn: '2025-04-15', contractTypeId: 1 })),
     );
   });
 
   it('new employee: hire date and contract type are optional and empty', () => {
     show(null);
     expect(screen.getByLabelText('Data zatrudnienia')).toHaveValue('');
-    expect(screen.getByLabelText('Rodzaj umowy', { selector: 'input:not([type=hidden])' })).toHaveValue('');
+    expect(contractField()).toHaveValue('');
   });
 
   it('empty form → "To pole jest wymagane."', async () => {
@@ -151,5 +156,75 @@ describe('EmployeeFormModal', () => {
     await waitFor(() => expect(put).toHaveBeenCalledWith('/employees/2', expect.objectContaining({ annualDays: 20, carriedDays: 4, role: 'employee' })));
     expect(success).toHaveBeenCalledWith('Zapisano dane pracownika.');
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+describe('contract type field', () => {
+  /** Opcje z listy tego pola (Mantine trzyma listy wszystkich pól w dokumencie, więc szukamy po aria-controls). */
+  const optionNames = async () => {
+    // Najpierw odpowiedź z listą typów, potem otwarcie pola (jak u człowieka, który klika po załadowaniu okna).
+    await waitFor(() => expect(api.get).toHaveBeenCalled());
+    await vi.mocked(api.get).mock.results[0]!.value;
+    await act(async () => {});
+    fireEvent.click(contractField());
+    const options = await waitFor(() => {
+      const listbox = document.getElementById(contractField().getAttribute('aria-controls') ?? '')!;
+      const found = within(listbox).queryAllByRole('option', { hidden: true });
+      expect(found.length).toBeGreaterThan(0);
+      return found;
+    });
+    return options.map((o) => o.textContent);
+  };
+
+  it('options in the order from the API, from the employees route', async () => {
+    show(null);
+    expect(await optionNames()).toEqual(['Umowa o pracę', 'Umowa zlecenie', 'B2B']);
+    expect(api.get).toHaveBeenCalledWith('/employees/contract-types');
+  });
+
+  it('own hidden type is selected with "(ukryty)" at the end; another person does not see it', async () => {
+    show({ ...jan, contractType: { id: 5, name: 'Umowa o staż', hidden: true } });
+    await waitFor(() => expect(contractField()).toHaveValue('Umowa o staż (ukryty)'));
+    expect(await optionNames()).toEqual(['Umowa o pracę', 'Umowa zlecenie', 'B2B', 'Umowa o staż (ukryty)']);
+  });
+
+  it('a person with a visible type gets no "(ukryty)" option', async () => {
+    show(jan);
+    const names = await optionNames();
+    expect(names).toEqual(['Umowa o pracę', 'Umowa zlecenie', 'B2B']);
+    expect(names.some((n) => n?.includes('(ukryty)'))).toBe(false);
+  });
+
+  it('contract types failed to load → message under the field', async () => {
+    vi.spyOn(api, 'get').mockRejectedValue(new Error('down'));
+    show(jan);
+    expect(await screen.findByText('Nie udało się wczytać typów umów. Odśwież stronę.')).toBeInTheDocument();
+  });
+
+  it('no visible types → text pointing to Settings', async () => {
+    mockOptions([]);
+    show(null);
+    fireEvent.click(contractField());
+    expect(await screen.findByText('Brak typów umów. Dodasz je w Ustawieniach → Typy umów.')).toBeInTheDocument();
+  });
+
+  it('clearing sends an empty contract', async () => {
+    const put = vi.spyOn(api, 'put').mockResolvedValue({ data: { ok: true } });
+    show(jan);
+    await waitFor(() => expect(contractField()).toHaveValue('Umowa o pracę'));
+    fireEvent.click(screen.getByLabelText('Wyczyść', { selector: 'button' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
+    await waitFor(() => expect(put).toHaveBeenCalledWith('/employees/2', expect.objectContaining({ contractTypeId: null })));
+  });
+
+  it('400 contract_type_unavailable → error under the field', async () => {
+    const config = { url: '/employees/2', headers: new AxiosHeaders() };
+    const key = 'employees.server.contract_type_unavailable';
+    vi.spyOn(api, 'put').mockRejectedValue(new AxiosError('fail', 'ERR', config, undefined, {
+      status: 400, statusText: 'Bad Request', headers: {}, config, data: { error: { message: key, fields: { contractTypeId: key } } },
+    }));
+    show(jan);
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
+    expect(await screen.findByText('Tego typu umowy nie można już wybrać. Odśwież stronę.')).toBeInTheDocument();
   });
 });

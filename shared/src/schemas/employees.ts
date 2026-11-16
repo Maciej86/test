@@ -4,13 +4,14 @@ import { FIRST_NAME_MAX, LAST_NAME_MAX } from '../constants/login';
 import {
   ANNUAL_DAYS_MAX,
   CARRIED_DAYS_MAX,
-  CONTRACT_TYPES,
   EMPLOYEE_SORTS,
-  type ContractType,
   type EmployeeSort,
 } from '../constants/employees';
 import { email, isoDate, login, newPassword, optionalField, personName, wholeNumber } from './fields';
 import { listQuerySchema, type ListResponse } from './list';
+
+/** Największy numer w kolumnie INT UNSIGNED, którą zna zapis pracownika (ochrona przed ogromnymi liczbami). */
+const CONTRACT_TYPE_ID_MAX = 2_147_483_647;
 
 const employeeFields = {
   firstName: personName(FIRST_NAME_MAX),
@@ -19,7 +20,8 @@ const employeeFields = {
   email: optionalField(email),
   role: z.enum(ROLES, { error: 'validation.required' }),
   hiredOn: optionalField(isoDate),
-  contractType: optionalField(z.enum(CONTRACT_TYPES, { error: 'validation.required' })),
+  // Numer typu ze słownika Typy umów; serwer sprawdza, czy można go wybrać.
+  contractTypeId: optionalField(wholeNumber(1, CONTRACT_TYPE_ID_MAX)),
   annualDays: wholeNumber(0, ANNUAL_DAYS_MAX).optional(),
   carriedDays: wholeNumber(0, CARRIED_DAYS_MAX).optional(),
 };
@@ -94,7 +96,8 @@ export interface EmployeeListItem {
   role: Role;
   /** Data zatrudnienia `RRRR-MM-DD` albo null. */
   hiredOn: string | null;
-  contractType: ContractType | null;
+  /** Typ umowy ze słownika (także ukryty) albo null. */
+  contractType: { id: number; name: string; hidden: boolean } | null;
   isMe: boolean;
   /** null dla administratora. */
   pool: EmployeePool | null;

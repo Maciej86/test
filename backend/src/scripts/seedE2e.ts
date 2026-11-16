@@ -10,6 +10,8 @@ export const E2E_ACCOUNTS = { admin: 'e2e.admin@test.local', employee: 'e2e.empl
 export const E2E_TEMP_LOGIN_LIKE = 'e2e.tmp.%@test.local';
 /** Typy urlopów dodawane przez testy w przeglądarce (np. „E2E 1731600000000”); bez wniosków, więc można je usunąć. */
 export const E2E_TEMP_LEAVE_TYPE_LIKE = 'E2E %';
+/** Typy umów dodawane przez testy w przeglądarce (np. „E2E 1731600000000”). */
+export const E2E_TEMP_CONTRACT_TYPE_LIKE = 'E2E %';
 
 export interface E2eAccount {
   firstName: string;
@@ -41,10 +43,17 @@ const saveToDb = async (account: E2eAccount): Promise<void> => {
   );
 };
 
-/** Porządek przed testami: bez kont i typów urlopów z poprzednich uruchomień (pule znikają z kontami, CASCADE). */
+/**
+ * Porządek przed testami: bez kont, typów urlopów i typów umów z poprzednich uruchomień (pule znikają z kontami,
+ * CASCADE). Typ umowy ma u pracowników RESTRICT, więc najpierw konta przestają go wskazywać.
+ */
 export const removeTemporaryData = async (): Promise<void> => {
   await pool.query('DELETE FROM users WHERE login LIKE ?', [E2E_TEMP_LOGIN_LIKE]);
   await pool.query('DELETE FROM leave_types WHERE name LIKE ?', [E2E_TEMP_LEAVE_TYPE_LIKE]);
+  await pool.query('UPDATE users SET contract_type_id = NULL WHERE contract_type_id IN (SELECT id FROM contract_types WHERE name LIKE ?)', [
+    E2E_TEMP_CONTRACT_TYPE_LIKE,
+  ]);
+  await pool.query('DELETE FROM contract_types WHERE name LIKE ?', [E2E_TEMP_CONTRACT_TYPE_LIKE]);
 };
 
 /** Dzwonek administratora e2e: dwa nieprzeczytane i jedno przeczytane powiadomienie, za każdym razem od nowa. */

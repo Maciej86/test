@@ -17,6 +17,7 @@ import { diffChanges, logActivity } from '../../db/activityLog';
 import { pool } from '../../db/pool';
 import { withTransaction } from '../../db/transaction';
 import { fail, type Result, type ServiceError } from '../../middleware/routeHelpers';
+import { findContractType, listSelectableContractTypes } from '../contract-types/contract-types.queries';
 import * as q from './employees.queries';
 
 /** Kto wykonuje zmianę (z `req.user`). */
@@ -62,7 +63,7 @@ export const listEmployeesPage = async (query: EmployeesListQuery, me: Actor): P
     email: r.email,
     role: r.role,
     hiredOn: r.hired_on,
-    contractType: r.contract_type,
+    contractType: r.contract_type_id !== null ? { id: r.contract_type_id, name: r.contract_type_name ?? '', hidden: r.contract_type_hidden_at !== null } : null,
     isMe: r.id === me.id,
     pool:
       r.role === 'employee' && r.annual_days !== null
@@ -96,15 +97,32 @@ const duplicateError = (error: unknown): { error: ServiceError } | null => {
   return fail(409, key, { fields: { [field]: key } });
 };
 
-/** Pola konta do historii zmian (nazwy kolumn w bazie). */
-const accountFields = (d: q.AccountData) => ({
+/**
+ * Typ umowy do zapisu: widoczny albo ten, który osoba już ma (ukryty zostaje u niej). Zwraca nazwę do historii.
+ * Nieistniejący i cudzy ukryty → 400 pod polem.
+ */
+const checkContractType = async (db: q.Db, typeId: number | null, currentTypeId: number | null): Promise<{ name: string | null } | { error: ServiceError }> => {
+  if (typeId === null) return { name: null };
+  const type = await findContractType(db, typeId, { forShare: true });
+  if (!type || (type.hidden && type.id !== currentTypeId)) {
+    return fail(400, EMPLOYEE_MESSAGES.contractTypeUnavailable, { fields: { contractTypeId: EMPLOYEE_MESSAGES.contractTypeUnavailable } });
+  }
+  return { name: type.name };
+};
+
+/** Nazwa obecnego typu osoby (do historii); brak → null. */
+const contractTypeName = async (db: q.Db, typeId: number | null): Promise<string | null> =>
+  typeId === null ? null : ((await findContractType(db, typeId))?.name ?? null);
+
+/** Pola konta do historii zmian (nazwy kolumn w bazie); typ umowy jako nazwa, żeby wpis był czytelny po zmianie nazwy. */
+const accountFields = (d: q.AccountData, contractTypeName: string | null) => ({
   first_name: d.firstName,
   last_name: d.lastName,
   login: d.login,
   email: d.email,
   role: d.role,
   hired_on: d.hiredOn,
-  contract_type: d.contractType,
+  contract_type: contractTypeName,
 });
 
 const accountOf = (u: q.UserRow): q.AccountData => ({
@@ -114,7 +132,7 @@ const accountOf = (u: q.UserRow): q.AccountData => ({
   email: u.email,
   role: u.role,
   hiredOn: u.hired_on ?? null,
-  contractType: u.contract_type ?? null,
+  contractTypeId: u.contract_type_id ?? null,
 });
 
 const accountInput = (d: EmployeeData): q.AccountData => ({
@@ -124,18 +142,21 @@ const accountInput = (d: EmployeeData): q.AccountData => ({
   email: d.email,
   role: d.role,
   hiredOn: d.hiredOn,
-  contractType: d.contractType,
+  contractTypeId: d.contractTypeId,
 });
 
 export const createEmployee = async (input: EmployeeCreateData, actor: Actor): Promise<Result<{ id: number }>> => {
   const passwordHash = await hashPassword(input.password);
   try {
     return await withTransaction(async (conn) => {
+      const contractType = await checkContractType(conn, input.contractTypeId, null);
+      if ('error' in contractType) return contractType;
       const conflict = await findConflict(conn, input.login, input.email, null);
       if (conflict) return conflict;
       const id = await q.insertUser(conn, { ...accountInput(input), passwordHash });
       const log = { userId: actor.id, userName: actor.name, entityId: id };
-      await logActivity(conn, { ...log, action: 'create', entityType: 'users', changes: diffChanges({}, accountFields(accountInput(input))) });
+      const changes = diffChanges({}, accountFields(accountInput(input), contractType.name));
+      await logActivity(conn, { ...log, action: 'create', entityType: 'users', changes });
       if (input.role === 'employee' && input.annualDays !== undefined) {
         const year = await getOpenYear(conn);
         await q.upsertPool(conn, id, year, input.annualDays, input.carriedDays);
@@ -169,11 +190,15 @@ export const updateEmployee = async (id: number, input: EmployeeData, actor: Act
       const before = await findActiveEmployee(conn, id);
       if (!before) return notFound();
       if (id === actor.id && input.role !== before.role) return fail(409, EMPLOYEE_MESSAGES.ownRole);
+      const contractType = await checkContractType(conn, input.contractTypeId, before.contract_type_id);
+      if ('error' in contractType) return contractType;
       const conflict = await findConflict(conn, input.login, input.email, id);
       if (conflict) return conflict;
 
       const log = { userId: actor.id, userName: actor.name, entityId: id };
-      const accountChanges = diffChanges(accountFields(accountOf(before)), accountFields(accountInput(input)));
+      const beforeTypeName =
+        before.contract_type_id === input.contractTypeId ? contractType.name : await contractTypeName(conn, before.contract_type_id);
+      const accountChanges = diffChanges(accountFields(accountOf(before), beforeTypeName), accountFields(accountInput(input), contractType.name));
       if (Object.keys(accountChanges).length > 0) {
         await q.updateUser(conn, id, accountInput(input));
         await logActivity(conn, { ...log, action: 'update', entityType: 'users', changes: accountChanges });
@@ -301,6 +326,9 @@ export const getPool = async (userId: number, year: number): Promise<EmployeePoo
   const usage = (await getPoolUsage([userId], year)).get(userId) ?? { usedDays: 0, pendingDays: 0 };
   return toPool(year, row.annual_days, row.carried_days, usage);
 };
+
+/** Typy umów do wyboru w oknie pracownika (widoczne, w ustalonej kolejności). */
+export const listContractTypeOptions = async () => ({ items: await listSelectableContractTypes() });
 
 /** Osoby spoza archiwum (np. do przypisania zadania): tylko numer i imię z nazwiskiem. */
 export const listActiveUsers = async (): Promise<{ id: number; name: string }[]> => {

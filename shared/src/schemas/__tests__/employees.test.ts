@@ -73,21 +73,24 @@ describe('employee schemas', () => {
   });
 
   it('hire date and contract type are optional: empty → null', () => {
-    const r = employeeUpdateSchema.parse({ ...base, hiredOn: '', contractType: '' });
+    const r = employeeUpdateSchema.parse({ ...base, hiredOn: '', contractTypeId: '' });
     expect(r.hiredOn).toBeNull();
-    expect(r.contractType).toBeNull();
+    expect(r.contractTypeId).toBeNull();
+    expect(employeeUpdateSchema.parse({ ...base, contractTypeId: null }).contractTypeId).toBeNull();
+    expect(employeeUpdateSchema.parse(base).contractTypeId).toBeNull();
     expect(employeeUpdateSchema.parse(base).hiredOn).toBeNull();
   });
 
-  it('hire date 2024-03-01 and contract b2b saved; 2024-02-30 → validation.date; contract kot → error', () => {
-    const r = employeeCreateSchema.parse({ ...base, password: 'Urlop-2026', hiredOn: '2024-03-01', contractType: 'b2b' });
-    expect(r).toMatchObject({ hiredOn: '2024-03-01', contractType: 'b2b' });
+  it('hire date 2024-03-01 and contract type 4 saved; 2024-02-30 → validation.date; type 0, 1.5 or kot → error', () => {
+    const r = employeeCreateSchema.parse({ ...base, password: 'Urlop-2026', hiredOn: '2024-03-01', contractTypeId: 4 });
+    expect(r).toMatchObject({ hiredOn: '2024-03-01', contractTypeId: 4 });
+    expect(employeeUpdateSchema.parse({ ...base, contractTypeId: '2' }).contractTypeId).toBe(2);
     expect(issue(employeeUpdateSchema.safeParse({ ...base, hiredOn: '2024-02-30' }), 'hiredOn')).toBe('validation.date');
-    expect(employeeUpdateSchema.safeParse({ ...base, contractType: 'kot' }).success).toBe(false);
+    for (const bad of [0, -1, 1.5, 'kot']) expect(employeeUpdateSchema.safeParse({ ...base, contractTypeId: bad }).success).toBe(false);
   });
 
   it('administrator also keeps hire date and contract type', () => {
-    const r = employeeUpdateSchema.parse({ ...base, role: 'admin', hiredOn: '2020-01-02', contractType: 'employment' });
-    expect(r).toMatchObject({ hiredOn: '2020-01-02', contractType: 'employment' });
+    const r = employeeUpdateSchema.parse({ ...base, role: 'admin', hiredOn: '2020-01-02', contractTypeId: 1 });
+    expect(r).toMatchObject({ hiredOn: '2020-01-02', contractTypeId: 1 });
   });
 });

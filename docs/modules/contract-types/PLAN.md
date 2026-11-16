@@ -43,17 +43,18 @@ Pracownicy wołają funkcje z `contract-types.queries.ts` (sekcja „Powiązania
 
 ---
 
-- [ ] **0. Szkielet testów.** `it.todo` dla każdego wymagania z kroków 1–8 w:
+- [x] **0. Szkielet testów.** `it.todo` dla każdego wymagania z kroków 1–8 w:
   `shared/src/schemas/__tests__/contractTypes.test.ts`,
   `backend/src/modules/contract-types/__tests__/contract-types.queries.test.ts`,
   `backend/src/modules/contract-types/__tests__/contract-types.service.test.ts`,
   `backend/src/modules/contract-types/__tests__/contract-types.routes.test.ts`,
   `frontend/src/modules/contract-types/__tests__/ContractTypesPage.test.tsx`,
   `frontend/src/modules/contract-types/components/__tests__/ContractTypeFormModal.test.tsx`,
-  dopisane `it.todo` w istniejących testach Pracowników (schemat, usługa, trasy, okno),
+  (Pracownicy są `zrobiony`, więc test zasad nie pozwala na `it.todo` w ich testach: wymagania z kroków 5 i 7
+  dopisuję tam od razu jako prawdziwe testy),
   `e2e/contract-types.spec.ts` (`test.fixme`). → `npm run check`
 
-- [ ] **1. Stałe i schematy.** `shared/src/constants/contractTypes.ts` (wartości wyżej).
+- [x] **1. Stałe i schematy.** `shared/src/constants/contractTypes.ts` (wartości wyżej).
   `shared/src/schemas/contractTypes.ts`: `contractTypeSchema = z.object({ name: personName(CONTRACT_TYPE_NAME_MAX) })`,
   `contractTypeMoveSchema = z.object({ direction: z.enum(['up', 'down']) })`; typy `ContractTypeInput`,
   `ContractTypeItem = { id: number; name: string; hidden: boolean; employeesCount: number }`,
@@ -61,7 +62,7 @@ Pracownicy wołają funkcje z `contract-types.queries.ts` (sekcja „Powiązania
   eksport w `shared/src/index.ts`. Testy: nazwa 1/2/60/61 znaków, „ B2B ” → „B2B”, pusta → `validation.required`;
   `direction: 'left'` → błąd.
 
-- [ ] **2. Migracje i zapytania.** `backend/migrations/012_contract_types.sql`, `013_contract_types_seed.sql`,
+- [x] **2. Migracje i zapytania.** `backend/migrations/012_contract_types.sql`, `013_contract_types_seed.sql`,
   `014_users_contract_type_id.sql` (FK `ON DELETE RESTRICT`), `015_users_contract_type_copy.sql`
   (`UPDATE users u JOIN contract_types c ON c.name = CASE u.contract_type … END SET u.contract_type_id = c.id`),
   `016_users_drop_contract_type.sql` → `npm run migrate`; sprawdzenie: liczba osób z umową przed i po taka sama.
@@ -73,7 +74,7 @@ Pracownicy wołają funkcje z `contract-types.queries.ts` (sekcja „Powiązania
   `listContractTypes` zamienia wiersze na `ContractTypeItem`; `lockVisible` i `maxPosition` mają `FOR UPDATE`;
   `listSelectableContractTypes` ma `hidden_at IS NULL`.
 
-- [ ] **3. Lista, dodawanie, edycja.** `contract-types.service.ts`: `listTypes()`, `createType(input):
+- [x] **3. Lista, dodawanie, edycja.** `contract-types.service.ts`: `listTypes()`, `createType(input):
   Promise<Result<{ id: number }>>` (w `withTransaction`, nowy na `maxPosition + 1`), `updateType(id, input):
   Promise<Result>` (brak → 404). Konflikt nazwy: widoczny → 409 `fields.name` = `name_taken`; ukryty →
   `name_taken_hidden` + `hiddenType: { id, name }`; `ER_DUP_ENTRY` → 409 `name_taken`. Trasy `GET /`, `POST /` (201),
@@ -81,14 +82,14 @@ Pracownicy wołają funkcje z `contract-types.queries.ts` (sekcja „Powiązania
   `SPEC-GENERAL.md`. Testy: lista; dodanie → pozycja 5; „ umowa zlecenie ” → 409 `name_taken`; nazwa ukrytego →
   `name_taken_hidden` z `hiddenType`; „b2b” przy edycji „B2B” → 200; brak → 404; `ER_DUP_ENTRY` → 409; 401, 403.
 
-- [ ] **4. Przesuwanie, ukrywanie, przywracanie.** `moveType(id, direction)`, `hideType(id)`, `unhideType(id)` w
+- [x] **4. Przesuwanie, ukrywanie, przywracanie.** `moveType(id, direction)`, `hideType(id)`, `unhideType(id)` w
   `withTransaction`. Trasy `POST /:id/move` (`validateBody(contractTypeMoveSchema)`), `POST /:id/hide`,
   `POST /:id/unhide` (`// rule-ok: bez danych wejściowych, tylko numer z adresu`). Move: zamiana z sąsiadem z
   `lockVisible`; brzeg → 200 bez zapisu; ukryty / brak → 404. Hide: brak → 404; ukryty → 409 `already_hidden`;
   ostatni widoczny **też** da się ukryć. Unhide: brak → 404; widoczny → 409 `not_hidden`; pozycja `maxPosition + 1`.
   Testy: każdy przypadek; pozycje 1, 3, 4 → „wyżej” przy 3 zamienia z 1; ukrycie jedynego widocznego → 200.
 
-- [ ] **5. Pracownicy: backend.** Schemat Pracowników: `contractType` → `contractTypeId:
+- [x] **5. Pracownicy: backend.** Schemat Pracowników: `contractType` → `contractTypeId:
   optionalField(wholeNumber(1, 2_147_483_647))`; `EmployeeItem.contractType: { id: number; name: string; hidden:
   boolean } | null`; usunięte `CONTRACT_TYPES`, `ContractType`, `CONTRACT_TYPE_LABELS` i `employees.contract_types.*`.
   `employees.queries.ts`: lista i odczyt z `LEFT JOIN contract_types`; zapis `contract_type_id`. Usługa: przed zapisem
@@ -100,7 +101,7 @@ Pracownicy wołają funkcje z `contract-types.queries.ts` (sekcja „Powiązania
   zapis bez umowy; historia z nazwami „Umowa o pracę” → „B2B”; lista ma `contractType.name` i `hidden`; nowa trasa
   zwraca widoczne w kolejności, 401, 403.
 
-- [ ] **6. Front: Typy umów.** `contract-types.api.ts`: `useContractTypes()`, `useCreateContractType()`,
+- [x] **6. Front: Typy umów.** `contract-types.api.ts`: `useContractTypes()`, `useCreateContractType()`,
   `useUpdateContractType()`, `useMoveContractType()`, `useHideContractType()`, `useUnhideContractType()` (po sukcesie
   `invalidateQueries(['contract-types'])` i `['employees']`). `ContractTypesPage.tsx` (wpis w `pages.ts`),
   `components/ContractTypesTable.tsx`, `ContractTypeCards.tsx`, `ContractTypeFormModal.tsx` (`zodResolver(
@@ -112,20 +113,34 @@ Pracownicy wołają funkcje z `contract-types.queries.ts` (sekcja „Powiązania
   `name_taken` → błąd pod polem; `name_taken_hidden` → link „Przywróć go” → `unhide`, zamknięcie, dymek; okno
   ukrycia z liczbą (przy 0 bez zdania o pracownikach) → dymek `hidden_done`.
 
-- [ ] **7. Front: Pracownicy.** Hook `useContractTypeOptions()` w `employees.api.ts` (`GET /api/employees/contract-types`).
+- [x] **7. Front: Pracownicy.** Hook `useContractTypeOptions()` w `employees.api.ts` (`GET /api/employees/contract-types`).
   `EmployeeFormModal.tsx`: `Select` z typami; obecny ukryty typ osoby dopisany na końcu z „(ukryty)”; pusta lista →
   `nothingFoundMessage` = `employees.contract_types_empty`; wysyła `contractTypeId` (liczba albo `''`).
   `EmployeesTable.tsx` (i karta): `contractType.name` albo szare „brak”. Testy: opcje w kolejności z API; osoba
   z ukrytym typem ma go wybranego z „(ukryty)”, inna osoba go nie widzi; wyczyszczenie wysyła pustą umowę; kolumna
   „Umowa” z nazwą; 400 `contract_type_unavailable` → błąd pod polem.
 
-- [ ] **8. Dokumenty i testy w przeglądarce.** `TESTS.md` (scenariusze administratora; pracownik nie ma pozycji, adres
+- [x] **8. Dokumenty i testy w przeglądarce.** `TESTS.md` (scenariusze administratora; pracownik nie ma pozycji, adres
   → brak dostępu). `e2e/contract-types.spec.ts`: admin dodaje typ `E2E <znacznik czasu>`, zmienia nazwę, przesuwa
   wyżej, wybiera go u pracownika, ukrywa (pracownik go zachowuje, nowy pracownik go nie widzi), przywraca; ta sama
   nazwa → błąd; pracownik → brak dostępu. Seed e2e (`removeTemporaryData`) najpierw zeruje `contract_type_id`
   u kont z typem `E2E %`, potem usuwa te typy. Makieta Pracowników bez zmian (moduł zamknięty). `SPEC.md` Pracowników:
   dopisek o zmianie pola. → `npm run check`, `npm run test:e2e`.
 
-- [ ] **9. Przegląd kodu** (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami.
+- [x] **9. Przegląd kodu** (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami.
 
 ## Rozstrzygnięcia w trakcie budowy
+
+- Krok 0: bez `it.todo` w testach Pracowników (moduł `zrobiony`, test zasad); ich testy powstają od razu w krokach 5 i 7.
+- Kroki 5 i 7 zrobione razem: usunięcie `CONTRACT_TYPES` ze `shared` od razu psuje front i makietę Pracowników, więc
+  `npm run check` jest zielony dopiero z obiema zmianami.
+- Makieta Pracowników (moduł zamknięty) dostała tylko podmianę stałej listy na nazwy typów w `data.ts`
+  (`CONTRACT_TYPE_NAMES`); wygląd bez zmian. Inaczej makiety by się nie budowały.
+- Pole „Rodzaj umowy”: przycisk czyszczenia ma etykietę „Wyczyść” (`employees.contract_type_clear`), żeby czytnik ekranu
+  i test go znajdowały.
+- Przegląd kodu (bez błędów krytycznych), poprawione z testami: zapis pracownika odświeża też Typy umów (liczba
+  „Pracownicy” bez 30 s opóźnienia); gdy wszystkie typy są ukryte, lista od razu je pokazuje; błąd wczytania typów
+  w oknie pracownika pod polem (`employees.contract_types_error`); typ czytany przy zapisie pracownika z `FOR SHARE`
+  (równoczesne „Ukryj” czeka); mocniejszy test „bez (ukryty)” u osoby z widocznym typem.
+- Stare wpisy historii mają w `contract_type` kody (`employment`), nowe nazwy typów; ekran „Historia zmian” (moduł 11)
+  ma pokazywać wartość tak, jak jest, bez tłumaczenia.

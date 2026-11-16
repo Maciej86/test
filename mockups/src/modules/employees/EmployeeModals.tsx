@@ -18,11 +18,11 @@ import {
 } from '@mantine/core';
 import { CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { CONTRACT_TYPE_LABELS, CONTRACT_TYPES, TABLE_MIN_WIDTH, translateKey } from '@app/shared';
+import { TABLE_MIN_WIDTH, translateKey } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateField } from '../../common/DateField';
 import { notify } from '../../common/notify';
-import { ARCHIVED_DUPLICATE, EMPLOYEES, GENERATED_PASSWORD, POOL_YEAR, poolParts, type MockEmployee } from './data';
+import { ARCHIVED_DUPLICATE, CONTRACT_TYPE_NAMES, EMPLOYEES, GENERATED_PASSWORD, POOL_YEAR, poolParts, type MockEmployee } from './data';
 
 const PasswordField = ({ label }: { label: string }) => {
   const { t } = useTranslation('employees');
@@ -96,7 +96,7 @@ export const EmployeeModal = ({ opened, onClose, employee, loginTaken = false }:
           <DateField label={t('hired_on')} value={hiredOn} onChange={setHiredOn} />
           <Select
             label={t('contract_type')}
-            data={CONTRACT_TYPES.map((c) => ({ value: c, label: translateKey(t, CONTRACT_TYPE_LABELS[c]) }))}
+            data={CONTRACT_TYPE_NAMES}
             defaultValue={employee?.contractType ?? null}
             clearable
           />

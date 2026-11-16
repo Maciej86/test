@@ -6,10 +6,13 @@ import type {
   EmployeeInput,
   EmployeesListQuery,
   EmployeesListResponse,
+  SelectableContractType,
 } from '@app/shared';
 import { api } from '../../core/api/client';
 
 const KEY = ['employees'] as const;
+/** Typy umów pokazują liczbę pracowników z każdym typem: po zapisie pracownika też się odświeżają. */
+const CONTRACT_TYPES_KEY = ['contract-types'] as const;
 
 export const useEmployees = (params: EmployeesListQuery) => {
   return useQuery({
@@ -19,12 +22,23 @@ export const useEmployees = (params: EmployeesListQuery) => {
   });
 };
 
+/** Typy umów do pola „Rodzaj umowy” (widoczne, w kolejności ustawionej w Typach umów). */
+export const useContractTypeOptions = () => {
+  return useQuery({
+    queryKey: [...KEY, 'contract-types'],
+    queryFn: () => api.get<{ items: SelectableContractType[] }>('/employees/contract-types').then((r) => r.data.items),
+  });
+};
+
 /** Każda zmiana odświeża listę i podgląd zamknięcia roku. */
 const useEmployeesMutation = <T>(fn: (input: T) => Promise<unknown>) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: fn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY }),
+    onSuccess: () => Promise.all([
+      queryClient.invalidateQueries({ queryKey: KEY }),
+      queryClient.invalidateQueries({ queryKey: CONTRACT_TYPES_KEY }),
+    ]),
   });
 };
 

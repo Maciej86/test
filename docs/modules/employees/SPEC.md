@@ -223,3 +223,13 @@ pendingDays, leftDays, leftCarriedDays } | null` (null dla administratora).
 - Usuwanie kont na stałe i ekran archiwum (moduł Archiwum).
 - Wysyłanie loginu i hasła e-mailem (administrator przekazuje je sam).
 - Dodatkowe dane pracownika (stanowisko, telefon, data zatrudnienia), pula proporcjonalna dla nowych osób.
+
+## Zmiana 2026-11-16: rodzaj umowy ze słownika
+
+Moduł Typy umów (`docs/modules/contract-types/SPEC.md`) zastąpił stałą listę czterech rodzajów umowy:
+- w bazie `users.contract_type_id` (klucz obcy do `contract_types`, `RESTRICT`) zamiast `users.contract_type` (ENUM);
+  dotychczasowe umowy przepisane migracją `015`;
+- pole „Rodzaj umowy” w oknie pracownika ma widoczne typy w kolejności z „Typów umów” (`GET /api/employees/contract-types`);
+  pracownik z ukrytym typem go zachowuje i widzi go z dopiskiem „(ukryty)”, nikt inny nie może go wybrać
+  (400 `employees.server.contract_type_unavailable`);
+- lista pokazuje nazwę typu (także ukrytego), historia zmian konta zapisuje nazwę typu.

@@ -27,10 +27,12 @@ vi.mock('../employees.queries', () => ({
   closePool: vi.fn(),
   listActiveUsers: vi.fn(),
 }));
+vi.mock('../../contract-types/contract-types.queries', () => ({ findContractType: vi.fn(), listSelectableContractTypes: vi.fn() }));
 process.env.JWT_SECRET = 'test-secret-test-secret-test-secret';
 
 const users = await import('../../../auth/users.queries');
 const q = await import('../employees.queries');
+const ct = await import('../../contract-types/contract-types.queries');
 const { logActivity } = await import('../../../db/activityLog');
 const { withTransaction } = await import('../../../db/transaction');
 const { createApp } = await import('../../../app');
@@ -54,7 +56,7 @@ const as = (user: SessionUser | null) => {
 };
 
 const row = (o: Partial<Record<string, unknown>>) => ({
-  id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hired_on: '2024-03-01', contract_type: 'employment', annual_days: 26, carried_days: 4, ...o,
+  id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hired_on: '2024-03-01', contract_type_id: 1, contract_type_name: 'Umowa o pracę', contract_type_hidden_at: null, annual_days: 26, carried_days: 4, ...o,
 });
 const newJan = { firstName: 'Jan', lastName: 'Kowalski', login: 'Jan.Kowalski@Firma.pl', email: '', role: 'employee', password: 'Urlop-2026', annualDays: 26, carriedDays: 0 };
 const historyOf = () => vi.mocked(logActivity).mock.calls.map((c) => c[1]);
@@ -87,7 +89,7 @@ describe('employees routes', () => {
     expect(res.body.total).toBe(2);
     expect(res.body.items[0]).toMatchObject({ id: 1, isMe: true, pool: null });
     expect(res.body.items[1]).toMatchObject({
-      id: 2, isMe: false, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', hiredOn: '2024-03-01', contractType: 'employment',
+      id: 2, isMe: false, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', hiredOn: '2024-03-01', contractType: { id: 1, name: 'Umowa o pracę', hidden: false },
       pool: { year: 2026, annualDays: 26, carriedDays: 4, usedDays: 0, pendingDays: 0, leftDays: 30, leftCarriedDays: 4 },
     });
     expect(JSON.stringify(res.body)).not.toContain('password');
@@ -113,7 +115,7 @@ describe('employees routes', () => {
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ id: 7 });
     expect(q.insertUser).toHaveBeenCalledWith(conn, {
-      firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hiredOn: null, contractType: null,
+      firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hiredOn: null, contractTypeId: null,
       passwordHash: 'hash(Urlop-2026)',
     });
     expect(q.upsertPool).toHaveBeenCalledWith(conn, 7, 2026, 26, 0);
@@ -182,7 +184,7 @@ describe('employees routes', () => {
     expect(res.body.error.fields).toMatchObject({ firstName: 'validation.required', lastName: 'validation.too_short', password: 'validation.password_rules' });
   });
 
-  const janUser = { id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hired_on: null, contract_type: null, archived_at: null };
+  const janUser = { id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hired_on: null, contract_type_id: null, archived_at: null };
   const janEdit = { firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: '', role: 'employee', annualDays: 26, carriedDays: 4 };
   const janPool = { id: 11, user_id: 2, year: 2026, annual_days: 26, carried_days: 4, closed_at: null };
 
@@ -266,18 +268,19 @@ describe('employees routes', () => {
   it('PUT /employees/:id: hire date and contract type saved with history', async () => {
     vi.mocked(q.findUser).mockResolvedValue(janUser as never);
     vi.mocked(q.findPool).mockResolvedValue(janPool as never);
-    const res = await as(anna).put('/employees/2', { ...janEdit, hiredOn: '2024-03-01', contractType: 'mandate' });
+    vi.mocked(ct.findContractType).mockResolvedValue({ id: 2, name: 'Umowa zlecenie', hidden: false });
+    const res = await as(anna).put('/employees/2', { ...janEdit, hiredOn: '2024-03-01', contractTypeId: 2 });
     expect(res.status).toBe(200);
-    expect(q.updateUser).toHaveBeenCalledWith(conn, 2, expect.objectContaining({ hiredOn: '2024-03-01', contractType: 'mandate' }));
+    expect(q.updateUser).toHaveBeenCalledWith(conn, 2, expect.objectContaining({ hiredOn: '2024-03-01', contractTypeId: 2 }));
     expect(historyOf()[0]!.changes).toEqual({
       hired_on: { before: null, after: '2024-03-01' },
-      contract_type: { before: null, after: 'mandate' },
+      contract_type: { before: null, after: 'Umowa zlecenie' },
     });
   });
 
   it('PUT /employees/:id: hire date 2024-02-30 or contract kot → 400', async () => {
     expect((await as(anna).put('/employees/2', { ...janEdit, hiredOn: '2024-02-30' })).status).toBe(400);
-    expect((await as(anna).put('/employees/2', { ...janEdit, contractType: 'kot' })).status).toBe(400);
+    expect((await as(anna).put('/employees/2', { ...janEdit, contractTypeId: 'kot' })).status).toBe(400);
     expect(q.updateUser).not.toHaveBeenCalled();
   });
 
@@ -402,5 +405,85 @@ describe('employees routes', () => {
     const app = as(anna);
     vi.mocked(users.findActiveUserById).mockResolvedValue(null);
     expect((await app.get('/employees')).status).toBe(401);
+  });
+});
+
+describe('contract types at employees', () => {
+  const unavailable = { status: 400, body: { error: { message: 'validation.invalid', fields: { contractTypeId: 'employees.server.contract_type_unavailable' } } } };
+  const visible = { id: 2, name: 'Umowa zlecenie', hidden: false };
+  const hidden = { id: 5, name: 'Umowa o staż', hidden: true };
+  const mary = { id: 3, name: 'Maria Lis', first_name: 'Maria', last_name: 'Lis', login: 'maria.lis@firma.pl', email: null, role: 'employee', hired_on: null, contract_type_id: 5, archived_at: null };
+  const maryEdit = { firstName: 'Maria', lastName: 'Lis', login: 'maria.lis@firma.pl', email: '', role: 'employee', annualDays: 26, carriedDays: 0, contractTypeId: 5 };
+  const expectUnavailable = (res: { status: number; body: unknown }) => {
+    expect(res.status).toBe(unavailable.status);
+    expect((res.body as { error: { fields: unknown } }).error.fields).toEqual(unavailable.body.error.fields);
+  };
+
+  beforeEach(() => {
+    vi.mocked(q.insertUser).mockResolvedValue(7);
+    vi.mocked(q.findPool).mockResolvedValue({ id: 12, user_id: 3, year: 2026, annual_days: 26, carried_days: 0, closed_at: null } as never);
+  });
+
+  it('add with a visible type → 201; with hidden or missing type → 400 contract_type_unavailable', async () => {
+    vi.mocked(ct.findContractType).mockResolvedValueOnce(visible);
+    const ok = await as(anna).post('/employees', { ...newJan, contractTypeId: 2 });
+    expect(ok.status).toBe(201);
+    expect(q.insertUser).toHaveBeenCalledWith(conn, expect.objectContaining({ contractTypeId: 2 }));
+    // Odczyt typu blokuje go do końca zapisu, żeby równoczesne „Ukryj” nie przeszło w połowie.
+    expect(ct.findContractType).toHaveBeenCalledWith(conn, 2, { forShare: true });
+    expect(historyOf()[0]!.changes).toMatchObject({ contract_type: { before: undefined, after: 'Umowa zlecenie' } });
+    vi.mocked(q.insertUser).mockClear();
+
+    vi.mocked(ct.findContractType).mockResolvedValueOnce(hidden);
+    expectUnavailable(await as(anna).post('/employees', { ...newJan, contractTypeId: 5 }));
+    vi.mocked(ct.findContractType).mockResolvedValueOnce(null);
+    expectUnavailable(await as(anna).post('/employees', { ...newJan, contractTypeId: 99 }));
+    expect(q.insertUser).not.toHaveBeenCalled();
+  });
+
+  it('null contract type → saved without a type, no type lookup', async () => {
+    expect((await as(anna).post('/employees', { ...newJan, contractTypeId: null })).status).toBe(201);
+    expect(q.insertUser).toHaveBeenCalledWith(conn, expect.objectContaining({ contractTypeId: null }));
+    expect(ct.findContractType).not.toHaveBeenCalled();
+  });
+
+  it('edit of a person with a hidden type without change → 200; change to another hidden → 400', async () => {
+    vi.mocked(q.findUser).mockResolvedValue(mary as never);
+    vi.mocked(ct.findContractType).mockResolvedValue(hidden);
+    const res = await as(anna).put('/employees/3', { ...maryEdit, email: 'maria@firma.pl' });
+    expect(res.status).toBe(200);
+    expect(q.updateUser).toHaveBeenCalledWith(conn, 3, expect.objectContaining({ contractTypeId: 5, email: 'maria@firma.pl' }));
+    expect(historyOf()[0]!.changes).toEqual({ email: { before: null, after: 'maria@firma.pl' } });
+    vi.mocked(q.updateUser).mockClear();
+
+    vi.mocked(ct.findContractType).mockResolvedValue({ id: 6, name: 'Umowa agencyjna', hidden: true });
+    expectUnavailable(await as(anna).put('/employees/3', { ...maryEdit, contractTypeId: 6 }));
+    expect(q.updateUser).not.toHaveBeenCalled();
+  });
+
+  it('history saves type names before and after', async () => {
+    vi.mocked(q.findUser).mockResolvedValue({ ...mary, contract_type_id: 1 } as never);
+    vi.mocked(ct.findContractType).mockImplementation(async (_db, id) => (id === 1 ? { id: 1, name: 'Umowa o pracę', hidden: false } : { id: 4, name: 'B2B', hidden: false }));
+    expect((await as(anna).put('/employees/3', { ...maryEdit, contractTypeId: 4 })).status).toBe(200);
+    expect(historyOf()[0]!.changes).toEqual({ contract_type: { before: 'Umowa o pracę', after: 'B2B' } });
+  });
+
+  it('list has contractType with name and hidden; no type → null', async () => {
+    vi.mocked(q.listEmployees).mockResolvedValue({
+      rows: [row({ contract_type_id: 5, contract_type_name: 'Umowa o staż', contract_type_hidden_at: new Date() }), row({ id: 3, contract_type_id: null, contract_type_name: null })] as never,
+      total: 2,
+    });
+    const res = await as(anna).get('/employees');
+    expect(res.body.items[0].contractType).toEqual({ id: 5, name: 'Umowa o staż', hidden: true });
+    expect(res.body.items[1].contractType).toBeNull();
+  });
+
+  it('GET /employees/contract-types → visible types in order; 401; 403', async () => {
+    vi.mocked(ct.listSelectableContractTypes).mockResolvedValue([{ id: 1, name: 'Umowa o pracę' }, { id: 4, name: 'B2B' }]);
+    const res = await as(anna).get('/employees/contract-types');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ items: [{ id: 1, name: 'Umowa o pracę' }, { id: 4, name: 'B2B' }] });
+    expect((await as(null).get('/employees/contract-types')).status).toBe(401);
+    expect((await as(jan).get('/employees/contract-types')).status).toBe(403);
   });
 });

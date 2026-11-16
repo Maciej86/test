@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.34
 
-**Następny krok:** Typy umów: akceptacja planu (`docs/modules/contract-types/PLAN.md`).
+**Następny krok:** Typy umów: testy (próby nadużyć, sprawdzenie w przeglądarce, potem `TESTS.md` z użytkownikiem).
 
 ## Start aplikacji
 
@@ -25,7 +25,7 @@
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
-| 7 | Typy umów | contract-types | w toku | plan | employees |
+| 7 | Typy umów | contract-types | w toku | testy | employees |
 | 8 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
@@ -36,6 +36,10 @@
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-16: Typy umów: zbudowane (kroki 0–9, przegląd kodu z poprawkami), `npm run check` i wszystkie testy e2e zielone; umowy pracowników przepisane na typy ze słownika (1 z 12 kont miało umowę, po zmianie tak samo).
+
+- 2026-11-16: Typy umów: plan zaakceptowany (10 kroków, od szkieletu testów do przeglądu kodu).
 
 - 2026-11-16: Typy umów: spec zaakceptowany (słownik z kolejnością i ukrywaniem, `users.contract_type_id` zamiast stałej listy, pracownik zachowuje ukryty typ).
 

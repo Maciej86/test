@@ -26,12 +26,15 @@ describe('seedE2eAccounts', () => {
     expect(await verifyPassword('Test-123', String(admin!.passwordHash))).toBe(true);
   });
 
-  it('removes temporary accounts and leave types added by browser tests', async () => {
+  it('removes temporary accounts, leave types and contract types added by browser tests', async () => {
     vi.mocked(pool.query).mockResolvedValue([{}] as never);
     await removeTemporaryData();
     expect(vi.mocked(pool.query).mock.calls).toEqual([
       ['DELETE FROM users WHERE login LIKE ?', ['e2e.tmp.%@test.local']],
       ['DELETE FROM leave_types WHERE name LIKE ?', ['E2E %']],
+      // Najpierw konta przestają wskazywać typ (klucz obcy RESTRICT), potem typ znika.
+      ['UPDATE users SET contract_type_id = NULL WHERE contract_type_id IN (SELECT id FROM contract_types WHERE name LIKE ?)', ['E2E %']],
+      ['DELETE FROM contract_types WHERE name LIKE ?', ['E2E %']],
     ]);
   });
 });

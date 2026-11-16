@@ -1,6 +1,6 @@
 import { Card, Group, Stack, Table, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { CONTRACT_TYPE_LABELS, TABLE_MIN_WIDTH, translateKey, type EmployeeListItem } from '@app/shared';
+import { TABLE_MIN_WIDTH, type EmployeeListItem } from '@app/shared';
 import { DateText } from '../../../common/DateText';
 import { PoolMeter } from './PoolMeter';
 import { NameCell, RoleBadge, RowButtons, type RowActions } from './EmployeeRowParts';
@@ -12,7 +12,7 @@ const EMPLOYEES_TABLE_MIN_WIDTH = TABLE_MIN_WIDTH + 480;
 const ContractText = ({ e }: { e: EmployeeListItem }) => {
   const { t } = useTranslation('employees');
   if (!e.contractType) return <Text span inherit c="dimmed">{t('no_email')}</Text>;
-  return <>{translateKey(t, CONTRACT_TYPE_LABELS[e.contractType])}</>;
+  return <>{e.contractType.name}</>;
 };
 
 /** Komputer: tabela. */

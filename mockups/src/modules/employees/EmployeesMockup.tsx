@@ -18,7 +18,7 @@ import {
 } from '@mantine/core';
 import { Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { CONTRACT_TYPE_LABELS, TABLE_MIN_WIDTH, translateKey } from '@app/shared';
+import { TABLE_MIN_WIDTH, translateKey } from '@app/shared';
 import { DateText } from '../../common/DateText';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { ArchiveModal, CloseYearModal, EmployeeModal, PasswordModal } from './EmployeeModals';
@@ -71,7 +71,7 @@ const Actions = ({ e, onEdit, onPassword, onArchive }: RowActions & { e: MockEmp
 const ContractText = ({ e }: { e: MockEmployee }) => {
   const { t } = useTranslation('employees');
   if (!e.contractType) return <Text span inherit c="dimmed">{t('no_email')}</Text>;
-  return <>{translateKey(t, CONTRACT_TYPE_LABELS[e.contractType])}</>;
+  return <>{e.contractType}</>;
 };
 
 const EmployeesTable = ({ rows, ...actions }: RowActions & { rows: MockEmployee[] }) => {

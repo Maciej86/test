@@ -7,8 +7,6 @@ import {
   ANNUAL_DAYS_DEFAULT,
   ANNUAL_DAYS_MAX,
   CARRIED_DAYS_MAX,
-  CONTRACT_TYPE_LABELS,
-  CONTRACT_TYPES,
   EMPLOYEE_MESSAGES,
   ROLE_LABELS,
   ROLES,
@@ -24,13 +22,14 @@ import { DateField } from '../../../common/DateField';
 import { apiErrorBody, apiErrorFields, apiErrorMessage } from '../../../core/api/client';
 import { fieldError } from '../../../core/fieldError';
 import { notify } from '../../../core/notify';
-import { useCreateEmployee, useRestoreEmployee, useUpdateEmployee } from '../employees.api';
+import { useContractTypeOptions, useCreateEmployee, useRestoreEmployee, useUpdateEmployee } from '../employees.api';
 import { PasswordField } from './PasswordField';
 
-type FormValues = Omit<EmployeeCreateInput, 'email' | 'hiredOn' | 'contractType'> & {
+type FormValues = Omit<EmployeeCreateInput, 'email' | 'hiredOn' | 'contractTypeId'> & {
   email: string;
   hiredOn: string | null;
-  contractType: string | null;
+  /** Select trzyma numer typu jako tekst. */
+  contractTypeId: string | null;
 };
 
 const initialValues = (employee: EmployeeListItem | null): FormValues => {
@@ -41,7 +40,7 @@ const initialValues = (employee: EmployeeListItem | null): FormValues => {
     email: employee?.email ?? '',
     role: employee?.role ?? 'employee',
     hiredOn: employee?.hiredOn ?? null,
-    contractType: employee?.contractType ?? null,
+    contractTypeId: employee?.contractType ? String(employee.contractType.id) : null,
     password: '',
     annualDays: employee?.pool?.annualDays ?? ANNUAL_DAYS_DEFAULT,
     carriedDays: employee?.pool?.carriedDays ?? 0,
@@ -67,8 +66,17 @@ export const EmployeeFormModal = ({ opened, employee, year, onClose }: {
     validate: zod4Resolver(isNew ? employeeCreateSchema : employeeUpdateSchema),
   });
 
-  const submit = form.onSubmit((values) => {
+  const contractTypes = useContractTypeOptions();
+  // Ukryty typ, który osoba już ma, zostaje do wyboru tylko u niej, na końcu listy.
+  const ownHidden = employee?.contractType?.hidden ? employee.contractType : null;
+  const contractOptions = [
+    ...(contractTypes.data ?? []).map((c) => ({ value: String(c.id), label: c.name })),
+    ...(ownHidden ? [{ value: String(ownHidden.id), label: `${ownHidden.name} ${t('hidden_suffix')}` }] : []),
+  ];
+
+  const submit = form.onSubmit((formValues) => {
     setArchived(null);
+    const values = { ...formValues, contractTypeId: formValues.contractTypeId ? Number(formValues.contractTypeId) : null };
     const onError = (error: unknown) => {
       const fields = apiErrorFields(error);
       if (!fields) return notify.error(apiErrorMessage(error, t));
@@ -158,10 +166,12 @@ export const EmployeeFormModal = ({ opened, employee, year, onClose }: {
             />
             <Select
               label={t('contract_type')}
-              data={CONTRACT_TYPES.map((c) => ({ value: c, label: translateKey(t, CONTRACT_TYPE_LABELS[c]) }))}
+              data={contractOptions}
               clearable
-              {...form.getInputProps('contractType')}
-              error={fieldError(t, form.errors.contractType)}
+              clearButtonProps={{ 'aria-label': t('contract_type_clear') }}
+              nothingFoundMessage={t('contract_types_empty')}
+              {...form.getInputProps('contractTypeId')}
+              error={fieldError(t, form.errors.contractTypeId) ?? (contractTypes.isError ? t('contract_types_error') : undefined)}
             />
           </SimpleGrid>
           {isNew && (

@@ -19,6 +19,7 @@ import {
   closeYear,
   createEmployee,
   getCloseYearPreview,
+  listContractTypeOptions,
   listEmployeesPage,
   restoreEmployee,
   setEmployeePassword,
@@ -57,6 +58,10 @@ employeesRoutes.post('/:id/archive', async (req, res) => { // rule-ok: bez danyc
 employeesRoutes.post('/:id/restore', async (req, res) => { // rule-ok: bez danych wejściowych, tylko numer z adresu
   const id = idParam(res, req.params.id);
   if (id !== null) reply(res, await restoreEmployee(id, actorOf(req.user)));
+});
+
+employeesRoutes.get('/contract-types', async (_req, res) => {
+  res.json(await listContractTypeOptions());
 });
 
 employeesRoutes.get('/close-year', async (_req, res) => {

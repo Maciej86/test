@@ -10,7 +10,7 @@ const anna: EmployeeListItem = {
   id: 1, name: 'Anna Nowak', firstName: 'Anna', lastName: 'Nowak', login: 'anna.nowak@firma.pl', email: 'anna.nowak@firma.pl', role: 'admin', hiredOn: null, contractType: null, isMe: true, pool: null,
 };
 const jan: EmployeeListItem = {
-  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hiredOn: '2024-03-01', contractType: 'b2b', isMe: false,
+  id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', hiredOn: '2024-03-01', contractType: { id: 4, name: 'B2B', hidden: true }, isMe: false,
   pool: { year: thisYear, annualDays: 26, carriedDays: 4, usedDays: 9, pendingDays: 0, leftDays: 21, leftCarriedDays: 0 },
 };
 const list = (items: EmployeeListItem[], o: Partial<EmployeesListResponse> = {}): EmployeesListResponse => ({

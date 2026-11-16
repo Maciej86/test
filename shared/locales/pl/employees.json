@@ -98,7 +98,8 @@
     "already_archived": "To konto jest już w archiwum.",
     "not_archived": "To konto nie jest w archiwum.",
     "year_not_open": "Ten rok jest już zamknięty. Odśwież stronę.",
-    "year_too_early": "Tego roku nie można jeszcze zamknąć."
+    "year_too_early": "Tego roku nie można jeszcze zamknąć.",
+    "contract_type_unavailable": "Tego typu umowy nie można już wybrać. Odśwież stronę."
   },
   "close_year_later": "Rok {{year}} zamkniesz w {{year}}.",
   "email_taken_archived": "Ten e-mail ma konto w archiwum: {{name}}.",
@@ -113,10 +114,8 @@
   "col_contract": "Umowa",
   "hired_on": "Data zatrudnienia",
   "contract_type": "Rodzaj umowy",
-  "contract_types": {
-    "employment": "Umowa o pracę",
-    "mandate": "Umowa zlecenie",
-    "specific_work": "Umowa o dzieło",
-    "b2b": "B2B"
-  }
+  "contract_type_clear": "Wyczyść",
+  "hidden_suffix": "(ukryty)",
+  "contract_types_empty": "Brak typów umów. Dodasz je w Ustawieniach → Typy umów.",
+  "contract_types_error": "Nie udało się wczytać typów umów. Odśwież stronę."
 }

@@ -52,5 +52,11 @@
     "employee_field": "Okno pracownika",
     "empty": "Pusta lista"
   },
-  "empty": "Nie ma jeszcze typów umów. Dodaj pierwszy, a potem wybierzesz go w oknie pracownika."
+  "empty": "Nie ma jeszcze typów umów. Dodaj pierwszy, a potem wybierzesz go w oknie pracownika.",
+  "server": {
+    "name_taken": "Typ o tej nazwie już jest.",
+    "name_taken_hidden": "Typ o tej nazwie już jest, ukryty.",
+    "already_hidden": "Ten typ jest już ukryty. Odśwież stronę.",
+    "not_hidden": "Ten typ jest już do wyboru u pracownika. Odśwież stronę."
+  }
 }
