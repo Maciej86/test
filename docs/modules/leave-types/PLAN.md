@@ -40,7 +40,7 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
 
 ---
 
-- [ ] **0. Szkielet testów.** `it.todo` dla każdego wymagania z kroków 1–7 (nazwy jak niżej) w:
+- [x] **0. Szkielet testów.** `it.todo` dla każdego wymagania z kroków 1–7 (nazwy jak niżej) w:
   `shared/src/schemas/__tests__/leaveTypes.test.ts`,
   `backend/src/modules/leave-types/__tests__/leave-types.queries.test.ts`,
   `backend/src/modules/leave-types/__tests__/leave-types.service.test.ts`,
