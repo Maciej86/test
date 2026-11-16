@@ -21,6 +21,7 @@ test.beforeEach(async ({ page }) => {
 
 test('administrator dodaje, zmienia, przesuwa, ukrywa i przywraca typ urlopu', async ({ page }) => {
   const name = `E2E ${Date.now()}`;
+  await page.getByRole('button', { name: 'Ustawienia' }).click();
   await page.getByRole('link', { name: 'Typy urlopów' }).click();
   await expect(page.getByRole('heading', { name: 'Typy urlopów' })).toBeVisible();
   await addType(page, name);
@@ -69,6 +70,7 @@ test('pracownik nie widzi typów urlopów i nie wejdzie pod adres', async ({ pag
   const { login, temporary } = await addEmployee(page, 'Ola Lis');
   await logOut(page);
   await logInWithOwnPassword(page, login, temporary);
+  await expect(page.getByRole('button', { name: 'Ustawienia' })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'Typy urlopów' })).toHaveCount(0);
   await page.goto('/admin/leave-types');
   await expect(page.getByText('Nie masz dostępu do tej części aplikacji.')).toBeVisible();

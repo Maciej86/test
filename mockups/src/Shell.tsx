@@ -65,19 +65,31 @@ const MenuLinks = ({ items, role }: { items: NavItem[]; role: Role }) => {
   const visible = visibleNav(items, { id: 0, name: 'Makieta', role, mustChangePassword: false });
   const activeKey = activeNavKey(flattenNav(visible), pathname);
   const render = (list: NavItem[]): ReactNode =>
-    list.map((item) => (
-      <NavLink
-        key={item.key}
-        component={RouterLink}
-        to={item.path}
-        end
-        label={translateKey(t, item.label)}
-        leftSection={<NavIcon name={item.icon} />}
-        active={item.key === activeKey}
-      >
-        {item.children ? render(item.children) : undefined}
-      </NavLink>
-    ));
+    list.map((item) =>
+      item.children ? (
+        // Grupa (np. „Ustawienia”) nie ma własnej strony: tylko rozwija swoje pozycje.
+        <NavLink
+          key={item.key}
+          component="button"
+          type="button"
+          label={translateKey(t, item.label)}
+          leftSection={<NavIcon name={item.icon} />}
+          defaultOpened={item.children.some((c) => c.key === activeKey)}
+        >
+          {render(item.children)}
+        </NavLink>
+      ) : (
+        <NavLink
+          key={item.key}
+          component={RouterLink}
+          to={item.path}
+          end
+          label={translateKey(t, item.label)}
+          leftSection={<NavIcon name={item.icon} />}
+          active={item.key === activeKey}
+        />
+      ),
+    );
   return <>{render(visible)}</>;
 };
 

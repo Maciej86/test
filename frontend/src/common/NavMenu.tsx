@@ -15,19 +15,30 @@ export const NavMenu = ({ items, user }: Props) => {
   const visible = visibleNav(items, user);
   const activeKey = activeNavKey(flattenNav(visible), pathname);
   const render = (list: NavItem[]) =>
-    list.map((item) => (
-      <NavLink
-        key={item.key}
-        component={RouterLink}
-        to={item.path}
-        end
-        label={translateKey(t, item.label)}
-        leftSection={<NavIcon name={item.icon} />}
-        active={item.key === activeKey}
-        defaultOpened={item.children?.some((c) => pathname.startsWith(c.path))}
-      >
-        {item.children ? render(item.children) : undefined}
-      </NavLink>
-    ));
+    list.map((item) =>
+      item.children ? (
+        // Grupa (np. „Ustawienia”) nie ma własnej strony: tylko rozwija swoje pozycje.
+        <NavLink
+          key={item.key}
+          component="button"
+          type="button"
+          label={translateKey(t, item.label)}
+          leftSection={<NavIcon name={item.icon} />}
+          defaultOpened={item.children.some((c) => c.key === activeKey)}
+        >
+          {render(item.children)}
+        </NavLink>
+      ) : (
+        <NavLink
+          key={item.key}
+          component={RouterLink}
+          to={item.path}
+          end
+          label={translateKey(t, item.label)}
+          leftSection={<NavIcon name={item.icon} />}
+          active={item.key === activeKey}
+        />
+      ),
+    );
   return <>{render(visible)}</>;
 };

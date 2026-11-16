@@ -28,6 +28,18 @@ describe('buildRoutes', () => {
   });
 });
 
+describe('buildRoutes with a group', () => {
+  const group: NavItem = {
+    key: 'settings', path: '/admin/settings', label: 'common.nav.settings', icon: 'settings', roles: ['admin'],
+    children: [adminOnly],
+  };
+
+  it('a group has no page of its own, its items do', () => {
+    const routes = buildRoutes([group], { reports: Page }, admin);
+    expect(routes.map((r) => r.path)).toEqual(['/admin/reports']);
+  });
+});
+
 describe('buildAppRoutes', () => {
   it('sends an admin from / to the panel when there is no public site', async () => {
     const { router } = renderRoutes(buildAppRoutes({ public: false, account: true, admin: true }, {}, admin), '/');

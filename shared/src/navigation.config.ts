@@ -23,8 +23,15 @@ export const NAVIGATION: NavItem[] = [
   { key: 'leave-requests', path: '/admin/leave-requests', label: 'common.nav.leave_requests', icon: 'calendar-check', roles: ['admin'] },
   { key: 'tasks', path: '/admin/tasks', label: 'common.nav.tasks', icon: 'square-kanban', roles: ['admin', 'employee'] },
   { key: 'employees', path: '/admin/employees', label: 'common.nav.employees', icon: 'users', roles: ['admin'] },
-  { key: 'leave-types', path: '/admin/leave-types', label: 'common.nav.leave_types', icon: 'tags', roles: ['admin'] },
   { key: 'activity-log', path: '/admin/activity-log', label: 'common.nav.activity_log', icon: 'history', roles: ['admin'] },
   { key: 'archive', path: '/admin/archive', label: 'common.nav.archive', icon: 'archive', roles: ['admin'] },
+  {
+    key: 'settings',
+    path: '/admin/settings',
+    label: 'common.nav.settings',
+    icon: 'settings',
+    roles: ['admin'],
+    children: [{ key: 'leave-types', path: '/admin/leave-types', label: 'common.nav.leave_types', icon: 'tags', roles: ['admin'] }],
+  },
   { key: 'my-account', path: '/admin/my-account', label: 'common.nav.my_account', icon: 'user', roles: ['admin', 'employee'] },
 ];

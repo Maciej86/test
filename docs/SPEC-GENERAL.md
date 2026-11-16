@@ -61,9 +61,10 @@ Panel (`NAVIGATION` w `shared/src/navigation.config.ts`):
 | Wnioski urlopowe | leave-requests | `/admin/leave-requests` | admin |
 | Zadania | tasks | `/admin/tasks` | admin, employee |
 | Pracownicy | employees | `/admin/employees` | admin |
-| Typy urlopów | leave-types | `/admin/leave-types` | admin |
 | Historia zmian | activity-log | `/admin/activity-log` | admin |
 | Archiwum | archive | `/admin/archive` | admin |
+| Ustawienia (rozwijane, bez własnej strony; zmiana 2026-11-16) | settings | — | admin |
+| ↳ Typy urlopów | leave-types | `/admin/leave-types` | admin |
 | Moje konto | my-account | `/admin/my-account` | admin, employee |
 
 Bez pozycji w menu: dzwonek powiadomień w górnej belce (moduł `notifications`), ekran `/login`.

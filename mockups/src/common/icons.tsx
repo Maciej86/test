@@ -3,6 +3,7 @@ import {
   CalendarCheck,
   CalendarDays,
   Circle,
+  Settings,
   History,
   House,
   SquareKanban,
@@ -26,6 +27,7 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
   tags: Tags,
   history: History,
   archive: Archive,
+  settings: Settings,
 };
 
 export const NavIcon = ({ name }: { name: string }) => {
