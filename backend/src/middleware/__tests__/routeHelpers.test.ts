@@ -9,8 +9,8 @@ const fakeRes = () => {
 };
 
 describe('route helpers', () => {
-  it('idParam: 0, -1, abc, 1.5 → 404; 7 → 7', () => {
-    for (const raw of ['0', '-1', 'abc', '1.5']) {
+  it('idParam: 0, -1, abc, 1.5, 1e3, 0x10, " 7", 007 → 404; 7 → 7', () => {
+    for (const raw of ['0', '-1', 'abc', '1.5', '1e3', '0x10', ' 7', '007', '']) {
       const res = fakeRes();
       expect(idParam(res, raw)).toBeNull();
       expect(res.status).toHaveBeenCalledWith(404);

@@ -20,10 +20,10 @@ export const fail = (status: number, message: string, extra: Omit<ServiceError, 
   error: { ...extra, status, message },
 });
 
-/** Numer z adresu: tylko dodatnia liczba całkowita, inaczej 404. */
+/** Numer z adresu: tylko same cyfry bez zera na początku (np. 7, nie 1e3, 0x10 ani 007), inaczej 404. */
 export const idParam = (res: Response, raw: unknown): number | null => {
-  const id = Number(raw);
-  if (Number.isInteger(id) && id > 0) return id;
+  const id = typeof raw === 'string' && /^[1-9]\d{0,9}$/.test(raw) ? Number(raw) : Number.NaN;
+  if (Number.isSafeInteger(id)) return id;
   sendError(res, 404, SERVER_MESSAGES.notFound);
   return null;
 };

@@ -115,3 +115,56 @@ describe('leave types routes', () => {
     expect((await as(jan).post('/leave-types/3/hide')).status).toBe(403);
   });
 });
+
+describe('abuse', () => {
+  it('employee gets 403 on every leave types route, and nothing is called', async () => {
+    const e = as(jan);
+    const responses = await Promise.all([
+      e.get('/leave-types'),
+      e.post('/leave-types', body),
+      e.put('/leave-types/1', body),
+      e.post('/leave-types/1/move', { direction: 'up' }),
+      e.post('/leave-types/1/hide'),
+      e.post('/leave-types/1/unhide'),
+    ]);
+    expect(responses.map((r) => r.status)).toEqual([403, 403, 403, 403, 403, 403]);
+    for (const fn of [s.listTypes, s.createType, s.updateType, s.moveType, s.hideType, s.unhideType]) expect(fn).not.toHaveBeenCalled();
+  });
+
+  it('forged fields (id, position, hidden, requestsCount) are dropped before the service', async () => {
+    vi.mocked(s.createType).mockResolvedValue({ id: 6 });
+    const forged = { ...body, id: 1, position: 1, hidden: true, hiddenAt: '2020-01-01', requestsCount: 99 };
+    await as(anna).post('/leave-types', forged);
+    expect(s.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null });
+    await as(anna).put('/leave-types/3', forged);
+    expect(s.updateType).toHaveBeenCalledWith(3, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null });
+    await as(anna).post('/leave-types/3/move', { direction: 'up', position: 1 });
+    expect(s.moveType).toHaveBeenCalledWith(3, 'up');
+  });
+
+  it('bad data → 400 with field keys: too long, negative, huge, text, wrong boolean', async () => {
+    const cases: [object, string][] = [
+      [{ ...body, name: 'a'.repeat(41) }, 'name'],
+      [{ ...body, yearlyLimit: -5 }, 'yearlyLimit'],
+      [{ ...body, yearlyLimit: 99999999 }, 'yearlyLimit'],
+      [{ ...body, yearlyLimit: 'abc' }, 'yearlyLimit'],
+      [{ ...body, deductsPool: 'yes' }, 'deductsPool'],
+    ];
+    for (const [data, field] of cases) {
+      const res = await as(anna).post('/leave-types', data);
+      expect(res.status).toBe(400);
+      expect(res.body.error.fields[field]).toBeDefined();
+    }
+    expect(s.createType).not.toHaveBeenCalled();
+  });
+
+  it('ids that are not positive whole numbers → 404 on every route with an id', async () => {
+    const a = as(anna);
+    for (const id of ['0', '-1', '1.5', '1e3', 'abc']) {
+      expect((await a.put(`/leave-types/${id}`, body)).status).toBe(404);
+      expect((await a.post(`/leave-types/${id}/move`, { direction: 'up' })).status).toBe(404);
+      expect((await a.post(`/leave-types/${id}/hide`)).status).toBe(404);
+      expect((await a.post(`/leave-types/${id}/unhide`)).status).toBe(404);
+    }
+  });
+});

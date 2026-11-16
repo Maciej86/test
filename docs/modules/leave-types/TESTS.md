@@ -33,4 +33,13 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180.
 
 ## Próby nadużyć
 
-(uzupełniane na etapie testy)
+- Pracownik wywołuje każdy adres API typów urlopów (lista, dodaj, zmień, przesuń, ukryj, przywróć) → 403, nic się nie zmienia: przeszła
+- Pracownik wpisuje adres ekranu `/admin/leave-types` → „Nie masz dostępu”, bez danych: przeszła
+- Podrobione pola w żądaniu (numer, pozycja, „ukryty”, liczba wniosków) → serwer je pomija, pozycję liczy sam: przeszła
+- Złe dane (nazwa 41 znaków, limit −5, 99999999, „abc”, „Odejmuje” jako tekst) → 400 z błędem pola: przeszła
+- Numer w adresie zapisany inaczej niż samymi cyframi (`1e3`, `0x10`, `007`) → 404: naprawiona (wcześniej `1e3` znaczyło typ 1000)
+- Sześć „Ukryj” wysłanych naraz na prawdziwej bazie → pięć ukrytych, jeden typ zostaje widoczny: przeszła
+- Dwa dodania naraz tej samej nazwy różniącej się wielkością liter → jedno dodane, drugie „Typ o tej nazwie już jest.”: przeszła
+- Nazwa z kodem strony (`<b>…</b>`, `<script>`) → widać ją jako zwykły tekst: przeszła
+- Podwójne kliknięcie „Przywróć” → jedno żądanie: naprawiona przy przeglądzie kodu
+- Cudze dane, przejścia statusów, usuwanie: nie dotyczy (jeden wspólny słownik administratora, typów się nie usuwa)

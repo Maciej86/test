@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.28
 
-**Następny krok:** Moduł Typy urlopów, etap testy: próby nadużyć (`describe('abuse')`), klikanie w przeglądarce, potem użytkownik przechodzi `docs/modules/leave-types/TESTS.md`.
+**Następny krok:** Moduł Typy urlopów, etap testy: użytkownik przechodzi `docs/modules/leave-types/TESTS.md` i potwierdza „działa”; potem zamknięcie modułu.
 
 ## Start aplikacji
 

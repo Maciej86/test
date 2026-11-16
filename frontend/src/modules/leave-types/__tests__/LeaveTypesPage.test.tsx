@@ -101,6 +101,12 @@ describe('LeaveTypesPage', () => {
     expect(post).toHaveBeenCalledTimes(1);
   });
 
+  it('abuse: a name with HTML is shown as plain text', async () => {
+    show([vacation, type({ id: 9, name: '<script>alert(1)</script>' })]);
+    expect(await rowOf('<script>alert(1)</script>')).toBeInTheDocument();
+    expect(document.querySelector('tbody script')).toBeNull();
+  });
+
   it('server error → error state with retry', async () => {
     vi.spyOn(api, 'get').mockRejectedValue(new Error('down'));
     renderWithProviders(<LeaveTypesPage />);
