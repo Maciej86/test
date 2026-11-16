@@ -81,7 +81,13 @@ Nowa pozycja nawigacji: wpis w `NAVIGATION` (panel, ścieżka od `/admin`), `ACC
 - `<Module>ListPage.tsx`, `<Module>FormPage.tsx` (albo `<Module>FormModal.tsx`): ekrany;
 - `components/`: części ekranów używane tylko w tym module;
 - `<module>.api.ts`: hooki zapytań modułu („Pobieranie danych na froncie”);
-- `<Ekran>.module.css` i testy `*.test.tsx` obok pliku, którego dotyczą.
+- `<Ekran>.module.css` obok pliku, którego dotyczy.
+- **Testy w folderze `__tests__`** na tym samym poziomie co testowane pliki, np.
+  `backend/src/modules/employees/__tests__/employees.routes.test.ts` testuje
+  `backend/src/modules/employees/employees.routes.ts`, a `frontend/src/common/__tests__/DataState.test.tsx` testuje
+  `frontend/src/common/DataState.tsx`. Dotyczy backendu, frontu, `shared` i makiet. Wyjątek: testy całego projektu
+  (testy zasad, `routeProtection.test.ts`, kolory, tabele) i pomocniki testów (`setup.ts`, `render.tsx`) zostają
+  w `src/test/`. Pilnuje tego test zasad.
 
 **Wspólne zamiast kopii.** Gdy komponent albo hook jest potrzebny w drugim module, przenosisz go do
 `frontend/src/common/` (komponent) albo `frontend/src/core/` (hook bez wyglądu), z testem, i podmieniasz w pierwszym
@@ -263,8 +269,17 @@ więc backend sprawdza wszystko sam, nawet jeśli formularz już to sprawdził:
   role jawnie, `mountModule(api, 'email', emailRoutes, ['admin'])`. Węższe uprawnienia pojedynczej trasy („usuwa tylko
   admin”): `requireRole('admin')` przy tej trasie. Ukrycie pozycji w menu nie jest zabezpieczeniem.
 - Każda trasa modułu ma wiersz w „Mapie dostępu” (`SPEC-GENERAL.md`); `SPEC.md` modułu wymienia trasy z rolami.
-- W koncie użytkownika dane są **zawsze** filtrowane po `req.user.id` (klient nie zobaczy cudzych zamówień, nawet
-  gdy zmieni numer w adresie).
+- **Trzy sprawdzenia przy każdej trasie:** zalogowany (`requireAuth`), rola (`mountModule` / `requireRole`) i **dostęp
+  do tego rekordu**. Gdy rola widzi tylko część rekordów (swoje wnioski, zadania swojego zespołu, pojazdy swojego
+  oddziału, zamówienia swojej firmy), warunek jest w samym zapytaniu SQL przy liście, odczycie po `id`, edycji,
+  usuwaniu i pobieraniu plików, np. `WHERE id = ? AND user_id = ?` z `req.user.id`. Funkcja zapytania przyjmuje osobę
+  (`findLeaveRequest(id, actor)`), żeby nie dało się jej wywołać bez warunku. Rekord poza zasięgiem → 404, tak jak
+  nieistniejący (403 zdradziłby, że istnieje). Dotyczy konta użytkownika i panelu, gdy pracownik ma w nim swoje moduły.
+- **Żądania z obcych stron:** `sameOrigin` w `app.ts` odrzuca zapisy z nagłówkiem `Origin` innym niż `FRONTEND_URL`,
+  a ciasteczko ma `SameSite=Lax`. Nie wyłączasz ich i nie dopisujesz adresów do `cors` bez decyzji w
+  `SPEC-GENERAL.md`. GET nigdy niczego nie zapisuje.
+- **Nagłówki stron:** `Caddyfile` wysyła CSP, HSTS i zakaz osadzania w ramce. Moduł, który ładuje coś z innego serwera
+  (mapa, czcionki, płatności), dopisuje ten adres do `Content-Security-Policy` w `Caddyfile` i do specu.
 - `validateBody(schema)` z tym samym schematem co formularz (`zodResolver(schema)` z `mantine-form-zod-resolver`
   w `useForm`).
 - Format błędu jest jeden: `{ error: { message: <klucz>, fields?: { pole: <klucz> } } }`, kody 400/401/403/404/409/503.
@@ -304,7 +319,7 @@ Gdy moduł przyjmuje pliki (zdjęcia, dokumenty, załączniki). Pomocnik: `backe
 - **Usuwanie:** wiersz z tabeli w transakcji, plik z dysku (`removeUpload`) po udanym `commit`. Archiwizacja rekordu
   nie usuwa plików; usunięcie na stałe: `removeRecordUploads` po `commit`.
 - Na serwerze pliki leżą w wolumenie `uploads_data` (przetrwają „wgraj nową wersję”) i trafiają do kopii zapasowej
-  (`scripts/backup-db.sh`). `uploads/` jest w `.gitignore`.
+  (`scripts/backup/backup.sh`). `uploads/` jest w `.gitignore`.
 - Testy: zły typ i za duży plik → 400; pobranie cudzego pliku → 404; bez logowania → 401; usunięcie rekordu na stałe
   usuwa jego pliki.
 
@@ -439,7 +454,7 @@ Najpierw test, potem kod (TDD). Krok planu jest zrobiony dopiero po `npm run che
 - **Ochrona tras:** `backend/src/test/routeProtection.test.ts` sam sprawdza każdy moduł podpięty przez `mountModule`:
   bez logowania 401, rola spoza modułu 403, na każdym adresie i każdą metodą.
 
-- **Backend** (`*.test.ts` obok kodu, supertest na `createApp({ extraRoutes })` albo na trasach modułu): każda trasa:
+- **Backend** (`*.test.ts` w `__tests__` obok kodu, supertest na `createApp({ extraRoutes })` albo na trasach modułu): każda trasa:
   poprawne dane → sukces; błędne dane → 400 z kluczami pól; bez logowania → 401; zła rola → 403; w koncie cudze
   dane → 404. Plus reguły usuwania, archiwum i historii, jeśli dotyczą modułu.
 - **`shared/`:** schematy zod (poprawne i błędne dane, wartości graniczne z tabeli pól, klucze komunikatów).
@@ -455,7 +470,7 @@ w całości). Czerwony test zasad znaczy: popraw kod, nie test.
 
 | Plik | Pilnuje |
 |---|---|
-| `backend/src/test/conventions.test.ts` | SQL tylko z `?`; transakcje tylko przez `withTransaction`; `validateBody` przy każdej trasie zapisu; kto i jaka rola tylko z `req.user`; moduły za logowaniem tylko przez `mountModule`; obok każdego `*.routes.ts` test z 401 i 403; każdy klucz obcy z `ON DELETE`; w module `zrobiony` (według `docs/STATUS.md`) żadnego `it.todo` |
+| `backend/src/test/conventions.test.ts` | SQL tylko z `?`; transakcje tylko przez `withTransaction`; `validateBody` przy każdej trasie zapisu; kto i jaka rola tylko z `req.user`; moduły za logowaniem tylko przez `mountModule`; w `__tests__` obok każdego `*.routes.ts` test z 401 i 403; pliki `*.test.ts(x)` tylko w `__tests__` albo `src/test/` (backend, front, shared, makiety); każdy klucz obcy z `ON DELETE`; w module `zrobiony` (według `docs/STATUS.md`) żadnego `it.todo` |
 | `backend/src/test/routeProtection.test.ts` | każdy moduł z `mountModule`: bez logowania 401, rola spoza modułu 403 |
 | `frontend/src/test/conventions.test.ts` | zapytania tylko przez `api`; w modułach `api` tylko w `*.api.ts`; brak importów z innego modułu; dymki przez `notify`; brak polskich tekstów w kodzie; schematy w `shared/src/schemas/` bez własnych `.regex(` |
 | `frontend/src/test/colors.test.ts`, `formatting.test.ts`, `tables.test.ts` | kolory z motywu; daty i liczby przez `@app/shared`; tabele w `Table.ScrollContainer` |
@@ -487,7 +502,8 @@ Używaj jej, gdy nie ma `superpowers:requesting-code-review`:
 
 - [ ] moduł podpięty przez `mountModule`; trasy publiczne tylko te z „Mapy dostępu”, z limitem i `validateBody`
 - [ ] każda trasa jest w „Mapie dostępu”, a testy sprawdzają 401 bez logowania i 403 dla złej roli
-- [ ] SQL tylko z `?`, dane konta filtrowane po `req.user.id`, przy wielu firmach po `company_id`
+- [ ] SQL tylko z `?`; rekordy z ograniczonym dostępem: warunek w zapytaniu, cudzy rekord → 404; przy wielu firmach
+  `company_id`
 - [ ] każda relacja ma klucz obcy z regułą zgodną ze specem
 - [ ] brak polskich tekstów i liczb „z ręki” w kodzie
 - [ ] te same schematy zod na froncie i w backendzie
@@ -504,4 +520,5 @@ Używaj jej, gdy nie ma `superpowers:requesting-code-review`:
 - [ ] każde `// rule-ok:` ma konkretny, prawdziwy powód; testy zasad niezmienione
 - [ ] pliki przez `saveUpload` / `sendUpload`, pobieranie z kontrolą dostępu, tabela plików z kluczem obcym
 - [ ] testy dla każdej trasy i formularza, `npm run check` zielony
+- [ ] blok `describe('abuse')` z próbami z `abuse.md`, wynik w sekcji „Próby nadużyć” w `TESTS.md`
 - [ ] `.env` nie jest w repo (`git check-ignore .env`)

@@ -1,6 +1,6 @@
 # Stan projektu: test
 
-**Wersja stepkit:** 0.1.22
+**Wersja stepkit:** 0.1.27
 
 **Następny krok:** Moduł Typy urlopów, etap makieta (otwórz nową rozmowę i wpisz /stepkit:dalej).
 
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-16: Aktualizacja stepkit 0.1.22 → 0.1.27: makiety otwierają panel pod `/`, skrypty kopii zapasowych poza serwerem i wdrożeń (`scripts/backup/`, `scripts/deploy.sh`), nagłówki bezpieczeństwa w Caddyfile, blokada zapisów z obcych stron, baza i phpMyAdmin tylko z tego komputera, zmiana hasła kończy inne sesje (`users.token_version`), testy w folderach `__tests__`.
 
 - 2026-11-15: Moduł Pracownicy zrobiony (potwierdzony przez użytkownika): lista z paskiem puli, dodawanie i edycja (imię i nazwisko osobno), hasło tymczasowe, archiwum i przywracanie, „Zamknij rok” z kolumną „Razem”.
 

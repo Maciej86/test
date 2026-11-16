@@ -16,11 +16,16 @@ logowaniem). W projekcie ten plik jest w `docs/conventions/`.
   roli albo archiwizacja (np. zwolnienie) działa od razu, a nie po wygaśnięciu tokenu. Testy: konto zarchiwizowane →
   401, zmieniona rola → nowa rola. Hasła `bcryptjs` z kosztem `BCRYPT_COST`. Token i ciasteczko przez
   `signToken`, `setAuthCookie`, `clearAuthCookie` z `backend/src/auth/token.ts`.
+- **Zmiana hasła kończy inne sesje:** kolumna `users.token_version INT NOT NULL DEFAULT 0`, w tokenie pole `ver`;
+  `authenticate` porównuje je z bazą (inna wartość → niezalogowany). Każda zmiana hasła (własna, tymczasowa od
+  administratora, przez link z e-maila) podnosi `token_version` w tym samym zapytaniu co nowy skrót hasła; osoba, która
+  sama zmieniła hasło, dostaje nowe ciasteczko. Testy: po ustawieniu hasła tymczasowego przez administratora stary
+  token → 401; po zmianie własnego hasła stary token → 401, nowy działa.
 - `loginLimiter` jest gotowy w `backend/src/middleware/rateLimit.ts`; podpinasz go na `POST /api/auth/login` przed
   `validateBody`. Liczy tylko nieudane próby i rozpoznaje osoby za serwerem Caddy (`trust proxy` w `app.ts`); nie
   zmieniaj tych ustawień. **Plan ma w kroku z trasą logowania test:** 10 nieudanych prób przechodzi, 11. daje 429
   `server.too_many_logins`, a udane logowania nie zużywają limitu. Ten test trzymasz w osobnym pliku (np.
-  `auth.rateLimit.test.ts`), bo licznik limitu jest wspólny dla wszystkich testów w jednym pliku.
+  `__tests__/auth.rateLimit.test.ts`), bo licznik limitu jest wspólny dla wszystkich testów w jednym pliku.
 - Zły e-mail i złe hasło dają ten sam komunikat (`server.login_failed`), żeby nie zdradzać, które konta istnieją.
 - **Logowanie loginem** (gdy w `SPEC-GENERAL.md` nie wszyscy mają e-mail): kolumna `login` (unikalna, bez spacji,
   zapisywana małymi literami; może wyglądać jak e-mail, np. `jan.kowalski@firma.pl`, jeśli użytkownik tak chce) i
@@ -29,9 +34,8 @@ logowaniem). W projekcie ten plik jest w `docs/conventions/`.
   Zmiana hasła bez e-maila: administrator ustawia hasło tymczasowe w module użytkowników, a osoba zmienia je po
   zalogowaniu. E-maile (`email` moduł) wysyłasz tylko osobom z adresem; pozostali widzą powiadomienie w aplikacji.
 - Pierwszy administrator: skrypt `backend/src/scripts/createAdmin.ts` (`npm run admin -w @app/backend`), pyta
-  w terminalu o imię, e-mail i hasło. **Ty nie możesz odpowiadać na pytania w terminalu**, więc poproś użytkownika:
-  „Otwórz terminal (w VS Code: menu Terminal → New Terminal), wejdź do folderu projektu i wpisz
-  `npm run admin -w @app/backend`. Hasło wpisujesz tylko tam, nie w rozmowie.”
+  w terminalu o imię, e-mail i hasło. **Ty nie możesz odpowiadać na pytania w terminalu**, więc poproś użytkownika
+  według zasady „Polecenie w terminalu” z `SKILL.md` (polecenie: `npm run admin`).
 - Gdy spec przewiduje wymuszoną zmianę hasła (`must_change_password`), ekran „Ustaw nowe hasło” po zalogowaniu
   należy do modułu Logowanie, nie do „Moje konto”.
 - Ekran `/login` (`frontend/src/modules/login/`, wpis `login` w `PAGES`); po zalogowaniu `refresh()` z `useAuth`
@@ -41,3 +45,4 @@ logowaniem). W projekcie ten plik jest w `docs/conventions/`.
 
 - [ ] `POST /api/auth/login` ma `loginLimiter` i test na 429
 - [ ] `authenticate` czyta konto z bazy przy każdym żądaniu; testy: konto w archiwum → 401, zmieniona rola → nowa rola
+- [ ] zmiana hasła podnosi `token_version`; stary token → 401

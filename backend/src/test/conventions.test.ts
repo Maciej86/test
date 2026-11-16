@@ -147,10 +147,10 @@ describe('backend follows the conventions', () => {
     expect(mountedWithoutMountModule(read(join(root, 'app.ts')))).toEqual([]);
   });
 
-  it.each(routes.map(name))('%s: has a test next to it that checks 401 and 403', (f) => {
+  it.each(routes.map(name))('%s: has a test in __tests__ next to it that checks 401 and 403', (f) => {
     const text = read(resolve(root, '..', f));
     if (ALLOWED.test(text)) return;
-    const test = join(dirname(resolve(root, '..', f)), basename(f).replace(/\.ts$/, '.test.ts'));
+    const test = join(dirname(resolve(root, '..', f)), '__tests__', basename(f).replace(/\.ts$/, '.test.ts'));
     expect(existsSync(test), `brak pliku ${basename(test)}`).toBe(true);
     const testText = read(test);
     expect(testText).toContain('401');
@@ -196,12 +196,39 @@ describe('finished modules have no test placeholders', () => {
     const places = [
       join(project, 'backend/src/modules', folder),
       join(project, 'frontend/src/modules', folder),
-      join(project, 'shared/src/schemas', `${folder}.test.ts`),
+      join(project, 'shared/src/schemas/__tests__', `${folder}.test.ts`),
       join(project, 'e2e', `${folder}.spec.ts`),
     ];
     const offending = places
       .flatMap(allFiles)
       .flatMap((f) => leftTodos(readFileSync(f, 'utf8')).map((line) => `${relative(project, f)}:${line}`));
+    expect(offending).toEqual([]);
+  });
+});
+
+/** Plik testu poza folderem `__tests__` (i poza `src/test/`, gdzie są testy całego projektu i pomocniki testów). */
+export const misplacedTest = (path: string) =>
+  /\.test\.tsx?$/.test(path) && !/(^|\/)(__tests__|src\/test)\//.test(path.replace(/\\/g, '/'));
+
+describe('tests live in __tests__ folders', () => {
+  it('tells a misplaced test from a well placed one', () => {
+    expect(misplacedTest('backend/src/modules/clients/clients.routes.test.ts')).toBe(true);
+    expect(misplacedTest('backend/src/modules/clients/__tests__/clients.routes.test.ts')).toBe(false);
+    expect(misplacedTest('frontend/src/test/colors.test.ts')).toBe(false);
+    expect(misplacedTest('frontend/src/modules/clients/ClientsPage.tsx')).toBe(false);
+  });
+
+  it('backend, frontend, shared and mockups keep their tests in __tests__ next to the tested files', () => {
+    const project = resolve(root, '../..');
+    const walk = (dir: string): string[] =>
+      !existsSync(dir)
+        ? []
+        : readdirSync(dir).flatMap((n) => {
+            const path = join(dir, n);
+            if (statSync(path).isDirectory()) return n === 'node_modules' || n === 'dist' ? [] : walk(path);
+            return [relative(project, path)];
+          });
+    const offending = ['backend', 'frontend', 'shared', 'mockups'].flatMap((w) => walk(join(project, w))).filter(misplacedTest);
     expect(offending).toEqual([]);
   });
 });
