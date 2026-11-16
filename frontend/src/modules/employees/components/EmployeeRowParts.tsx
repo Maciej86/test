@@ -10,12 +10,12 @@ export interface RowActions {
   onArchive: (e: EmployeeListItem) => void;
 }
 
-export function RoleBadge({ role }: { role: EmployeeListItem['role'] }) {
+export const RoleBadge = ({ role }: { role: EmployeeListItem['role'] }) => {
   const { t } = useTranslation();
   return <Badge variant="light" color={role === 'admin' ? 'navy' : 'gray'}>{translateKey(t, ROLE_LABELS[role])}</Badge>;
-}
+};
 
-export function NameCell({ e }: { e: EmployeeListItem }) {
+export const NameCell = ({ e }: { e: EmployeeListItem }) => {
   const { t } = useTranslation('employees');
   return (
     <Stack gap={0}>
@@ -26,9 +26,9 @@ export function NameCell({ e }: { e: EmployeeListItem }) {
       <Text size="sm" c="dimmed">{e.login}</Text>
     </Stack>
   );
-}
+};
 
-export function RowButtons({ e, onEdit, onPassword, onArchive }: RowActions & { e: EmployeeListItem }) {
+export const RowButtons = ({ e, onEdit, onPassword, onArchive }: RowActions & { e: EmployeeListItem }) => {
   const { t } = useTranslation('employees');
   return (
     <Group gap={4} justify="flex-end" wrap="nowrap">
@@ -52,4 +52,4 @@ export function RowButtons({ e, onEdit, onPassword, onArchive }: RowActions & { 
       </Tooltip>
     </Group>
   );
-}
+};

@@ -13,7 +13,7 @@ const STATUS_COLOR: Record<LeaveStatus, string> = {
   cancelled: 'gray',
 };
 
-export function LeaveRequestsMockup() {
+export const LeaveRequestsMockup = () => {
   const { t } = useTranslation('leave-requests');
   const [filter, setFilter] = useState('pending');
   const [rejectOpened, reject] = useDisclosure(false);
@@ -101,4 +101,4 @@ export function LeaveRequestsMockup() {
       </Modal>
     </Stack>
   );
-}
+};

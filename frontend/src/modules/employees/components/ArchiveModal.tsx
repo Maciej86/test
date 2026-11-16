@@ -10,7 +10,7 @@ import { useArchiveEmployee } from '../employees.api';
  * Potwierdzenie „Do archiwum”. Liczby czekających wniosków i zadań dopiszą moduły „Moje urlopy” i „Zadania”
  * (SPEC.md, „Powiązania”).
  */
-export function ArchiveModal({ employee, onClose }: { employee: EmployeeListItem; onClose: () => void }) {
+export const ArchiveModal = ({ employee, onClose }: { employee: EmployeeListItem; onClose: () => void }) => {
   const { t } = useTranslation('employees');
   const archive = useArchiveEmployee();
   const confirm = () =>
@@ -36,4 +36,4 @@ export function ArchiveModal({ employee, onClose }: { employee: EmployeeListItem
       </Stack>
     </Modal>
   );
-}
+};

@@ -30,7 +30,7 @@ interface Props {
   initialPath?: string;
 }
 
-export function MockupApp({
+export const MockupApp = ({
   areas = AREAS,
   navigation = NAVIGATION,
   accountNavigation = ACCOUNT_NAVIGATION,
@@ -38,7 +38,7 @@ export function MockupApp({
   screens = SCREENS,
   extraScreens = EXTRA_SCREENS,
   initialPath,
-}: Props) {
+}: Props) => {
   // Bez strony dla odwiedzających adres / prowadzi do pierwszej włączonej części (konto albo panel).
   const homePath = areas.public ? null : areas.account ? '/account' : '/admin';
   const requestedPath = initialPath ?? window.location.pathname;
@@ -88,4 +88,4 @@ export function MockupApp({
   }, [role]);
 
   return <RouterProvider router={router} />;
-}
+};

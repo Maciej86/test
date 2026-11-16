@@ -2,7 +2,7 @@ import { AxiosError, AxiosHeaders } from 'axios';
 import { apiErrorFields, apiErrorKey, apiErrorMessage, handleSessionError, sessionRedirect } from '../client';
 import { i18n } from '../../../test/render';
 
-function axiosError(data: unknown, status = 403, url = '/orders') {
+const axiosError = (data: unknown, status = 403, url = '/orders') => {
   return new AxiosError('fail', 'ERR', { url, headers: new AxiosHeaders() }, undefined, {
     status,
     statusText: 'Error',
@@ -10,7 +10,7 @@ function axiosError(data: unknown, status = 403, url = '/orders') {
     headers: {},
     config: { url, headers: new AxiosHeaders() },
   });
-}
+};
 
 describe('apiErrorMessage', () => {
   it('translates the key sent by the server', () => {

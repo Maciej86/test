@@ -14,7 +14,7 @@ import { fieldError } from '../../core/fieldError';
 import { useChangePassword } from './login.api';
 
 /** Własne hasło zamiast tymczasowego od administratora; bez tego aplikacja nie pokaże żadnego innego ekranu. */
-export function ChangePasswordPage() {
+export const ChangePasswordPage = () => {
   const { t } = useTranslation('login');
   const { user, refresh, logout } = useAuth();
   const navigate = useNavigate();
@@ -74,4 +74,4 @@ export function ChangePasswordPage() {
       <IdleWarningModal />
     </AuthCard>
   );
-}
+};

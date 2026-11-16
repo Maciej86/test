@@ -16,7 +16,7 @@ import { UserMenu } from './UserMenu';
  * tle panelu. Na telefonie menu jest schowane pod przyciskiem w belce i chowa się samo po wybraniu pozycji.
  * Dzwonek powiadomień dodaje moduł powiadomień, obok przełącznika motywu.
  */
-export function SideMenuLayout({ items }: { items: NavItem[] }) {
+export const SideMenuLayout = ({ items }: { items: NavItem[] }) => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const accountPath = findVisibleNavItem('my-account', [ACCOUNT_NAVIGATION, NAVIGATION], user)?.path ?? null;
@@ -59,4 +59,4 @@ export function SideMenuLayout({ items }: { items: NavItem[] }) {
       <IdleWarningModal />
     </AppShell>
   );
-}
+};

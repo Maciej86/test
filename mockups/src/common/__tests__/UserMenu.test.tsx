@@ -3,14 +3,14 @@ import { MemoryRouter } from 'react-router';
 import { renderWithProviders } from '../../test/render';
 import { UserMenu } from '../UserMenu';
 
-function show(accountPath: string | null, onLogout = vi.fn()) {
+const show = (accountPath: string | null, onLogout = vi.fn()) => {
   renderWithProviders(
     <MemoryRouter>
       <UserMenu name="Jan Kowalski" accountPath={accountPath} onLogout={onLogout} />
     </MemoryRouter>,
   );
   return onLogout;
-}
+};
 
 describe('UserMenu', () => {
   it('shows the initials and opens the menu with my account and logout', async () => {

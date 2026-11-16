@@ -11,7 +11,7 @@ import { pool } from './pool';
  *     return result.insertId;
  *   });
  */
-export async function withTransaction<T>(work: (conn: PoolConnection) => Promise<T>): Promise<T> {
+export const withTransaction = async <T>(work: (conn: PoolConnection) => Promise<T>): Promise<T> => {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
@@ -24,4 +24,4 @@ export async function withTransaction<T>(work: (conn: PoolConnection) => Promise
   } finally {
     conn.release();
   }
-}
+};

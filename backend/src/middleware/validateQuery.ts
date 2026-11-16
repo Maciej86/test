@@ -7,7 +7,7 @@ import { sendError } from './errors';
  * Sprawdza parametry z adresu (np. listQuerySchema z @app/shared). Po sprawdzeniu `req.query` ma już
  * poprawione wartości (liczby, domyślne); błędny parametr → 400 z kluczem przy nazwie parametru.
  */
-export function validateQuery(schema: z.ZodType) {
+export const validateQuery = (schema: z.ZodType) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.query ?? {});
     if (!result.success) {
@@ -22,4 +22,4 @@ export function validateQuery(schema: z.ZodType) {
     Object.defineProperty(req, 'query', { value: result.data, writable: true, configurable: true, enumerable: true });
     next();
   };
-}
+};

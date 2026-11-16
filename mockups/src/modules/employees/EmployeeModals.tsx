@@ -23,7 +23,7 @@ import { ButtonIcon } from '../../common/ButtonIcon';
 import { notify } from '../../common/notify';
 import { ARCHIVED_DUPLICATE, EMPLOYEES, GENERATED_PASSWORD, POOL_YEAR, poolParts, type MockEmployee } from './data';
 
-function PasswordField({ label }: { label: string }) {
+const PasswordField = ({ label }: { label: string }) => {
   const { t } = useTranslation('employees');
   const [value, setValue] = useState('');
   return (
@@ -41,15 +41,15 @@ function PasswordField({ label }: { label: string }) {
       </Button>
     </Group>
   );
-}
+};
 
 /** Dodawanie (employee = null) i edycja pracownika. `loginTaken` pokazuje błąd loginu z kontem w archiwum. */
-export function EmployeeModal({ opened, onClose, employee, loginTaken = false }: {
+export const EmployeeModal = ({ opened, onClose, employee, loginTaken = false }: {
   opened: boolean;
   onClose: () => void;
   employee: MockEmployee | null;
   loginTaken?: boolean;
-}) {
+}) => {
   const { t } = useTranslation('employees');
   const [role, setRole] = useState<string>(employee?.role ?? 'employee');
   const isNew = employee === null;
@@ -110,9 +110,9 @@ export function EmployeeModal({ opened, onClose, employee, loginTaken = false }:
       </Stack>
     </Modal>
   );
-}
+};
 
-export function PasswordModal({ employee, onClose }: { employee: MockEmployee | null; onClose: () => void }) {
+export const PasswordModal = ({ employee, onClose }: { employee: MockEmployee | null; onClose: () => void }) => {
   const { t } = useTranslation('employees');
   return (
     <Modal opened={employee !== null} onClose={onClose} title={t('password_title', { name: employee?.name })}>
@@ -128,9 +128,9 @@ export function PasswordModal({ employee, onClose }: { employee: MockEmployee | 
       </Stack>
     </Modal>
   );
-}
+};
 
-export function ArchiveModal({ employee, onClose }: { employee: MockEmployee | null; onClose: () => void }) {
+export const ArchiveModal = ({ employee, onClose }: { employee: MockEmployee | null; onClose: () => void }) => {
   const { t } = useTranslation('employees');
   return (
     <Modal opened={employee !== null} onClose={onClose} title={t('archive_title', { name: employee?.name })}>
@@ -151,9 +151,9 @@ export function ArchiveModal({ employee, onClose }: { employee: MockEmployee | n
       </Stack>
     </Modal>
   );
-}
+};
 
-export function CloseYearModal({ opened, onClose }: { opened: boolean; onClose: () => void }) {
+export const CloseYearModal = ({ opened, onClose }: { opened: boolean; onClose: () => void }) => {
   const { t } = useTranslation('employees');
   const next = POOL_YEAR + 1;
   const staff = EMPLOYEES.filter((e) => e.pool !== null);
@@ -212,4 +212,4 @@ export function CloseYearModal({ opened, onClose }: { opened: boolean; onClose: 
       </Stack>
     </Modal>
   );
-}
+};

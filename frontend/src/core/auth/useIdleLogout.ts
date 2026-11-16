@@ -7,16 +7,16 @@ const ACTIVITY_EVENTS = ['mousemove', 'keydown', 'pointerdown', 'scroll', 'touch
 const TICK_MS = 1000;
 
 /** Potwierdzenie dla serwera, że osoba pracuje: przedłuża sesję także przy pracy bez zapytań (np. długie pisanie). */
-function keepSessionAlive() {
+const keepSessionAlive = () => {
   void api.get('/auth/me', { headers: { [USER_ACTIVITY_HEADER]: '1' } }).catch(() => undefined);
-}
+};
 
 /**
  * Wylogowanie po bezczynności: po IDLE_LOGOUT_MS − IDLE_WARNING_MS bez czynności ostrzeżenie z odliczaniem, po
  * IDLE_LOGOUT_MS `onIdle()`. Czynność w innej karcie (localStorage) też się liczy. Przy otwartym ostrzeżeniu ruch
  * myszy go nie zamyka; zamyka tylko `stay()` (przycisk), żeby nikt nie przedłużył sesji przypadkiem.
  */
-export function useIdleLogout(onIdle: () => void) {
+export const useIdleLogout = (onIdle: () => void) => {
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const warningOpen = useRef(false);
   const lastPing = useRef(Date.now());
@@ -74,4 +74,4 @@ export function useIdleLogout(onIdle: () => void) {
   }, []);
 
   return { warning: secondsLeft !== null, secondsLeft: secondsLeft ?? 0, stay };
-}
+};

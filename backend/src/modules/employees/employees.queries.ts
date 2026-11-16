@@ -53,10 +53,10 @@ const ORDER_BY: Record<EmployeeSort, Record<'asc' | 'desc', string>> = {
 const likePattern = (search: string) => `%${search.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
 
 /** Konta spoza archiwum z pulą na podany rok (strona listy). */
-export async function listEmployees(
+export const listEmployees = async (
   db: Db,
   q: { search: string; role?: Role; sort: EmployeeSort; dir: 'asc' | 'desc'; page: number; pageSize: number; year: number },
-): Promise<{ rows: EmployeeRow[]; total: number }> {
+): Promise<{ rows: EmployeeRow[]; total: number }> => {
   const where = ['u.archived_at IS NULL'];
   const params: unknown[] = [];
   if (q.search) {
@@ -76,32 +76,32 @@ export async function listEmployees(
   );
   const [count] = await db.query<RowDataPacket[]>(`SELECT COUNT(*) AS total ${from}`, [q.year, ...params]); // rule-ok: WHERE z gotowych kawałków z ?
   return { rows, total: Number(count[0]?.total ?? 0) };
-}
+};
 
 /** Liczba kont spoza archiwum i administratorów wśród nich (podpis pod tytułem listy). */
-export async function countEmployees(db: Db): Promise<{ all: number; admins: number }> {
+export const countEmployees = async (db: Db): Promise<{ all: number; admins: number }> => {
   const [rows] = await db.query<RowDataPacket[]>(
     "SELECT COUNT(*) AS total, COALESCE(SUM(role = 'admin'), 0) AS admins FROM users WHERE archived_at IS NULL",
   );
   return { all: Number(rows[0]?.total ?? 0), admins: Number(rows[0]?.admins ?? 0) };
-}
+};
 
 /** Konta (także w archiwum) z tym loginem albo e-mailem, poza kontem `exceptId`. */
-export async function findAccountsWithLoginOrEmail(db: Db, login: string, email: string | null, exceptId: number | null): Promise<UserRow[]> {
+export const findAccountsWithLoginOrEmail = async (db: Db, login: string, email: string | null, exceptId: number | null): Promise<UserRow[]> => {
   const [rows] = await db.query<UserRow[]>(
     'SELECT id, name, first_name, last_name, login, email, role, archived_at FROM users WHERE (login = ? OR (? IS NOT NULL AND email = ?)) AND id <> ?',
     [login, email, email, exceptId ?? 0],
   );
   return rows;
-}
+};
 
-export async function findUser(db: Db, id: number): Promise<UserRow | null> {
+export const findUser = async (db: Db, id: number): Promise<UserRow | null> => {
   const [rows] = await db.query<UserRow[]>(
     'SELECT id, name, first_name, last_name, login, email, role, archived_at FROM users WHERE id = ?',
     [id],
   );
   return rows[0] ?? null;
-}
+};
 
 /** Dane konta z formularza (name składa baza z imienia i nazwiska). */
 export interface AccountData {
@@ -113,15 +113,15 @@ export interface AccountData {
 }
 
 /** Nowe konto zawsze z hasłem tymczasowym. */
-export async function insertUser(db: Db, u: AccountData & { passwordHash: string }): Promise<number> {
+export const insertUser = async (db: Db, u: AccountData & { passwordHash: string }): Promise<number> => {
   const [result] = await db.query<ResultSetHeader>(
     'INSERT INTO users (first_name, last_name, login, email, role, password_hash, must_change_password) VALUES (?, ?, ?, ?, ?, ?, 1)',
     [u.firstName, u.lastName, u.login, u.email, u.role, u.passwordHash],
   );
   return result.insertId;
-}
+};
 
-export async function updateUser(db: Db, id: number, u: AccountData): Promise<void> {
+export const updateUser = async (db: Db, id: number, u: AccountData): Promise<void> => {
   await db.query('UPDATE users SET first_name = ?, last_name = ?, login = ?, email = ?, role = ? WHERE id = ?', [
     u.firstName,
     u.lastName,
@@ -130,48 +130,48 @@ export async function updateUser(db: Db, id: number, u: AccountData): Promise<vo
     u.role,
     id,
   ]);
-}
+};
 
 /**
  * Hasło ustawione przez administratora jest tymczasowe: przy następnym kliknięciu osoba ustawia własne.
  * Podniesiona wersja sesji wylogowuje tę osobę na wszystkich urządzeniach.
  */
-export async function setTemporaryPassword(db: Db, id: number, passwordHash: string): Promise<void> {
+export const setTemporaryPassword = async (db: Db, id: number, passwordHash: string): Promise<void> => {
   await db.query(
     'UPDATE users SET password_hash = ?, must_change_password = 1, token_version = token_version + 1 WHERE id = ?',
     [passwordHash, id],
   );
-}
+};
 
 /** `byUserId` = kto archiwizuje; `null` = przywrócenie. */
-export async function setArchived(db: Db, id: number, byUserId: number | null): Promise<void> {
+export const setArchived = async (db: Db, id: number, byUserId: number | null): Promise<void> => {
   if (byUserId === null) {
     await db.query('UPDATE users SET archived_at = NULL, archived_by = NULL WHERE id = ?', [id]);
   } else {
     await db.query('UPDATE users SET archived_at = NOW(), archived_by = ? WHERE id = ?', [byUserId, id]);
   }
-}
+};
 
 /** Najmniejszy rok z pulą bez `closed_at`; brak pul → null. */
-export async function minOpenYear(db: Db): Promise<number | null> {
+export const minOpenYear = async (db: Db): Promise<number | null> => {
   const [rows] = await db.query<RowDataPacket[]>('SELECT MIN(year) AS year FROM leave_pools WHERE closed_at IS NULL');
   return rows[0]?.year ?? null;
-}
+};
 
-export async function findPool(db: Db, userId: number, year: number): Promise<PoolRow | null> {
+export const findPool = async (db: Db, userId: number, year: number): Promise<PoolRow | null> => {
   const [rows] = await db.query<PoolRow[]>(
     'SELECT id, user_id, year, annual_days, carried_days, closed_at FROM leave_pools WHERE user_id = ? AND year = ?',
     [userId, year],
   );
   return rows[0] ?? null;
-}
+};
 
-export async function upsertPool(db: Db, userId: number, year: number, annualDays: number, carriedDays: number): Promise<void> {
+export const upsertPool = async (db: Db, userId: number, year: number, annualDays: number, carriedDays: number): Promise<void> => {
   await db.query(
     'INSERT INTO leave_pools (user_id, year, annual_days, carried_days) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE annual_days = VALUES(annual_days), carried_days = VALUES(carried_days)',
     [userId, year, annualDays, carriedDays],
   );
-}
+};
 
 export interface YearPoolRow extends PoolRow {
   name: string;
@@ -180,7 +180,7 @@ export interface YearPoolRow extends PoolRow {
 }
 
 /** Wszystkie otwarte pule danego roku (także osób w archiwum), z imieniem i rolą. */
-export async function findOpenPoolsForYear(db: Db, year: number): Promise<YearPoolRow[]> {
+export const findOpenPoolsForYear = async (db: Db, year: number): Promise<YearPoolRow[]> => {
   const [rows] = await db.query<YearPoolRow[]>(
     `SELECT p.id, p.user_id, p.year, p.annual_days, p.carried_days, p.closed_at, u.name, u.role, u.archived_at
      FROM leave_pools p JOIN users u ON u.id = p.user_id
@@ -188,16 +188,16 @@ export async function findOpenPoolsForYear(db: Db, year: number): Promise<YearPo
     [year],
   );
   return rows;
-}
+};
 
-export async function closePool(db: Db, id: number): Promise<void> {
+export const closePool = async (db: Db, id: number): Promise<void> => {
   await db.query('UPDATE leave_pools SET closed_at = NOW() WHERE id = ?', [id]);
-}
+};
 
 /** Osoby spoza archiwum (np. do przypisania zadania). */
-export async function listActiveUsers(db: Db): Promise<{ id: number; name: string }[]> {
+export const listActiveUsers = async (db: Db): Promise<{ id: number; name: string }[]> => {
   const [rows] = await db.query<RowDataPacket[]>(
     'SELECT id, name FROM users WHERE archived_at IS NULL ORDER BY last_name, first_name',
   );
   return rows.map((r) => ({ id: r.id as number, name: r.name as string }));
-}
+};

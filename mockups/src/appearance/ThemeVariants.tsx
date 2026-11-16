@@ -19,7 +19,7 @@ const VariantContext = createContext<{ variants: ThemeVariant[]; current: string
 });
 
 /** Motyw makiet: wybrany wariant (gdy są warianty) albo motyw aplikacji z shared/src/theme.ts. */
-export function ThemeVariantProvider({ variants, children }: { variants: ThemeVariant[]; children: ReactNode }) {
+export const ThemeVariantProvider = ({ variants, children }: { variants: ThemeVariant[]; children: ReactNode }) => {
   const [current, setCurrent] = useState(variants[0]?.key ?? '');
   const active = variants.find((v) => v.key === current);
   return (
@@ -32,10 +32,10 @@ export function ThemeVariantProvider({ variants, children }: { variants: ThemeVa
       </MantineProvider>
     </VariantContext.Provider>
   );
-}
+};
 
 /** Przełącznik wariantów w pasku makiety; widoczny tylko, gdy są co najmniej dwa warianty. */
-export function VariantSwitch() {
+export const VariantSwitch = () => {
   const { t } = useTranslation();
   const { variants, current, setCurrent } = useContext(VariantContext);
   if (variants.length < 2) return null;
@@ -47,4 +47,4 @@ export function VariantSwitch() {
       data={variants.map((v) => ({ value: v.key, label: v.label }))}
     />
   );
-}
+};

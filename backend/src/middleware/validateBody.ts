@@ -4,7 +4,7 @@ import { SERVER_MESSAGES } from '@app/shared';
 import { sendError } from './errors';
 
 /** Sprawdza dane tym samym schematem co formularz na froncie. Komunikaty pól to klucze validation.*. */
-export function validateBody(schema: z.ZodType) {
+export const validateBody = (schema: z.ZodType) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const result = schema.safeParse(req.body ?? {});
     if (!result.success) {
@@ -18,4 +18,4 @@ export function validateBody(schema: z.ZodType) {
     req.body = result.data;
     next();
   };
-}
+};

@@ -5,12 +5,12 @@ const ADMIN = 'e2e.admin@test.local';
 const EMPLOYEE = 'e2e.employee@test.local';
 const password = () => process.env.E2E_PASSWORD!;
 
-async function logIn(page: Page, login: string, pass: string) {
+const logIn = async (page: Page, login: string, pass: string) => {
   await page.goto('/login');
   await page.getByLabel('Login').fill(login);
   await page.getByLabel('Hasło', { exact: true }).fill(pass);
   await page.getByRole('button', { name: 'Zaloguj się' }).click();
-}
+};
 
 test('administrator loguje się i widzi Pulpit', async ({ page }) => {
   await logIn(page, ADMIN.toUpperCase(), password());

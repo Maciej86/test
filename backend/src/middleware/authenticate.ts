@@ -18,7 +18,7 @@ declare global {
  * Nigdy nie odrzuca żądania; od tego są requireAuth i requireRole. Token starszy niż minuta odnawia tylko przy
  * żądaniu po czynności człowieka (nagłówek USER_ACTIVITY_HEADER), więc odświeżanie w tle nie przedłuża sesji.
  */
-export async function authenticate(req: Request, res: Response, next: NextFunction) {
+export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   req.user = undefined;
   const token = req.cookies?.[AUTH_COOKIE_NAME];
   const payload = typeof token === 'string' ? verifyToken(token) : null;
@@ -34,4 +34,4 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
   } catch (error) {
     next(error);
   }
-}
+};

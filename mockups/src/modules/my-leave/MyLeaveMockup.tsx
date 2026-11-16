@@ -13,7 +13,7 @@ export const STATUS_COLOR: Record<LeaveStatus, string> = {
   cancelled: 'gray',
 };
 
-export function MyLeaveMockup() {
+export const MyLeaveMockup = () => {
   const { t } = useTranslation('my-leave');
   const [opened, { open, close }] = useDisclosure(false);
   const left = POOL.annual + POOL.carriedOver - POOL.usedAnnual - POOL.usedCarried;
@@ -93,4 +93,4 @@ export function MyLeaveMockup() {
       </Modal>
     </Stack>
   );
-}
+};

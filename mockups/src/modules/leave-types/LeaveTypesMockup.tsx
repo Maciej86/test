@@ -16,12 +16,12 @@ interface RowActions {
   onHide: (lt: MockLeaveType) => void;
 }
 
-function DeductsBadge({ deducts }: { deducts: boolean }) {
+const DeductsBadge = ({ deducts }: { deducts: boolean }) => {
   const { t } = useTranslation('leave-types');
   return <Badge variant="light" color={deducts ? 'navy' : 'gray'}>{deducts ? t('deducts_yes') : t('deducts_no')}</Badge>;
-}
+};
 
-function NameCell({ lt }: { lt: MockLeaveType }) {
+const NameCell = ({ lt }: { lt: MockLeaveType }) => {
   const { t } = useTranslation('leave-types');
   return (
     <Stack gap={0}>
@@ -32,15 +32,15 @@ function NameCell({ lt }: { lt: MockLeaveType }) {
       {lt.hidden && <Text size="xs" c="dimmed">{t('hidden_hint')}</Text>}
     </Stack>
   );
-}
+};
 
-function LimitText({ limit }: { limit: number | null }) {
+const LimitText = ({ limit }: { limit: number | null }) => {
   const { t } = useTranslation('leave-types');
   return limit === null ? <Text span inherit c="dimmed">{t('no_limit')}</Text> : <>{t('limit_days', { count: limit })}</>;
-}
+};
 
 /** Strzałki kolejności: ta sama kolejność jest w formularzu wniosku pracownika. */
-function OrderArrows({ index, count }: { index: number; count: number }) {
+const OrderArrows = ({ index, count }: { index: number; count: number }) => {
   const { t } = useTranslation('leave-types');
   return (
     <Group gap={2} wrap="nowrap">
@@ -52,9 +52,9 @@ function OrderArrows({ index, count }: { index: number; count: number }) {
       </ActionIcon>
     </Group>
   );
-}
+};
 
-function Actions({ lt, onEdit, onHide }: RowActions & { lt: MockLeaveType }) {
+const Actions = ({ lt, onEdit, onHide }: RowActions & { lt: MockLeaveType }) => {
   const { t } = useTranslation('leave-types');
   return (
     <Group gap={4} justify="flex-end" wrap="nowrap">
@@ -70,9 +70,9 @@ function Actions({ lt, onEdit, onHide }: RowActions & { lt: MockLeaveType }) {
       )}
     </Group>
   );
-}
+};
 
-function LeaveTypesTable({ rows, visibleCount, ...actions }: RowActions & { rows: MockLeaveType[]; visibleCount: number }) {
+const LeaveTypesTable = ({ rows, visibleCount, ...actions }: RowActions & { rows: MockLeaveType[]; visibleCount: number }) => {
   const { t } = useTranslation('leave-types');
   return (
     <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH} visibleFrom="sm">
@@ -102,10 +102,10 @@ function LeaveTypesTable({ rows, visibleCount, ...actions }: RowActions & { rows
       </Table>
     </Table.ScrollContainer>
   );
-}
+};
 
 /** Na telefonie każdy typ to karta zamiast wiersza tabeli. */
-function LeaveTypeCards({ rows, visibleCount, ...actions }: RowActions & { rows: MockLeaveType[]; visibleCount: number }) {
+const LeaveTypeCards = ({ rows, visibleCount, ...actions }: RowActions & { rows: MockLeaveType[]; visibleCount: number }) => {
   const { t } = useTranslation('leave-types');
   return (
     <Stack gap="sm" hiddenFrom="sm">
@@ -129,9 +129,9 @@ function LeaveTypeCards({ rows, visibleCount, ...actions }: RowActions & { rows:
       ))}
     </Stack>
   );
-}
+};
 
-export function LeaveTypesMockup() {
+export const LeaveTypesMockup = () => {
   const { t } = useTranslation('leave-types');
   const [state, setState] = useState<State>('list');
   const [showHidden, setShowHidden] = useState(false);
@@ -194,4 +194,4 @@ export function LeaveTypesMockup() {
       <HideModal leaveType={hide} onClose={() => setHide(null)} />
     </Stack>
   );
-}
+};

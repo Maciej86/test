@@ -6,7 +6,7 @@ import { InfoCard } from '../../common/InfoCard';
 import { useMockupRole } from '../../common/mockupRole';
 import { MY_POOL, MY_TASKS, PENDING_REQUESTS, TASK_COUNTS } from './data';
 
-function AdminDashboard() {
+const AdminDashboard = () => {
   const { t } = useTranslation('dashboard');
   return (
     <SimpleGrid cols={{ base: 1, md: 2 }}>
@@ -34,9 +34,9 @@ function AdminDashboard() {
       </InfoCard>
     </SimpleGrid>
   );
-}
+};
 
-function EmployeeDashboard() {
+const EmployeeDashboard = () => {
   const { t } = useTranslation('dashboard');
   const total = MY_POOL.annual + MY_POOL.carriedOver;
   const left = total - MY_POOL.used;
@@ -65,9 +65,9 @@ function EmployeeDashboard() {
       </InfoCard>
     </SimpleGrid>
   );
-}
+};
 
-export function DashboardMockup() {
+export const DashboardMockup = () => {
   const { t } = useTranslation('dashboard');
   const role = useMockupRole();
   return (
@@ -76,4 +76,4 @@ export function DashboardMockup() {
       {role === 'admin' ? <AdminDashboard /> : <EmployeeDashboard />}
     </Stack>
   );
-}
+};

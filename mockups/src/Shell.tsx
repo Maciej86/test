@@ -26,18 +26,18 @@ import {
 
 export type Part = 'public' | 'account' | 'admin';
 
-export function partOf(path: string): Part {
+export const partOf = (path: string): Part => {
   if (path.startsWith('/account')) return 'account';
   if (path.startsWith('/admin')) return 'admin';
   return 'public';
-}
+};
 
 const PART_HOME: Record<Part, string> = { public: '/', account: '/account', admin: '/admin' };
 
 /** Pierwsza rola, która po zalogowaniu trafia do danej części. */
-export function defaultRole(part: Part): Role {
+export const defaultRole = (part: Part): Role => {
   return ROLES.find((r) => ROLE_HOME[r] === `/${part}`) ?? ROLES[0];
-}
+};
 
 /** Ekran makiety spoza menu aplikacji, np. logowanie (`label` = klucz tłumaczenia z przestrzenią nazw). */
 export interface ExtraScreen {
@@ -58,7 +58,7 @@ interface Props {
   children: ReactNode;
 }
 
-function MenuLinks({ items, role }: { items: NavItem[]; role: Role }) {
+const MenuLinks = ({ items, role }: { items: NavItem[]; role: Role }) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const visible = visibleNav(items, { id: 0, name: 'Makieta', role, mustChangePassword: false });
@@ -78,15 +78,15 @@ function MenuLinks({ items, role }: { items: NavItem[]; role: Role }) {
       </NavLink>
     ));
   return <>{render(visible)}</>;
-}
+};
 
-function ProgressLink() {
+const ProgressLink = () => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   return <NavLink component={RouterLink} to="/progress" label={t('mockup.progress')} active={pathname === '/progress'} />;
-}
+};
 
-function ExtraLinks({ screens }: { screens: ExtraScreen[] }) {
+const ExtraLinks = ({ screens }: { screens: ExtraScreen[] }) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   return (
@@ -96,9 +96,9 @@ function ExtraLinks({ screens }: { screens: ExtraScreen[] }) {
       ))}
     </>
   );
-}
+};
 
-export function Shell({ areas, extraScreens = [], navigation, accountNavigation, publicNavigation, role, onRoleChange, children }: Props) {
+export const Shell = ({ areas, extraScreens = [], navigation, accountNavigation, publicNavigation, role, onRoleChange, children }: Props) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -206,6 +206,6 @@ export function Shell({ areas, extraScreens = [], navigation, accountNavigation,
       <AppShell.Main bg={current === 'public' ? undefined : 'var(--app-panel-background)'}>{children}</AppShell.Main>
     </AppShell>
   );
-}
+};
 
 export type Screens = Record<string, ComponentType>;

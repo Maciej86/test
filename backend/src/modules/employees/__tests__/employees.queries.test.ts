@@ -3,11 +3,11 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn() } }));
 const { insertUser, listEmployees, setTemporaryPassword } = await import('../employees.queries');
 
-function fakeDb(rows: unknown[][]) {
+const fakeDb = (rows: unknown[][]) => {
   const query = vi.fn();
   for (const r of rows) query.mockResolvedValueOnce([r]);
   return { query };
-}
+};
 
 describe('employees queries', () => {
   it('a temporary password raises token_version, so the person is logged out everywhere', async () => {

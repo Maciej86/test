@@ -34,21 +34,21 @@ export const employeesRoutes = Router();
 const actorOf = (user: Express.Request['user']): Actor => ({ id: user!.id, name: user!.name });
 
 /** Numer z adresu: tylko dodatnia liczba całkowita, inaczej 404. */
-function idParam(res: Response, raw: unknown): number | null {
+const idParam = (res: Response, raw: unknown): number | null => {
   const id = Number(raw);
   if (Number.isInteger(id) && id > 0) return id;
   sendError(res, 404, SERVER_MESSAGES.notFound);
   return null;
-}
+};
 
 /** Wynik usługi → odpowiedź: błąd jednym formatem, sukces jako JSON. */
-function reply<T>(res: Response, result: Result<T>, status = 200) {
+const reply = <T>(res: Response, result: Result<T>, status = 200) => {
   if (typeof result === 'object' && result !== null && 'error' in result) {
     const { status: code, message, fields, archivedUser } = result.error;
     return sendError(res, code, message, fields, archivedUser ? { archivedUser } : undefined);
   }
   res.status(status).json(result);
-}
+};
 
 employeesRoutes.get('/', validateQuery(employeesListQuerySchema), async (req, res) => {
   res.json(await listEmployeesPage(req.query as unknown as EmployeesListQuery, actorOf(req.user)));

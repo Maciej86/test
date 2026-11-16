@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { InfoCard } from '../../common/InfoCard';
 import { useMockupRole } from '../../common/mockupRole';
 
-export function MyAccountMockup() {
+export const MyAccountMockup = () => {
   const { t } = useTranslation('my-account');
   const role = useMockupRole();
   const person = role === 'admin'
@@ -27,4 +27,4 @@ export function MyAccountMockup() {
       </SimpleGrid>
     </Stack>
   );
-}
+};

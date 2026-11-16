@@ -15,17 +15,17 @@ import { fieldError } from '../../core/fieldError';
 import { useLogin } from './login.api';
 
 /** Dokąd po zalogowaniu: najpierw własne hasło, jeśli administrator nadał tymczasowe. */
-function homeOf(user: SessionUser): string {
+const homeOf = (user: SessionUser): string => {
   return user.mustChangePassword ? PASSWORD_CHANGE_PATH : ROLE_HOME[user.role];
-}
+};
 
 /** Komunikat serwera, który ekran pokazuje w ramce nad polami (zły login lub hasło, za dużo prób). */
-function loginProblem(error: unknown): string | null {
+const loginProblem = (error: unknown): string | null => {
   const key = apiErrorKey(error);
   return key === SERVER_MESSAGES.loginFailed || key === SERVER_MESSAGES.tooManyLogins ? key : null;
-}
+};
 
-export function LoginPage() {
+export const LoginPage = () => {
   const { t } = useTranslation('login');
   const { user, refresh } = useAuth();
   const navigate = useNavigate();
@@ -90,4 +90,4 @@ export function LoginPage() {
       <Text size="sm" c="dimmed">{t('forgot')}</Text>
     </AuthCard>
   );
-}
+};

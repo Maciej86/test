@@ -19,14 +19,14 @@ import type { ReactElement } from 'react';
  * Konto i panel tylko dla zalogowanych: niezalogowany trafia na /login, osoba z hasłem tymczasowym na ustawienie
  * własnego hasła (serwer i tak odrzuci jej zapytania, ale tak nie zobaczy nawet pustych ekranów).
  */
-function guarded(layout: ReactElement, user: SessionUser | null): ReactElement {
+const guarded = (layout: ReactElement, user: SessionUser | null): ReactElement => {
   if (!user) return <Navigate to="/login" replace />;
   if (user.mustChangePassword) return <Navigate to={PASSWORD_CHANGE_PATH} replace />;
   return layout;
-}
+};
 
 /** Wszystkie trasy aplikacji według włączonych części (AREAS). */
-export function buildAppRoutes(areas: Areas, pages: Pages, user: SessionUser | null): RouteObject[] {
+export const buildAppRoutes = (areas: Areas, pages: Pages, user: SessionUser | null): RouteObject[] => {
   const routes: RouteObject[] = [];
 
   if (areas.public) {
@@ -63,4 +63,4 @@ export function buildAppRoutes(areas: Areas, pages: Pages, user: SessionUser | n
 
   routes.push({ path: '*', element: <MissingScreen /> });
   return routes;
-}
+};

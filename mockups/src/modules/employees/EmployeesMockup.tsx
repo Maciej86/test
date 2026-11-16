@@ -33,12 +33,12 @@ interface RowActions {
   onArchive: (e: MockEmployee) => void;
 }
 
-function RoleBadge({ role }: { role: MockEmployee['role'] }) {
+const RoleBadge = ({ role }: { role: MockEmployee['role'] }) => {
   const { t } = useTranslation('employees');
   return <Badge variant="light" color={role === 'admin' ? 'navy' : 'gray'}>{t(`role.${role}`)}</Badge>;
-}
+};
 
-function NameCell({ e }: { e: MockEmployee }) {
+const NameCell = ({ e }: { e: MockEmployee }) => {
   const { t } = useTranslation('employees');
   return (
     <Stack gap={0}>
@@ -49,9 +49,9 @@ function NameCell({ e }: { e: MockEmployee }) {
       <Text size="sm" c="dimmed">{e.login}</Text>
     </Stack>
   );
-}
+};
 
-function Actions({ e, onEdit, onPassword, onArchive }: RowActions & { e: MockEmployee }) {
+const Actions = ({ e, onEdit, onPassword, onArchive }: RowActions & { e: MockEmployee }) => {
   const { t } = useTranslation('employees');
   return (
     <Group gap={4} justify="flex-end" wrap="nowrap">
@@ -64,9 +64,9 @@ function Actions({ e, onEdit, onPassword, onArchive }: RowActions & { e: MockEmp
       </Tooltip>
     </Group>
   );
-}
+};
 
-function EmployeesTable({ rows, ...actions }: RowActions & { rows: MockEmployee[] }) {
+const EmployeesTable = ({ rows, ...actions }: RowActions & { rows: MockEmployee[] }) => {
   const { t } = useTranslation('employees');
   return (
     <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH + 260} visibleFrom="sm">
@@ -94,10 +94,10 @@ function EmployeesTable({ rows, ...actions }: RowActions & { rows: MockEmployee[
       </Table>
     </Table.ScrollContainer>
   );
-}
+};
 
 /** Na telefonie każda osoba to karta zamiast wiersza tabeli. */
-function EmployeeCards({ rows, ...actions }: RowActions & { rows: MockEmployee[] }) {
+const EmployeeCards = ({ rows, ...actions }: RowActions & { rows: MockEmployee[] }) => {
   const { t } = useTranslation('employees');
   return (
     <Stack gap="sm" hiddenFrom="sm">
@@ -116,9 +116,9 @@ function EmployeeCards({ rows, ...actions }: RowActions & { rows: MockEmployee[]
       ))}
     </Stack>
   );
-}
+};
 
-function EmptyState({ onAdd }: { onAdd: () => void }) {
+const EmptyState = ({ onAdd }: { onAdd: () => void }) => {
   const { t } = useTranslation('employees');
   return (
     <Paper withBorder p="xl">
@@ -130,9 +130,9 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
       </Stack>
     </Paper>
   );
-}
+};
 
-export function EmployeesMockup() {
+export const EmployeesMockup = () => {
   const { t } = useTranslation('employees');
   const [state, setState] = useState<State>('list');
   const [form, setForm] = useState<{ employee: MockEmployee | null } | null>(null);
@@ -233,4 +233,4 @@ export function EmployeesMockup() {
       <CloseYearModal opened={closeYear} onClose={() => setCloseYear(false)} />
     </Stack>
   );
-}
+};

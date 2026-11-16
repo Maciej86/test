@@ -11,46 +11,46 @@ const LOGOUT_KEY = 'app.logoutAt';
 
 let localLast = Date.now();
 
-function read(key: string): number {
+const read = (key: string): number => {
   try {
     return Number(localStorage.getItem(key)) || 0;
   } catch {
     return 0;
   }
-}
+};
 
-function write(key: string, value: number): void {
+const write = (key: string, value: number): void => {
   try {
     localStorage.setItem(key, String(value));
   } catch {
     // brak localStorage: zostaje pamięć tej karty
   }
-}
+};
 
-export function markActivity(now = Date.now()): void {
+export const markActivity = (now = Date.now()): void => {
   localLast = now;
   write(ACTIVITY_KEY, now);
-}
+};
 
-export function lastActivityAt(): number {
+export const lastActivityAt = (): number => {
   return Math.max(localLast, read(ACTIVITY_KEY));
-}
+};
 
 /** Czy człowiek coś robił w ostatniej minucie (tylko takie zapytania przedłużają sesję na serwerze). */
-export function isRecentlyActive(now = Date.now()): boolean {
+export const isRecentlyActive = (now = Date.now()): boolean => {
   return now - lastActivityAt() <= SESSION_KEEPALIVE_MS;
-}
+};
 
 /** Daje znać innym kartom, że ta się wylogowała. */
-export function announceLogout(): void {
+export const announceLogout = (): void => {
   write(LOGOUT_KEY, Date.now());
-}
+};
 
 /** Wylogowanie w innej karcie przenosi tę na ekran logowania. Zwraca funkcję, która przestaje nasłuchiwać. */
-export function watchLogoutInOtherTabs(): () => void {
+export const watchLogoutInOtherTabs = (): () => void => {
   const handler = (event: StorageEvent) => {
     if (event.key === LOGOUT_KEY) sessionRedirect.go('/login');
   };
   window.addEventListener('storage', handler);
   return () => window.removeEventListener('storage', handler);
-}
+};

@@ -8,14 +8,14 @@ export const LIST_SEARCH_MAX = 100;
  * z listy `sortable` (nazwa kolumny z adresu nigdy nie trafia do SQL bez tego sprawdzenia). Ten sam schemat
  * czyta adres na froncie i sprawdza zapytanie na serwerze (`validateQuery`).
  */
-export function listQuerySchema<const S extends readonly [string, ...string[]]>(sortable: S, defaultSort: S[number] = sortable[0]) {
+export const listQuerySchema = <const S extends readonly [string, ...string[]]>(sortable: S, defaultSort: S[number] = sortable[0]) => {
   return z.object({
     page: z.coerce.number().int().min(1).catch(1).default(1),
     search: z.string().trim().max(LIST_SEARCH_MAX).catch('').default(''),
     sort: z.enum(sortable, { error: 'validation.list_sort' }).default(defaultSort),
     dir: z.enum(['asc', 'desc']).catch('asc').default('asc'),
   });
-}
+};
 
 export type ListQuery<S extends string = string> = { page: number; search: string; sort: S; dir: 'asc' | 'desc' };
 

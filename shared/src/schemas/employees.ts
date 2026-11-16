@@ -16,22 +16,22 @@ const employeeFields = {
 };
 
 /** Pula wymagana tylko przy roli Pracownik (administrator nie ma puli). */
-function requirePool(v: { role: Role; annualDays?: number }, ctx: z.RefinementCtx) {
+const requirePool = (v: { role: Role; annualDays?: number }, ctx: z.RefinementCtx) => {
   if (v.role === 'employee' && v.annualDays === undefined) {
     ctx.addIssue({ code: 'custom', path: ['annualDays'], message: 'validation.required' });
   }
-}
+};
 
 /** Brak zaległych dni = 0. */
 const defaultCarried = <T extends { carriedDays?: number }>(v: T) => ({ ...v, carriedDays: v.carriedDays ?? 0 });
 
 /** Administrator nie ma puli: ukryte pola puli nie są sprawdzane ani zapisywane. */
-function skipPoolForAdmin(value: unknown): unknown {
+const skipPoolForAdmin = (value: unknown): unknown => {
   if (value && typeof value === 'object' && (value as { role?: unknown }).role === 'admin') {
     return { ...value, annualDays: undefined, carriedDays: undefined };
   }
   return value;
-}
+};
 
 const employeeUpdateObject = z.object(employeeFields).superRefine(requirePool).transform(defaultCarried);
 const employeeCreateObject = z

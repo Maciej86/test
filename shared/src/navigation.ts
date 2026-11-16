@@ -34,12 +34,12 @@ export interface Areas {
 
 export type AreaHome = '/account' | '/admin';
 
-export function canSee(item: NavItem, user: SessionUser | null): boolean {
+export const canSee = (item: NavItem, user: SessionUser | null): boolean => {
   if (!user || !isRole(user.role)) return false;
   return item.roles.includes(user.role);
-}
+};
 
-export function visibleNav(items: NavItem[], user: SessionUser | null): NavItem[] {
+export const visibleNav = (items: NavItem[], user: SessionUser | null): NavItem[] => {
   const result: NavItem[] = [];
   for (const item of items) {
     if (!canSee(item, user)) continue;
@@ -52,51 +52,51 @@ export function visibleNav(items: NavItem[], user: SessionUser | null): NavItem[
     }
   }
   return result;
-}
+};
 
-export function flattenNav(items: NavItem[]): NavItem[] {
+export const flattenNav = (items: NavItem[]): NavItem[] => {
   return items.flatMap((item) => [item, ...flattenNav(item.children ?? [])]);
-}
+};
 
 /**
  * Role, które mają dostęp do modułu pozycji nawigacji `key` (jej role i role pozycji pod nią) albo null, gdy takiej
  * pozycji nie ma. Moduł może mieć pozycję w kilku miejscach (np. „Powiadomienia” w koncie dla pracownika i w panelu
  * dla administratora): wtedy role ze wszystkich. Z tego korzysta mountModule: menu i API mają jedno źródło uprawnień.
  */
-export function rolesFor(key: string, items: NavItem[]): Role[] | null {
+export const rolesFor = (key: string, items: NavItem[]): Role[] | null => {
   const found = flattenNav(items).filter((item) => item.key === key);
   if (found.length === 0) return null;
   return [...new Set(flattenNav(found).flatMap((item) => item.roles))];
-}
+};
 
 /**
  * Klucz pozycji menu, która ma być podświetlona dla adresu `pathname`: ta, której adres jest równy albo jest początkiem
  * bieżącego (`/admin/orders` dla `/admin/orders/5`). Wygrywa najdłuższy, więc „Pulpit” pod `/admin` nie świeci
  * na każdej podstronie panelu.
  */
-export function activeNavKey(items: { key: string; path: string }[], pathname: string): string | null {
+export const activeNavKey = (items: { key: string; path: string }[], pathname: string): string | null => {
   const matches = items.filter(
     (item) => pathname === item.path || (item.path !== '/' && pathname.startsWith(`${item.path}/`)),
   );
   if (matches.length === 0) return null;
   return matches.reduce((best, item) => (item.path.length > best.path.length ? item : best)).key;
-}
+};
 
 /** Pozycja menu o kluczu `key`, którą ta osoba widzi (z kilku menu naraz), albo null. Np. „Moje konto” w menu użytkownika. */
-export function findVisibleNavItem(
+export const findVisibleNavItem = (
   key: string,
   menus: NavItem[][],
   user: SessionUser | null,
-): NavItem | null {
+): NavItem | null => {
   for (const items of menus) {
     const found = flattenNav(visibleNav(items, user)).find((item) => item.key === key);
     if (found) return found;
   }
   return null;
-}
+};
 
 /** Inicjały do kółka w menu użytkownika: „Jan Kowalski” → „JK”, „Anna” → „A”. */
-export function initials(name: string): string {
+export const initials = (name: string): string => {
   const letters = name
     .trim()
     .split(/\s+/)
@@ -104,4 +104,4 @@ export function initials(name: string): string {
     .map((part) => part[0]!.toLocaleUpperCase('pl'));
   if (letters.length === 0) return '?';
   return letters.length === 1 ? letters[0]! : letters[0]! + letters[letters.length - 1]!;
-}
+};

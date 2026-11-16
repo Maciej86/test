@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { DateText } from '../../common/DateText';
 import { COLUMNS, EMPLOYEES, TASKS } from './data';
 
-function initials(name: string) {
+const initials = (name: string) => {
   return name.split(' ').map((p) => p[0]).join('');
-}
+};
 
-export function TasksMockup() {
+export const TasksMockup = () => {
   const { t } = useTranslation('tasks');
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -85,4 +85,4 @@ export function TasksMockup() {
       </Modal>
     </Stack>
   );
-}
+};

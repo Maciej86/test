@@ -10,7 +10,7 @@ import { notify } from '../../../core/notify';
 import { useCloseYear, useCloseYearPreview } from '../employees.api';
 
 /** „Zamknij rok”: podgląd z pulą na nowy rok do zmiany i sumą „Razem” liczoną na bieżąco. */
-export function CloseYearModal({ opened, onClose }: { opened: boolean; onClose: () => void }) {
+export const CloseYearModal = ({ opened, onClose }: { opened: boolean; onClose: () => void }) => {
   const { t } = useTranslation('employees');
   const preview = useCloseYearPreview(opened);
   const closeYear = useCloseYear();
@@ -91,4 +91,4 @@ export function CloseYearModal({ opened, onClose }: { opened: boolean; onClose: 
       </DataState>
     </Modal>
   );
-}
+};

@@ -10,16 +10,16 @@ const variants: ThemeVariant[] = [
   { key: 'b', label: 'B. Kolorowy', theme: { primaryColor: 'grape' } },
 ];
 
-function Probe() {
+const Probe = () => {
   return (
     <>
       <span>kolor: {useMantineTheme().primaryColor}</span>
       <span>tryb: {useComputedColorScheme()}</span>
     </>
   );
-}
+};
 
-function renderWith(list: ThemeVariant[]) {
+const renderWith = (list: ThemeVariant[]) => {
   return render(
     <I18nextProvider i18n={i18n}>
       <ThemeVariantProvider variants={list}>
@@ -28,7 +28,7 @@ function renderWith(list: ThemeVariant[]) {
       </ThemeVariantProvider>
     </I18nextProvider>,
   );
-}
+};
 
 describe('theme variants in mockups', () => {
   it('uses the app theme and hides the switch when there are no variants', () => {

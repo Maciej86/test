@@ -6,11 +6,11 @@ import { formatDate, formatDateTime, type DateInput } from '@app/shared';
  * Data na ekranie: zawsze `DD.MM.RRRR` (z godziną: `withTime`). Pusta wartość = szare „brak”.
  * `dimmed` dla nieaktywnych wierszy (np. zarchiwizowanych).
  */
-export function DateText({ value, withTime = false, dimmed = false }: {
+export const DateText = ({ value, withTime = false, dimmed = false }: {
   value: DateInput;
   withTime?: boolean;
   dimmed?: boolean;
-}) {
+}) => {
   const { t } = useTranslation();
   const text = withTime ? formatDateTime(value) : formatDate(value);
   return (
@@ -18,4 +18,4 @@ export function DateText({ value, withTime = false, dimmed = false }: {
       {text ?? t('empty_value')}
     </Text>
   );
-}
+};

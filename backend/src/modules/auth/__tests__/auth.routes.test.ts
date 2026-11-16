@@ -38,10 +38,10 @@ beforeEach(() => {
   vi.mocked(password.verifyPassword).mockClear();
 });
 
-function tokenFrom(res: { headers: Record<string, unknown> }) {
+const tokenFrom = (res: { headers: Record<string, unknown> }) => {
   const header = (res.headers['set-cookie'] as string[] | undefined)?.[0] ?? '';
   return verifyToken(header.slice(`${AUTH_COOKIE_NAME}=`.length).split(';')[0]!);
-}
+};
 
 describe('password change ends other sessions (token_version)', () => {
   it('POST /auth/login puts the account token version into the cookie', async () => {

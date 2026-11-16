@@ -3,7 +3,7 @@ import { api, sessionRedirect } from '../../api/client';
 import { renderWithProviders } from '../../../test/render';
 import { AuthProvider, useAuth } from '../AuthProvider';
 
-function LogoutButtons() {
+const LogoutButtons = () => {
   const { logout } = useAuth();
   return (
     <>
@@ -11,7 +11,7 @@ function LogoutButtons() {
       <button onClick={() => void logout('idle')}>bezczynność</button>
     </>
   );
-}
+};
 
 describe('AuthProvider', () => {
   const go = vi.spyOn(sessionRedirect, 'go').mockImplementation(() => {});

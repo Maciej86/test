@@ -11,7 +11,7 @@ const COLORS: Record<ModuleStatus, string> = {
   czeka: 'gray',
 };
 
-export function ProgressPage({ source = statusText }: { source?: string }) {
+export const ProgressPage = ({ source = statusText }: { source?: string }) => {
   const { t } = useTranslation();
   const result = parseStatus(source);
   if (!result.ok) {
@@ -79,4 +79,4 @@ export function ProgressPage({ source = statusText }: { source?: string }) {
       )}
     </Stack>
   );
-}
+};

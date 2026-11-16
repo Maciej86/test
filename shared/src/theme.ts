@@ -43,9 +43,9 @@ export const COLOR_SCHEME_TOGGLE = false;
 export const FIXED_COLOR_SCHEME: 'light' | 'dark' = 'dark';
 
 /** Ustawienia MantineProvider: bez przełącznika zawsze FIXED_COLOR_SCHEME, z przełącznikiem na start jak w systemie. */
-export function colorSchemeProps(
+export const colorSchemeProps = (
   toggle: boolean = COLOR_SCHEME_TOGGLE,
   fixed: 'light' | 'dark' = FIXED_COLOR_SCHEME,
-): Pick<MantineProviderProps, 'defaultColorScheme' | 'forceColorScheme'> {
+): Pick<MantineProviderProps, 'defaultColorScheme' | 'forceColorScheme'> => {
   return toggle ? { defaultColorScheme: 'auto' } : { forceColorScheme: fixed };
-}
+};

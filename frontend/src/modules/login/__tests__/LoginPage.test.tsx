@@ -13,7 +13,7 @@ vi.mock('../../../core/auth/AuthProvider', () => ({
 
 const jan: SessionUser = { id: 2, name: 'Jan Kowalski', role: 'employee', mustChangePassword: false };
 
-function serverError(status: number, message?: string) {
+const serverError = (status: number, message?: string) => {
   const config = { url: '/auth/login', headers: new AxiosHeaders() };
   return new AxiosError('fail', 'ERR', config, undefined, {
     status,
@@ -22,9 +22,9 @@ function serverError(status: number, message?: string) {
     headers: {},
     config,
   });
-}
+};
 
-function show(path = '/login') {
+const show = (path = '/login') => {
   return renderRoutes(
     [
       { path: '/login', element: <LoginPage /> },
@@ -33,13 +33,13 @@ function show(path = '/login') {
     ],
     path,
   );
-}
+};
 
-function fillAndSubmit(login = 'jan.kowalski@firma.pl', password = 'Urlop-2026') {
+const fillAndSubmit = (login = 'jan.kowalski@firma.pl', password = 'Urlop-2026') => {
   fireEvent.change(screen.getByLabelText('Login'), { target: { value: login } });
   fireEvent.change(screen.getByLabelText('Hasło'), { target: { value: password } });
   fireEvent.click(screen.getByRole('button', { name: 'Zaloguj się' }));
-}
+};
 
 describe('LoginPage', () => {
   beforeEach(() => {

@@ -26,7 +26,7 @@ import { PasswordField } from './PasswordField';
 
 type FormValues = Omit<EmployeeCreateInput, 'email'> & { email: string };
 
-function initialValues(employee: EmployeeListItem | null): FormValues {
+const initialValues = (employee: EmployeeListItem | null): FormValues => {
   return {
     firstName: employee?.firstName ?? '',
     lastName: employee?.lastName ?? '',
@@ -37,15 +37,15 @@ function initialValues(employee: EmployeeListItem | null): FormValues {
     annualDays: employee?.pool?.annualDays ?? ANNUAL_DAYS_DEFAULT,
     carriedDays: employee?.pool?.carriedDays ?? 0,
   };
-}
+};
 
 /** Okno „Dodaj pracownika” (employee = null) i „Edytuj”. Pula na rok otwarty tylko przy roli Pracownik. */
-export function EmployeeFormModal({ opened, employee, year, onClose }: {
+export const EmployeeFormModal = ({ opened, employee, year, onClose }: {
   opened: boolean;
   employee: EmployeeListItem | null;
   year: number;
   onClose: () => void;
-}) {
+}) => {
   const { t } = useTranslation('employees');
   const isNew = employee === null;
   const create = useCreateEmployee();
@@ -202,4 +202,4 @@ export function EmployeeFormModal({ opened, employee, year, onClose }: {
       </Modal>
     </Modal>
   );
-}
+};

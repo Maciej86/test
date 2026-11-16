@@ -3,10 +3,10 @@ import { MockupApp } from '../../App';
 import { useMockupRole } from '../mockupRole';
 import { renderWithProviders } from '../../test/render';
 
-function RoleProbe() {
+const RoleProbe = () => {
   const role = useMockupRole();
   return <p>Rola: {role}</p>;
-}
+};
 
 describe('useMockupRole', () => {
   it('gives screens the role chosen in the bar', async () => {

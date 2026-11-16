@@ -21,7 +21,7 @@ interface AppOptions {
   publicRoutes?: Router;
 }
 
-export function createApp(options: AppOptions = {}) {
+export const createApp = (options: AppOptions = {}) => {
   const app = express();
   // Na serwerze aplikacja stoi za Caddy: bez tego limit logowania liczyłby wszystkich jako jedną osobę.
   app.set('trust proxy', 1);
@@ -59,4 +59,4 @@ export function createApp(options: AppOptions = {}) {
     sendError(res, 500, SERVER_MESSAGES.serverError);
   });
   return app;
-}
+};

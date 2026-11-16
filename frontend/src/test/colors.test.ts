@@ -6,13 +6,13 @@ import { describe, expect, it } from 'vitest';
 
 const HARDCODED = /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(/;
 
-function sourceFiles(dir: string): string[] {
+const sourceFiles = (dir: string): string[] => {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) return name === 'test' ? [] : sourceFiles(path);
     return /\.(tsx?|css)$/.test(name) && !/\.test\.tsx?$/.test(name) ? [path] : [];
   });
-}
+};
 
 describe('colors', () => {
   const roots = ['src', '../mockups/src'].map((d) => resolve(process.cwd(), d));

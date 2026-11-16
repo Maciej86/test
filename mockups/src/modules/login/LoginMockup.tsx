@@ -22,7 +22,7 @@ const STATES = ['normal', 'failed', 'too_many', 'idle', 'new_password', 'idle_wa
 type State = (typeof STATES)[number];
 
 /** Kartka z kalendarza: dzisiejsza data dużym szeryfowym krojem, jak nagłówek pisma kadrowego. */
-function CalendarSheet() {
+const CalendarSheet = () => {
   const { t } = useTranslation('login');
   return (
     <Stack gap={0} pl="xl" style={{ borderLeft: '3px solid var(--mantine-color-navy-4)' }}>
@@ -33,10 +33,10 @@ function CalendarSheet() {
       <Text c="dimmed" maw={320}>{t('intro')}</Text>
     </Stack>
   );
-}
+};
 
 /** Wąski nagłówek nad formularzem na telefonie (zamiast kartki z kalendarza). */
-function PhoneHeader() {
+const PhoneHeader = () => {
   const { t } = useTranslation('login');
   return (
     <Stack gap={2} hiddenFrom="md" mb="lg">
@@ -44,17 +44,17 @@ function PhoneHeader() {
       <Text c="dimmed" size="sm">{today.full}</Text>
     </Stack>
   );
-}
+};
 
-function FormCard({ children }: { children: ReactNode }) {
+const FormCard = ({ children }: { children: ReactNode }) => {
   return (
     <Paper withBorder p="xl" bg="dark.6" w="100%" maw={420}>
       <Stack gap="md">{children}</Stack>
     </Paper>
   );
-}
+};
 
-function LoginForm({ state }: { state: State }) {
+const LoginForm = ({ state }: { state: State }) => {
   const { t } = useTranslation('login');
   const filled = state !== 'normal' && state !== 'idle';
   return (
@@ -84,9 +84,9 @@ function LoginForm({ state }: { state: State }) {
       <Text size="sm" c="dimmed">{t('forgot')}</Text>
     </FormCard>
   );
-}
+};
 
-function NewPasswordForm() {
+const NewPasswordForm = () => {
   const { t } = useTranslation('login');
   return (
     <FormCard>
@@ -97,10 +97,10 @@ function NewPasswordForm() {
       <Button size="md" fullWidth leftSection={<ButtonIcon action="save" />}>{t('new_password_submit')}</Button>
     </FormCard>
   );
-}
+};
 
 /** Okno ostrzeżenia w panelu, pokazane tu bez przyciemnienia ekranu, żeby dało się wrócić do innych stanów. */
-function IdleWarning() {
+const IdleWarning = () => {
   const { t } = useTranslation('login');
   return (
     <Stack align="center" gap="sm" w="100%">
@@ -123,9 +123,9 @@ function IdleWarning() {
       </Group>
     </Stack>
   );
-}
+};
 
-export function LoginMockup() {
+export const LoginMockup = () => {
   const { t } = useTranslation('login');
   const [state, setState] = useState<State>('normal');
 
@@ -162,4 +162,4 @@ export function LoginMockup() {
       </Box>
     </Stack>
   );
-}
+};

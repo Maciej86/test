@@ -5,13 +5,13 @@ import { theme } from '@app/shared/theme';
 import { i18n } from '../../test/render';
 import { DateText } from '../DateText';
 
-function show(ui: React.ReactElement) {
+const show = (ui: React.ReactElement) => {
   render(
     <I18nextProvider i18n={i18n}>
       <MantineProvider theme={theme}>{ui}</MantineProvider>
     </I18nextProvider>,
   );
-}
+};
 
 describe('DateText', () => {
   it('shows a date as DD.MM.YYYY', () => {

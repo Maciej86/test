@@ -6,7 +6,7 @@ import { useAuth } from './core/auth/AuthProvider';
 import { buildAppRoutes } from './core/routes/buildAppRoutes';
 import { PAGES } from './core/routes/pages';
 
-export function App() {
+export const App = () => {
   const { user, loading } = useAuth();
   const router = useMemo(() => createBrowserRouter(buildAppRoutes(AREAS, PAGES, user)), [user]);
   if (loading) {
@@ -17,4 +17,4 @@ export function App() {
     );
   }
   return <RouterProvider router={router} />;
-}
+};

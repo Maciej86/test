@@ -7,7 +7,7 @@ import { activeNavKey, PUBLIC_NAVIGATION, translateKey, type Areas } from '@app/
  * Strona dla odwiedzających: menu przyklejone u góry okna, treść bez marginesów, żeby zdjęcie w nagłówku
  * strony i tła sekcji (PageSection) szły na całą szerokość. Bieżąca podstrona jest podświetlona w menu.
  */
-export function PublicLayout({ areas }: { areas: Areas }) {
+export const PublicLayout = ({ areas }: { areas: Areas }) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const activeKey = activeNavKey(PUBLIC_NAVIGATION, pathname);
@@ -41,4 +41,4 @@ export function PublicLayout({ areas }: { areas: Areas }) {
       </AppShell.Main>
     </AppShell>
   );
-}
+};

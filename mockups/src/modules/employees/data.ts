@@ -32,10 +32,10 @@ export const ARCHIVED_DUPLICATE = { name: 'Ewa Mazur', login: 'ewa.mazur@firma.p
 export const GENERATED_PASSWORD = 'Sosna-48-Kruk!';
 
 /** Dni z puli: zaległe schodzą pierwsze. */
-export function poolParts(pool: NonNullable<MockEmployee['pool']>) {
+export const poolParts = (pool: NonNullable<MockEmployee['pool']>) => {
   const total = pool.annual + pool.carried;
   const usedCarried = Math.min(pool.used, pool.carried);
   const leftCarried = pool.carried - usedCarried;
   const leftAnnual = pool.annual - (pool.used - usedCarried);
   return { total, left: leftCarried + leftAnnual, leftCarried, leftAnnual };
-}
+};

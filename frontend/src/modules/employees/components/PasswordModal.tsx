@@ -11,7 +11,7 @@ import { useSetEmployeePassword } from '../employees.api';
 import { PasswordField } from './PasswordField';
 
 /** Nowe hasło tymczasowe; stare przestaje działać od razu. */
-export function PasswordModal({ employee, onClose }: { employee: EmployeeListItem; onClose: () => void }) {
+export const PasswordModal = ({ employee, onClose }: { employee: EmployeeListItem; onClose: () => void }) => {
   const { t } = useTranslation('employees');
   const setPassword = useSetEmployeePassword();
   const form = useForm<EmployeePasswordInput>({ initialValues: { password: '' }, validate: zod4Resolver(employeePasswordSchema) });
@@ -46,4 +46,4 @@ export function PasswordModal({ employee, onClose }: { employee: EmployeeListIte
       </form>
     </Modal>
   );
-}
+};

@@ -18,31 +18,31 @@ export interface E2eAccount {
   passwordHash: string;
 }
 
-export async function seedE2eAccounts(
+export const seedE2eAccounts = async (
   env: Record<string, string | undefined>,
   save: (account: E2eAccount) => Promise<void>,
-): Promise<void> {
+): Promise<void> => {
   if (env.NODE_ENV === 'production') throw new Error('Konta testowe e2e nie powstają na serwerze produkcyjnym.');
   const password = env.E2E_PASSWORD;
   if (!password) throw new Error('Brak E2E_PASSWORD (ustawia je e2e/global-setup.ts).');
   const passwordHash = await hashPassword(password);
   await save({ firstName: 'Test', lastName: 'Administrator', login: E2E_ACCOUNTS.admin, role: 'admin', mustChangePassword: false, passwordHash });
   await save({ firstName: 'Test', lastName: 'Pracownik', login: E2E_ACCOUNTS.employee, role: 'employee', mustChangePassword: true, passwordHash });
-}
+};
 
-async function saveToDb(account: E2eAccount): Promise<void> {
+const saveToDb = async (account: E2eAccount): Promise<void> => {
   await pool.query(
     `INSERT INTO users (first_name, last_name, login, password_hash, role, must_change_password) VALUES (?, ?, ?, ?, ?, ?)
      ON DUPLICATE KEY UPDATE first_name = VALUES(first_name), last_name = VALUES(last_name), password_hash = VALUES(password_hash), role = VALUES(role),
        must_change_password = VALUES(must_change_password), archived_at = NULL, archived_by = NULL`,
     [account.firstName, account.lastName, account.login, account.passwordHash, account.role, account.mustChangePassword ? 1 : 0],
   );
-}
+};
 
 /** Porządek przed testami: bez kont tymczasowych z poprzednich uruchomień (pule znikają z nimi, CASCADE). */
-async function removeTemporaryAccounts(): Promise<void> {
+const removeTemporaryAccounts = async (): Promise<void> => {
   await pool.query('DELETE FROM users WHERE login LIKE ?', [E2E_TEMP_LOGIN_LIKE]);
-}
+};
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   removeTemporaryAccounts()

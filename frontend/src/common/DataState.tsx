@@ -21,7 +21,7 @@ interface QueryLike {
  *     <ClientsTable data={clients.data!} />
  *   </DataState>
  */
-export function DataState({
+export const DataState = ({
   query,
   isEmpty = false,
   emptyText,
@@ -33,7 +33,7 @@ export function DataState({
   emptyText?: string;
   emptyAction?: ReactNode;
   children: ReactNode;
-}) {
+}) => {
   const { t } = useTranslation();
   if (query.isPending) {
     return (
@@ -63,4 +63,4 @@ export function DataState({
     );
   }
   return <>{children}</>;
-}
+};

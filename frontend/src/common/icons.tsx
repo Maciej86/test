@@ -28,7 +28,7 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
   archive: Archive,
 };
 
-export function NavIcon({ name }: { name: string }) {
+export const NavIcon = ({ name }: { name: string }) => {
   const Component = NAV_ICONS[name] ?? Circle;
   return <Component size={18} strokeWidth={1.75} />;
-}
+};

@@ -26,12 +26,12 @@ export interface BackupHealth {
 }
 
 /** `lastRun` = ostatni przebieg o statusie innym niż `skipped` (skipped = próba albo równoległy przebieg). */
-export function backupHealth(input: {
+export const backupHealth = (input: {
   lastRun: BackupRun | null;
   lastSuccessAt: Date | null;
   now: Date;
   slots: string[];
-}): BackupHealth {
+}): BackupHealth => {
   const { lastRun, lastSuccessAt, now, slots } = input;
   let problem: BackupProblem | null = null;
   let missedSlotAt: Date | null = null;
@@ -45,10 +45,10 @@ export function backupHealth(input: {
     }
   }
   return { ok: problem === null, problem, lastSuccessAt, lastRun, missedSlotAt };
-}
+};
 
 /** Najwyżej jeden mail na dobę; brak maila „wróciło do normy”. */
-export function shouldAlert(health: BackupHealth, lastSentAt: Date | null, now: Date): boolean {
+export const shouldAlert = (health: BackupHealth, lastSentAt: Date | null, now: Date): boolean => {
   if (health.ok) return false;
   return !lastSentAt || now.getTime() - lastSentAt.getTime() >= ALERT_EVERY_HOURS * HOUR_MS;
-}
+};

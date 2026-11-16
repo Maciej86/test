@@ -26,7 +26,7 @@ export interface AdminDeps {
 export type AdminResult = { ok: true; id: number } | { ok: false; errors: Record<string, string> };
 
 /** Sprawdza dane tymi samymi zasadami co aplikacja i zakłada konto administratora (bez hasła tymczasowego). */
-export async function createAdminAccount(input: unknown, deps: AdminDeps): Promise<AdminResult> {
+export const createAdminAccount = async (input: unknown, deps: AdminDeps): Promise<AdminResult> => {
   const parsed = adminAccountSchema.safeParse(input);
   if (!parsed.success) {
     const errors: Record<string, string> = {};
@@ -38,7 +38,7 @@ export async function createAdminAccount(input: unknown, deps: AdminDeps): Promi
   if (email && (await deps.emailTaken(email))) return { ok: false, errors: { email: 'validation.email_taken' } };
   const id = await deps.insert({ firstName, lastName, login, email, passwordHash: await hashPassword(password), role: 'admin' });
   return { ok: true, id };
-}
+};
 
 /** Dostęp do bazy dla polecenia (login i e-mail sprawdzane także wśród kont w archiwum). */
 const dbDeps: AdminDeps = {
@@ -59,7 +59,7 @@ const dbDeps: AdminDeps = {
   },
 };
 
-async function main() {
+const main = async () => {
   const i18n = createI18n();
   const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, { ns: 'login', ...options }) as string;
   const field = (key: string) => translateKey(i18n.t, key);
@@ -111,7 +111,7 @@ async function main() {
     rl.close();
     await pool.end();
   }
-}
+};
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   main().catch((error: unknown) => {

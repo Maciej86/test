@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { formatDateParts, todayIsoDate } from '@app/shared';
 
 /** Kartka z kalendarza: dzisiejsza data dużym szeryfowym krojem, jak nagłówek pisma kadrowego (komputer). */
-export function CalendarSheet() {
+export const CalendarSheet = () => {
   const { t } = useTranslation('login');
   const today = formatDateParts(todayIsoDate())!;
   return (
@@ -15,10 +15,10 @@ export function CalendarSheet() {
       <Text c="dimmed" maw={320}>{t('intro')}</Text>
     </Stack>
   );
-}
+};
 
 /** Nazwa aplikacji i pełna data nad formularzem (telefon, zamiast kartki z kalendarza). */
-export function PhoneHeader() {
+export const PhoneHeader = () => {
   const { t } = useTranslation('login');
   const today = formatDateParts(todayIsoDate())!;
   return (
@@ -27,4 +27,4 @@ export function PhoneHeader() {
       <Text c="dimmed" size="sm">{today.full}</Text>
     </Stack>
   );
-}
+};

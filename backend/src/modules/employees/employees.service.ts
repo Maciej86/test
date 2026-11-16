@@ -43,27 +43,27 @@ const fail = (status: number, message: string, extra: Omit<ServiceError, 'status
 export const currentYear = () => Number(todayIsoDate().slice(0, 4));
 
 /** Rok otwarty: najmniejszy rok z niezamkniętą pulą; bez pul bieżący rok. */
-export async function getOpenYear(db: q.Db = pool): Promise<number> {
+export const getOpenYear = async (db: q.Db = pool): Promise<number> => {
   return (await q.minOpenYear(db)) ?? currentYear();
-}
+};
 
 /**
  * Wykorzystane (zatwierdzone) i czekające dni z puli. Wniosków jeszcze nie ma, więc na razie zera;
  * moduł „Moje urlopy” podmieni tę funkcję na liczenie z leave_requests.
  */
-export async function getPoolUsage(userIds: number[], _year: number): Promise<Map<number, { usedDays: number; pendingDays: number }>> {
+export const getPoolUsage = async (userIds: number[], _year: number): Promise<Map<number, { usedDays: number; pendingDays: number }>> => {
   return new Map(userIds.map((id) => [id, { usedDays: 0, pendingDays: 0 }]));
-}
+};
 
 /** Pula z liczbami do pokazania: zaległe schodzą pierwsze. */
-export function toPool(year: number, annualDays: number, carriedDays: number, usage: { usedDays: number; pendingDays: number }): EmployeePool {
+export const toPool = (year: number, annualDays: number, carriedDays: number, usage: { usedDays: number; pendingDays: number }): EmployeePool => {
   const usedFromCarried = Math.min(usage.usedDays, carriedDays);
   const leftCarriedDays = carriedDays - usedFromCarried;
   const leftDays = Math.max(0, annualDays + carriedDays - usage.usedDays);
   return { year, annualDays, carriedDays, usedDays: usage.usedDays, pendingDays: usage.pendingDays, leftDays, leftCarriedDays };
-}
+};
 
-export async function listEmployeesPage(query: EmployeesListQuery, me: Actor): Promise<EmployeesListResponse> {
+export const listEmployeesPage = async (query: EmployeesListQuery, me: Actor): Promise<EmployeesListResponse> => {
   const year = await getOpenYear();
   const { rows, total } = await q.listEmployees(pool, { ...query, year, pageSize: PAGE_SIZE });
   const usage = await getPoolUsage(rows.map((r) => r.id), year);
@@ -82,10 +82,10 @@ export async function listEmployeesPage(query: EmployeesListQuery, me: Actor): P
         : null,
   }));
   return { items, total, page: query.page, pageSize: PAGE_SIZE, openYear: year, counts: await q.countEmployees(pool) };
-}
+};
 
 /** Login i e-mail są niepowtarzalne razem z archiwum; konto w archiwum → podpowiedź przywrócenia. */
-async function findConflict(db: q.Db, login: string, email: string | null, exceptId: number | null): Promise<{ error: ServiceError } | null> {
+const findConflict = async (db: q.Db, login: string, email: string | null, exceptId: number | null): Promise<{ error: ServiceError } | null> => {
   const others = await q.findAccountsWithLoginOrEmail(db, login, email, exceptId);
   for (const field of ['login', 'email'] as const) {
     const other = others.find((o) => (field === 'login' ? o.login === login : email !== null && o.email === email));
@@ -98,15 +98,15 @@ async function findConflict(db: q.Db, login: string, email: string | null, excep
     return fail(409, key, { fields: { [field]: key } });
   }
   return null;
-}
+};
 
 /** Wyścig dwóch zapisów: unikalny indeks w bazie odrzuca drugi; zamieniamy to na ten sam błąd pola. */
-function duplicateError(error: unknown): { error: ServiceError } | null {
+const duplicateError = (error: unknown): { error: ServiceError } | null => {
   if (!(error instanceof Error) || (error as { code?: string }).code !== 'ER_DUP_ENTRY') return null;
   const field = error.message.includes('uq_users_email') ? 'email' : 'login';
   const key = field === 'email' ? EMPLOYEE_MESSAGES.emailTaken : EMPLOYEE_MESSAGES.loginTaken;
   return fail(409, key, { fields: { [field]: key } });
-}
+};
 
 /** Pola konta do historii zmian (nazwy kolumn w bazie). */
 const accountFields = (d: q.AccountData) => ({
@@ -133,7 +133,7 @@ const accountInput = (d: EmployeeData): q.AccountData => ({
   role: d.role,
 });
 
-export async function createEmployee(input: EmployeeCreateData, actor: Actor): Promise<Result<{ id: number }>> {
+export const createEmployee = async (input: EmployeeCreateData, actor: Actor): Promise<Result<{ id: number }>> => {
   const passwordHash = await hashPassword(input.password);
   try {
     return await withTransaction(async (conn) => {
@@ -159,17 +159,17 @@ export async function createEmployee(input: EmployeeCreateData, actor: Actor): P
     if (duplicate) return duplicate;
     throw error;
   }
-}
+};
 
 const notFound = () => fail(404, SERVER_MESSAGES.notFound);
 
 /** Konto spoza archiwum albo null. */
-async function findActiveEmployee(db: q.Db, id: number) {
+const findActiveEmployee = async (db: q.Db, id: number) => {
   const user = await q.findUser(db, id);
   return user && !user.archived_at ? user : null;
-}
+};
 
-export async function updateEmployee(id: number, input: EmployeeData, actor: Actor): Promise<Result> {
+export const updateEmployee = async (id: number, input: EmployeeData, actor: Actor): Promise<Result> => {
   try {
     return await withTransaction(async (conn) => {
       const before = await findActiveEmployee(conn, id);
@@ -204,9 +204,9 @@ export async function updateEmployee(id: number, input: EmployeeData, actor: Act
     if (duplicate) return duplicate;
     throw error;
   }
-}
+};
 
-export async function setEmployeePassword(id: number, password: string, actor: Actor): Promise<Result> {
+export const setEmployeePassword = async (id: number, password: string, actor: Actor): Promise<Result> => {
   const passwordHash = await hashPassword(password);
   return withTransaction(async (conn) => {
     if (!(await findActiveEmployee(conn, id))) return notFound();
@@ -218,10 +218,10 @@ export async function setEmployeePassword(id: number, password: string, actor: A
     });
     return { ok: true as const };
   });
-}
+};
 
 /** Do archiwum: konto przestaje działać od razu (authenticate czyta bazę przy każdym żądaniu). */
-export async function archiveEmployee(id: number, actor: Actor): Promise<Result> {
+export const archiveEmployee = async (id: number, actor: Actor): Promise<Result> => {
   return withTransaction(async (conn) => {
     const user = await q.findUser(conn, id);
     if (!user) return notFound();
@@ -231,10 +231,10 @@ export async function archiveEmployee(id: number, actor: Actor): Promise<Result>
     await logActivity(conn, { userId: actor.id, userName: actor.name, entityId: id, action: 'archive', entityType: 'users', changes: {} });
     return { ok: true as const };
   });
-}
+};
 
 /** Przywrócenie z archiwum (link „Przywróć konto” i później moduł Archiwum). */
-export async function restoreEmployee(id: number, actor: Actor): Promise<Result> {
+export const restoreEmployee = async (id: number, actor: Actor): Promise<Result> => {
   return withTransaction(async (conn) => {
     const user = await q.findUser(conn, id);
     if (!user) return notFound();
@@ -243,17 +243,17 @@ export async function restoreEmployee(id: number, actor: Actor): Promise<Result>
     await logActivity(conn, { userId: actor.id, userName: actor.name, entityId: id, action: 'restore', entityType: 'users', changes: {} });
     return { ok: true as const };
   });
-}
+};
 
-async function leftDaysByUser(pools: q.YearPoolRow[], year: number): Promise<Map<number, number>> {
+const leftDaysByUser = async (pools: q.YearPoolRow[], year: number): Promise<Map<number, number>> => {
   const usage = await getPoolUsage(pools.map((p) => p.user_id), year);
   return new Map(
     pools.map((p) => [p.user_id, toPool(year, p.annual_days, p.carried_days, usage.get(p.user_id) ?? { usedDays: 0, pendingDays: 0 }).leftDays]),
   );
-}
+};
 
 /** Podgląd okna „Zamknij rok”: pracownicy spoza archiwum z pulą roku otwartego. */
-export async function getCloseYearPreview(): Promise<CloseYearPreview> {
+export const getCloseYearPreview = async (): Promise<CloseYearPreview> => {
   const year = await getOpenYear();
   const pools = (await q.findOpenPoolsForYear(pool, year)).filter((p) => p.role === 'employee' && !p.archived_at);
   const left = await leftDaysByUser(pools, year);
@@ -265,13 +265,13 @@ export async function getCloseYearPreview(): Promise<CloseYearPreview> {
     pendingRequests: 0,
     rows: pools.map((p) => ({ userId: p.user_id, name: p.name, left: left.get(p.user_id) ?? 0, annualDays: p.annual_days })),
   };
-}
+};
 
 /**
  * Zamknięcie roku otwartego: każda jego pula (także osób w archiwum) dostaje closed_at, a na następny rok powstaje
  * pula z zaległymi = wszystkie niewykorzystane dni i pulą roczną z okna (brak w oknie → jak w zamykanym roku).
  */
-export async function closeYear(input: CloseYearInput, actor: Actor): Promise<Result> {
+export const closeYear = async (input: CloseYearInput, actor: Actor): Promise<Result> => {
   return withTransaction(async (conn) => {
     const year = await getOpenYear(conn);
     if (input.year !== year) return fail(409, EMPLOYEE_MESSAGES.yearNotOpen);
@@ -294,21 +294,21 @@ export async function closeYear(input: CloseYearInput, actor: Actor): Promise<Re
     }
     return { ok: true as const };
   });
-}
+};
 
 /* Funkcje dla innych modułów (SPEC.md, „Powiązania”). */
 
 /** Pula osoby na rok, z policzonymi dniami; administrator albo brak puli → null. */
-export async function getPool(userId: number, year: number): Promise<EmployeePool | null> {
+export const getPool = async (userId: number, year: number): Promise<EmployeePool | null> => {
   const user = await q.findUser(pool, userId);
   if (!user || user.role !== 'employee') return null;
   const row = await q.findPool(pool, userId, year);
   if (!row) return null;
   const usage = (await getPoolUsage([userId], year)).get(userId) ?? { usedDays: 0, pendingDays: 0 };
   return toPool(year, row.annual_days, row.carried_days, usage);
-}
+};
 
 /** Osoby spoza archiwum (np. do przypisania zadania): tylko numer i imię z nazwiskiem. */
-export async function listActiveUsers(): Promise<{ id: number; name: string }[]> {
+export const listActiveUsers = async (): Promise<{ id: number; name: string }[]> => {
   return q.listActiveUsers(pool);
-}
+};

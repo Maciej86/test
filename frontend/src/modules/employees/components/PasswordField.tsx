@@ -5,7 +5,7 @@ import { ButtonIcon } from '../../../common/ButtonIcon';
 import { generateTemporaryPassword } from '../../../core/password';
 
 /** Pole „Hasło tymczasowe” z przyciskiem „Wygeneruj”; wygenerowane hasło widać od razu, żeby je przekazać. */
-export function PasswordField({ value, error, onChange }: { value: string; error?: string; onChange: (value: string) => void }) {
+export const PasswordField = ({ value, error, onChange }: { value: string; error?: string; onChange: (value: string) => void }) => {
   const { t } = useTranslation('employees');
   const [visible, setVisible] = useState(false);
   return (
@@ -35,4 +35,4 @@ export function PasswordField({ value, error, onChange }: { value: string; error
       </Button>
     </Group>
   );
-}
+};

@@ -8,7 +8,7 @@ import { useIdleLogout } from '../core/auth/useIdleLogout';
 import { ButtonIcon } from './ButtonIcon';
 
 /** Okno „Zaraz Cię wylogujemy” w panelu i koncie (moduł Logowanie). Zamyka je tylko przycisk. */
-export function IdleWarningModal() {
+export const IdleWarningModal = () => {
   const { t } = useTranslation('login');
   const { logout } = useAuth();
   const onIdle = useCallback(() => void logout('idle'), [logout]);
@@ -41,4 +41,4 @@ export function IdleWarningModal() {
       </Group>
     </Modal>
   );
-}
+};

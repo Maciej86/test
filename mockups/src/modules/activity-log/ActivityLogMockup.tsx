@@ -5,7 +5,7 @@ import { ENTRIES } from './data';
 
 const AREA_COLOR: Record<string, string> = { leave: 'blue', pool: 'violet', tasks: 'teal' };
 
-export function ActivityLogMockup() {
+export const ActivityLogMockup = () => {
   const { t } = useTranslation('activity-log');
   return (
     <Stack>
@@ -47,4 +47,4 @@ export function ActivityLogMockup() {
       </Table.ScrollContainer>
     </Stack>
   );
-}
+};

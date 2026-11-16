@@ -21,7 +21,7 @@ export type EmployeeDialog =
   | { kind: 'close-year' };
 
 /** Adres → parametry listy (ten sam schemat sprawdza je na serwerze). */
-function useListParams(): [EmployeesListQuery, (next: Partial<EmployeesListQuery>) => void] {
+const useListParams = (): [EmployeesListQuery, (next: Partial<EmployeesListQuery>) => void] => {
   const [searchParams, setSearchParams] = useSearchParams();
   const raw = Object.fromEntries(searchParams);
   // Zły parametr (np. stara zakładka z ?sort=foo) → domyślna kolejność zamiast pustego ekranu.
@@ -35,9 +35,9 @@ function useListParams(): [EmployeesListQuery, (next: Partial<EmployeesListQuery
     setSearchParams(new URLSearchParams(entries.map(([k, v]) => [k, String(v)])));
   };
   return [params, update];
-}
+};
 
-function NoEmployeesYet({ onAdd }: { onAdd: () => void }) {
+const NoEmployeesYet = ({ onAdd }: { onAdd: () => void }) => {
   const { t } = useTranslation('employees');
   return (
     <Paper withBorder p="xl">
@@ -49,9 +49,9 @@ function NoEmployeesYet({ onAdd }: { onAdd: () => void }) {
       </Stack>
     </Paper>
   );
-}
+};
 
-export function EmployeesListPage() {
+export const EmployeesListPage = () => {
   const { t } = useTranslation('employees');
   const [params, setParams] = useListParams();
   const employees = useEmployees(params);
@@ -129,4 +129,4 @@ export function EmployeesListPage() {
       {dialog?.kind === 'close-year' && <CloseYearModal opened onClose={close} />}
     </Stack>
   );
-}
+};

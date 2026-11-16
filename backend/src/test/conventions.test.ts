@@ -7,18 +7,18 @@ import { describe, expect, it } from 'vitest';
 const ALLOWED = /\/\/ rule-ok: \S/;
 const root = resolve(__dirname, '..');
 
-function files(dir: string, pattern: RegExp): string[] {
+const files = (dir: string, pattern: RegExp): string[] => {
   if (!existsSync(dir)) return [];
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) return name === 'node_modules' || name === 'test' ? [] : files(path, pattern);
     return pattern.test(name) && !/\.test\.ts$/.test(name) ? [path] : [];
   });
-}
+};
 const lineOf = (text: string, index: number) => text.slice(0, index).split('\n').length;
 
 /** 1. Wartość wklejona w tekst zapytania SQL zamiast `?`. */
-export function sqlInterpolation(text: string): number[] {
+export const sqlInterpolation = (text: string): number[] => {
   const found: number[] = [];
   for (const m of text.matchAll(/\.(query|execute)(<[^>]*>)?\(\s*`([^`]*)`/g)) {
     if (!m[3]!.includes('${')) continue;
@@ -28,28 +28,28 @@ export function sqlInterpolation(text: string): number[] {
     if (!lines.some((l) => ALLOWED.test(l))) found.push(start);
   }
   return found;
-}
+};
 
 /** 2. Ręczna transakcja zamiast withTransaction. */
-export function manualTransaction(text: string): number[] {
+export const manualTransaction = (text: string): number[] => {
   return text
     .split('\n')
     .flatMap((l, i) => (/\b(getConnection|beginTransaction)\(/.test(l) && !ALLOWED.test(l) ? [i + 1] : []));
-}
+};
 
 /** 3. Trasa zapisu bez validateBody. */
-export function writeRouteWithoutValidation(text: string): number[] {
+export const writeRouteWithoutValidation = (text: string): number[] => {
   const starts = [...text.matchAll(/\.(get|post|put|patch|delete)\(\s*['"`]/g)];
   return starts.flatMap((m, i) => {
     if (!['post', 'put', 'patch'].includes(m[1]!)) return [];
     const segment = text.slice(m.index!, starts[i + 1]?.index ?? text.length);
     return segment.includes('validateBody(') || ALLOWED.test(segment) ? [] : [lineOf(text, m.index!)];
   });
-}
+};
 
 const IDENTITY = '(userId|user_id|role|companyId|company_id|createdBy|created_by|ownerId|owner_id)';
 /** 4. Tożsamość lub rola wzięta z treści żądania zamiast z req.user. */
-export function identityFromBody(text: string): number[] {
+export const identityFromBody = (text: string): number[] => {
   const patterns = [
     new RegExp(`req\\.body\\.${IDENTITY}\\b`),
     new RegExp(`\\{[^}]*\\b${IDENTITY}\\b[^}]*\\}\\s*=\\s*req\\.body`),
@@ -57,10 +57,10 @@ export function identityFromBody(text: string): number[] {
   return text
     .split('\n')
     .flatMap((l, i) => (patterns.some((p) => p.test(l)) && !ALLOWED.test(l) ? [i + 1] : []));
-}
+};
 
 /** 5. Moduł podpięty za logowaniem bez mountModule. */
-export function mountedWithoutMountModule(appText: string): number[] {
+export const mountedWithoutMountModule = (appText: string): number[] => {
   const lines = appText.split('\n');
   const auth = lines.findIndex((l) => /api\.use\(requireAuth\)/.test(l));
   if (auth < 0) return [0];
@@ -69,16 +69,16 @@ export function mountedWithoutMountModule(appText: string): number[] {
       ? [i + 1]
       : [],
   );
-}
+};
 
 /** 7. Klucz obcy bez reguły ON DELETE. */
-export function foreignKeyWithoutOnDelete(sql: string): number[] {
+export const foreignKeyWithoutOnDelete = (sql: string): number[] => {
   const found: number[] = [];
   for (const m of sql.matchAll(/REFERENCES\s+`?\w+`?\s*\([^)]*\)([^,;]*)/gi)) {
     if (!/ON\s+DELETE/i.test(m[1]!)) found.push(lineOf(sql, m.index!));
   }
   return found;
-}
+};
 
 describe('convention checks catch violations', () => {
   it('1. SQL with a value pasted into the text', () => {
@@ -163,13 +163,13 @@ describe('backend follows the conventions', () => {
 });
 
 /** Foldery modułów oznaczonych w docs/STATUS.md jako `zrobiony`. */
-export function doneModuleFolders(status: string): string[] {
+export const doneModuleFolders = (status: string): string[] => {
   return status
     .split('\n')
     .map((l) => l.split('|').map((c) => c.trim()))
     .filter((c) => c.length > 5 && /^\d+$/.test(c[1]!) && c[4] === 'zrobiony')
     .map((c) => c[3]!);
-}
+};
 
 /** Szkielet testu z planu (`it.todo`), którego nie zamieniono na prawdziwy test. */
 export const leftTodos = (text: string) =>
@@ -229,6 +229,38 @@ describe('tests live in __tests__ folders', () => {
             return [relative(project, path)];
           });
     const offending = ['backend', 'frontend', 'shared', 'mockups'].flatMap((w) => walk(join(project, w))).filter(misplacedTest);
+    expect(offending).toEqual([]);
+  });
+});
+
+/** Funkcja zapisana przez `function` zamiast stałej ze strzałką (`export const name = (…) => …`). */
+export const functionDeclarations = (text: string): number[] =>
+  text
+    .split('\n')
+    .flatMap((l, i) =>
+      /^\s*(export\s+)?(default\s+)?(async\s+)?function[\s*]/.test(l) && !ALLOWED.test(l) ? [i + 1] : [],
+    );
+
+describe('functions are arrow functions', () => {
+  it('finds function declarations', () => {
+    expect(functionDeclarations('export function useClients() {}\nexport const useOrders = () => {};')).toEqual([1]);
+    expect(functionDeclarations('  async function load() {}\nexport default function App() {}')).toEqual([1, 2]);
+    expect(functionDeclarations('function legacy() {} // rule-ok: biblioteka wymaga function')).toEqual([]);
+  });
+
+  it('backend, frontend, shared, mockups and e2e use arrow functions only', () => {
+    const project = resolve(root, '../..');
+    const walk = (dir: string): string[] =>
+      !existsSync(dir)
+        ? []
+        : readdirSync(dir).flatMap((n) => {
+            const path = join(dir, n);
+            if (statSync(path).isDirectory()) return n === 'node_modules' || n === 'dist' ? [] : walk(path);
+            return /\.tsx?$/.test(n) ? [path] : [];
+          });
+    const offending = ['backend', 'frontend', 'shared', 'mockups', 'e2e']
+      .flatMap((w) => walk(join(project, w)))
+      .flatMap((f) => functionDeclarations(readFileSync(f, 'utf8')).map((line) => `${relative(project, f)}:${line}`));
     expect(offending).toEqual([]);
   });
 });

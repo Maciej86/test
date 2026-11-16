@@ -8,14 +8,14 @@ const ALLOWED = /\/\/ rule-ok: \S/;
 const src = resolve(process.cwd(), 'src');
 const modulesDir = join(src, 'modules');
 
-function files(dir: string): string[] {
+const files = (dir: string): string[] => {
   if (!existsSync(dir)) return [];
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) return name === 'test' ? [] : files(path);
     return /\.tsx?$/.test(name) && !/\.test\.tsx?$/.test(name) ? [path] : [];
   });
-}
+};
 const lines = (text: string, test: (line: string) => boolean) =>
   text.split('\n').flatMap((l, i) => (test(l) && !ALLOWED.test(l) ? [i + 1] : []));
 
@@ -27,7 +27,7 @@ export const apiOutsideHooks = (text: string) =>
   lines(text, (l) => /import\s*\{[^}]*\bapi\b[^}]*\}\s*from\s*['"][^'"]*core\/api\/client['"]/.test(l));
 
 /** 10. Import z folderu innego modułu (wspólne idzie do common/ albo core/). */
-export function importFromOtherModule(text: string, file: string): number[] {
+export const importFromOtherModule = (text: string, file: string): number[] => {
   const own = relative(modulesDir, file).split(sep)[0];
   return lines(text, (l) => {
     const m = /from\s+['"](\.[^'"]*)['"]/.exec(l);
@@ -35,17 +35,17 @@ export function importFromOtherModule(text: string, file: string): number[] {
     const target = relative(modulesDir, resolve(dirname(file), m[1]!));
     return !target.startsWith('..') && target.split(sep)[0] !== own;
   });
-}
+};
 
 /** 11. Dymek z pominięciem `notify`. */
 export const ownNotifications = (text: string) => lines(text, (l) => /notifications\.show|from ['"]@mantine\/notifications['"]/.test(l));
 
 /** Treść pliku bez komentarzy (z zachowaniem numerów linii). */
-function withoutComments(text: string): string {
+const withoutComments = (text: string): string => {
   return text
     .replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '))
     .replace(/(^|[^:'"`])\/\/(?! rule-ok:).*$/gm, '$1');
-}
+};
 /** 12. Polski tekst wpisany w kod zamiast klucza i18n. */
 export const polishTextInCode = (text: string) => lines(withoutComments(text), (l) => /[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(l));
 

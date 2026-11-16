@@ -42,7 +42,7 @@ const anna: SessionUser = { id: 1, name: 'Anna Nowak', role: 'admin', mustChange
 const jan: SessionUser = { id: 2, name: 'Jan Kowalski', role: 'employee', mustChangePassword: false };
 const thisYear = Number(todayIsoDate().slice(0, 4));
 
-function as(user: SessionUser | null) {
+const as = (user: SessionUser | null) => {
   vi.mocked(users.findActiveUserById).mockResolvedValue(user);
   const app = createApp();
   const cookie = user ? `${AUTH_COOKIE_NAME}=${signToken(user, 0)}` : '';
@@ -51,7 +51,7 @@ function as(user: SessionUser | null) {
     post: (url: string, body?: object) => request(app).post(`/api${url}`).set('Cookie', cookie).send(body),
     put: (url: string, body?: object) => request(app).put(`/api${url}`).set('Cookie', cookie).send(body),
   };
-}
+};
 
 const row = (o: Partial<Record<string, unknown>>) => ({
   id: 2, name: 'Jan Kowalski', first_name: 'Jan', last_name: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', annual_days: 26, carried_days: 4, ...o,

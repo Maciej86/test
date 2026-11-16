@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { InfoCard } from '../../common/InfoCard';
 
 /** Pulpit: podsumowanie w boksach (InfoCard). Moduły dopisują tu swoje boksy. */
-export function DashboardPage() {
+export const DashboardPage = () => {
   const { t } = useTranslation('dashboard');
   return (
     <Stack>
@@ -15,4 +15,4 @@ export function DashboardPage() {
       </SimpleGrid>
     </Stack>
   );
-}
+};

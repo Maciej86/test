@@ -13,7 +13,7 @@ const ALL_ROLES = 'all';
 type Filters = Pick<EmployeesListQuery, 'search' | 'role' | 'sort' | 'dir'>;
 
 /** Wyszukiwarka, filtr roli i kolejność; zmiana wraca do strony 1 (stan siedzi w adresie). */
-export function EmployeesFilters({ value, onChange }: { value: Filters; onChange: (next: Partial<Filters>) => void }) {
+export const EmployeesFilters = ({ value, onChange }: { value: Filters; onChange: (next: Partial<Filters>) => void }) => {
   const { t } = useTranslation('employees');
   const [search, setSearch] = useState(value.search);
   // Ostatnie wyszukiwanie wysłane z tego pola; inna wartość w adresie = zmiana z zewnątrz („Wyczyść”, wstecz).
@@ -66,4 +66,4 @@ export function EmployeesFilters({ value, onChange }: { value: Filters; onChange
       <Box visibleFrom="sm"><PoolLegend /></Box>
     </Group>
   );
-}
+};

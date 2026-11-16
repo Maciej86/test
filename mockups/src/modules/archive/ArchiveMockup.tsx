@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { DateText } from '../../common/DateText';
 import { ARCHIVED_EMPLOYEES, ARCHIVED_TASKS } from './data';
 
-function Actions() {
+const Actions = () => {
   const { t } = useTranslation('archive');
   return (
     <Group gap="xs" justify="flex-end" wrap="nowrap">
@@ -11,9 +11,9 @@ function Actions() {
       <Button size="xs" variant="subtle" color="red">{t('delete_forever')}</Button>
     </Group>
   );
-}
+};
 
-export function ArchiveMockup() {
+export const ArchiveMockup = () => {
   const { t } = useTranslation('archive');
   return (
     <Stack>
@@ -74,4 +74,4 @@ export function ArchiveMockup() {
       </Tabs>
     </Stack>
   );
-}
+};

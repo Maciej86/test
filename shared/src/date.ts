@@ -27,7 +27,7 @@ export type DateInput = string | Date | null | undefined;
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-function toDayjs(value: DateInput): Dayjs | null {
+const toDayjs = (value: DateInput): Dayjs | null => {
   if (value === null || value === undefined || value === '') return null;
   if (typeof value === 'string' && ISO_DATE.test(value)) {
     const day = dayjs(value, ISO_DATE_FORMAT, true);
@@ -35,37 +35,37 @@ function toDayjs(value: DateInput): Dayjs | null {
   }
   const moment = dayjs(value);
   return moment.isValid() ? moment.tz(APP_TIME_ZONE) : null;
-}
+};
 
 /** `12.11.2026`; pusta lub błędna wartość → `null` (ekran pokazuje wtedy „brak”). */
-export function formatDate(value: DateInput): string | null {
+export const formatDate = (value: DateInput): string | null => {
   return toDayjs(value)?.format(DATE_FORMAT) ?? null;
-}
+};
 
 /** `12.11.2026 14:05` w strefie aplikacji. */
-export function formatDateTime(value: DateInput): string | null {
+export const formatDateTime = (value: DateInput): string | null => {
   return toDayjs(value)?.format(DATE_TIME_FORMAT) ?? null;
-}
+};
 
 /** `14:05` w strefie aplikacji. */
-export function formatTime(value: DateInput): string | null {
+export const formatTime = (value: DateInput): string | null => {
   return toDayjs(value)?.format(TIME_FORMAT) ?? null;
-}
+};
 
 /** Dzień w formacie bazy `RRRR-MM-DD` (do zapytań, porównań i API). */
-export function toIsoDate(value: DateInput): string | null {
+export const toIsoDate = (value: DateInput): string | null => {
   return toDayjs(value)?.format(ISO_DATE_FORMAT) ?? null;
-}
+};
 
 /** Dzisiejszy dzień w strefie aplikacji, `RRRR-MM-DD`. */
-export function todayIsoDate(): string {
+export const todayIsoDate = (): string => {
   return dayjs().tz(APP_TIME_ZONE).format(ISO_DATE_FORMAT);
-}
+};
 
 /** Części daty do dużego zapisu (ekran logowania): `piątek`, `14`, `listopada 2026`, `piątek, 14 listopada 2026`. */
-export function formatDateParts(
+export const formatDateParts = (
   value: DateInput,
-): { weekday: string; day: string; monthYear: string; full: string } | null {
+): { weekday: string; day: string; monthYear: string; full: string } | null => {
   const day = toDayjs(value)?.locale('pl');
   if (!day) return null;
   // „D MMMM” daje miesiąc w dopełniaczu („14 listopada”), samo „MMMM” w mianowniku („listopad”).
@@ -76,6 +76,6 @@ export function formatDateParts(
     monthYear: dayMonthYear.slice(dayMonthYear.indexOf(' ') + 1),
     full: `${day.format('dddd')}, ${dayMonthYear}`,
   };
-}
+};
 
 export { dayjs };

@@ -9,13 +9,13 @@ const OWN_FORMATTING =
   /\.toLocale(Date|Time)?String\(|Intl\.(DateTimeFormat|NumberFormat)|\.get(Full)?Year\(\)|\.getMonth\(\)|\.toFixed\(/;
 const ALLOWED = /\/\/ format-ok: \S/;
 
-function sourceFiles(dir: string): string[] {
+const sourceFiles = (dir: string): string[] => {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) return name === 'test' || name === 'node_modules' ? [] : sourceFiles(path);
     return /\.tsx?$/.test(name) && !/\.test\.tsx?$/.test(name) ? [path] : [];
   });
-}
+};
 
 describe('formatting', () => {
   const roots = ['src', '../mockups/src', '../backend/src'].map((d) => resolve(process.cwd(), d));

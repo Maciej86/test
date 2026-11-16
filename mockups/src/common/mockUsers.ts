@@ -10,6 +10,6 @@ export const MOCK_USER_NAMES: Partial<Record<Role, string>> = {
   employee: 'Jan Kowalski',
 };
 
-export function mockUserName(role: Role, t: i18n['t']): string {
+export const mockUserName = (role: Role, t: i18n['t']): string => {
   return MOCK_USER_NAMES[role] ?? translateKey(t, ROLE_LABELS[role]);
-}
+};

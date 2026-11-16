@@ -6,7 +6,7 @@ import { poolParts, type MockEmployee } from './data';
  * Pula dni jednym paskiem: wykorzystane (przygaszone), zostało z zaległych (jaśniejszy granat, schodzą pierwsze)
  * i zostało z puli rocznej (granat). Nad paskiem liczba, która interesuje administratora najbardziej: ile zostało.
  */
-export function PoolMeter({ pool }: { pool: MockEmployee['pool'] }) {
+export const PoolMeter = ({ pool }: { pool: MockEmployee['pool'] }) => {
   const { t } = useTranslation('employees');
 
   if (!pool) {
@@ -47,10 +47,10 @@ export function PoolMeter({ pool }: { pool: MockEmployee['pool'] }) {
       )}
     </Stack>
   );
-}
+};
 
 /** Objaśnienie kolorów paska, raz nad tabelą. */
-export function PoolLegend() {
+export const PoolLegend = () => {
   const { t } = useTranslation('employees');
   const items = [
     { color: 'var(--mantine-color-dark-4)', label: t('legend_used') },
@@ -67,4 +67,4 @@ export function PoolLegend() {
       ))}
     </Group>
   );
-}
+};

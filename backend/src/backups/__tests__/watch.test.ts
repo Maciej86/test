@@ -6,7 +6,7 @@ const { checkBackups } = await import('../watch');
 const { DEFAULT_BACKUP_SLOTS } = await import('../schedule');
 
 /** Udawana baza: odpowiedzi po kolei, jak w checkBackups. */
-function fakeDb(lastRun: object | null, lastSuccessAt: string | null, lastSentAt: string | null) {
+const fakeDb = (lastRun: object | null, lastSuccessAt: string | null, lastSentAt: string | null) => {
   const query = vi.fn(async (sql: string) => {
     if (sql.includes("status <> 'skipped'")) return [lastRun ? [lastRun] : []];
     if (sql.includes('MAX(started_at)')) return [[{ at: lastSuccessAt }]];
@@ -14,7 +14,7 @@ function fakeDb(lastRun: object | null, lastSuccessAt: string | null, lastSentAt
     return [{ affectedRows: 0 }];
   });
   return { query } as never as { query: typeof query };
-}
+};
 
 const now = new Date('2026-11-15T12:00:00Z');
 

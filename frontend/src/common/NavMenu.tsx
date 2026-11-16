@@ -9,7 +9,7 @@ interface Props {
   user: SessionUser | null;
 }
 
-export function NavMenu({ items, user }: Props) {
+export const NavMenu = ({ items, user }: Props) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const visible = visibleNav(items, user);
@@ -30,4 +30,4 @@ export function NavMenu({ items, user }: Props) {
       </NavLink>
     ));
   return <>{render(visible)}</>;
-}
+};

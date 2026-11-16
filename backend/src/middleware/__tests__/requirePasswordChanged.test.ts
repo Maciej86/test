@@ -21,13 +21,13 @@ const jan: SessionUser = { id: 2, name: 'Jan Kowalski', role: 'employee', mustCh
 const temporary: SessionUser = { ...jan, mustChangePassword: true };
 const cookie = `${AUTH_COOKIE_NAME}=${signToken(jan, 0)}`;
 
-function appWithModule() {
+const appWithModule = () => {
   const extra = express.Router();
   extra.get('/test/data', (_req, res) => {
     res.json({ ok: true });
   });
   return createApp({ extraRoutes: extra });
-}
+};
 
 beforeEach(() => {
   vi.mocked(queries.findActiveUserById).mockReset();

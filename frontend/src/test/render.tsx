@@ -9,7 +9,7 @@ import { theme } from '@app/shared/theme';
 
 const i18n = createI18n();
 
-export function renderWithProviders(ui: ReactElement) {
+export const renderWithProviders = (ui: ReactElement) => {
   // Każdy test ma własną pamięć danych i nie ponawia zapytań, żeby błąd było widać od razu.
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
   return render(
@@ -21,12 +21,12 @@ export function renderWithProviders(ui: ReactElement) {
       </QueryClientProvider>
     </I18nextProvider>,
   );
-}
+};
 
-export function renderRoutes(routes: RouteObject[], path: string) {
+export const renderRoutes = (routes: RouteObject[], path: string) => {
   const router = createMemoryRouter(routes, { initialEntries: [path] });
   const result = renderWithProviders(<RouterProvider router={router} />);
   return { ...result, router };
-}
+};
 
 export { i18n };

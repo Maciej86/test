@@ -18,11 +18,11 @@ const list = (items: EmployeeListItem[], o: Partial<EmployeesListResponse> = {})
   counts: { all: items.length, admins: items.filter((i) => i.role === 'admin').length }, ...o,
 });
 
-function show(response: EmployeesListResponse, path = '/admin/employees') {
+const show = (response: EmployeesListResponse, path = '/admin/employees') => {
   const get = vi.spyOn(api, 'get').mockResolvedValue({ data: response });
   const view = renderRoutes([{ path: '/admin/employees', element: <EmployeesListPage /> }], path);
   return { get, ...view };
-}
+};
 
 afterEach(() => vi.restoreAllMocks());
 

@@ -6,21 +6,21 @@ import { expect, test, type Page } from '@playwright/test';
 const ADMIN = 'e2e.admin@test.local';
 const password = () => process.env.E2E_PASSWORD!;
 
-async function logIn(page: Page, login: string, pass: string) {
+const logIn = async (page: Page, login: string, pass: string) => {
   await page.goto('/login');
   await page.getByLabel('Login').fill(login);
   await page.getByLabel('Hasło', { exact: true }).fill(pass);
   await page.getByRole('button', { name: 'Zaloguj się' }).click();
-}
+};
 
-async function logOut(page: Page) {
+const logOut = async (page: Page) => {
   await page.getByLabel('Menu użytkownika').click();
   await page.getByText('Wyloguj').click();
   await expect(page).toHaveURL(/\/login$/);
-}
+};
 
 /** Dodaje pracownika przez okno; zwraca login i wygenerowane hasło tymczasowe. */
-async function addEmployee(page: Page, name: string) {
+const addEmployee = async (page: Page, name: string) => {
   const [firstName, lastName] = name.split(' ') as [string, string];
   const login = `e2e.tmp.${Date.now()}${Math.floor(Math.random() * 1000)}@test.local`;
   await page.goto('/admin/employees');
@@ -37,7 +37,7 @@ async function addEmployee(page: Page, name: string) {
   await page.getByPlaceholder('Szukaj po imieniu, nazwisku albo loginie').fill(login);
   await expect(page.getByRole('row', { name: new RegExp(name) })).toBeVisible();
   return { login, temporary };
-}
+};
 
 const row = (page: Page, name: string) => page.getByRole('row', { name: new RegExp(name) });
 

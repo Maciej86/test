@@ -7,10 +7,10 @@ import { useMantineTheme } from '@mantine/core';
 import { theme } from '@app/shared/theme';
 import { renderWithProviders } from './render';
 
-function ThemeProbe() {
+const ThemeProbe = () => {
   const current = useMantineTheme();
   return <span>{`${current.primaryColor}|${current.defaultRadius}`}</span>;
-}
+};
 
 describe('shared theme', () => {
   it('is used by the test renderer', () => {

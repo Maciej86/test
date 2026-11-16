@@ -24,7 +24,7 @@ export const resources = {
 
 export type Language = keyof typeof resources;
 
-export function createI18n(lng: Language = 'pl'): i18n {
+export const createI18n = (lng: Language = 'pl'): i18n => {
   const instance = i18next.createInstance();
   void instance.init({
     lng,
@@ -36,10 +36,10 @@ export function createI18n(lng: Language = 'pl'): i18n {
     interpolation: { escapeValue: false },
   });
   return instance;
-}
+};
 
 /** Tłumaczy klucz w formie '<namespace>.<reszta>', np. 'server.no_access'. */
-export function translateKey(t: i18n['t'], key: string): string {
+export const translateKey = (t: i18n['t'], key: string): string => {
   const [ns, ...rest] = key.split('.');
   return t(rest.join('.'), { ns }) as string;
-}
+};

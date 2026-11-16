@@ -16,7 +16,7 @@ interface QuestionProps {
  * Wszystkie pytania do ekranu makiety, w jednym panelu na samej górze ekranu (nad makietą, nie pomiędzy jej częściami).
  * Numery zgodne z docs/modules/<module>/QUESTIONS.md.
  */
-export function Questions({ children }: { children: ReactNode }) {
+export const Questions = ({ children }: { children: ReactNode }) => {
   const { t } = useTranslation();
   const [opened, { toggle }] = useDisclosure(true);
   const count = Children.toArray(children).length;
@@ -36,10 +36,10 @@ export function Questions({ children }: { children: ReactNode }) {
       </Collapse>
     </Paper>
   );
-}
+};
 
 /** Jedno pytanie; wstawiaj tylko wewnątrz <Questions>. */
-export function Question({ number, about, options, recommended, children }: QuestionProps) {
+export const Question = ({ number, about, options, recommended, children }: QuestionProps) => {
   const { t } = useTranslation();
   return (
     <div>
@@ -67,4 +67,4 @@ export function Question({ number, about, options, recommended, children }: Ques
       )}
     </div>
   );
-}
+};

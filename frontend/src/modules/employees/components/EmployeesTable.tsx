@@ -8,7 +8,7 @@ import { NameCell, RoleBadge, RowButtons, type RowActions } from './EmployeeRowP
 const EMPLOYEES_TABLE_MIN_WIDTH = TABLE_MIN_WIDTH + 260;
 
 /** Komputer: tabela. */
-export function EmployeesTable({ rows, year, ...actions }: RowActions & { rows: EmployeeListItem[]; year: number }) {
+export const EmployeesTable = ({ rows, year, ...actions }: RowActions & { rows: EmployeeListItem[]; year: number }) => {
   const { t } = useTranslation('employees');
   return (
     <Table.ScrollContainer minWidth={EMPLOYEES_TABLE_MIN_WIDTH} visibleFrom="sm">
@@ -36,10 +36,10 @@ export function EmployeesTable({ rows, year, ...actions }: RowActions & { rows: 
       </Table>
     </Table.ScrollContainer>
   );
-}
+};
 
 /** Telefon: każda osoba to karta zamiast wiersza tabeli. */
-export function EmployeeCards({ rows, ...actions }: RowActions & { rows: EmployeeListItem[] }) {
+export const EmployeeCards = ({ rows, ...actions }: RowActions & { rows: EmployeeListItem[] }) => {
   const { t } = useTranslation('employees');
   return (
     <Stack gap="sm" hiddenFrom="sm">
@@ -58,4 +58,4 @@ export function EmployeeCards({ rows, ...actions }: RowActions & { rows: Employe
       ))}
     </Stack>
   );
-}
+};

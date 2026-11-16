@@ -128,6 +128,14 @@ Nowa akcja: dopisz ją do `BUTTON_ICONS` we froncie i w makietach oraz do tabeli
 
 - **Identyfikatory po angielsku:** foldery, pliki, funkcje, zmienne, typy, tabele, kolumny, adresy URL.
   `orders/OrderList.tsx`, tabela `orders`, kolumna `created_at`. **Nie:** `zamowienia/ListaZamowien.tsx`, `data_utworzenia`.
+
+- **Funkcje strzałkowe:** każdą funkcję zapisujesz jako stałą ze strzałką, także komponenty, hooki i middleware:
+  `export const useClients = (params: ListQuery) => …`, `export const DataState = ({ query, children }: Props) => …`,
+  `export const requireAuth = (req: Request, res: Response, next: NextFunction) => { … }`. **Nie:**
+  `export function useClients(…)`. W plikach `.tsx` funkcja z typem ogólnym ma przecinek:
+  `const first = <T,>(items: T[]) => items[0]`. Stała nie jest dostępna przed swoją linią, więc funkcję definiujesz
+  przed miejscem, w którym kod modułu ją wywołuje. Pilnuje tego test zasad; wyjątek (np. biblioteka wymaga
+  `function`) tylko z `// rule-ok: <powód>`.
 - Nazwy folderów modułów różnią się czymś więcej niż liczbą pojedynczą i mnogą (`new-request` i `leave-requests`,
   nie `leave-request` i `leave-requests`).
 - **Po polsku tylko to, co czyta człowiek:** teksty w plikach `locales`, treść dokumentów, opisy commitów.
@@ -203,19 +211,18 @@ Nowa akcja: dopisz ją do `BUTTON_ICONS` we froncie i w makietach oraz do tabeli
   odświeżyć, decyduje TanStack Query (`@tanstack/react-query`, `QueryClientProvider` jest w `main.tsx`).
 - Każdy moduł ma hooki w `frontend/src/modules/<module>/<module>.api.ts`; ekrany nie wołają `api` same:
   ```ts
-  export function useClients(params: ListQuery) {
-    return useQuery({
+  export const useClients = (params: ListQuery) =>
+    useQuery({
       queryKey: ['clients', params],
       queryFn: () => api.get<ListResponse<Client>>('/clients', { params }).then((r) => r.data),
     });
-  }
-  export function useSaveClient() {
+  export const useSaveClient = () => {
     const queryClient = useQueryClient();
     return useMutation({
       mutationFn: (client: ClientInput) => api.post('/clients', client),
       onSuccess: () => queryClient.invalidateQueries({ queryKey: ['clients'] }),
     });
-  }
+  };
   ```
   Po udanym zapisie odświeżasz dane przez `invalidateQueries`. Nigdy `useEffect` z ręcznym pobieraniem.
 - **Ładowanie, błąd, pusto:** każdy ekran z danymi używa `<DataState query={…} isEmpty={…} emptyText={…}
@@ -343,9 +350,8 @@ Dwa przypadki, dwie drogi:
   pdfmake.addFonts(Roboto);
   pdfmake.setUrlAccessPolicy(() => false); // dokument nigdy nie pobiera nic z internetu
   pdfmake.setLocalAccessPolicy((path: string) => path.startsWith(fontsDir)); // ani plików z serwera
-  export function renderPdf(doc: object): Promise<Buffer> {
-    return pdfmake.createPdf({ defaultStyle: { font: 'Roboto' }, ...doc }).getBuffer();
-  }
+  export const renderPdf = (doc: object): Promise<Buffer> =>
+    pdfmake.createPdf({ defaultStyle: { font: 'Roboto' }, ...doc }).getBuffer();
   ```
   Treść dokumentu buduje funkcja modułu (np. `orders.pdf.ts`) z danych z bazy: teksty z i18n, daty przez
   `formatDate`, kwoty przez `formatMoney`, liczby przez `formatNumber`. Trasa `GET /api/<moduł>/:id/pdf` z tymi samymi
@@ -470,7 +476,7 @@ w całości). Czerwony test zasad znaczy: popraw kod, nie test.
 
 | Plik | Pilnuje |
 |---|---|
-| `backend/src/test/conventions.test.ts` | SQL tylko z `?`; transakcje tylko przez `withTransaction`; `validateBody` przy każdej trasie zapisu; kto i jaka rola tylko z `req.user`; moduły za logowaniem tylko przez `mountModule`; w `__tests__` obok każdego `*.routes.ts` test z 401 i 403; pliki `*.test.ts(x)` tylko w `__tests__` albo `src/test/` (backend, front, shared, makiety); każdy klucz obcy z `ON DELETE`; w module `zrobiony` (według `docs/STATUS.md`) żadnego `it.todo` |
+| `backend/src/test/conventions.test.ts` | SQL tylko z `?`; transakcje tylko przez `withTransaction`; `validateBody` przy każdej trasie zapisu; kto i jaka rola tylko z `req.user`; moduły za logowaniem tylko przez `mountModule`; w `__tests__` obok każdego `*.routes.ts` test z 401 i 403; pliki `*.test.ts(x)` tylko w `__tests__` albo `src/test/` (backend, front, shared, makiety); każdy klucz obcy z `ON DELETE`; w module `zrobiony` (według `docs/STATUS.md`) żadnego `it.todo`; funkcje tylko strzałkowe (backend, front, shared, makiety, e2e) |
 | `backend/src/test/routeProtection.test.ts` | każdy moduł z `mountModule`: bez logowania 401, rola spoza modułu 403 |
 | `frontend/src/test/conventions.test.ts` | zapytania tylko przez `api`; w modułach `api` tylko w `*.api.ts`; brak importów z innego modułu; dymki przez `notify`; brak polskich tekstów w kodzie; schematy w `shared/src/schemas/` bez własnych `.regex(` |
 | `frontend/src/test/colors.test.ts`, `formatting.test.ts`, `tables.test.ts` | kolory z motywu; daty i liczby przez `@app/shared`; tabele w `Table.ScrollContainer` |
@@ -514,6 +520,7 @@ Używaj jej, gdy nie ma `superpowers:requesting-code-review`:
 - [ ] dane z innych modułów przez ich funkcje, z polami dozwolonymi dla roli
 - [ ] pola formularzy zgodne z tabelą w specu, formaty z `fields.ts`, testy wartości granicznych
 - [ ] dane na froncie przez hooki `<module>.api.ts` i `DataState`; brak `useEffect` z pobieraniem i `fetch`
+- [ ] funkcje strzałkowe, bez `function`
 - [ ] listy: `validateQuery(listQuerySchema(...))`, sortowanie tylko po kolumnach z listy, stan w adresie
 - [ ] kilka zapisów naraz przez `withTransaction`
 - [ ] nic skopiowanego między modułami: wspólne w `common/` albo `core/`

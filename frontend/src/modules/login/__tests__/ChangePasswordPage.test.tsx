@@ -12,7 +12,7 @@ vi.mock('../../../core/auth/AuthProvider', () => ({
   useAuth: () => ({ user: auth.user, loading: false, refresh: auth.refresh, logout: auth.logout }),
 }));
 
-function show() {
+const show = () => {
   return renderRoutes(
     [
       { path: '/change-password', element: <ChangePasswordPage /> },
@@ -20,13 +20,13 @@ function show() {
     ],
     '/change-password',
   );
-}
+};
 
-function fill(newPassword: string, repeatPassword: string) {
+const fill = (newPassword: string, repeatPassword: string) => {
   fireEvent.change(screen.getByLabelText('Nowe hasło'), { target: { value: newPassword } });
   fireEvent.change(screen.getByLabelText('Powtórz nowe hasło'), { target: { value: repeatPassword } });
   fireEvent.click(screen.getByRole('button', { name: 'Zapisz i przejdź dalej' }));
-}
+};
 
 describe('ChangePasswordPage', () => {
   beforeEach(() => {

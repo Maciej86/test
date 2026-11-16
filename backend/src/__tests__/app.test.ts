@@ -19,7 +19,7 @@ const { env } = await import('../env');
 
 const { mountModule } = await import('../middleware/mountModule');
 
-function appWithTestRoutes() {
+const appWithTestRoutes = () => {
   const extra = express.Router();
   extra.get('/test/admin-only', requireRole('admin'), (_req, res) => {
     res.json({ ok: true });
@@ -37,7 +37,7 @@ function appWithTestRoutes() {
     },
   );
   return createApp({ extraRoutes: extra, publicRoutes });
-}
+};
 
 const cookie = (token: string) => `${AUTH_COOKIE_NAME}=${token}`;
 
@@ -117,7 +117,7 @@ describe('protected by default', () => {
 });
 
 describe('mountModule', () => {
-  function appWithModule(roles?: Parameters<typeof mountModule>[3]) {
+  const appWithModule = (roles?: Parameters<typeof mountModule>[3]) => {
     const moduleRoutes = express.Router();
     moduleRoutes.get('/', (_req, res) => {
       res.json({ ok: true });
@@ -125,7 +125,7 @@ describe('mountModule', () => {
     const extra = express.Router();
     mountModule(extra, 'dashboard', moduleRoutes, roles);
     return createApp({ extraRoutes: extra });
-  }
+  };
 
   it('takes the roles of the navigation item (dashboard: admin and employee)', async () => {
     const user = signToken({ id: 2 }, 0);

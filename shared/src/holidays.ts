@@ -63,7 +63,7 @@ const MOVABLE_HOLIDAYS: readonly { offset: number; key: HolidayKey }[] = [
 const pad = (n: number) => String(n).padStart(2, '0');
 
 /** Niedziela Wielkanocna (algorytm Meeusa/Jonesa/Butchera), `RRRR-MM-DD`. */
-export function easterSunday(year: number): string {
+export const easterSunday = (year: number): string => {
   const a = year % 19;
   const b = Math.floor(year / 100);
   const c = year % 100;
@@ -79,12 +79,12 @@ export function easterSunday(year: number): string {
   const month = Math.floor((h + l - 7 * m + 114) / 31);
   const day = ((h + l - 7 * m + 114) % 31) + 1;
   return `${year}-${pad(month)}-${pad(day)}`;
-}
+};
 
 const cache = new Map<number, Holiday[]>();
 
 /** Wszystkie święta w roku, posortowane po dacie. */
-export function getPolishHolidays(year: number): Holiday[] {
+export const getPolishHolidays = (year: number): Holiday[] => {
   const cached = cache.get(year);
   if (cached) return cached;
   const easter = dayjs(easterSunday(year), ISO_DATE_FORMAT);
@@ -100,25 +100,25 @@ export function getPolishHolidays(year: number): Holiday[] {
     .sort((x, y) => x.date.localeCompare(y.date));
   cache.set(year, result);
   return result;
-}
+};
 
 /** Święto w danym dniu albo `null`. */
-export function getHoliday(value: DateInput): Holiday | null {
+export const getHoliday = (value: DateInput): Holiday | null => {
   const date = toIsoDate(value);
   if (!date) return null;
   return getPolishHolidays(Number(date.slice(0, 4))).find((h) => h.date === date) ?? null;
-}
+};
 
-export function isHoliday(value: DateInput): boolean {
+export const isHoliday = (value: DateInput): boolean => {
   return getHoliday(value) !== null;
-}
+};
 
-export function isWeekend(value: DateInput): boolean {
+export const isWeekend = (value: DateInput): boolean => {
   const date = toIsoDate(value);
   if (!date) return false;
   const weekday = dayjs(date, ISO_DATE_FORMAT).day();
   return weekday === 0 || weekday === 6;
-}
+};
 
 /**
  * Dni wolne ustalone przez firmę (np. dzień za święto w sobotę, wigilia firmowa), `RRRR-MM-DD`. Pochodzą z tabeli,
@@ -126,19 +126,19 @@ export function isWeekend(value: DateInput): boolean {
  */
 export type ExtraDaysOff = ReadonlySet<string> | readonly string[];
 
-function isExtraDayOff(date: string, extra?: ExtraDaysOff): boolean {
+const isExtraDayOff = (date: string, extra?: ExtraDaysOff): boolean => {
   if (!extra) return false;
   return 'has' in extra ? extra.has(date) : extra.includes(date);
-}
+};
 
 /** Dzień roboczy: nie sobota, nie niedziela, nie święto, nie dodatkowy dzień wolny firmy. */
-export function isWorkingDay(value: DateInput, extraDaysOff?: ExtraDaysOff): boolean {
+export const isWorkingDay = (value: DateInput, extraDaysOff?: ExtraDaysOff): boolean => {
   const date = toIsoDate(value);
   return date !== null && !isWeekend(date) && !isHoliday(date) && !isExtraDayOff(date, extraDaysOff);
-}
+};
 
 /** Liczba dni roboczych od `from` do `to` włącznie (0, gdy `to` jest przed `from`). */
-export function countWorkingDays(from: DateInput, to: DateInput, extraDaysOff?: ExtraDaysOff): number {
+export const countWorkingDays = (from: DateInput, to: DateInput, extraDaysOff?: ExtraDaysOff): number => {
   const start = toIsoDate(from);
   const end = toIsoDate(to);
   if (!start || !end) return 0;
@@ -150,4 +150,4 @@ export function countWorkingDays(from: DateInput, to: DateInput, extraDaysOff?: 
     day = day.add(1, 'day');
   }
   return count;
-}
+};

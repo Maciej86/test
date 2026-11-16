@@ -7,17 +7,17 @@ const MIGRATION_FILE = /^\d{3}_[a-z0-9_]+\.sql$/;
 const MIGRATIONS_DIR = fileURLToPath(new URL('../../migrations', import.meta.url));
 
 /** Pliki migracji, których baza jeszcze nie ma, w kolejności numerów. */
-export function pendingMigrations(files: string[], applied: string[]): string[] {
+export const pendingMigrations = (files: string[], applied: string[]): string[] => {
   const done = new Set(applied);
   return files.filter((f) => MIGRATION_FILE.test(f) && !done.has(f)).sort();
-}
+};
 
 /**
  * Uwaga: MySQL zatwierdza zmiany struktury (CREATE, ALTER, DROP) od razu, więc transakcja nie cofnie ich po błędzie.
  * Dlatego jedna migracja = jedna zmiana struktury. Gdy migracja przerwie się w połowie, cofnij ręcznie to, co
  * zdążyła utworzyć (opis błędu podaje nazwę pliku), popraw plik i uruchom ponownie.
  */
-export async function runMigrations(conn: mysql.Connection, dir = MIGRATIONS_DIR): Promise<string[]> {
+export const runMigrations = async (conn: mysql.Connection, dir = MIGRATIONS_DIR): Promise<string[]> => {
   await conn.query(
     'CREATE TABLE IF NOT EXISTS schema_migrations (name VARCHAR(255) PRIMARY KEY, applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB',
   );
@@ -36,9 +36,9 @@ export async function runMigrations(conn: mysql.Connection, dir = MIGRATIONS_DIR
     }
   }
   return todo;
-}
+};
 
-async function main() {
+const main = async () => {
   const conn = await mysql.createConnection({
     host: env.DB_HOST,
     port: env.DB_PORT,
@@ -53,7 +53,7 @@ async function main() {
   } finally {
     await conn.end();
   }
-}
+};
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   main().catch((error) => {

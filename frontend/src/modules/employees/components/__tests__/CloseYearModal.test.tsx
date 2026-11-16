@@ -19,12 +19,12 @@ const jan: EmployeeListItem = {
   id: 2, name: 'Jan Kowalski', firstName: 'Jan', lastName: 'Kowalski', login: 'jan.kowalski@firma.pl', email: null, role: 'employee', isMe: false, pool: null,
 };
 
-function serverError(status: number, message: string) {
+const serverError = (status: number, message: string) => {
   const config = { url: '/employees/close-year', headers: new AxiosHeaders() };
   return new AxiosError('fail', 'ERR', config, undefined, {
     status, statusText: 'Error', headers: {}, config, data: { error: { message } },
   });
-}
+};
 
 afterEach(() => vi.restoreAllMocks());
 

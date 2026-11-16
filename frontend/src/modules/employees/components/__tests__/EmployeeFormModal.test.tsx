@@ -12,19 +12,19 @@ const jan: EmployeeListItem = {
 };
 const anna: EmployeeListItem = { ...jan, id: 1, name: 'Anna Nowak', firstName: 'Anna', lastName: 'Nowak', login: 'anna.nowak@firma.pl', role: 'admin', isMe: true, pool: null };
 
-function conflict(fields: Record<string, string>, archivedUser?: { id: number; name: string }) {
+const conflict = (fields: Record<string, string>, archivedUser?: { id: number; name: string }) => {
   const config = { url: '/employees', headers: new AxiosHeaders() };
   return new AxiosError('fail', 'ERR', config, undefined, {
     status: 409, statusText: 'Conflict', headers: {}, config,
     data: { error: { message: Object.values(fields)[0], fields, archivedUser } },
   });
-}
+};
 
-function show(employee: EmployeeListItem | null) {
+const show = (employee: EmployeeListItem | null) => {
   const onClose = vi.fn();
   renderWithProviders(<EmployeeFormModal opened employee={employee} year={2026} onClose={onClose} />);
   return { onClose };
-}
+};
 
 const fill = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label, { exact: false }), { target: { value } });
 

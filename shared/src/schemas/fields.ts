@@ -35,17 +35,17 @@ export const QUANTITY_MAX = 999_999_999.999;
 
 const digitsOnly = (value: string) => value.replace(/[\s-]/g, '');
 
-function weightedSum(digits: string, weights: number[]): number {
+const weightedSum = (digits: string, weights: number[]): number => {
   return weights.reduce((sum, weight, i) => sum + weight * Number(digits[i]), 0);
-}
+};
 
-export function isValidNip(value: string): boolean {
+export const isValidNip = (value: string): boolean => {
   if (!/^\d{10}$/.test(value)) return false;
   const check = weightedSum(value, [6, 5, 7, 2, 3, 4, 5, 6, 7]) % 11;
   return check !== 10 && check === Number(value[9]);
-}
+};
 
-export function isValidRegon(value: string): boolean {
+export const isValidRegon = (value: string): boolean => {
   const weights: Record<number, number[]> = {
     9: [8, 9, 2, 3, 4, 5, 6, 7],
     14: [2, 4, 8, 5, 0, 9, 7, 3, 6, 1, 2, 4, 8],
@@ -54,23 +54,23 @@ export function isValidRegon(value: string): boolean {
   const w = weights[value.length]!;
   const check = (weightedSum(value, w) % 11) % 10;
   return check === Number(value[value.length - 1]);
-}
+};
 
-export function isValidPesel(value: string): boolean {
+export const isValidPesel = (value: string): boolean => {
   if (!/^\d{11}$/.test(value)) return false;
   const check = (10 - (weightedSum(value, [1, 3, 7, 9, 1, 3, 7, 9, 1, 3]) % 10)) % 10;
   return check === Number(value[10]);
-}
+};
 
 /** Polski numer konta: 26 cyfr, suma kontrolna IBAN (mod 97). */
-export function isValidIban(value: string): boolean {
+export const isValidIban = (value: string): boolean => {
   if (!/^\d{26}$/.test(value)) return false;
   // „PL” = 25 21; dwie pierwsze cyfry (suma kontrolna) idą na koniec.
   const rearranged = value.slice(2) + '2521' + value.slice(0, 2);
   let rest = 0;
   for (const digit of rearranged) rest = (rest * 10 + Number(digit)) % 97;
   return rest === 1;
-}
+};
 
 const textInput = () => z.string({ error: M.required });
 
@@ -139,12 +139,12 @@ export const personName = (max: number) =>
     .max(max, M.tooLong);
 
 /** Pole nieobowiązkowe: puste pole formularza (`''`, same spacje, brak) zapisuje się jako NULL. */
-export function optionalField<T extends z.ZodType>(schema: T) {
+export const optionalField = <T extends z.ZodType>(schema: T) => {
   return z.preprocess(
     (v) => (v === undefined || v === '' || (typeof v === 'string' && v.trim() === '') ? null : v),
     schema.nullable(),
   );
-}
+};
 
 /** Login konta: 3–190 znaków bez spacji, zapisywany małymi literami (może wyglądać jak e-mail). */
 export const login = textInput()

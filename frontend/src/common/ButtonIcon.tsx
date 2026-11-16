@@ -60,7 +60,7 @@ export const BUTTON_ICONS = {
 export type ButtonAction = keyof typeof BUTTON_ICONS;
 
 /** Ikona do `leftSection` przycisku: `<Button leftSection={<ButtonIcon action="save" />}>`. */
-export function ButtonIcon({ action, size = 16 }: { action: ButtonAction; size?: number }) {
+export const ButtonIcon = ({ action, size = 16 }: { action: ButtonAction; size?: number }) => {
   const Component = BUTTON_ICONS[action];
   return <Component size={size} strokeWidth={1.75} aria-hidden />;
-}
+};

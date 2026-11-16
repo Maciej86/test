@@ -11,13 +11,13 @@ const BACKGROUNDS = {
  * Sekcja strony dla odwiedzających: tło na całą szerokość okna, treść w środku w kontenerze.
  * Kolejne sekcje zmieniają tło (`default` / `alt`), żeby było widać, gdzie kończy się jedna, a zaczyna druga.
  */
-export function PageSection({ background = 'default', children }: {
+export const PageSection = ({ background = 'default', children }: {
   background?: keyof typeof BACKGROUNDS;
   children: ReactNode;
-}) {
+}) => {
   return (
     <Box component="section" bg={BACKGROUNDS[background]} py={64}>
       <Container size="lg">{children}</Container>
     </Box>
   );
-}
+};

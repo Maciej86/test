@@ -15,7 +15,7 @@ const all: Areas = { public: true, account: true, admin: true };
 
 const extra = [{ key: 'login', path: '/login', label: 'common.mockup.screen_login', screen: () => <p>Ekran logowania</p> }];
 
-function renderMockup(areas: Areas = all, path = '/admin') {
+const renderMockup = (areas: Areas = all, path = '/admin') => {
   return renderWithProviders(
     <MockupApp
       areas={areas}
@@ -27,7 +27,7 @@ function renderMockup(areas: Areas = all, path = '/admin') {
       initialPath={path}
     />,
   );
-}
+};
 
 describe('mockup shell', () => {
   it('has a phone menu button that closes the menu after choosing a page', async () => {

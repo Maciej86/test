@@ -8,11 +8,11 @@ import { initials } from '@app/shared';
  * Menu użytkownika w górnej belce: kółko z inicjałami i imię (na telefonie same inicjały), a w nim „Moje konto”
  * (gdy ta osoba ma taką pozycję w menu) i „Wyloguj”. Ten sam wygląd w aplikacji i w makietach.
  */
-export function UserMenu({ name, accountPath, onLogout }: {
+export const UserMenu = ({ name, accountPath, onLogout }: {
   name: string;
   accountPath: string | null;
   onLogout(): void;
-}) {
+}) => {
   const { t } = useTranslation();
   return (
     <Menu position="bottom-end" width={200} withinPortal>
@@ -41,4 +41,4 @@ export function UserMenu({ name, accountPath, onLogout }: {
       </Menu.Dropdown>
     </Menu>
   );
-}
+};

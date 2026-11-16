@@ -3,7 +3,7 @@ import { Moon, Sun } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 /** Przełącznik jasny/ciemny motyw; widoczny, gdy COLOR_SCHEME_TOGGLE w shared/src/theme.ts jest włączony. */
-export function ColorSchemeToggle() {
+export const ColorSchemeToggle = () => {
   const { t } = useTranslation();
   const { setColorScheme } = useMantineColorScheme();
   const dark = useComputedColorScheme('light') === 'dark';
@@ -13,4 +13,4 @@ export function ColorSchemeToggle() {
       {dark ? <Sun size={18} /> : <Moon size={18} />}
     </ActionIcon>
   );
-}
+};

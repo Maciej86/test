@@ -4,13 +4,13 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-function sourceFiles(dir: string): string[] {
+const sourceFiles = (dir: string): string[] => {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
     if (statSync(path).isDirectory()) return name === 'test' ? [] : sourceFiles(path);
     return /\.tsx$/.test(name) && !/\.test\.tsx$/.test(name) ? [path] : [];
   });
-}
+};
 
 describe('tables', () => {
   const files = sourceFiles(resolve(process.cwd(), 'src')).filter((f) => /<Table[\s>]/.test(readFileSync(f, 'utf8')));

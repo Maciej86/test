@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthState>({
 });
 
 /** Zalogowany użytkownik z GET /api/auth/me (moduł Logowanie). */
-export function AuthProvider({ children }: { children: ReactNode }) {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,8 +51,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => watchLogoutInOtherTabs(), []);
 
   return <AuthContext.Provider value={{ user, loading, refresh, logout }}>{children}</AuthContext.Provider>;
-}
+};
 
-export function useAuth(): AuthState {
+export const useAuth = (): AuthState => {
   return useContext(AuthContext);
-}
+};

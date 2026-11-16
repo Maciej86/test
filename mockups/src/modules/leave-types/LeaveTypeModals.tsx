@@ -6,11 +6,11 @@ import { notify } from '../../common/notify';
 import { TAKEN_NAME, type MockLeaveType } from './data';
 
 /** Dodawanie (leaveType = null) i edycja typu. `nameTaken` pokazuje błąd nazwy zajętej przez ukryty typ. */
-export function LeaveTypeModal({ leaveType, nameTaken = false, onClose }: {
+export const LeaveTypeModal = ({ leaveType, nameTaken = false, onClose }: {
   leaveType: MockLeaveType | null;
   nameTaken?: boolean;
   onClose: () => void;
-}) {
+}) => {
   const { t } = useTranslation('leave-types');
   const isNew = leaveType === null;
 
@@ -61,9 +61,9 @@ export function LeaveTypeModal({ leaveType, nameTaken = false, onClose }: {
       </Stack>
     </Modal>
   );
-}
+};
 
-export function HideModal({ leaveType, onClose }: { leaveType: MockLeaveType | null; onClose: () => void }) {
+export const HideModal = ({ leaveType, onClose }: { leaveType: MockLeaveType | null; onClose: () => void }) => {
   const { t } = useTranslation('leave-types');
   return (
     <Modal opened={leaveType !== null} onClose={onClose} title={t('hide_title', { name: leaveType?.name })}>
@@ -78,4 +78,4 @@ export function HideModal({ leaveType, onClose }: { leaveType: MockLeaveType | n
       </Stack>
     </Modal>
   );
-}
+};

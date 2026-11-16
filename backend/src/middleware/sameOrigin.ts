@@ -10,9 +10,9 @@ const READ_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
  * i DELETE, więc zapis z innego adresu niż FRONTEND_URL dostaje 403. Żądania bez Origin (curl, testy, webhooki)
  * przechodzą, bo nie wysyła ich przeglądarka zalogowanej osoby. Razem z ciasteczkiem SameSite=Lax.
  */
-export function sameOrigin(req: Request, res: Response, next: NextFunction) {
+export const sameOrigin = (req: Request, res: Response, next: NextFunction) => {
   if (READ_METHODS.has(req.method)) return next();
   const origin = req.get('origin');
   if (origin && origin !== new URL(env.FRONTEND_URL).origin) return sendError(res, 403, SERVER_MESSAGES.noAccess);
   next();
-}
+};

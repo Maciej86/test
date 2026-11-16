@@ -4,7 +4,7 @@ import { translateKey } from '@app/shared';
 
 /** Zaślepka zamiast ekranu modułu, który jest już zrobiony w prawdziwej aplikacji. */
 /** labelKey = etykieta pozycji nawigacji modułu, np. 'orders.nav'. */
-export function Done({ labelKey }: { labelKey: string }) {
+export const Done = ({ labelKey }: { labelKey: string }) => {
   const { t } = useTranslation();
   return (
     <Center p="xl">
@@ -15,4 +15,4 @@ export function Done({ labelKey }: { labelKey: string }) {
       </Stack>
     </Center>
   );
-}
+};
