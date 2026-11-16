@@ -21,4 +21,14 @@ skrzynka testowa: http://localhost:8026.
    pominięty).
 
 ## Próby nadużyć
-(uzupełniane na etapie testy)
+
+Testy: `backend/src/email/__tests__/abuse.test.ts`, `shared/src/__tests__/navigation.test.ts`.
+
+- Imię z przejściem do nowej linii i „Bcc: …” nie dodaje ukrytego adresata: przeszła
+- Komentarz ze skryptem, obrazkiem i linkiem trafia do e-maila jako zwykły tekst: przeszła
+- Bardzo długi komentarz (20 000 znaków) nie psuje e-maila: przeszła
+- `{{employee}}` i `$t(…)` w komentarzu nie są podmieniane: przeszła
+- Adres w imieniu pracownika nie dodaje adresata: przeszła
+- Adres powrotu na obcą stronę (`https://…`, `//…`, `/\…`, `javascript:`) i wyjście z panelu (`/admin/%2e%2e/…`): odrzucone;
+  zakodowane `%2e`, `%2f`, `%5c`: naprawiona przy przeglądzie kodu
+- Awaria serwera poczty nie blokuje zapisu wniosku na minuty (limit 10 s, wysyłka równoległa): naprawiona przy przeglądzie
