@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.28
 
-**Następny krok:** Moduł Typy urlopów, etap spec: akceptacja `docs/modules/leave-types/SPEC.md`.
+**Następny krok:** Moduł Typy urlopów, etap plan: akceptacja `docs/modules/leave-types/PLAN.md`, potem implementacja od kroku 0.
 
 ## Start aplikacji
 
@@ -22,7 +22,7 @@
 | 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
 | 2 | Logowanie | login | zrobiony | zamknięcie | appearance |
 | 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
-| 4 | Typy urlopów | leave-types | w toku | spec | login |
+| 4 | Typy urlopów | leave-types | w toku | plan | login |
 | 5 | E-mail | email | czeka | makieta | login |
 | 6 | Powiadomienia | notifications | czeka | makieta | login |
 | 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
