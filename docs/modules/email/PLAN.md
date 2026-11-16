@@ -124,5 +124,24 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
   - `test('adres spoza aplikacji w next jest pomijany')` (`/login?next=https://example.com` → Pulpit)
   → `npm run test:e2e`.
 
-- [ ] 10. **Przegląd kodu** całego modułu (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testem,
+- [x] 10. **Przegląd kodu** całego modułu (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testem,
   `npm run check`.
+
+## Przegląd kodu (2026-11-16)
+
+Poprawione (każde z testem, który najpierw nie przechodził):
+- Wysyłka do administratorów nie rzuca także przy błędzie wzoru (`a template error is logged and returns 0…`).
+- Limit 10 s na serwer poczty (`gives up on an unreachable mail server after 10 seconds…`) i wysyłka do wszystkich
+  równocześnie (`sends to all admins at the same time…`); „Moje urlopy” woła ją bez czekania (SPEC, „Powiązania”).
+- `safeNextPath` odrzuca zakodowane `%2e`, `%2f`, `%5c` (`/admin/%2e%2e/login` → `null`).
+- Odmiana „1 dzień / 2 dni / 5 dni” (`uses Polish plural forms…`).
+
+Ustalenia:
+- Port skrzynki testowej z `SMTP_PORT` nie trafi na serwer: produkcja używa `docker-compose.prod.yml` bez Mailpit.
+
+Drobne, odłożone (bez wpływu na dziś):
+- `EMAIL_TRANSPORT` w `.env` jest tylko opisem (kod go nie czyta); puste `SMTP_PORT=` dałoby port 0. Do uporządkowania
+  przy Mailgun w module Publikacja.
+- Część „Konto” (`AREAS.account`) nie ma powrotu pod `next`; dziś wyłączona.
+- `/admin?tab=1` dla niezalogowanego wraca na Pulpit bez parametrów.
+- Przykładowe dane w `sendTestEmail.ts` są w kodzie (dane do testu, nie teksty ekranu).

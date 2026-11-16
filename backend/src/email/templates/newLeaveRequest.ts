@@ -39,7 +39,7 @@ export const newLeaveRequestEmail = (data: NewLeaveRequestEmailData): { subject:
       ? []
       : ([
           [k('split'), k('split_value', { carried: whole(data.daysFromCarried), annual: whole(data.daysFromAnnual) })],
-          [k('left_after'), k('left_after_value', { count: whole(data.leftAfter) })],
+          [k('left_after'), k('left_after_value', { count: data.leftAfter })],
         ] as [string, string][])),
     ...(comment ? ([[k('comment'), comment]] as [string, string][]) : []),
   ];

@@ -62,4 +62,23 @@ describe('emailAdminsAboutNewRequest', () => {
     expect(d.sendEmail).not.toHaveBeenCalled();
     expect(log).toHaveBeenCalledWith('email failed', { requestId: 128 }, expect.any(Error));
   });
+
+  it('a template error is logged and returns 0 instead of throwing', async () => {
+    const d = deps();
+    const broken = { ...data, comment: 42 as unknown as string };
+    expect(await emailAdminsAboutNewRequest(broken, d)).toBe(0);
+    expect(d.sendEmail).not.toHaveBeenCalled();
+    expect(log).toHaveBeenCalledWith('email failed', { requestId: 128 }, expect.any(Error));
+  });
+
+  it('sends to all admins at the same time, so one slow server does not delay the others', async () => {
+    let release!: () => void;
+    const slow = new Promise<void>((r) => (release = r));
+    const sendEmail = vi.fn<SendEmail>().mockImplementationOnce(() => slow.then(() => ({}))).mockResolvedValueOnce({});
+    const pending = emailAdminsAboutNewRequest(data, deps({ sendEmail }));
+    await Promise.resolve();
+    expect(sendEmail).toHaveBeenCalledTimes(2);
+    release();
+    expect(await pending).toBe(2);
+  });
 });

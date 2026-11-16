@@ -72,6 +72,15 @@ describe('newLeaveRequestEmail', () => {
     expect(subject).toContain('<b>Jan</b>');
   });
 
+  it('uses Polish plural forms: 1 dzień, 2 dni, 5 dni, 22 dni', () => {
+    const left = (n: number) => newLeaveRequestEmail({ ...data, leftAfter: n }).text;
+    expect(left(1)).toContain('Zostanie po zatwierdzeniu: 1 dzień');
+    expect(left(2)).toContain('Zostanie po zatwierdzeniu: 2 dni');
+    expect(left(5)).toContain('Zostanie po zatwierdzeniu: 5 dni');
+    expect(left(22)).toContain('Zostanie po zatwierdzeniu: 22 dni');
+    expect(left(0)).toContain('Zostanie po zatwierdzeniu: 0 dni');
+  });
+
   it('no untranslated {{…}} and no missing keys in subject, html and text', () => {
     const { subject, html, text } = newLeaveRequestEmail(data);
     for (const body of [subject, html, text]) {

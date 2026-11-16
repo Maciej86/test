@@ -105,7 +105,7 @@ wierszy „Z puli” i „Zostanie…” **[decyzja AI]**), `comment` (może by�
 
 | Z modułem | Co ten moduł pokazuje stamtąd / co tamten pokazuje stąd | Funkcja | Pola widoczne dla roli |
 |---|---|---|---|
-| my-leave | po zapisaniu wniosku wywołuje wysyłkę do administratorów | `emailAdminsAboutNewRequest(data)` | admin: wszystko z wniosku (1a) |
+| my-leave | po zapisaniu wniosku wywołuje wysyłkę do administratorów **bez czekania** (`void emailAdminsAboutNewRequest(data)`), żeby awaria poczty nie wydłużała zapisu wniosku | `emailAdminsAboutNewRequest(data)` | admin: wszystko z wniosku (1a) |
 | leave-requests | przycisk w e-mailu prowadzi do `/admin/leave-requests/:id`; ten ekran musi istnieć | — | admin |
 | deploy | prawdziwa wysyłka przez Mailgun, alarm o kopiach przez `sendEmail` | `sendEmail` | — |
 | login | powrót pod `next` po zalogowaniu | `safeNextPath` | — |

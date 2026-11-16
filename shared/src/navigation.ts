@@ -111,10 +111,11 @@ const ADMIN_PATH = /^\/admin(\/[^?#]*)?(\?[^#]*)?$/;
 
 /**
  * Dokąd wrócić po zalogowaniu (`/login?next=…`, np. z linku w e-mailu). Tylko adres w panelu tej aplikacji; obcy
- * adres (`https://…`, `//…`), wyjście wyżej (`..`), `\` i znaki sterujące → `null` (wtedy Pulpit).
+ * adres (`https://…`, `//…`), wyjście wyżej (`..`, także zakodowane `%2e`), `\`, zakodowane `/` i `\` oraz znaki
+ * sterujące → `null` (wtedy Pulpit).
  */
 export const safeNextPath = (raw: string | null | undefined): string | null => {
   if (!raw || !ADMIN_PATH.test(raw)) return null;
-  if (raw.includes('//') || raw.includes('\\') || raw.includes('..') || /[\u0000-\u001f\u007f]/.test(raw)) return null;
+  if (raw.includes('//') || raw.includes('\\') || raw.includes('..') || /%(2e|2f|5c)/i.test(raw) || /[\u0000-\u001f\u007f]/.test(raw)) return null;
   return raw;
 };

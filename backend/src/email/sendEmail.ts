@@ -18,11 +18,17 @@ interface SmtpSettings {
   password: string;
 }
 
+/** Niedostępny serwer poczty: rezygnacja po 10 s zamiast domyślnych minut nodemailer. */
+const SMTP_TIMEOUT_MS = 10_000;
+
 /** Ustawienia serwera poczty. Mailpit i Mailgun różnią się tylko wartościami w `.env`; logowanie tylko z loginem. */
 export const smtpOptions = (s: SmtpSettings): SMTPTransport.Options => ({
   host: s.host,
   port: s.port,
   secure: s.port === 465,
+  connectionTimeout: SMTP_TIMEOUT_MS,
+  greetingTimeout: SMTP_TIMEOUT_MS,
+  socketTimeout: SMTP_TIMEOUT_MS,
   ...(s.user ? { auth: { user: s.user, pass: s.password } } : {}),
 });
 
