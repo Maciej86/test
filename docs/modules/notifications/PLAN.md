@@ -108,7 +108,7 @@ spoza menu dopięta w `buildAppRoutes.tsx`. Wygląd 1:1 z makiety (`mockups/src/
   i przechodzi pod `link`; `link` `https://x` → bez przejścia; „Oznacz wszystkie” woła `read-all`; pusto → tekst
   `empty`; błąd → „Spróbuj ponownie”. → `npm run check`
 
-- [ ] **6. Strona „Powiadomienia”.** `NotificationsPage.tsx` jak makieta (bez panelu pytań i przełącznika stanów):
+- [x] **6. Strona „Powiadomienia”.** `NotificationsPage.tsx` jak makieta (bez panelu pytań i przełącznika stanów):
   tytuł, podpowiedź, „Oznacz wszystkie…”, `SegmentedControl` Wszystkie / Nieprzeczytane (N), grupy `dayLabel`, godzina
   `formatTime`, `Pagination`; `page` i `unread` w adresie (czytane `notificationsQuerySchema`), `DataState`. Trasa
   `NOTIFICATIONS_PATH` w `buildAppRoutes.tsx` (dziecko `AppLayout`, dla obu ról), strona w `pages.ts`. Testy:

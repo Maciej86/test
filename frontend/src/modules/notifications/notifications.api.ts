@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   NOTIFICATION_REFRESH_MS,
   type NotificationsListResponse,
@@ -24,6 +24,8 @@ export const useNotificationsList = (query: NotificationsQuery) => {
     queryKey: [...KEY, 'list', query],
     queryFn: () => api.get<NotificationsListResponse>('/notifications', { params: query }).then((r) => r.data),
     refetchOnWindowFocus: true,
+    // Przy zmianie filtra albo strony zostają poprzednie dane, zamiast licznika „(0)” i kręciołka.
+    placeholderData: keepPreviousData,
   });
 };
 

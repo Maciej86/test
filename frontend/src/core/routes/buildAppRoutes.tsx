@@ -13,6 +13,7 @@ import { MissingScreen } from '../../common/MissingScreen';
 import { PublicLayout } from '../../common/PublicLayout';
 import { buildRoutes, type Pages } from './buildRoutes';
 import { PASSWORD_CHANGE_PATH } from '../../config/constants';
+import { NOTIFICATIONS_PATH } from '@app/shared';
 import type { ReactElement } from 'react';
 
 /**
@@ -61,7 +62,10 @@ export const buildAppRoutes = (areas: Areas, pages: Pages, user: SessionUser | n
     routes.push({ element: guarded(<AccountLayout />, user), children: buildRoutes(ACCOUNT_NAVIGATION, pages, user) });
   }
   if (areas.admin) {
-    routes.push({ element: guarded(<AppLayout />, user), children: buildRoutes(NAVIGATION, pages, user) });
+    // Strony panelu bez pozycji w menu, dla każdej zalogowanej roli: „Powiadomienia” (z dzwonka).
+    const Notifications = pages.notifications;
+    const unlisted = [{ path: NOTIFICATIONS_PATH, element: Notifications ? <Notifications /> : <MissingScreen /> }];
+    routes.push({ element: guarded(<AppLayout />, user), children: [...buildRoutes(NAVIGATION, pages, user), ...unlisted] });
     // Każdy inny adres w panelu (np. /admin/leave-requests/128 z e-maila): niezalogowany też trafia na logowanie.
     if (!user) routes.push({ path: '/admin/*', element: <RedirectToLogin /> });
   }

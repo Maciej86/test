@@ -70,7 +70,19 @@ describe('login guard', () => {
     'change-password': () => <p>Ekran hasła</p>,
     dashboard: () => <p>Pulpit testowy</p>,
     tasks: () => <p>Zadania testowe</p>,
+    notifications: () => <p>Powiadomienia testowe</p>,
   };
+
+  it('the notifications page (outside the menu) opens in the panel for both roles', async () => {
+    renderRoutes(buildAppRoutes(areas, pages, user), '/admin/notifications');
+    expect(await screen.findByText('Powiadomienia testowe')).toBeInTheDocument();
+  });
+
+  it('a logged-out person on /admin/notifications sees the login screen with the return address', async () => {
+    const { router } = renderRoutes(buildAppRoutes(areas, pages, null), '/admin/notifications');
+    expect(await screen.findByText('Ekran logowania')).toBeInTheDocument();
+    expect(router.state.location.search).toBe('?next=%2Fadmin%2Fnotifications');
+  });
 
   it('a logged-out person on /admin/tasks sees the login screen', async () => {
     const { router } = renderRoutes(buildAppRoutes(areas, pages, null), '/admin/tasks');
