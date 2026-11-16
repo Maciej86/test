@@ -6,7 +6,6 @@ import { TasksMockup } from './modules/tasks/TasksMockup';
 import { ActivityLogMockup } from './modules/activity-log/ActivityLogMockup';
 import { ArchiveMockup } from './modules/archive/ArchiveMockup';
 import { MyAccountMockup } from './modules/my-account/MyAccountMockup';
-import { EmailMockup } from './modules/email/EmailMockup';
 import { Done } from './common/Done';
 import type { ExtraScreen } from './Shell';
 
@@ -34,5 +33,6 @@ export const SCREENS: Record<string, ComponentType> = {
 export const EXTRA_SCREENS: ExtraScreen[] = [
   // Moduł Logowanie zrobiony; makieta zostaje w modules/login/LoginMockup.tsx.
   { key: 'login', path: '/login', label: 'common.mockup.screen_login', screen: () => <Done labelKey="common.mockup.screen_login" /> },
-  { key: 'email', path: '/email', label: 'common.mockup.screen_email', screen: EmailMockup },
+  // Moduł E-mail zrobiony; makieta zostaje w modules/email/EmailMockup.tsx.
+  { key: 'email', path: '/email', label: 'common.mockup.screen_email', screen: () => <Done labelKey="common.mockup.screen_email" /> },
 ];
