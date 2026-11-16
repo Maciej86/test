@@ -63,7 +63,7 @@ spoza menu dopięta w `buildAppRoutes.tsx`. Wygląd 1:1 z makiety (`mockups/src/
   `backend/migrations/010_notifications.sql` według tabeli w specu (`user_id` FK `ON DELETE CASCADE`, indeks
   `idx_notifications_user (user_id, read_at, created_at)`); `npm run migrate`. → `npm run check`
 
-- [ ] **2. Zapytania i usługa (tworzenie).** `notifications.queries.ts`:
+- [x] **2. Zapytania i usługa (tworzenie).** `notifications.queries.ts`:
   `insertNotifications(conn, rows: { userId; type; params; actorName; link }[]): Promise<void>` (jeden `INSERT …
   VALUES (?, ?, ?, ?, ?), …`, `params` przez `JSON.stringify`), `deleteOldRead(conn, userIds: number[], days: number)`
   (`read_at < NOW() - INTERVAL ? DAY AND user_id IN (?)`), `activeUserIds(conn, ids: number[]): Promise<number[]>`
