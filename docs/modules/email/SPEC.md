@@ -1,6 +1,6 @@
 # Spec: E-mail
 
-**Data:** 2026-11-16 · **Status:** do akceptacji
+**Data:** 2026-11-16 · **Status:** zaakceptowany przez użytkownika 2026-11-16
 **Podstawa:** `QUESTIONS.md` (odpowiedzi 2026-11-16: 1a, 2a, 3a, 4a, 5a, 6a), `SPEC-GENERAL.md`,
 makieta `mockups/src/modules/email/`
 

@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.29
 
-**Następny krok:** Moduł E-mail, etap spec: akceptacja `docs/modules/email/SPEC.md`.
+**Następny krok:** Moduł E-mail, etap plan: akceptacja `docs/modules/email/PLAN.md`.
 
 ## Start aplikacji
 
@@ -23,7 +23,7 @@
 | 2 | Logowanie | login | zrobiony | zamknięcie | appearance |
 | 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
-| 5 | E-mail | email | w toku | spec | login |
+| 5 | E-mail | email | w toku | plan | login |
 | 6 | Powiadomienia | notifications | czeka | makieta | login |
 | 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 8 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
