@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.29
 
-**Następny krok:** Moduł E-mail, implementacja: krok 1 z 10 (Mailpit i ustawienia).
+**Następny krok:** Moduł E-mail, implementacja: krok 2 z 10 (sendEmail).
 
 ## Start aplikacji
 
@@ -23,7 +23,7 @@
 | 2 | Logowanie | login | zrobiony | zamknięcie | appearance |
 | 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
-| 5 | E-mail | email | w toku | implementacja (krok 1/10) | login |
+| 5 | E-mail | email | w toku | implementacja (krok 2/10) | login |
 | 6 | Powiadomienia | notifications | czeka | makieta | login |
 | 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 8 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-16: Skrzynka testowa Mailpit na porcie 8026 (`MAILPIT_PORT` w `.env`), bo 8025 zajmuje inny projekt.
 
 - 2026-11-16: E-mail: makieta podglądu e-maila „Nowy wniosek urlopowy” (jasna treść, wersja tekstowa, widok na telefonie); 6 pytań (w tym powrót do wniosku po zalogowaniu).
 

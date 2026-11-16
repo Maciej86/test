@@ -34,4 +34,12 @@ export const env = {
   BACKUP_SLOTS: process.env.BACKUP_SLOTS ?? '',
   /** Adres alarmu o kopiach (tylko na serwerze, gdy aplikacja wysyła e-maile); pusto = bez alarmu. */
   BACKUP_ALERT_EMAIL: process.env.BACKUP_ALERT_EMAIL ?? '',
+  /** Serwer poczty: lokalnie Mailpit (127.0.0.1:1025), na serwerze Mailgun (smtp.eu.mailgun.org:587). */
+  SMTP_HOST: process.env.SMTP_HOST ?? '127.0.0.1',
+  SMTP_PORT: Number(process.env.SMTP_PORT ?? 1025),
+  /** Pusty login = serwer bez logowania (Mailpit). */
+  SMTP_USER: process.env.SMTP_USER ?? '',
+  SMTP_PASSWORD: process.env.SMTP_PASSWORD ?? '',
+  /** Adres nadawcy; nazwę nadawcy bierze sendEmail z common.app_name. */
+  EMAIL_FROM: process.env.EMAIL_FROM ?? 'no-reply@localhost',
 };

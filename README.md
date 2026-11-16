@@ -19,6 +19,9 @@ i nazwisko, login (np. `anna.nowak@firma.pl`), e-mail do powiadomień (Enter = b
 w tym cyfra i znak specjalny; podczas wpisywania nic nie widać). Hasło wpisujesz tylko w terminalu, nigdy w rozmowie
 z Claude. Potem logujesz się na http://localhost:5180/login. Kolejne konta zakłada administrator w aplikacji.
 
+**E-mail testowy:** `npm run email:test` wysyła przykładowy e-mail „Nowy wniosek urlopowy” do skrzynki testowej
+(http://localhost:8026). Możesz podać adres: `npm run email:test -- ania@firma.pl`.
+
 Wyłączenie bazy: `npm run db:stop`. Dane zostają, przy następnym `npm run db` wszystko wróci.
 
 ## Gdzie co podejrzeć
@@ -29,6 +32,7 @@ Wyłączenie bazy: `npm run db:stop`. Dane zostają, przy następnym `npm run db
 | http://localhost:5181 | makiety (podgląd ekranów) | `npm run dev` |
 | http://localhost:5181/progress | **postęp prac**: co zrobione, co dalej | `npm run dev` |
 | http://localhost:8081 | podgląd bazy (phpMyAdmin) | `npm run db` |
+| http://localhost:8026 | skrzynka testowa (Mailpit): e-maile wysłane przez aplikację | `npm run db` |
 
 **Logowanie do phpMyAdmin:** użytkownik `app`, hasło to wartość `DB_PASSWORD` z pliku `.env`
 (otwórz go w edytorze i skopiuj). Baza aplikacji nazywa się `app`. Hasła nie wklejaj do rozmowy z Claude.
