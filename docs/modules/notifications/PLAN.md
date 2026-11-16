@@ -90,7 +90,7 @@ spoza menu dopięta w `buildAppRoutes.tsx`. Wygląd 1:1 z makiety (`mockups/src/
   (`password_change_required`). Test zapytań: `markRead` ma `user_id = ?` i nie nadpisuje `read_at`.
   → `npm run check`
 
-- [ ] **4. Podświetlenie menu i czas na ekranie.** `shared/src/navigation.ts` `activeNavKey`: pozycja, której
+- [x] **4. Podświetlenie menu i czas na ekranie.** `shared/src/navigation.ts` `activeNavKey`: pozycja, której
   adres to sam adres części (`/admin`, `/account`), pasuje tylko dokładnie. Test: `/admin/notifications` → `null`,
   `/admin` → `dashboard`, `/admin/employees/5` → `employees`. `frontend/src/modules/notifications/notificationTime.ts`:
   `whenLabel(iso: string, now: Date, t): string` („dzisiaj, GG:MM” / „wczoraj, GG:MM” / `formatDateTime`) i

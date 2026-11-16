@@ -167,10 +167,15 @@ describe('activeNavKey', () => {
 
   it('does not mix up paths that only share a prefix', () => {
     expect(activeNavKey(items, '/admin/orders-reports')).toBe('order-reports');
-    expect(activeNavKey(items, '/admin/settings')).toBe('dashboard');
+    expect(activeNavKey(items, '/admin/settings')).toBeNull();
   });
 
-  it.todo('a part home item (/admin) matches only exactly: /admin/notifications → null');
+  it('a part home item (/admin, /account) matches only exactly: /admin/notifications → null', () => {
+    expect(activeNavKey(items, '/admin/notifications')).toBeNull();
+    expect(activeNavKey(items, '/admin')).toBe('dashboard');
+    expect(activeNavKey([{ key: 'home', path: '/account' }], '/account/x')).toBeNull();
+    expect(activeNavKey([{ key: 'employees', path: '/admin/employees' }], '/admin/employees/5')).toBe('employees');
+  });
 
   it('returns null outside the menu', () => {
     expect(activeNavKey(items, '/login')).toBeNull();

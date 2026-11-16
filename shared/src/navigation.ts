@@ -74,9 +74,15 @@ export const rolesFor = (key: string, items: NavItem[]): Role[] | null => {
  * bieżącego (`/admin/orders` dla `/admin/orders/5`). Wygrywa najdłuższy, więc „Pulpit” pod `/admin` nie świeci
  * na każdej podstronie panelu.
  */
+/**
+ * Adresy części aplikacji: ich pozycja (np. „Pulpit” pod /admin) podświetla się tylko na tym adresie, nie na
+ * podstronach spoza menu (np. /admin/notifications).
+ */
+const PART_HOMES = ['/', '/admin', '/account'];
+
 export const activeNavKey = (items: { key: string; path: string }[], pathname: string): string | null => {
   const matches = items.filter(
-    (item) => pathname === item.path || (item.path !== '/' && pathname.startsWith(`${item.path}/`)),
+    (item) => pathname === item.path || (!PART_HOMES.includes(item.path) && pathname.startsWith(`${item.path}/`)),
   );
   if (matches.length === 0) return null;
   return matches.reduce((best, item) => (item.path.length > best.path.length ? item : best)).key;
