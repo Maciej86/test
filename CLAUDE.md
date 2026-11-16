@@ -51,8 +51,10 @@ Kilka zapisów naraz (także z historią zmian) tylko przez `withTransaction` (`
   `email`, `money`…); ten sam schemat na froncie i w backendzie.
 - Dane na froncie: hooki modułu w `<module>.api.ts` (TanStack Query, zapytania przez `api` z `core/api/client.ts`),
   ekran z `DataState`; nigdy `useEffect` z pobieraniem ani `fetch`.
-- Wspólne zamiast kopii: to, czego potrzebuje drugi moduł, przenosisz do `common/` (komponent) albo `core/` (hook),
-  z testem. Nie importujesz z folderu innego modułu.
+- Wspólne zamiast kopii: zanim napiszesz coś nowego, sprawdź, czy inny moduł nie robi już tego samego albo prawie
+  tego samego. Wtedy przenosisz to z parametrami do `common/` (komponent), `core/` (hook), `backend/src/db/` lub
+  `middleware/` (backend) albo `shared/src/` (front i backend), z testem. Bez parametrów na siłę: kilka linii albo
+  przypadkowe podobieństwo zostaje osobno. Nie importujesz z folderu innego modułu.
 
 ## Wygląd i teksty
 

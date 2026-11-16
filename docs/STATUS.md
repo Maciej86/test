@@ -1,6 +1,6 @@
 # Stan projektu: test
 
-**Wersja stepkit:** 0.1.34
+**Wersja stepkit:** 0.1.36
 
 **Następny krok:** Moje urlopy: makieta (`/stepkit:dalej`).
 
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-16: Aktualizacja stepkit 0.1.34 → 0.1.36: wspólne pole daty i grupy w menu bez własnej strony były już w projekcie; nowa zasada „Wspólne zamiast kopii” (przed planem sprawdzam, czy coś podobnego już jest, i przenoszę do wspólnego miejsca).
 - 2026-11-16: Moduł Typy umów zrobiony (potwierdzony przez użytkownika): słownik typów umów w „Ustawieniach” (kolejność strzałkami, dodawanie, zmiana nazwy, ukrywanie i przywracanie, 4 typy na start), pole „Rodzaj umowy” u pracownika z typów (`users.contract_type_id`), pracownik zachowuje ukryty typ.
 
 - 2026-11-16: Typy umów: zbudowane (kroki 0–9, przegląd kodu z poprawkami), `npm run check` i wszystkie testy e2e zielone; umowy pracowników przepisane na typy ze słownika (1 z 12 kont miało umowę, po zmianie tak samo).

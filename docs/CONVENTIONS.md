@@ -89,10 +89,26 @@ Nowa pozycja nawigacji: wpis w `NAVIGATION` (panel, ścieżka od `/admin`), `ACC
   (testy zasad, `routeProtection.test.ts`, kolory, tabele) i pomocniki testów (`setup.ts`, `render.tsx`) zostają
   w `src/test/`. Pilnuje tego test zasad.
 
-**Wspólne zamiast kopii.** Gdy komponent albo hook jest potrzebny w drugim module, przenosisz go do
-`frontend/src/common/` (komponent) albo `frontend/src/core/` (hook bez wyglądu), z testem, i podmieniasz w pierwszym
-module. Nie kopiujesz go i nie importujesz z folderu innego modułu. Gdy makieta używa tego samego klocka, kopia jest
-w `mockups/src/common/`. Plik ekranu dłuższy niż ok. 250 linii rozbijasz na komponenty w `components/`.
+**Wspólne zamiast kopii.** Kod potrzebny w drugim miejscu nie powstaje drugi raz: przenosisz go do wspólnego
+miejsca, z testem, i podmieniasz w pierwszym module. Nie kopiujesz i nie importujesz z folderu innego modułu.
+
+| Co | Dokąd |
+|---|---|
+| komponent z wyglądem (okno potwierdzenia, nagłówek ekranu, pusty stan) | `frontend/src/common/` (makiety: `mockups/src/common/`) |
+| hook albo funkcja frontu bez wyglądu (parametry listy w adresie, mutacja odświeżająca listę) | `frontend/src/core/` |
+| pomocnik backendu (rozpoznanie powtórzonej nazwy, „nie znaleziono”) | `backend/src/db/` albo `backend/src/middleware/` |
+| logika potrzebna na froncie i w backendzie (daty, liczby, bieżący rok) | `shared/src/` |
+
+Szukasz po tym, **co kod robi**, a nie identycznego kodu: dwa okna z pytaniem i dwoma przyciskami, dwie listy
+z filtrami w adresie, dwa nagłówki ekranu to ten sam klocek, nawet gdy różnią się tekstem, kolorem przycisku,
+polami czy kształtem danych. Różnice zamieniasz w parametry (props, argumenty, typ generyczny), np.
+`ConfirmModal` z `title`, `confirmLabel`, `danger` albo `useListParams(schema, defaults)`. Wspólny klocek ma jedno
+zachowanie (np. okno potwierdzenia przy błędzie zawsze zostaje otwarte); gdy dwa moduły robiły to samo różnie, wybierz
+jedno i powiedz o tym użytkownikowi.
+
+**Bez wydzielania na siłę.** Zostaw osobno, gdy: wspólna część to kilka linii; klocek potrzebowałby więcej
+parametrów i warunków niż ma wspólnego kodu; podobieństwo jest przypadkowe (dziś wygląda tak samo, ale każdy moduł
+będzie zmieniał się z innego powodu). Dobry wspólny klocek da się opisać jednym zdaniem bez „chyba że”. Plik ekranu dłuższy niż ok. 250 linii rozbijasz na komponenty w `components/`.
 
 **Wygląd:** prawdziwy ekran we `frontend/` odtwarza układ zaakceptowanej makiety modułu (bez panelu pytań) i trzyma się
 wzorców z `docs/DESIGN.md`. Gotowe klocki są w `common/` (we froncie i w makietach te same): `InfoCard` (boks z
@@ -116,6 +132,8 @@ importujesz je wprost: `import { CalendarDays } from 'lucide-react'`. **Przycisk
 Nowa akcja: dopisz ją do `BUTTON_ICONS` we froncie i w makietach oraz do tabeli w `DESIGN.md`. Ikona pozycji nawigacji: nazwa z Lucide w polu
 `icon` w `navigation.config.ts` (np. `'calendar-days'`) i ta sama nazwa dopisana do `NAV_ICONS` w
 `frontend/src/common/icons.tsx` **i** `mockups/src/common/icons.tsx` (test pilnuje, że każda jest na liście).
+Grupa w menu (np. „Ustawienia”) to pozycja z `children`: ma ikonę i etykietę, ale nie ma własnej strony ani wpisu
+w `PAGES`; kliknięcie tylko rozwija jej pozycje.
 
 ## Nazwy i stałe
 
@@ -192,8 +210,8 @@ Nowa akcja: dopisz ją do `BUTTON_ICONS` we froncie i w makietach oraz do tabeli
   (`shared/src/schemas/<module>.ts`). Ten sam schemat sprawdza formularz (`zodResolver`) i serwer (`validateBody`).
   Limity są w `shared/src/constants/<module>.ts`, a maksymalna długość zgadza się z kolumną w migracji (`VARCHAR(n)`).
 - **Gotowe pola zod** w `shared/src/schemas/fields.ts` (eksport z `@app/shared`): `text(max)`, `postalCode`, `nip`,
-  `regon`, `pesel`, `phone`, `email`, `iban`, `money` / `moneyField(min, max)`, `quantity` / `quantityField(min, max)`
-  i `optionalField(pole)` (puste pole formularza zapisuje się jako `NULL`). Moduł składa z nich schemat i nie pisze
+  `regon`, `pesel`, `phone`, `email`, `iban`, `money` / `moneyField(min, max)`, `quantity` / `quantityField(min, max)`,
+  `isoDate` (dzień `RRRR-MM-DD`) i `optionalField(pole)` (puste pole formularza zapisuje się jako `NULL`). Moduł składa z nich schemat i nie pisze
   własnych wyrażeń regularnych:
   ```ts
   export const clientSchema = z.object({
@@ -208,6 +226,9 @@ Nowa akcja: dopisz ją do `BUTTON_ICONS` we froncie i w makietach oraz do tabeli
   z kreską, e-mail małymi literami), więc front i serwer zapisują to samo.
 - Pole z formatem ma w formularzu podpowiedź z przykładem (`description`, np. „np. 64-300”), a komunikat błędu mówi,
   jak wygląda poprawna wartość.
+- **Data w formularzu tylko przez `DateField`** (`common/DateField.tsx` w aplikacji i makietach): kalendarz albo
+  wpisanie `DD.MM.RRRR`, wartość `RRRR-MM-DD` albo `null`, w schemacie `isoDate` (nieobowiązkowa:
+  `optionalField(isoDate)`). Nigdy zwykłe pole tekstowe ani własny `DateInput`.
 - **Testy schematu:** dla każdego pola z tabeli wartości graniczne (min−1, min, maks, maks+1) i jeden zły format.
 
 ## Pobieranie danych na froncie
@@ -530,6 +551,9 @@ Używaj jej, gdy nie ma `superpowers:requesting-code-review`:
 - [ ] dane z innych modułów przez ich funkcje, z polami dozwolonymi dla roli
 - [ ] pola formularzy zgodne z tabelą w specu, formaty z `fields.ts`, testy wartości granicznych
 - [ ] dane na froncie przez hooki `<module>.api.ts` i `DataState`; brak `useEffect` z pobieraniem i `fetch`
+- [ ] żaden fragment modułu nie robi tego samego co coś w innym module, `common/`, `core/` albo `shared/` (także
+  „prawie tak samo”; recenzent porównuje z resztą projektu, nie tylko z tym modułem); wspólne klocki bez parametrów
+  na siłę
 - [ ] funkcje strzałkowe, bez `function`
 - [ ] numer z adresu przez `idParam`, odpowiedź usługi przez `reply`
 - [ ] listy: `validateQuery(listQuerySchema(...))`, sortowanie tylko po kolumnach z listy, stan w adresie
