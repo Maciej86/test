@@ -132,9 +132,15 @@ export async function updateUser(db: Db, id: number, u: AccountData): Promise<vo
   ]);
 }
 
-/** Hasło ustawione przez administratora jest tymczasowe: przy następnym kliknięciu osoba ustawia własne. */
+/**
+ * Hasło ustawione przez administratora jest tymczasowe: przy następnym kliknięciu osoba ustawia własne.
+ * Podniesiona wersja sesji wylogowuje tę osobę na wszystkich urządzeniach.
+ */
 export async function setTemporaryPassword(db: Db, id: number, passwordHash: string): Promise<void> {
-  await db.query('UPDATE users SET password_hash = ?, must_change_password = 1 WHERE id = ?', [passwordHash, id]);
+  await db.query(
+    'UPDATE users SET password_hash = ?, must_change_password = 1, token_version = token_version + 1 WHERE id = ?',
+    [passwordHash, id],
+  );
 }
 
 /** `byUserId` = kto archiwizuje; `null` = przywrócenie. */

@@ -23,7 +23,7 @@ app.get('/me', requireAuth, (req, res) => {
 
 const nowSec = () => Math.floor(Date.now() / 1000);
 const tokenIssued = (secondsAgo: number) =>
-  jwt.sign({ id: 2, iat: nowSec() - secondsAgo }, SECRET, { expiresIn: '31m' });
+  jwt.sign({ id: 2, ver: 0, iat: nowSec() - secondsAgo }, SECRET, { expiresIn: '31m' });
 const cookie = (token: string) => `${AUTH_COOKIE_NAME}=${token}`;
 const row = (over: Record<string, unknown> = {}) => ({ id: 2, name: 'Jan Kowalski', role: 'employee', must_change_password: 0, ...over });
 
@@ -32,13 +32,14 @@ beforeEach(() => {
 });
 
 describe('authenticate', () => {
-  it('archived account gives 401 on /auth/me', async () => {
+  it('archived account (or a token version from before a password change) gives 401 on /auth/me', async () => {
     vi.mocked(pool.query).mockResolvedValue([[], []] as never);
     const res = await request(app).get('/me').set('Cookie', cookie(tokenIssued(10)));
     expect(res.status).toBe(401);
     const [sql, params] = vi.mocked(pool.query).mock.calls[0]!;
     expect(sql).toContain('archived_at IS NULL');
-    expect(params).toEqual([2]);
+    expect(sql).toContain('token_version = ?');
+    expect(params).toEqual([2, 0]);
   });
 
   it('role changed in the database is the role in req.user', async () => {

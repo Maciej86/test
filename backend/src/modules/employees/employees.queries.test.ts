@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../db/pool', () => ({ pool: { query: vi.fn() } }));
-const { insertUser, listEmployees } = await import('./employees.queries');
+const { insertUser, listEmployees, setTemporaryPassword } = await import('./employees.queries');
 
 function fakeDb(rows: unknown[][]) {
   const query = vi.fn();
@@ -10,6 +10,14 @@ function fakeDb(rows: unknown[][]) {
 }
 
 describe('employees queries', () => {
+  it('a temporary password raises token_version, so the person is logged out everywhere', async () => {
+    const db = { query: vi.fn().mockResolvedValue([{}]) };
+    await setTemporaryPassword(db, 2, 'h');
+    const [sql, params] = db.query.mock.calls[0]!;
+    expect(sql).toContain('token_version = token_version + 1');
+    expect(params).toEqual(['h', 2]);
+  });
+
   it('inserts first and last name, never the generated name column', async () => {
     const db = { query: vi.fn().mockResolvedValue([{ insertId: 5 }]) };
     await insertUser(db, { firstName: 'Jan', lastName: 'Kowalski', login: 'jan@firma.pl', email: null, role: 'employee', passwordHash: 'h' });

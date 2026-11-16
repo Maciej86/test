@@ -19,7 +19,7 @@ const jan = { id: 2, name: 'Jan Kowalski', role: 'employee' as const, mustChange
 
 beforeAll(async () => {
   const passwordHash = await hashPassword('Urlop-2026');
-  vi.mocked(queries.findActiveUserByLogin).mockResolvedValue({ user: jan, passwordHash });
+  vi.mocked(queries.findActiveUserByLogin).mockResolvedValue({ user: jan, passwordHash, tokenVersion: 0 });
 });
 
 describe('login rate limit', () => {

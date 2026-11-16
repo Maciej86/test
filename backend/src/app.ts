@@ -9,6 +9,7 @@ import { sendError } from './middleware/errors';
 import { requireAuth } from './middleware/requireRole';
 import { mountModule } from './middleware/mountModule';
 import { requirePasswordChanged } from './middleware/requirePasswordChanged';
+import { sameOrigin } from './middleware/sameOrigin';
 import { healthRoutes } from './modules/health/health.routes';
 import { authPublicRoutes, authRoutes } from './modules/auth/auth.routes';
 import { employeesRoutes } from './modules/employees/employees.routes';
@@ -26,6 +27,8 @@ export function createApp(options: AppOptions = {}) {
   app.set('trust proxy', 1);
   app.use(helmet());
   app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
+  // Zapisy tylko z własnej strony (FRONTEND_URL); nie wyłączaj. Nagłówki stron (CSP, ramki) ustawia Caddyfile.
+  app.use(sameOrigin);
   app.use(express.json());
   app.use(cookieParser());
   app.use(authenticate);

@@ -15,6 +15,7 @@ const { signToken } = await import('./auth/token');
 const { requireRole } = await import('./middleware/requireRole');
 const { validateBody } = await import('./middleware/validateBody');
 const { AUTH_COOKIE_NAME } = await import('./config/constants');
+const { env } = await import('./env');
 
 const { mountModule } = await import('./middleware/mountModule');
 
@@ -84,7 +85,7 @@ describe('behind a proxy (Caddy on the server)', () => {
 
 describe('unknown address', () => {
   it('returns 404 with a message key to a logged-in user', async () => {
-    const token = signToken({ id: 2 });
+    const token = signToken({ id: 2 }, 0);
     const res = await request(createApp()).get('/api/does-not-exist').set('Cookie', cookie(token));
     expect(res.status).toBe(404);
     expect(res.body.error.message).toBe('server.not_found');
@@ -104,7 +105,7 @@ describe('protected by default', () => {
   });
 
   it('lets any logged-in user through such a route', async () => {
-    const token = signToken({ id: 2 });
+    const token = signToken({ id: 2 }, 0);
     const res = await request(appWithTestRoutes()).get('/api/test/forgotten').set('Cookie', cookie(token));
     expect(res.status).toBe(200);
   });
@@ -127,14 +128,14 @@ describe('mountModule', () => {
   }
 
   it('takes the roles of the navigation item (dashboard: admin and employee)', async () => {
-    const user = signToken({ id: 2 });
-    const admin = signToken({ id: 1 });
+    const user = signToken({ id: 2 }, 0);
+    const admin = signToken({ id: 1 }, 0);
     expect((await request(appWithModule()).get('/api/dashboard').set('Cookie', cookie(user))).status).toBe(200);
     expect((await request(appWithModule()).get('/api/dashboard').set('Cookie', cookie(admin))).status).toBe(200);
   });
 
   it('accepts explicit roles for a module without a navigation item', async () => {
-    const user = signToken({ id: 2 });
+    const user = signToken({ id: 2 }, 0);
     const res = await request(appWithModule(['admin'])).get('/api/dashboard').set('Cookie', cookie(user));
     expect(res.status).toBe(403);
   });
@@ -157,26 +158,26 @@ describe('requireRole', () => {
   });
 
   it('rejects a user with the wrong role', async () => {
-    const token = signToken({ id: 2 });
+    const token = signToken({ id: 2 }, 0);
     const res = await request(app).get('/api/test/admin-only').set('Cookie', cookie(token));
     expect(res.status).toBe(403);
     expect(res.body.error.message).toBe('server.no_access');
   });
 
   it('lets the right role in', async () => {
-    const token = signToken({ id: 1 });
+    const token = signToken({ id: 1 }, 0);
     const res = await request(app).get('/api/test/admin-only').set('Cookie', cookie(token));
     expect(res.status).toBe(200);
   });
 
   it('treats a token signed with another secret as logged out', async () => {
-    const token = jwt.sign({ id: 1 }, 'another-secret');
+    const token = jwt.sign({ id: 1, ver: 0 }, 'another-secret');
     const res = await request(app).get('/api/test/admin-only').set('Cookie', cookie(token));
     expect(res.status).toBe(401);
   });
 
   it('treats an account with an unknown role in the database as logged out', async () => {
-    const token = signToken({ id: 9 });
+    const token = signToken({ id: 9 }, 0);
     const res = await request(app).get('/api/test/admin-only').set('Cookie', cookie(token));
     expect(res.status).toBe(401);
   });
@@ -196,5 +197,45 @@ describe('validateBody', () => {
       .send({ email: 'anna@example.com', extra: 'dropped' });
     expect(res.status).toBe(200);
     expect(res.body.body).toEqual({ email: 'anna@example.com' });
+  });
+});
+
+describe('sameOrigin', () => {
+  it('rejects a write sent from another site', async () => {
+    const res = await request(appWithTestRoutes())
+      .post('/api/test/form')
+      .set('Origin', 'https://evil.example')
+      .send({ email: 'jan@firma.pl' });
+    expect(res.status).toBe(403);
+    expect(res.body.error.message).toBe('server.no_access');
+  });
+
+  it('accepts a write from the app itself and a request without Origin', async () => {
+    const app = appWithTestRoutes();
+    const own = await request(app).post('/api/test/form').set('Origin', new URL(env.FRONTEND_URL).origin).send({ email: 'jan@firma.pl' });
+    expect(own.status).toBe(200);
+    const noOrigin = await request(app).post('/api/test/form').send({ email: 'jan@firma.pl' });
+    expect(noOrigin.status).toBe(200);
+  });
+
+  it('does not block reading from another site (CORS decides what the browser may read)', async () => {
+    const res = await request(createApp()).get('/api/health').set('Origin', 'https://evil.example');
+    expect(res.status).toBe(200);
+  });
+});
+
+describe('JWT_SECRET', () => {
+  it('stops the app when the secret is too short', () => {
+    process.env.JWT_SECRET = 'short';
+    try {
+      expect(() => env.JWT_SECRET).toThrow(/za krótki/);
+    } finally {
+      process.env.JWT_SECRET = SECRET;
+    }
+  });
+
+  it('rejects a token signed with another algorithm', () => {
+    const forged = jwt.sign({ id: 1, ver: 0 }, SECRET, { algorithm: 'HS512' });
+    return request(appWithTestRoutes()).get('/api/test/forgotten').set('Cookie', cookie(forged)).expect(401);
   });
 });

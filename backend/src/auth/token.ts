@@ -3,19 +3,22 @@ import jwt from 'jsonwebtoken';
 import { AUTH_COOKIE_NAME, TOKEN_TTL } from '../config/constants';
 import { env } from '../env';
 
-/** Token zawiera tylko numer konta; imię, rolę i stan konta `authenticate` czyta z bazy przy każdym żądaniu. */
-export function signToken(user: { id: number }): string {
-  return jwt.sign({ id: user.id }, env.JWT_SECRET, { expiresIn: TOKEN_TTL });
+/**
+ * Token zawiera tylko numer konta i wersję sesji (`users.token_version`); imię, rolę i stan konta `authenticate`
+ * czyta z bazy przy każdym żądaniu. Zmiana hasła podnosi wersję, więc starsze tokeny przestają działać.
+ */
+export function signToken(user: { id: number }, tokenVersion: number): string {
+  return jwt.sign({ id: user.id, ver: tokenVersion }, env.JWT_SECRET, { algorithm: 'HS256', expiresIn: TOKEN_TTL });
 }
 
-/** Numer konta i chwila wystawienia tokenu albo null (zły podpis, wygasły token). */
-export function verifyToken(token: string): { id: number; issuedAtMs: number } | null {
+/** Numer konta, wersja sesji i chwila wystawienia tokenu albo null (zły podpis, wygasły token, brak wersji). */
+export function verifyToken(token: string): { id: number; tokenVersion: number; issuedAtMs: number } | null {
   try {
-    const payload = jwt.verify(token, env.JWT_SECRET);
+    const payload = jwt.verify(token, env.JWT_SECRET, { algorithms: ['HS256'] });
     if (typeof payload !== 'object' || payload === null) return null;
-    const { id, iat } = payload as Record<string, unknown>;
-    if (typeof id !== 'number' || typeof iat !== 'number') return null;
-    return { id, issuedAtMs: iat * 1000 };
+    const { id, ver, iat } = payload as Record<string, unknown>;
+    if (typeof id !== 'number' || typeof ver !== 'number' || typeof iat !== 'number') return null;
+    return { id, tokenVersion: ver, issuedAtMs: iat * 1000 };
   } catch {
     return null;
   }

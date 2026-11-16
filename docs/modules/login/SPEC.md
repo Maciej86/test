@@ -103,6 +103,10 @@ Migracje (jedna zmiana na plik):
    - Klucz obcy `archived_by` → `users.id` `ON DELETE SET NULL` (autorstwo archiwizacji, `SPEC-GENERAL.md`).
    - Unikalność loginu i e-maila obejmuje też konta w archiwum (`SPEC-GENERAL.md`, „Archiwum”).
 2. `002_activity_log.sql`: kopia `backend/src/db/sql/activity_log.sql` (klucz obcy `user_id` `ON DELETE SET NULL`).
+3. `007_users_token_version.sql` (2026-11-16, aktualizacja stepkit 0.1.26): `users.token_version INT NOT NULL DEFAULT 0`.
+   Token ma pole `ver`; `authenticate` szuka konta z tą wersją. Każda zmiana hasła (własna z tymczasowego, hasło
+   tymczasowe od administratora) podnosi wersję w tym samym zapytaniu, więc inne sesje tej osoby się kończą; osoba,
+   która sama zmieniła hasło, dostaje nowe ciasteczko.
 
 Logowania i wylogowania **nie** trafiają do historii zmian (nie ma ich w zakresie w `SPEC-GENERAL.md`). Zmiana
 hasła tymczasowego też nie (to nie zmiana danych pracownika z listy zakresu). **[decyzja AI]**

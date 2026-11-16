@@ -9,9 +9,16 @@ function required(name: string, hint: string): string {
   return value;
 }
 
+/** Krótszy sekret da się zgadnąć i podrobić ciasteczko logowania. Generowany ma 96 znaków. */
+const JWT_SECRET_MIN_LENGTH = 32;
+
 export const env = {
   get JWT_SECRET() {
-    return required('JWT_SECRET', 'skopiuj .env.example do .env');
+    const secret = required('JWT_SECRET', 'skopiuj .env.example do .env');
+    if (secret.length < JWT_SECRET_MIN_LENGTH) {
+      throw new Error(`JWT_SECRET w pliku .env jest za krótki (minimum ${JWT_SECRET_MIN_LENGTH} znaki); wygeneruj nowy losowy`);
+    }
+    return secret;
   },
   DB_HOST: process.env.DB_HOST ?? '127.0.0.1',
   DB_PORT: Number(process.env.DB_PORT ?? 3307),

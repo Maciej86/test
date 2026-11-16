@@ -24,11 +24,11 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
   const payload = typeof token === 'string' ? verifyToken(token) : null;
   if (!payload) return next();
   try {
-    const user = await findActiveUserById(payload.id);
+    const user = await findActiveUserById(payload.id, payload.tokenVersion);
     if (!user) return next();
     req.user = user;
     if (req.get(USER_ACTIVITY_HEADER) === '1' && Date.now() - payload.issuedAtMs > TOKEN_RENEW_AFTER_MS) {
-      setAuthCookie(res, signToken(user));
+      setAuthCookie(res, signToken(user, payload.tokenVersion));
     }
     next();
   } catch (error) {

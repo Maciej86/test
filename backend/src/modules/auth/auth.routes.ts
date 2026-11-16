@@ -16,7 +16,7 @@ authPublicRoutes.post('/auth/login', loginLimiter, validateBody(loginSchema), as
   // Bez konta i tak porównujemy hasło, żeby czas odpowiedzi nie zdradzał, czy login istnieje.
   const valid = await verifyPassword(password, account?.passwordHash ?? (await dummyPasswordHash()));
   if (!account || !valid) return sendError(res, 401, SERVER_MESSAGES.loginFailed);
-  setAuthCookie(res, signToken(account.user));
+  setAuthCookie(res, signToken(account.user, account.tokenVersion));
   res.json({ user: account.user });
 });
 
@@ -44,6 +44,8 @@ authRoutes.post('/change-password', validateBody(newPasswordSchema), async (req,
   if (currentHash && (await verifyPassword(newPassword, currentHash))) {
     return sendError(res, 400, SERVER_MESSAGES.invalidData, { newPassword: 'validation.password_same_as_temporary' });
   }
-  await updatePassword(user.id, await hashPassword(newPassword));
+  const tokenVersion = await updatePassword(user.id, await hashPassword(newPassword));
+  // Stare sesje tej osoby właśnie wygasły; ta dostaje nowe ciasteczko i zostaje zalogowana.
+  setAuthCookie(res, signToken(user, tokenVersion));
   res.json({ user: { ...user, mustChangePassword: false } });
 });

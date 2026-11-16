@@ -45,7 +45,7 @@ const thisYear = Number(todayIsoDate().slice(0, 4));
 function as(user: SessionUser | null) {
   vi.mocked(users.findActiveUserById).mockResolvedValue(user);
   const app = createApp();
-  const cookie = user ? `${AUTH_COOKIE_NAME}=${signToken(user)}` : '';
+  const cookie = user ? `${AUTH_COOKIE_NAME}=${signToken(user, 0)}` : '';
   return {
     get: (url: string) => request(app).get(`/api${url}`).set('Cookie', cookie),
     post: (url: string, body?: object) => request(app).post(`/api${url}`).set('Cookie', cookie).send(body),

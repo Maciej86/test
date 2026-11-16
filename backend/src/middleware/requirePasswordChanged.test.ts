@@ -19,7 +19,7 @@ const { AUTH_COOKIE_NAME } = await import('../config/constants');
 
 const jan: SessionUser = { id: 2, name: 'Jan Kowalski', role: 'employee', mustChangePassword: false };
 const temporary: SessionUser = { ...jan, mustChangePassword: true };
-const cookie = `${AUTH_COOKIE_NAME}=${signToken(jan)}`;
+const cookie = `${AUTH_COOKIE_NAME}=${signToken(jan, 0)}`;
 
 function appWithModule() {
   const extra = express.Router();
