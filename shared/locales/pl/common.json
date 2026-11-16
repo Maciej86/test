@@ -31,6 +31,7 @@
     "role_cannot_see": "Ta rola nie widzi tego ekranu.",
     "progress": "Postęp",
     "screen_login": "Ekran logowania",
+    "screen_email": "E-mail: nowy wniosek",
     "question": "Pytanie {{number}}",
     "recommended": "(polecam)",
     "questions_title": "Pytania do tej makiety ({{count}})",

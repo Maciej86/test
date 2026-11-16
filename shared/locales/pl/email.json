@@ -1,1 +1,36 @@
-{}
+{
+  "new_request": {
+    "subject": "Nowy wniosek urlopowy: {{employee}}, {{dateFrom}}–{{dateTo}}",
+    "heading": "Nowy wniosek urlopowy",
+    "intro": "{{employee}} prosi o urlop. Wniosek czeka na Twoją decyzję.",
+    "employee": "Pracownik",
+    "leave_type": "Typ urlopu",
+    "dates": "Termin",
+    "working_days": "Dni robocze",
+    "working_days_value": "{{count}}",
+    "split": "Z puli",
+    "split_value": "{{carried}} z zaległego, {{annual}} z puli rocznej",
+    "left_after": "Zostanie po zatwierdzeniu",
+    "left_after_value": "{{count}} dni",
+    "comment": "Komentarz",
+    "button": "Otwórz wniosek",
+    "link_hint": "Przycisk nie działa? Skopiuj adres do przeglądarki: {{link}}",
+    "footer": "Dostajesz tę wiadomość, bo jesteś administratorem i masz wpisany e-mail do powiadomień. Adres zmienisz w aplikacji: Moje konto."
+  },
+  "preview": {
+    "title": "Podgląd e-maila",
+    "summary": "Jedyny e-mail aplikacji: nowy wniosek urlopowy, do każdego administratora z e-mailem do powiadomień.",
+    "state": "Pokaż:",
+    "states": {
+      "html": "E-mail",
+      "text": "Wersja tekstowa",
+      "no_comment": "Wniosek bez komentarza",
+      "mobile": "Na telefonie"
+    },
+    "from": "Od",
+    "to": "Do",
+    "subject": "Temat",
+    "sent": "Wysłano",
+    "text_hint": "Tak wygląda e-mail w programach, które nie pokazują kolorów i przycisków."
+  }
+}

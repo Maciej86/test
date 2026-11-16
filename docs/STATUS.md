@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.29
 
-**Następny krok:** Moduł E-mail, etap makieta (wpisz `/stepkit:dalej` w nowej rozmowie).
+**Następny krok:** Moduł E-mail, etap pytania: odpowiedzi na 5 pytań w makiecie http://localhost:5181/email.
 
 ## Start aplikacji
 
@@ -23,7 +23,7 @@
 | 2 | Logowanie | login | zrobiony | zamknięcie | appearance |
 | 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
-| 5 | E-mail | email | czeka | makieta | login |
+| 5 | E-mail | email | w toku | pytania | login |
 | 6 | Powiadomienia | notifications | czeka | makieta | login |
 | 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 8 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-16: E-mail: makieta podglądu e-maila „Nowy wniosek urlopowy” (jasna treść, wersja tekstowa, widok na telefonie); 5 pytań.
 
 - 2026-11-16: Aktualizacja stepkit 0.1.28 → 0.1.29: test zasad pilnuje, że numer z adresu idzie tylko przez `idParam` (nigdy `Number(req.params…)`); `routeHelpers.ts`, `errors.ts` i ich testy wyrównane z szablonem.
 
