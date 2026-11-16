@@ -5,3 +5,4 @@ export * from './ui';
 export * from './numbers';
 export * from './login';
 export * from './employees';
+export * from './leaveTypes';

@@ -50,7 +50,7 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
   `frontend/src/modules/leave-types/components/__tests__/LeaveTypeFormModal.test.tsx`,
   `e2e/leave-types.spec.ts` (`test.fixme`). → `npm run check`
 
-- [ ] **1. Stałe i schematy.** `shared/src/constants/leaveTypes.ts` (wartości wyżej). `shared/src/schemas/leaveTypes.ts`:
+- [x] **1. Stałe i schematy.** `shared/src/constants/leaveTypes.ts` (wartości wyżej). `shared/src/schemas/leaveTypes.ts`:
   `leaveTypeSchema = z.object({ name: personName(LEAVE_TYPE_NAME_MAX), deductsPool: z.boolean(), yearlyLimit:
   optionalField(wholeNumber(LEAVE_TYPE_LIMIT_MIN, LEAVE_TYPE_LIMIT_MAX)) })`, `leaveTypeMoveSchema = z.object({
   direction: z.enum(['up', 'down']) })`; typy `LeaveTypeInput`, `LeaveTypeData`, `LeaveTypeItem = { id: number; name:
