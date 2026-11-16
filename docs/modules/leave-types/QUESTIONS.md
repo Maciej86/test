@@ -14,7 +14,7 @@ się ukryć (bez typów nie da się złożyć wniosku). Typy widzi i zmienia tyl
   i zatwierdzone, więc nie da się złożyć dwóch, które razem przekroczą limit **(polecam)**
 - b) Wliczają się tylko wnioski zatwierdzone; czekające nie blokują kolejnego
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 1a.
 
 ## 2. Edycja typu, który jest już we wnioskach
 
@@ -22,35 +22,35 @@ się ukryć (bez typów nie da się złożyć wniosku). Typy widzi i zmienia tyl
   wniosków (żółta ramka w oknie) **(polecam)**
 - b) Gdy typ jest już we wnioskach, „Odejmuje dni z puli” jest zablokowane; inną zasadę ustawia się nowym typem
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 2a.
 
 ## 3. Jak pokazywać ukryte typy?
 
 - a) Schowane; przełącznik „Pokaż ukryte” dopisuje je przygaszone, z przyciskiem „Przywróć” **(polecam)**
 - b) Zawsze widoczne na dole listy, przygaszone
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 3a.
 
 ## 4. Czy typ urlopu da się usunąć?
 
 - a) Tylko ukrywanie, bez usuwania na stałe (jak w specu ogólnym) **(polecam)**
 - b) Typ, którego nie ma w żadnym wniosku, można też usunąć na stałe
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 4a.
 
 ## 5. Kolejność typów na liście i w formularzu wniosku
 
 - a) Własna kolejność, ustawiana strzałkami; nowy typ trafia na koniec **(polecam)**
 - b) Alfabetycznie
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 5a.
 
 ## 6. Opis typu dla pracownika
 
 - a) Bez opisu, wystarczy nazwa **(polecam)**
 - b) Krótki opis (do 200 znaków) widoczny dla pracownika w formularzu wniosku
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 6a.
 
 ## 7. Kolumna „Wnioski”
 
@@ -59,7 +59,7 @@ W ilu wnioskach (ze wszystkich lat) jest typ; do czasu modułu „Moje urlopy”
 - a) Zostaje **(polecam)**
 - b) Bez tej kolumny
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 7a.
 
 ## 8. Zasady pól
 
@@ -69,4 +69,4 @@ W ilu wnioskach (ze wszystkich lat) jest typ; do czasu modułu „Moje urlopy”
 | Odejmuje dni z puli | — | tak / nie | przełącznik, domyślnie włączony |
 | Limit dni w roku | nie | 1–365 | liczba całkowita; puste = bez limitu |
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** ok.

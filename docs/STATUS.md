@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.27
 
-**Następny krok:** Moduł Typy urlopów, etap pytania: odpowiedzi na 8 pytań z makiety (http://localhost:5181/admin/leave-types).
+**Następny krok:** Moduł Typy urlopów, etap spec: akceptacja `docs/modules/leave-types/SPEC.md`.
 
 ## Start aplikacji
 
@@ -22,7 +22,7 @@
 | 1 | Wygląd | appearance | zrobiony | zamknięcie | — |
 | 2 | Logowanie | login | zrobiony | zamknięcie | appearance |
 | 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
-| 4 | Typy urlopów | leave-types | w toku | pytania | login |
+| 4 | Typy urlopów | leave-types | w toku | spec | login |
 | 5 | E-mail | email | czeka | makieta | login |
 | 6 | Powiadomienia | notifications | czeka | makieta | login |
 | 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-16: Typy urlopów: odpowiedzi 1a–7a, zasady pól ok (limit liczony na osobę z czekającymi, zmiana zasad tylko dla nowych wniosków, tylko ukrywanie, własna kolejność strzałkami, bez opisu, kolumna „Wnioski”).
 
 - 2026-11-16: Typy urlopów: makieta listy (kolejność strzałkami, „Pokaż ukryte”, kolumna „Wnioski”), okna dodaj/edytuj (ostrzeżenie przy typie użytym we wnioskach) i ukryj; 8 pytań. Nowe ikony przycisków: Ukryj (`EyeOff`), Przywróć ukryty (`Undo2`).
 

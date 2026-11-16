@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { notify } from '../../common/notify';
-import { Question, Questions } from '../../common/Question';
 import { HideModal, LeaveTypeModal } from './LeaveTypeModals';
 import { LEAVE_TYPES, type MockLeaveType } from './data';
 
@@ -15,95 +14,6 @@ type State = (typeof STATES)[number];
 interface RowActions {
   onEdit: (lt: MockLeaveType) => void;
   onHide: (lt: MockLeaveType) => void;
-}
-
-function ScreenQuestions() {
-  return (
-    <Questions>
-      <Question
-        number={1}
-        about="Limit w roku"
-        options={[
-          { id: 'a', text: 'Limit liczy się osobno dla każdej osoby, w dniach roboczych, w roku kalendarzowym. Wliczają się wnioski czekające i zatwierdzone, więc nie da się złożyć dwóch, które razem go przekroczą' },
-          { id: 'b', text: 'Wliczają się tylko wnioski zatwierdzone; czekające nie blokują kolejnego' },
-        ]}
-        recommended="a"
-      >
-        Jak liczyć „Limit w roku” (np. Na żądanie: 4 dni na osobę)?
-      </Question>
-      <Question
-        number={2}
-        about="Okno Edytuj"
-        options={[
-          { id: 'a', text: 'Nową nazwę widać we wszystkich wnioskach, także starych; „Odejmuje dni z puli” i limit działają tylko dla nowych wniosków (żółta ramka w oknie, stan „Edycja typu we wnioskach”)' },
-          { id: 'b', text: 'Gdy typ jest już we wnioskach, „Odejmuje dni z puli” jest zablokowane; inną zasadę ustawia się, dodając nowy typ' },
-        ]}
-        recommended="a"
-      >
-        Co się dzieje, gdy zmienisz typ, który jest już we wnioskach?
-      </Question>
-      <Question
-        number={3}
-        about="Tabela typów"
-        options={[
-          { id: 'a', text: 'Ukryte są schowane; przełącznik „Pokaż ukryte” dopisuje je przygaszone, z przyciskiem „Przywróć” (stan „Z ukrytymi”)' },
-          { id: 'b', text: 'Ukryte są zawsze widoczne na dole listy, przygaszone' },
-        ]}
-        recommended="a"
-      >
-        Jak pokazywać ukryte typy?
-      </Question>
-      <Question
-        number={4}
-        about="Ukryj"
-        options={[
-          { id: 'a', text: 'Typy tylko się ukrywa, bez usuwania na stałe (tak mówi spec ogólny; ukryty typ wraca jednym kliknięciem)' },
-          { id: 'b', text: 'Typ, którego nie ma w żadnym wniosku (np. dodany przez pomyłkę), można też usunąć na stałe' },
-        ]}
-        recommended="a"
-      >
-        Czy typ urlopu da się usunąć?
-      </Question>
-      <Question
-        number={5}
-        about="Kolejność"
-        options={[
-          { id: 'a', text: 'Własna kolejność, ustawiana strzałkami w pierwszej kolumnie tabeli; nowy typ trafia na koniec' },
-          { id: 'b', text: 'Alfabetycznie (wtedy Wypoczynkowy jest prawie na końcu listy)' },
-        ]}
-        recommended="a"
-      >
-        W jakiej kolejności typy są na liście i w formularzu wniosku pracownika?
-      </Question>
-      <Question
-        number={6}
-        about="Okno Dodaj / Edytuj"
-        options={[
-          { id: 'a', text: 'Bez opisu: wystarczy nazwa' },
-          { id: 'b', text: 'Krótki opis (do 200 znaków), który pracownik zobaczy pod listą typów we wniosku, np. „Okolicznościowy: ślub, narodziny dziecka, pogrzeb”' },
-        ]}
-        recommended="a"
-      >
-        Czy typ ma mieć opis dla pracownika?
-      </Question>
-      <Question
-        number={7}
-        about="Kolumna Wnioski"
-      >
-        Kolumna „Wnioski” pokazuje, w ilu wnioskach (ze wszystkich lat) jest typ, żeby przed ukryciem albo zmianą było
-        widać, czego to dotyczy. Liczby pojawią się, gdy powstanie moduł „Moje urlopy”; do tego czasu wszędzie będzie
-        0. Zostawić tę kolumnę? (polecam: tak)
-      </Question>
-      <Question
-        number={8}
-        about="Zasady pól"
-      >
-        Propozycja (odpowiedz „ok” albo popraw pojedyncze pola): Nazwa: wymagana, 2–40 znaków, niepowtarzalna także
-        wśród ukrytych, bez względu na wielkie i małe litery (np. Na żądanie). Odejmuje dni z puli: przełącznik,
-        domyślnie włączony. Limit dni w roku: nieobowiązkowy, liczba całkowita 1–365.
-      </Question>
-    </Questions>
-  );
 }
 
 function DeductsBadge({ deducts }: { deducts: boolean }) {
@@ -242,8 +152,6 @@ export function LeaveTypesMockup() {
 
   return (
     <Stack>
-      <ScreenQuestions />
-
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">
           <Text size="sm" fw={600}>{t('mockup_state')}</Text>
