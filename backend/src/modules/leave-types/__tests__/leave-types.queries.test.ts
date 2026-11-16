@@ -1,8 +1,70 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn() } }));
+const q = await import('../leave-types.queries');
+
+const db = (rows: unknown = []) => ({ query: vi.fn().mockResolvedValue([rows]) });
+const row = (o: Record<string, unknown>) => ({ id: 1, name: 'Wypoczynkowy', deducts_pool: 1, yearly_limit: null, position: 1, hidden_at: null, ...o });
 
 describe('leave types queries', () => {
-  it.todo('every query uses ? parameters');
-  it.todo('listLeaveTypes: visible by position, then hidden by name, mapped to LeaveTypeItem with requestsCount 0');
-  it.todo('findSelectableLeaveType: hidden type → null');
-  it.todo('lockVisible locks visible rows FOR UPDATE ordered by position');
+  it('every query uses ? parameters', async () => {
+    const calls: [string, unknown[] | undefined][] = [];
+    const spy = { query: vi.fn(async (sql: string, params?: unknown[]) => { calls.push([sql, params]); return [[{ id: 3, insertId: 3, max: 2 }]]; }) } as unknown as Parameters<typeof q.findLeaveType>[0];
+    await q.findLeaveType(spy, 3);
+    await q.findByName(spy, 'Na żądanie', 3);
+    await q.insertLeaveType(spy, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: 5 }, 6);
+    await q.updateLeaveType(spy, 3, { name: 'Szkoleniowy', deductsPool: false, yearlyLimit: null });
+    await q.setPosition(spy, 3, 2);
+    await q.setHidden(spy, 3);
+    await q.setVisible(spy, 3, 7);
+    await q.findSelectableLeaveType(3, spy);
+    for (const [sql, params] of calls) {
+      expect(sql).not.toMatch(/Szkoleniowy|żądanie/);
+      expect(params?.length).toBeGreaterThan(0);
+    }
+    expect(calls[1]![1]).toEqual(['Na żądanie', 3, 3]);
+    expect(calls[2]![1]).toEqual(['Szkoleniowy', true, 5, 6]);
+    expect(calls[6]![1]).toEqual([7, 3]);
+  });
+
+  it('findByName without exceptId does not skip any type', async () => {
+    const spy = db([]);
+    await q.findByName(spy, 'Na żądanie', null);
+    expect(spy.query.mock.calls[0]![1]).toEqual(['Na żądanie', null, null]);
+  });
+
+  it('listLeaveTypes: visible by position, then hidden by name, mapped to LeaveTypeItem with requestsCount 0', async () => {
+    const spy = db([row({}), row({ id: 5, name: 'Bezpłatny', deducts_pool: 0, yearly_limit: 4, hidden_at: new Date() })]);
+    const items = await q.listLeaveTypes(spy);
+    expect(spy.query.mock.calls[0]![0]).toMatch(/ORDER BY hidden_at IS NOT NULL, CASE WHEN hidden_at IS NULL THEN position END, name/);
+    expect(items).toEqual([
+      { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, hidden: false, requestsCount: 0 },
+      { id: 5, name: 'Bezpłatny', deductsPool: false, yearlyLimit: 4, hidden: true, requestsCount: 0 },
+    ]);
+  });
+
+  it('findSelectableLeaveType: hidden type → null', async () => {
+    const spy = db([]);
+    expect(await q.findSelectableLeaveType(5, spy)).toBeNull();
+    expect(spy.query.mock.calls[0]![0]).toContain('hidden_at IS NULL');
+    const found = db([row({ id: 2, name: 'Na żądanie', yearly_limit: 4 })]);
+    expect(await q.findSelectableLeaveType(2, found)).toEqual({ id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4 });
+  });
+
+  it('listSelectableLeaveTypes: only visible, by position', async () => {
+    const spy = db([row({})]);
+    expect(await q.listSelectableLeaveTypes(spy)).toEqual([{ id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null }]);
+    expect(spy.query.mock.calls[0]![0]).toMatch(/WHERE hidden_at IS NULL ORDER BY position/);
+  });
+
+  it('lockVisible locks visible rows FOR UPDATE ordered by position', async () => {
+    const spy = db([{ id: 1, position: 1 }]);
+    expect(await q.lockVisible(spy)).toEqual([{ id: 1, position: 1 }]);
+    expect(spy.query.mock.calls[0]![0]).toMatch(/WHERE hidden_at IS NULL ORDER BY position FOR UPDATE/);
+  });
+
+  it('maxPosition: empty table → 0', async () => {
+    expect(await q.maxPosition(db([{ max: null }]))).toBe(0);
+    expect(await q.maxPosition(db([{ max: 5 }]))).toBe(5);
+  });
 });

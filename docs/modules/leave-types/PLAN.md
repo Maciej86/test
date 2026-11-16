@@ -60,7 +60,7 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
   → „Szkoleniowy”, pusta → `validation.required`; limit `''`/`undefined` → `null`, 1 i 365 ok, 0, 366, 2.5 → błąd,
   `'4'` → 4; `deductsPool` brak → błąd; `direction: 'left'` → błąd.
 
-- [ ] **2. Migracje i zapytania.** `backend/migrations/008_leave_types.sql` (kolumny ze specu, `UNIQUE KEY
+- [x] **2. Migracje i zapytania.** `backend/migrations/008_leave_types.sql` (kolumny ze specu, `UNIQUE KEY
   uq_leave_types_name (name)`, `INDEX (hidden_at, position)`), `009_leave_types_seed.sql` (5 typów ze specu) →
   `npm run migrate`. `leave-types.queries.ts` (każda funkcja z `db: Db` jak w Pracownikach):
   `listLeaveTypes(db): Promise<LeaveTypeRow[]>` (widoczne `ORDER BY position`, potem ukryte `ORDER BY name`),
