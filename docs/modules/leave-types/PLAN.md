@@ -120,7 +120,7 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
   pracownik → brak dostępu. Seed e2e usuwa typy `E2E %` (bez wniosków to bezpieczne). → `npm run check`,
   `npm run test:e2e`.
 
-- [ ] **8. Przegląd kodu** (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami.
+- [x] **8. Przegląd kodu** (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami.
 
 ## Rozstrzygnięcia w trakcie budowy
 
@@ -128,3 +128,11 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
 - Krok 3: `ServiceError` w `routeHelpers.ts` ma dowolne dodatkowe dane (`archivedUser`, `hiddenType`), a `reply` przekazuje je wszystkie do `sendError`. Dodawanie typu w `withTransaction`, `maxPosition` z `FOR UPDATE`, żeby dwa nowe typy dodane w tej samej chwili nie dostały tej samej pozycji. Testy tras podmieniają usługę modułu (reguły sprawdzają testy usługi).
 - Kroki 5–6 zrobione razem (ekran używa okien). Pole „Limit dni w roku” ma `clampBehavior="none"`: domyślnie Mantine po cichu poprawiał 0 na 1 i kasował błąd pod polem. Formularz wysyła wartości jak w Pracownikach (pusty limit jako `''`), serwer zamienia je schematem na `null`. Brak dostępu pracownika pod adresem sprawdza wspólne prowadzenie tras i test e2e (krok 7), nie test ekranu.
 - Krok 7: wspólne kroki testów w przeglądarce (`logIn`, `logOut`, `addEmployee`, nowe `logInWithOwnPassword`) przeniesione do `e2e/helpers.ts`; testy Pracowników importują je stamtąd. Seed e2e (`removeTemporaryData`) usuwa też typy `E2E %`.
+
+## Przegląd kodu (2026-11-16)
+
+- Bez błędów krytycznych i ważnych.
+- Poprawione: podwójne kliknięcie „Przywróć” wysyłało dwa żądania (drugie dawało dymek z błędem) → przycisk kręci się i jest zablokowany do odpowiedzi serwera; test w `LeaveTypesPage.test.tsx`.
+- Poprawione: test „wyczyszczony limit” miał mylącą nazwę; dopisany test edycji z wyczyszczonym limitem (`''`, serwer zapisuje `NULL`); podwójne puste linie w kodzie.
+- Zapisane na później: seed e2e a wnioski z `ON DELETE RESTRICT` (uwaga w `SPEC.md`, sekcja „Powiązania”, dla modułu Moje urlopy).
+- Odłożone (drobne): `ServiceError` przyjmuje dowolne dodatkowe pole (literówka w nazwie, np. `archiveUser`, przeszłaby sprawdzanie typów; testy tras Pracowników pilnują `archivedUser`).

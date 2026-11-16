@@ -38,7 +38,7 @@ describe('LeaveTypeFormModal', () => {
     expect(post).not.toHaveBeenCalled();
   });
 
-  it('limit 0 and 366 → error under the field; cleared limit sends null', async () => {
+  it('limit 0 and 366 → error under the field; cleared limit is sent empty (server saves NULL)', async () => {
     const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { id: 6 } });
     show(null);
     fill('Nazwa', 'Szkoleniowy');
@@ -63,6 +63,14 @@ describe('LeaveTypeFormModal', () => {
   it('no warning for a type without requests', () => {
     show({ ...onDemand, requestsCount: 0 });
     expect(screen.queryByText(/Ten typ jest w/)).not.toBeInTheDocument();
+  });
+
+  it('editing: clearing the limit sends it empty (server saves NULL = no limit)', async () => {
+    vi.spyOn(api, 'put').mockResolvedValue({ data: { ok: true } });
+    show(onDemand);
+    fill('Limit dni w roku', '');
+    save();
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/leave-types/2', { name: 'Na żądanie', deductsPool: true, yearlyLimit: '' }));
   });
 
   it('409 name_taken → error under the name', async () => {

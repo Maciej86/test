@@ -138,6 +138,7 @@ Do czasu modułu „Moje urlopy” tabeli wniosków nie ma, więc `requestsCount
 ramki. Plan „Moich urlopów” ma krok: `countRequestsByLeaveType()` + podpięcie w `GET /api/leave-types` z testem.
 
 Zasady dla „Moich urlopów” (zapisane tu, bo wynikają z odpowiedzi w tym module):
+- Seed testów w przeglądarce usuwa typy `E2E %` (`removeTemporaryData` w `backend/src/scripts/seedE2e.ts`). Gdy powstanie `leave_requests` z `ON DELETE RESTRICT`, seed musi najpierw usunąć wnioski z tymi typami (albo testy nie składają wniosków na typy `E2E`).
 - Limit w roku (1a): osobno dla każdej osoby, w dniach roboczych, w roku kalendarzowym; wliczają się wnioski
   czekające i zatwierdzone tego typu.
 - Zmiana „Odejmuje dni z puli” i limitu (2a) dotyczy tylko nowych wniosków: złożony wniosek ma już zapisane

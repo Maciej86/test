@@ -90,6 +90,17 @@ describe('LeaveTypesPage', () => {
     await waitFor(() => expect(success).toHaveBeenCalledWith('Typ jest znowu w formularzu wniosku'));
   });
 
+  it('"Restore" is blocked while the request is pending (no double send)', async () => {
+    const post = vi.spyOn(api, 'post').mockReturnValue(new Promise(() => {}));
+    show([vacation, training]);
+    fireEvent.click(await screen.findByLabelText('Pokaż ukryte (1)'));
+    const restore = within(await rowOf('Szkoleniowy')).getByRole('button', { name: 'Przywróć' });
+    fireEvent.click(restore);
+    await waitFor(() => expect(restore).toBeDisabled());
+    fireEvent.click(restore);
+    expect(post).toHaveBeenCalledTimes(1);
+  });
+
   it('server error → error state with retry', async () => {
     vi.spyOn(api, 'get').mockRejectedValue(new Error('down'));
     renderWithProviders(<LeaveTypesPage />);

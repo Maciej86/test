@@ -33,6 +33,7 @@ export const LeaveTypesPage = () => {
     onHide: (leaveType) => setDialog({ kind: 'hide', leaveType }),
     onUnhide: (leaveType) => unhide.mutate(leaveType.id, { onSuccess: () => notify.success(t('unhidden_done')), onError }),
     onMove: (leaveType, direction) => move.mutate({ id: leaveType.id, direction }, { onError }),
+    unhidingId: unhide.isPending ? (unhide.variables ?? null) : null,
   };
   const add = () => setDialog({ kind: 'form', leaveType: null });
   const addButton = <Button leftSection={<ButtonIcon action="add" />} onClick={add}>{t('add')}</Button>;

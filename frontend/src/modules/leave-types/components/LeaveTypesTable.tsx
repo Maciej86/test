@@ -9,6 +9,8 @@ export interface RowActions {
   onHide: (lt: LeaveTypeItem) => void;
   onUnhide: (lt: LeaveTypeItem) => void;
   onMove: (lt: LeaveTypeItem, direction: LeaveTypeDirection) => void;
+  /** Typ, którego przywracanie właśnie trwa (przycisk się kręci i nie da się kliknąć drugi raz). */
+  unhidingId: number | null;
 }
 
 interface ListProps extends RowActions {
@@ -62,14 +64,20 @@ const OrderArrows = ({ lt, index, count, onMove }: { lt: LeaveTypeItem; index: n
   );
 };
 
-const Actions = ({ lt, visibleCount, onEdit, onHide, onUnhide }: Omit<RowActions, 'onMove'> & { lt: LeaveTypeItem; visibleCount: number }) => {
+const Actions = ({ lt, visibleCount, unhidingId, onEdit, onHide, onUnhide }: Omit<RowActions, 'onMove'> & { lt: LeaveTypeItem; visibleCount: number }) => {
   const { t } = useTranslation('leave-types');
   const last = !lt.hidden && visibleCount <= 1;
   return (
     <Group gap={4} justify="flex-end" wrap="nowrap">
       <Button size="xs" variant="subtle" leftSection={<ButtonIcon action="edit" size={14} />} onClick={() => onEdit(lt)}>{t('edit')}</Button>
       {lt.hidden ? (
-        <Button size="xs" variant="subtle" leftSection={<ButtonIcon action="unhide" size={14} />} onClick={() => onUnhide(lt)}>
+        <Button
+          size="xs"
+          variant="subtle"
+          leftSection={<ButtonIcon action="unhide" size={14} />}
+          loading={unhidingId === lt.id}
+          onClick={() => onUnhide(lt)}
+        >
           {t('unhide')}
         </Button>
       ) : (

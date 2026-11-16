@@ -19,13 +19,11 @@ import { withTransaction } from '../../db/transaction';
 import { fail, type Result, type ServiceError } from '../../middleware/routeHelpers';
 import * as q from './employees.queries';
 
-
 /** Kto wykonuje zmianę (z `req.user`). */
 export interface Actor {
   id: number;
   name: string;
 }
-
 
 /** Bieżący rok kalendarzowy w strefie aplikacji. */
 export const currentYear = () => Number(todayIsoDate().slice(0, 4));

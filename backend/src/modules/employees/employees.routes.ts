@@ -31,7 +31,6 @@ export const employeesRoutes = Router();
 
 const actorOf = (user: Express.Request['user']): Actor => ({ id: user!.id, name: user!.name });
 
-
 employeesRoutes.get('/', validateQuery(employeesListQuerySchema), async (req, res) => {
   res.json(await listEmployeesPage(req.query as unknown as EmployeesListQuery, actorOf(req.user)));
 });

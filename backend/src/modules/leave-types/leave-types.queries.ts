@@ -14,7 +14,6 @@ export interface LeaveTypeRow extends RowDataPacket {
   hidden_at: Date | null;
 }
 
-
 const toSelectable = (r: LeaveTypeRow): SelectableLeaveType => ({
   id: r.id,
   name: r.name,
