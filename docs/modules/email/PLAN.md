@@ -119,7 +119,7 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
 - [x] 8. **Dokumenty.** `SPEC-GENERAL.md`: wiersz `/api/email` w Mapie dostępu → „nie powstaje (moduł bez tras API)”.
   `TESTS.md` modułu. `npm run check`.
 
-- [ ] 9. **Test e2e** `e2e/email.spec.ts` ze scenariuszy `TESTS.md`:
+- [x] 9. **Test e2e** `e2e/email.spec.ts` ze scenariuszy `TESTS.md`:
   - `test('niezalogowany otwiera adres w panelu, loguje się i wraca na ten adres')` (`/admin/employees`)
   - `test('adres spoza aplikacji w next jest pomijany')` (`/login?next=https://example.com` → Pulpit)
   → `npm run test:e2e`.

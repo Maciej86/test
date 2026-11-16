@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.29
 
-**Następny krok:** Moduł E-mail, implementacja: krok 9 z 10 (test e2e).
+**Następny krok:** Moduł E-mail, implementacja: krok 10 z 10 (przegląd kodu).
 
 ## Start aplikacji
 
@@ -23,7 +23,7 @@
 | 2 | Logowanie | login | zrobiony | zamknięcie | appearance |
 | 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
-| 5 | E-mail | email | w toku | implementacja (krok 9/10) | login |
+| 5 | E-mail | email | w toku | implementacja (krok 10/10) | login |
 | 6 | Powiadomienia | notifications | czeka | makieta | login |
 | 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 8 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
