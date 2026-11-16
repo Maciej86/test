@@ -16,7 +16,7 @@ zalogowaniu wraca na adres, który otwierał (6a).
 
 Moduł działa, gdy:
 - polecenie `npm run email:test` wysyła przykładowy e-mail i widać go w Mailpit (http://localhost:8025), wyglądający
-  jak makieta;
+  jak makieta (na tym komputerze http://localhost:8026);
 - po wejściu niezalogowanym na adres w panelu i zalogowaniu się aplikacja wraca na ten adres.
 
 ## Ekrany
@@ -61,6 +61,9 @@ Klucz `server.email_failed` z `email-mailgun.md` nie jest potrzebny, bo nikt nie
   **[decyzja AI]** To rzadka sytuacja (pierwsze logowanie), a prowadzenie adresu przez dwa ekrany komplikuje kod.
 - Zalogowany pracownik, który otworzy link do wniosku, widzi „brak dostępu” jak dziś (wnioski widzi tylko admin).
 - Wylogowanie po bezczynności i wygaśnięcie sesji działają jak dziś (wracają na `/login?reason=…`, bez `next`).
+- Każdy adres w panelu, także taki, którego nie ma w menu (np. szczegóły wniosku), prowadzi niezalogowanego na
+  logowanie z `next` (trasa `/admin/*` dla niezalogowanego). Zalogowany na nieznanym adresie widzi „ekran nie
+  powstał”, jak dziś.
 
 ### Pola formularzy
 
@@ -73,7 +76,8 @@ w historii zmian nie ma (wysłanie e-maila nie zmienia danych).
 
 ## Konfiguracja
 
-- `docker-compose.yml`: usługa `mailpit` (porty 1025 i 8025, tylko z tego komputera: `127.0.0.1:`).
+- `docker-compose.yml`: usługa `mailpit` (porty `SMTP_PORT`, domyślnie 1025, i `MAILPIT_PORT`, domyślnie 8025, tylko
+  z tego komputera: `127.0.0.1:`). Na tym komputerze podgląd skrzynki pod 8026, bo 8025 zajmuje inny projekt.
 - `.env` i `.env.example`: `EMAIL_TRANSPORT=mailpit`, `SMTP_HOST=127.0.0.1`, `SMTP_PORT=1025`, `SMTP_USER=`,
   `SMTP_PASSWORD=`, `EMAIL_FROM=no-reply@localhost`; odczyt w `backend/src/env.ts`.
 - Biblioteka `nodemailer` (+ `@types/nodemailer`), z listy zatwierdzonej (`SPEC-GENERAL.md`, „Biblioteki”).

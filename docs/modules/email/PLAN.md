@@ -108,7 +108,7 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
     `/admin/*` → logowanie z `next` (testy: `a guest opening /admin/leave-requests/128…`, `a logged-in user on an
     unknown panel address sees the missing screen`).
 
-- [ ] 7. **`npm run email:test`.** `backend/src/scripts/sendTestEmail.ts`:
+- [x] 7. **`npm run email:test`.** `backend/src/scripts/sendTestEmail.ts`:
   `sendTestEmail(to: string, send = sendEmail): Promise<void>` z danymi jak w makiecie (`mockups/src/modules/email/
   data.ts`, przepisane, bez importu z makiety); uruchomienie: adres z argumentu albo `test@localhost`, wynik
   „Wysłano e-mail testowy na <adres>. Zobacz go w http://localhost:8025”. Skrypty: `backend/package.json`
@@ -116,7 +116,7 @@ w `buildAppRoutes.tsx` dopisuje `?next=`, `LoginPage` czyta `next`. Bez tras API
   @app/backend --"`. Test: `it('sends the sample new-request email to the given address')`. Sprawdzenie ręczne:
   `npm run email:test` → e-mail widoczny w Mailpit (API `http://localhost:8025/api/v1/messages`).
 
-- [ ] 8. **Dokumenty.** `SPEC-GENERAL.md`: wiersz `/api/email` w Mapie dostępu → „nie powstaje (moduł bez tras API)”.
+- [x] 8. **Dokumenty.** `SPEC-GENERAL.md`: wiersz `/api/email` w Mapie dostępu → „nie powstaje (moduł bez tras API)”.
   `TESTS.md` modułu. `npm run check`.
 
 - [ ] 9. **Test e2e** `e2e/email.spec.ts` ze scenariuszy `TESTS.md`:

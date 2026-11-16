@@ -32,5 +32,6 @@
     "subject": "Temat",
     "sent": "Wysłano",
     "text_hint": "Tak wygląda e-mail w programach, które nie pokazują kolorów i przycisków."
-  }
+  },
+  "test_sent": "Wysłano e-mail testowy na {{to}}. Zobacz go w skrzynce testowej: {{url}}"
 }

@@ -91,7 +91,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `/admin/archive`, `/api/archive` | admin | przywrócenie i usunięcie na stałe |
 | `/admin/my-account`, `/api/my-account` | admin, employee | tylko własne konto |
 | `/api/notifications` | admin, employee | `mountModule(api, 'notifications', …, ['admin', 'employee'])`; tylko własne |
-| `/api/email` (jeśli powstanie) | admin | `mountModule(api, 'email', …, ['admin'])` |
+| `/api/email` | — | nie powstaje: moduł E-mail nie ma tras API (wysyłka wołana z kodu serwera) |
 
 ## 6. Dane
 
