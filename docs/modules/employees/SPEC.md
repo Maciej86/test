@@ -233,3 +233,8 @@ Moduł Typy umów (`docs/modules/contract-types/SPEC.md`) zastąpił stałą lis
   pracownik z ukrytym typem go zachowuje i widzi go z dopiskiem „(ukryty)”, nikt inny nie może go wybrać
   (400 `employees.server.contract_type_unavailable`);
 - lista pokazuje nazwę typu (także ukrytego), historia zmian konta zapisuje nazwę typu.
+
+## Zmiana 2026-11-16: wspólne klocki zamiast kopii
+
+Lista korzysta ze wspólnych klocków: `PageHeader` (nagłówek), `useListParams` (`frontend/src/core/`, parametry w adresie), `ListPagination` (stronicowanie), `EmptyState` (pusty stan) i `ConfirmModal` (okno „Do archiwum”).
+„Nikt nie pasuje do …” ma teraz wygląd pustego stanu: ikona lupy, zdanie i przycisk „Wyczyść wyszukiwanie” pod nim, na środku.

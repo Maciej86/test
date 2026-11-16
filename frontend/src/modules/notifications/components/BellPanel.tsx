@@ -8,8 +8,9 @@ import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DataState } from '../../../common/DataState';
 import { useMarkAllRead, useNotificationsSummary } from '../notifications.api';
 import { useOpenNotification } from '../useOpenNotification';
-import { EmptyNotifications } from './EmptyNotifications';
 import { NotificationItem } from './NotificationItem';
+import { BellOff } from 'lucide-react';
+import { EmptyState } from '../../../common/EmptyState';
 
 /** Zawartość dzwonka: nagłówek, ostatnie powiadomienia, „Pokaż wszystkie”. Ta sama w okienku i w panelu na telefonie. */
 export const BellPanel = ({ onClose, phone }: { onClose(): void; phone: boolean }) => {
@@ -41,10 +42,10 @@ export const BellPanel = ({ onClose, phone }: { onClose(): void; phone: boolean 
         )}
       </Group>
       <Box p={summary.isError ? 'sm' : 0} style={phone ? { flex: 1, overflowY: 'auto' } : undefined}>
-        {/* Pusto: własny widok z ikoną dzwonka (jak w makiecie), DataState tylko ładowanie i błąd. */}
+        {/* Pusto: pusty stan z ikoną dzwonka (jak w makiecie), DataState tylko ładowanie i błąd. */}
         <DataState query={summary}>
           {latest.length === 0 ? (
-            <EmptyNotifications messageKey="empty" />
+            <EmptyState icon={BellOff} text={t('empty')} />
           ) : phone ? (
             list
           ) : (

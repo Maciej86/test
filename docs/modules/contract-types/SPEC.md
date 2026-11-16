@@ -156,3 +156,8 @@ Klucze `mockup_*` i `employee_*` zostają tylko dla makiety.
 - Usuwanie typów na stałe, historia zmian słownika typów.
 - Inne ustawienia typu, np. „Daje prawo do urlopu” (4b): w razie potrzeby nowy pomysł w `docs/IDEAS.md`.
 - Filtr listy pracowników po typie umowy.
+
+## Zmiana 2026-11-16: wspólne klocki zamiast kopii
+
+Okno „Ukryć typ?” i nagłówek ekranu korzystają ze wspólnych klocków `ConfirmModal` i `PageHeader` (`frontend/src/common/`).
+Błąd serwera przy ukrywaniu: dymek z błędem, **okno zostaje otwarte** (wcześniej się zamykało), jak każde okno potwierdzenia.

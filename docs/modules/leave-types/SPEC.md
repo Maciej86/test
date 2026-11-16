@@ -158,3 +158,8 @@ dla makiety.
 - Usuwanie typów na stałe (4b), opis typu dla pracownika (6b), historia zmian typów.
 - Inne właściwości typu (kolor w kalendarzu, wymagany załącznik): w razie potrzeby nowy pomysł w `docs/IDEAS.md`.
 - Liczenie dni i pilnowanie limitu przy wniosku: moduł „Moje urlopy”.
+
+## Zmiana 2026-11-16: wspólne klocki zamiast kopii
+
+Okno „Ukryć typ?” i nagłówek ekranu korzystają ze wspólnych klocków `ConfirmModal` i `PageHeader` (`frontend/src/common/`).
+Błąd serwera przy ukrywaniu: dymek z błędem, **okno zostaje otwarte** (wcześniej się zamykało), jak każde okno potwierdzenia.

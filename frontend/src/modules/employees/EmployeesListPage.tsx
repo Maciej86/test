@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { Button, Group, Pagination, Paper, Stack, Text, ThemeIcon, Title, Tooltip } from '@mantine/core';
-import { Users } from 'lucide-react';
+import { Button, Paper, Stack, Tooltip } from '@mantine/core';
+import { Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
-import { employeesListQuerySchema, todayIsoDate, type EmployeeListItem, type EmployeesListQuery } from '@app/shared';
+import { employeesListQuerySchema, todayIsoDate, type EmployeeListItem } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
+import { EmptyState } from '../../common/EmptyState';
+import { ListPagination } from '../../common/ListPagination';
+import { PageHeader } from '../../common/PageHeader';
+import { useListParams } from '../../core/useListParams';
 import { ArchiveModal } from './components/ArchiveModal';
 import { CloseYearModal } from './components/CloseYearModal';
 import { EmployeeFormModal } from './components/EmployeeFormModal';
@@ -20,40 +23,11 @@ export type EmployeeDialog =
   | { kind: 'password' | 'archive'; employee: EmployeeListItem }
   | { kind: 'close-year' };
 
-/** Adres → parametry listy (ten sam schemat sprawdza je na serwerze). */
-const useListParams = (): [EmployeesListQuery, (next: Partial<EmployeesListQuery>) => void] => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const raw = Object.fromEntries(searchParams);
-  // Zły parametr (np. stara zakładka z ?sort=foo) → domyślna kolejność zamiast pustego ekranu.
-  const parsed = employeesListQuerySchema.safeParse(raw);
-  const params = (parsed.success ? parsed.data : employeesListQuerySchema.parse({ ...raw, sort: undefined, dir: undefined })) as EmployeesListQuery;
-  const update = (next: Partial<EmployeesListQuery>) => {
-    const merged = { ...params, page: 1, ...next };
-    const defaults: Record<string, unknown> = { page: 1, sort: 'name', dir: 'asc', search: '' };
-    // W adresie tylko to, co różni się od domyślnych.
-    const entries = Object.entries(merged).filter(([k, v]) => v !== undefined && defaults[k] !== v);
-    setSearchParams(new URLSearchParams(entries.map(([k, v]) => [k, String(v)])));
-  };
-  return [params, update];
-};
-
-const NoEmployeesYet = ({ onAdd }: { onAdd: () => void }) => {
-  const { t } = useTranslation('employees');
-  return (
-    <Paper withBorder p="xl">
-      <Stack align="center" gap="sm" ta="center" py="lg">
-        <ThemeIcon variant="light" size={48} radius="md"><Users size={26} /></ThemeIcon>
-        <Title order={3}>{t('empty_title')}</Title>
-        <Text c="dimmed" maw={460}>{t('empty_text')}</Text>
-        <Button mt="xs" leftSection={<ButtonIcon action="add" />} onClick={onAdd}>{t('add')}</Button>
-      </Stack>
-    </Paper>
-  );
-};
+const LIST_DEFAULTS = { page: 1, search: '', sort: 'name', dir: 'asc' } as const;
 
 export const EmployeesListPage = () => {
   const { t } = useTranslation('employees');
-  const [params, setParams] = useListParams();
+  const [params, setParams] = useListParams(employeesListQuerySchema, LIST_DEFAULTS);
   const employees = useEmployees(params);
   const [dialog, setDialog] = useState<EmployeeDialog | null>(null);
   const close = () => setDialog(null);
@@ -68,54 +42,56 @@ export const EmployeesListPage = () => {
     onArchive: (employee: EmployeeListItem) => setDialog({ kind: 'archive', employee }),
   };
   const add = () => setDialog({ kind: 'form', employee: null });
+  const addButton = <Button leftSection={<ButtonIcon action="add" />} onClick={add}>{t('add')}</Button>;
 
   return (
     <Stack>
-      <Group justify="space-between" align="flex-end">
-        <Stack gap={2}>
-          <Title order={1}>{t('title')}</Title>
-          {data && <Text c="dimmed" size="sm">{t('summary', { count: data.counts.all, admins: data.counts.admins })}</Text>}
-        </Stack>
-        <Group gap="xs">
-          <Tooltip label={t('close_year_later', { year })} disabled={canCloseYear}>
-            <Button
-              variant="default"
-              leftSection={<ButtonIcon action="close_year" />}
-              disabled={!canCloseYear || onlyAdmins}
-              onClick={() => setDialog({ kind: 'close-year' })}
-            >
-              {t('close_year', { year })}
-            </Button>
-          </Tooltip>
-          <Button leftSection={<ButtonIcon action="add" />} onClick={add}>{t('add')}</Button>
-        </Group>
-      </Group>
+      <PageHeader
+        title={t('title')}
+        subtitle={data && t('summary', { count: data.counts.all, admins: data.counts.admins })}
+        actions={
+          <>
+            <Tooltip label={t('close_year_later', { year })} disabled={canCloseYear}>
+              <Button
+                variant="default"
+                leftSection={<ButtonIcon action="close_year" />}
+                disabled={!canCloseYear || onlyAdmins}
+                onClick={() => setDialog({ kind: 'close-year' })}
+              >
+                {t('close_year', { year })}
+              </Button>
+            </Tooltip>
+            {addButton}
+          </>
+        }
+      />
 
       <EmployeesFilters value={params} onChange={setParams} />
 
       <DataState query={employees}>
         {data && data.items.length === 0 && filtered ? (
-          <Paper withBorder p="lg">
-            <Group justify="space-between">
-              <Text>{t('no_results', { query: params.search })}</Text>
-              <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={() => setParams({ search: '', role: undefined })}>
-                {t('clear_search')}
-              </Button>
-            </Group>
+          <Paper withBorder>
+            <EmptyState
+              icon={Search}
+              text={t('no_results', { query: params.search })}
+              action={
+                <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={() => setParams({ search: '', role: undefined })}>
+                  {t('clear_search')}
+                </Button>
+              }
+            />
           </Paper>
         ) : (
           data && (
             <>
               <EmployeesTable rows={data.items} year={year} {...actions} />
               <EmployeeCards rows={data.items} {...actions} />
-              {onlyAdmins && !filtered && <NoEmployeesYet onAdd={add} />}
-              {data.total > data.pageSize && (
-                <Pagination
-                  total={Math.ceil(data.total / data.pageSize)}
-                  value={params.page}
-                  onChange={(page) => setParams({ page })}
-                />
+              {onlyAdmins && !filtered && (
+                <Paper withBorder>
+                  <EmptyState icon={Users} title={t('empty_title')} text={t('empty_text')} action={addButton} />
+                </Paper>
               )}
+              <ListPagination data={data} page={params.page} onChange={(page) => setParams({ page })} />
             </>
           )
         )}

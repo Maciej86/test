@@ -130,4 +130,14 @@ describe('HideLeaveTypeModal', () => {
     await waitFor(() => expect(success).toHaveBeenCalledWith('Typ ukryty'));
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('server error → error toast, the window stays open', async () => {
+    vi.spyOn(api, 'post').mockRejectedValue(new Error('fail'));
+    const error = vi.spyOn(notify, 'error');
+    const onClose = vi.fn();
+    renderWithProviders(<HideLeaveTypeModal leaveType={onDemand} onClose={onClose} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Ukryj' }));
+    await waitFor(() => expect(error).toHaveBeenCalled());
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });

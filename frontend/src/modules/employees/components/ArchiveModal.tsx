@@ -1,7 +1,7 @@
-import { Button, Group, List, Modal, Stack, Text } from '@mantine/core';
+import { List, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { EmployeeListItem } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
+import { ConfirmModal } from '../../../common/ConfirmModal';
 import { apiErrorMessage } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
 import { useArchiveEmployee } from '../employees.api';
@@ -20,20 +20,20 @@ export const ArchiveModal = ({ employee, onClose }: { employee: EmployeeListItem
     });
 
   return (
-    <Modal opened onClose={onClose} title={t('archive_title', { name: employee.name })}>
-      <Stack>
-        <List size="sm" spacing={6}>
-          <List.Item>{t('archive_logout')}</List.Item>
-          <List.Item>{t('archive_keeps')}</List.Item>
-        </List>
-        <Text size="sm" c="dimmed">{t('archive_restore_hint')}</Text>
-        <Group justify="flex-end">
-          <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-          <Button color="red" leftSection={<ButtonIcon action="archive" />} loading={archive.isPending} onClick={confirm}>
-            {t('archive')}
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
+    <ConfirmModal
+      title={t('archive_title', { name: employee.name })}
+      confirmLabel={t('archive')}
+      confirmAction="archive"
+      danger
+      loading={archive.isPending}
+      onConfirm={confirm}
+      onClose={onClose}
+    >
+      <List size="sm" spacing={6}>
+        <List.Item>{t('archive_logout')}</List.Item>
+        <List.Item>{t('archive_keeps')}</List.Item>
+      </List>
+      <Text size="sm" c="dimmed">{t('archive_restore_hint')}</Text>
+    </ConfirmModal>
   );
 };

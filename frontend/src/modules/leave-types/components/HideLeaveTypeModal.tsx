@@ -1,7 +1,7 @@
-import { Button, Group, Modal, Stack, Text } from '@mantine/core';
+import { Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { LeaveTypeItem } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
+import { ConfirmModal } from '../../../common/ConfirmModal';
 import { apiErrorMessage } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
 import { useHideLeaveType } from '../leave-types.api';
@@ -13,17 +13,18 @@ export const HideLeaveTypeModal = ({ leaveType, onClose }: { leaveType: LeaveTyp
   const confirm = () =>
     hide.mutate(leaveType.id, {
       onSuccess: () => { notify.success(t('hidden_done')); onClose(); },
-      onError: (error) => { notify.error(apiErrorMessage(error, t)); onClose(); },
+      onError: (error) => notify.error(apiErrorMessage(error, t)),
     });
   return (
-    <Modal opened onClose={onClose} title={t('hide_title', { name: leaveType.name })}>
-      <Stack>
-        <Text>{t('hide_text', { count: leaveType.requestsCount })}</Text>
-        <Group justify="flex-end">
-          <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-          <Button leftSection={<ButtonIcon action="hide" />} loading={hide.isPending} onClick={confirm}>{t('hide')}</Button>
-        </Group>
-      </Stack>
-    </Modal>
+    <ConfirmModal
+      title={t('hide_title', { name: leaveType.name })}
+      confirmLabel={t('hide')}
+      confirmAction="hide"
+      loading={hide.isPending}
+      onConfirm={confirm}
+      onClose={onClose}
+    >
+      <Text>{t('hide_text', { count: leaveType.requestsCount })}</Text>
+    </ConfirmModal>
   );
 };

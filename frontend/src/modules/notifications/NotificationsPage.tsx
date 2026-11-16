@@ -1,31 +1,20 @@
-import { Button, Group, Pagination, Paper, SegmentedControl, Stack, Text, Title } from '@mantine/core';
-import { useSearchParams } from 'react-router';
+import { Button, Paper, SegmentedControl, Stack, Text } from '@mantine/core';
+import { BellOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { apiErrorMessage } from '../../core/api/client';
 import { notify } from '../../core/notify';
 import { formatRelativeDay, notificationsQuerySchema, type NotificationItem as Item, type NotificationsQuery } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
-import { EmptyNotifications } from './components/EmptyNotifications';
+import { EmptyState } from '../../common/EmptyState';
+import { ListPagination } from '../../common/ListPagination';
+import { PageHeader } from '../../common/PageHeader';
+import { useListParams } from '../../core/useListParams';
 import { NotificationItem } from './components/NotificationItem';
 import { useMarkAllRead, useNotificationsList } from './notifications.api';
 import { useOpenNotification } from './useOpenNotification';
 
-/** Adres → parametry (ten sam schemat sprawdza je na serwerze); w adresie tylko to, co różni się od domyślnych. */
-const useListParams = (): [NotificationsQuery, (next: Partial<NotificationsQuery>) => void] => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const raw = Object.fromEntries(searchParams);
-  const parsed = notificationsQuerySchema.safeParse(raw);
-  const params = parsed.success ? parsed.data : notificationsQuerySchema.parse({ page: raw.page });
-  const update = (next: Partial<NotificationsQuery>) => {
-    const merged = { ...params, page: 1, ...next };
-    const entries: [string, string][] = [];
-    if (merged.page !== 1) entries.push(['page', String(merged.page)]);
-    if (merged.unread === '1') entries.push(['unread', '1']);
-    setSearchParams(new URLSearchParams(entries));
-  };
-  return [params, update];
-};
+const LIST_DEFAULTS = { page: 1, unread: '0' } as const;
 
 /** Kolejne powiadomienia (od najnowszych) w grupach po dniach. */
 const groupByDay = (items: Item[], label: (iso: string) => string) => {
@@ -42,7 +31,7 @@ const groupByDay = (items: Item[], label: (iso: string) => string) => {
 /** Strona „Powiadomienia” (bez pozycji w menu, otwierana z dzwonka). */
 export const NotificationsPage = () => {
   const { t } = useTranslation('notifications');
-  const [params, setParams] = useListParams();
+  const [params, setParams] = useListParams(notificationsQuerySchema, LIST_DEFAULTS);
   const list = useNotificationsList(params);
   const markAll = useMarkAllRead();
   const open = useOpenNotification();
@@ -52,17 +41,17 @@ export const NotificationsPage = () => {
 
   return (
     <Stack gap="md">
-      <Group justify="space-between" align="flex-end">
-        <Stack gap={4}>
-          <Title order={2}>{t('title')}</Title>
-          <Text size="sm" c="dimmed">{t('page_hint')}</Text>
-        </Stack>
-        {unread > 0 && (
-          <Button variant="default" leftSection={<ButtonIcon action="confirm" />} onClick={() => markAll.mutate(undefined, { onError: (error) => notify.error(apiErrorMessage(error, t)) })} loading={markAll.isPending}>
-            {t('mark_all_read')}
-          </Button>
-        )}
-      </Group>
+      <PageHeader
+        title={t('title')}
+        subtitle={t('page_hint')}
+        actions={
+          unread > 0 && (
+            <Button variant="default" leftSection={<ButtonIcon action="confirm" />} onClick={() => markAll.mutate(undefined, { onError: (error) => notify.error(apiErrorMessage(error, t)) })} loading={markAll.isPending}>
+              {t('mark_all_read')}
+            </Button>
+          )
+        }
+      />
 
       <SegmentedControl
         style={{ alignSelf: 'flex-start' }}
@@ -77,7 +66,7 @@ export const NotificationsPage = () => {
       <DataState query={list}>
         {data && data.items.length === 0 ? (
           <Paper withBorder bg="dark.7">
-            <EmptyNotifications messageKey={params.unread === '1' ? 'empty_unread' : 'empty'} />
+            <EmptyState icon={BellOff} text={t(params.unread === '1' ? 'empty_unread' : 'empty')} />
           </Paper>
         ) : (
           data && (
@@ -92,9 +81,7 @@ export const NotificationsPage = () => {
                   </Paper>
                 </Stack>
               ))}
-              {data.total > data.pageSize && (
-                <Pagination total={Math.ceil(data.total / data.pageSize)} value={params.page} onChange={(page) => setParams({ page })} />
-              )}
+              <ListPagination data={data} page={params.page} onChange={(page) => setParams({ page })} />
             </>
           )
         )}

@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-16: Porządki „wspólne zamiast kopii”: `ConfirmModal`, `PageHeader`, `EmptyState`, `ListPagination` (`frontend/src/common/`) i `useListParams` (`frontend/src/core/`) w Pracownikach, Typach urlopów, Typach umów i Powiadomieniach; okno potwierdzenia przy błędzie zostaje otwarte.
 - 2026-11-16: Aktualizacja stepkit 0.1.34 → 0.1.36: wspólne pole daty i grupy w menu bez własnej strony były już w projekcie; nowa zasada „Wspólne zamiast kopii” (przed planem sprawdzam, czy coś podobnego już jest, i przenoszę do wspólnego miejsca).
 - 2026-11-16: Moduł Typy umów zrobiony (potwierdzony przez użytkownika): słownik typów umów w „Ustawieniach” (kolejność strzałkami, dodawanie, zmiana nazwy, ukrywanie i przywracanie, 4 typy na start), pole „Rodzaj umowy” u pracownika z typów (`users.contract_type_id`), pracownik zachowuje ukryty typ.
 

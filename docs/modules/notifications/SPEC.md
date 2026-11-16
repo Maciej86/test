@@ -143,3 +143,8 @@ pracownika **[decyzja AI]** (wzorem `npm run email:test`; opis w README).
 - Powiadomienia e-mailem (osobny moduł E-mail, tylko nowy wniosek).
 - Tworzenie prawdziwych powiadomień przy wnioskach i zadaniach: robią to moduły Moje urlopy, Wnioski urlopowe,
   Zadania.
+
+## Zmiana 2026-11-16: wspólne klocki zamiast kopii
+
+Strona korzysta ze wspólnych klocków `PageHeader`, `useListParams`, `ListPagination` i `EmptyState`; własny `EmptyNotifications` usunięty.
+Tytuł strony ma ten sam rozmiar co na innych ekranach; pusty stan (strona i dzwonek): ikona `BellOff` w jasnym kwadracie, jak w innych pustych stanach.

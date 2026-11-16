@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Button, Group, Stack, Switch, Text, Title } from '@mantine/core';
+import { Button, Stack, Switch } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { ContractTypeItem } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
+import { PageHeader } from '../../common/PageHeader';
 import { apiErrorMessage } from '../../core/api/client';
 import { notify } from '../../core/notify';
 import { ContractTypeCards, ContractTypesTable, type RowActions } from './components/ContractTypesTable';
@@ -42,23 +43,23 @@ export const ContractTypesPage = () => {
 
   return (
     <Stack>
-      <Group justify="space-between" align="flex-end">
-        <Stack gap={2}>
-          <Title order={1}>{t('title')}</Title>
-          {contractTypes.data && <Text c="dimmed" size="sm">{t('summary', { visible: visible.length, hidden: hidden.length })}</Text>}
-        </Stack>
-        <Group gap="md">
-          {hidden.length > 0 && (
-            <Switch
-              label={t('show_hidden', { count: hidden.length })}
-              checked={showHidden || allHidden}
-              disabled={allHidden}
-              onChange={(e) => setShowHidden(e.currentTarget.checked)}
-            />
-          )}
-          {addButton}
-        </Group>
-      </Group>
+      <PageHeader
+        title={t('title')}
+        subtitle={contractTypes.data && t('summary', { visible: visible.length, hidden: hidden.length })}
+        actions={
+          <>
+            {hidden.length > 0 && (
+              <Switch
+                label={t('show_hidden', { count: hidden.length })}
+                checked={showHidden || allHidden}
+                disabled={allHidden}
+                onChange={(e) => setShowHidden(e.currentTarget.checked)}
+              />
+            )}
+            {addButton}
+          </>
+        }
+      />
 
       <DataState query={contractTypes} isEmpty={items.length === 0} emptyText={t('empty')} emptyAction={addButton}>
         <ContractTypesTable rows={rows} visibleCount={visible.length} {...actions} />

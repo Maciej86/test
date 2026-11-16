@@ -20,5 +20,5 @@ Statusy: `pomysł` · `zaplanowany` (jest już modułem w `STATUS.md`) · `odrzu
 | 2026-11-13 | Zestawienie urlopów z eksportem do Excela (pula, wykorzystane, zaległe, pozostałe, filtr po roku) | pomysł | na start bez zestawień |
 | 2026-11-13 | Kalendarz urlopów całego zespołu (kto i kiedy jest nieobecny) | pomysł | na start bez zestawień |
 | 2026-11-16 | Typy umów edytowane przez administratora (dodaj, zmień nazwę, ukryj) w menu „Ustawienia”, zamiast stałej listy rodzajów umowy u pracownika | zaplanowany | tylko administrator; budować zaraz, przed „Moimi urlopami” (odpowiedzi 1a 2a 3a) |
-| 2026-11-16 | Porządki w kodzie: wspólne okna potwierdzenia, parametry listy, stronicowanie, puste stany i nagłówki ekranów zamiast kopii w Pracownikach, Typach urlopów i Powiadomieniach | pomysł | zmiana w kodzie (zasada „Wspólne zamiast kopii”); robić po aktualizacji stepkit 0.1.34 → 0.1.36 przez `/stepkit:dalej` |
+| 2026-11-16 | Porządki w kodzie: wspólne okna potwierdzenia, parametry listy, stronicowanie, puste stany i nagłówki ekranów zamiast kopii w Pracownikach, Typach urlopów i Powiadomieniach | zaplanowany | zrobione 2026-11-16 jako poprawka (bez osobnego modułu); także Typy umów |
 | 2026-11-13 | Załączniki do zadań i wniosków urlopowych (PDF, zdjęcia) | pomysł | na start bez plików |

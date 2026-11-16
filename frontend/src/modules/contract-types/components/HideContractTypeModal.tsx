@@ -1,7 +1,7 @@
-import { Button, Group, Modal, Stack, Text } from '@mantine/core';
+import { Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { ContractTypeItem } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
+import { ConfirmModal } from '../../../common/ConfirmModal';
 import { apiErrorMessage } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
 import { useHideContractType } from '../contract-types.api';
@@ -13,17 +13,18 @@ export const HideContractTypeModal = ({ contractType, onClose }: { contractType:
   const confirm = () =>
     hide.mutate(contractType.id, {
       onSuccess: () => { notify.success(t('hidden_done')); onClose(); },
-      onError: (error) => { notify.error(apiErrorMessage(error, t)); onClose(); },
+      onError: (error) => notify.error(apiErrorMessage(error, t)),
     });
   return (
-    <Modal opened onClose={onClose} title={t('hide_title', { name: contractType.name })}>
-      <Stack>
-        <Text>{t('hide_text', { count: contractType.employeesCount })}</Text>
-        <Group justify="flex-end">
-          <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-          <Button leftSection={<ButtonIcon action="hide" />} loading={hide.isPending} onClick={confirm}>{t('hide')}</Button>
-        </Group>
-      </Stack>
-    </Modal>
+    <ConfirmModal
+      title={t('hide_title', { name: contractType.name })}
+      confirmLabel={t('hide')}
+      confirmAction="hide"
+      loading={hide.isPending}
+      onConfirm={confirm}
+      onClose={onClose}
+    >
+      <Text>{t('hide_text', { count: contractType.employeesCount })}</Text>
+    </ConfirmModal>
   );
 };

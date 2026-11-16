@@ -3,6 +3,7 @@ import { Alert, Button, Center, Loader, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { apiErrorMessage } from '../core/api/client';
 import { ButtonIcon } from './ButtonIcon';
+import { EmptyState } from './EmptyState';
 
 interface QueryLike {
   isPending: boolean;
@@ -55,12 +56,7 @@ export const DataState = ({
     );
   }
   if (isEmpty) {
-    return (
-      <Stack align="center" gap="sm" py="xl">
-        <Text c="dimmed">{emptyText ?? t('empty_list')}</Text>
-        {emptyAction}
-      </Stack>
-    );
+    return <EmptyState text={emptyText ?? t('empty_list')} action={emptyAction} />;
   }
   return <>{children}</>;
 };
