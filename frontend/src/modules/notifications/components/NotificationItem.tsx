@@ -1,9 +1,8 @@
 import { Box, Group, Stack, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
 import { Ban, Check, FilePlus2, SquareKanban, Undo2, X, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatTime, type NotificationItem as Item, type NotificationType } from '@app/shared';
+import { formatRelativeDateTime, formatTime, type NotificationItem as Item, type NotificationType } from '@app/shared';
 import { notificationTexts } from '../notificationTexts';
-import { whenLabel } from '../notificationTime';
 
 /** Ikona i kolor rodzaju: te same kolory co statusy wniosków (docs/DESIGN.md, „Statusy”). */
 const TYPE_LOOK: Record<NotificationType, { icon: LucideIcon; color: string }> = {
@@ -49,7 +48,7 @@ export const NotificationItem = ({ n, onOpen, compact = false }: { n: Item; onOp
             {detail}
           </Text>
           <Group gap="xs" wrap="nowrap">
-            <Text size="xs" c="dimmed">{compact ? whenLabel(n.createdAt, new Date(), t) : formatTime(n.createdAt)}</Text>
+            <Text size="xs" c="dimmed">{compact ? formatRelativeDateTime(n.createdAt, t) : formatTime(n.createdAt)}</Text>
             {n.actorName && <Text size="xs" c="dimmed" truncate>{n.actorName}</Text>}
           </Group>
         </Stack>

@@ -2,24 +2,17 @@ import { useState } from 'react';
 import { Button, Group, Paper, SegmentedControl, Stack, Text, Title } from '@mantine/core';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { formatDate } from '@app/shared';
+import { formatRelativeDay } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { useMockupRole } from '../../common/mockupRole';
 import { EmptyNotifications } from './NotificationBell';
 import { NotificationItem } from './NotificationItem';
 import { mockNotificationsStore, useMockNotifications, type MockNotification } from './data';
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-
 /** Nagłówek grupy: „Dzisiaj”, „Wczoraj” albo data. */
 const useDayLabel = () => {
   const { t } = useTranslation('notifications');
-  return (date: Date): string => {
-    const day = formatDate(date) ?? '';
-    if (day === formatDate(new Date())) return t('today');
-    if (day === formatDate(new Date(Date.now() - DAY_MS))) return t('yesterday');
-    return day;
-  };
+  return (date: Date): string => formatRelativeDay(date, t) ?? '';
 };
 
 const groupByDay = (items: MockNotification[], label: (d: Date) => string) => {

@@ -81,5 +81,11 @@
   "user_menu": "Menu użytkownika",
   "retry": "Spróbuj ponownie",
   "empty_list": "Nic tu jeszcze nie ma.",
-  "load_error": "Nie udało się wczytać danych."
+  "load_error": "Nie udało się wczytać danych.",
+  "date": {
+    "today": "Dzisiaj",
+    "yesterday": "Wczoraj",
+    "today_at": "dzisiaj, {{time}}",
+    "yesterday_at": "wczoraj, {{time}}"
+  }
 }

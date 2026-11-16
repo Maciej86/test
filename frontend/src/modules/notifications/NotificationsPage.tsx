@@ -3,13 +3,12 @@ import { useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { apiErrorMessage } from '../../core/api/client';
 import { notify } from '../../core/notify';
-import { notificationsQuerySchema, type NotificationItem as Item, type NotificationsQuery } from '@app/shared';
+import { formatRelativeDay, notificationsQuerySchema, type NotificationItem as Item, type NotificationsQuery } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
 import { EmptyNotifications } from './components/EmptyNotifications';
 import { NotificationItem } from './components/NotificationItem';
 import { useMarkAllRead, useNotificationsList } from './notifications.api';
-import { dayLabel } from './notificationTime';
 import { useOpenNotification } from './useOpenNotification';
 
 /** Adres → parametry (ten sam schemat sprawdza je na serwerze); w adresie tylko to, co różni się od domyślnych. */
@@ -83,7 +82,7 @@ export const NotificationsPage = () => {
         ) : (
           data && (
             <>
-              {groupByDay(data.items, (iso) => dayLabel(iso, now, t)).map((g) => (
+              {groupByDay(data.items, (iso) => formatRelativeDay(iso, t, now) ?? '').map((g) => (
                 <Stack key={g.label} gap={6}>
                   <Text ff="heading" fw={600} c="dark.1">{g.label}</Text>
                   <Paper withBorder bg="dark.7" style={{ overflow: 'hidden' }}>

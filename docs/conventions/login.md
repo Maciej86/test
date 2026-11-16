@@ -40,9 +40,17 @@ logowaniem). W projekcie ten plik jest w `docs/conventions/`.
   należy do modułu Logowanie, nie do „Moje konto”.
 - Ekran `/login` (`frontend/src/modules/login/`, wpis `login` w `PAGES`); po zalogowaniu `refresh()` z `useAuth`
   i przejście do `ROLE_HOME[user.role]`.
+- **Powrót na otwierany adres.** Niezalogowany na adresie w koncie albo panelu (także takim, którego nie ma w menu,
+  np. `/admin/orders/128` z linku w e-mailu) → `/login?next=<adres>` (`encodeURIComponent`, bez `next` dla samego
+  `/account` i `/admin`). Po zalogowaniu przejście pod `safeNextPath(next)` z `@app/shared`: tylko adres zaczynający
+  się od `/account` albo `/admin`, bez `//`, `\`, `..`, zakodowanych `%2e`/`%2f`/`%5c` ani znaków sterujących;
+  inaczej `ROLE_HOME[user.role]`. Konto z hasłem tymczasowym najpierw ustawia własne hasło (bez powrotu pod `next`).
+  Własnego sprawdzania adresu nie piszesz.
 
 ## Lista kontrolna
 
 - [ ] `POST /api/auth/login` ma `loginLimiter` i test na 429
 - [ ] `authenticate` czyta konto z bazy przy każdym żądaniu; testy: konto w archiwum → 401, zmieniona rola → nowa rola
 - [ ] zmiana hasła podnosi `token_version`; stary token → 401
+- [ ] niezalogowany na `/admin/<cokolwiek>` → `/login?next=…`, po zalogowaniu powrót tam; `?next=https://obca.pl`
+  → ekran startowy roli (test i e2e)

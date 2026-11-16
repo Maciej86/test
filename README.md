@@ -3,7 +3,8 @@
 Zbudowana z pluginem stepkit. To jest Twoja **ściągawka**: jak uruchomić aplikację i gdzie co podejrzeć.
 Claude uzupełnia ją sam, gdy zmienia się port albo dochodzi coś nowego (np. e-maile, adres w internecie).
 
-Dalsza praca: otwórz nową rozmowę w Claude Code i wpisz `/stepkit:dalej`.
+Dalsza praca: w Claude Code zacznij nową rozmowę: wpisz `/clear` i naciśnij Enter. To wyczyści tę rozmowę, ale cała
+praca zostaje zapisana w plikach i w git. Potem wpisz `/stepkit:dalej`.
 
 ## Uruchomienie
 

@@ -1,4 +1,5 @@
 import dayjs, { type Dayjs } from 'dayjs';
+import type { TFunction } from 'i18next';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -76,6 +77,37 @@ export const formatDateParts = (
     monthYear: dayMonthYear.slice(dayMonthYear.indexOf(' ') + 1),
     full: `${day.format('dddd')}, ${dayMonthYear}`,
   };
+};
+
+/** Ile dni kalendarzowych (w strefie aplikacji) minęło od `value` do `now`: 0 = dziś, 1 = wczoraj, inaczej null. */
+const calendarDaysAgo = (value: DateInput, now: Date): 0 | 1 | null => {
+  const day = toDayjs(value)?.format(ISO_DATE_FORMAT);
+  if (!day) return null;
+  const today = dayjs(now).tz(APP_TIME_ZONE).startOf('day');
+  if (day === today.format(ISO_DATE_FORMAT)) return 0;
+  if (day === today.subtract(1, 'day').format(ISO_DATE_FORMAT)) return 1;
+  return null;
+};
+
+/**
+ * Godzina względna: „dzisiaj, 14:32”, „wczoraj, 23:50”, starsze `12.11.2026 11:08`. Dni liczone po kalendarzu
+ * w strefie aplikacji (nie „teraz − 24 h”), więc zmiana czasu ani północ ich nie mylą. Teksty z `common.date`.
+ */
+export const formatRelativeDateTime = (value: DateInput, t: TFunction, now: Date = new Date()): string | null => {
+  const time = formatTime(value);
+  if (time === null) return null;
+  const ago = calendarDaysAgo(value, now);
+  if (ago === 0) return t('date.today_at', { ns: 'common', time });
+  if (ago === 1) return t('date.yesterday_at', { ns: 'common', time });
+  return formatDateTime(value);
+};
+
+/** Dzień względny, np. nagłówek grupy na liście: „Dzisiaj”, „Wczoraj” albo `12.11.2026`. */
+export const formatRelativeDay = (value: DateInput, t: TFunction, now: Date = new Date()): string | null => {
+  const ago = calendarDaysAgo(value, now);
+  if (ago === 0) return t('date.today', { ns: 'common' });
+  if (ago === 1) return t('date.yesterday', { ns: 'common' });
+  return formatDate(value);
 };
 
 export { dayjs };

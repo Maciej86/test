@@ -1,6 +1,6 @@
 # Stan projektu: test
 
-**Wersja stepkit:** 0.1.29
+**Wersja stepkit:** 0.1.33
 
 **Następny krok:** Moduł Moje urlopy, etap makieta (wpisz `/stepkit:dalej` w nowej rozmowie).
 
@@ -35,6 +35,8 @@
 | 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-16: Aktualizacja stepkit 0.1.29 → 0.1.33: baza w strefie UTC (`--default-time-zone=+00:00`), wspólne `formatRelativeDateTime`/`formatRelativeDay` w `shared/src/date.ts` zamiast własnych w Powiadomieniach, README: nowa rozmowa przez `/clear`. Powrót po zalogowaniu, `timezone: 'Z'` i podświetlenie menu projekt już miał.
 
 - 2026-11-16: Moduł Powiadomienia zrobiony (potwierdzony przez użytkownika): dzwonek w belce (okienko na komputerze, panel na cały ekran na telefonie), strona `/admin/notifications`, `notifyUsers`/`notifyAdmins` dla urlopów i zadań, `npm run notifications:test`; poprawka: godziny z bazy czytane w UTC (`timezone: 'Z'`).
 

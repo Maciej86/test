@@ -2,7 +2,7 @@ import { Box, Group, Stack, Text, ThemeIcon, UnstyledButton } from '@mantine/cor
 import { Ban, Check, FilePlus2, SquareKanban, Undo2, X, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { formatDate, formatDateTime, formatTime } from '@app/shared';
+import { formatRelativeDateTime, formatTime } from '@app/shared';
 import type { MockNotification, NotificationType } from './data';
 
 /** Ikona i kolor rodzaju powiadomienia: te same kolory co statusy wniosków (docs/DESIGN.md, „Statusy”). */
@@ -15,18 +15,10 @@ const TYPE_LOOK: Record<NotificationType, { icon: LucideIcon; color: string }> =
   task_assigned: { icon: SquareKanban, color: 'navy' },
 };
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-
 /** „dzisiaj, 14:32”, „wczoraj, 09:10”, starsze z pełną datą i godziną. */
 export const useWhen = () => {
   const { t } = useTranslation('notifications');
-  return (date: Date): string => {
-    const day = formatDate(date);
-    const time = formatTime(date) ?? '';
-    if (day === formatDate(new Date())) return t('today_at', { time });
-    if (day === formatDate(new Date(Date.now() - DAY_MS))) return t('yesterday_at', { time });
-    return formatDateTime(date) ?? '';
-  };
+  return (date: Date): string => formatRelativeDateTime(date, t) ?? '';
 };
 
 export const notificationTexts = (n: MockNotification, t: TFunction<'notifications'>) => {

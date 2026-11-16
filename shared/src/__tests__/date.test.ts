@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { formatDate, formatDateParts, formatDateTime, formatTime, toIsoDate, todayIsoDate } from '../date';
+import { createI18n } from '../i18n';
+import {
+  formatDate,
+  formatDateParts,
+  formatDateTime,
+  formatRelativeDateTime,
+  formatRelativeDay,
+  formatTime,
+  toIsoDate,
+  todayIsoDate,
+} from '../date';
 
 describe('date formatting', () => {
   it('formats a DATE column without shifting the day', () => {
@@ -43,5 +53,39 @@ describe('formatDateParts', () => {
   it('empty value gives null', () => {
     expect(formatDateParts(null)).toBeNull();
     expect(formatDateParts('')).toBeNull();
+  });
+});
+
+describe('relative dates', () => {
+  const t = createI18n().t;
+  // 16.11.2026 10:00 w Warszawie (zima, UTC+1)
+  const now = new Date('2026-11-16T09:00:00.000Z');
+
+  it('says today and yesterday by calendar day in Warsaw', () => {
+    expect(formatRelativeDateTime('2026-11-16T07:32:00.000Z', t, now)).toBe('dzisiaj, 08:32');
+    // 23:50 poprzedniego dnia w Warszawie = 22:50 UTC
+    expect(formatRelativeDateTime('2026-11-15T22:50:00.000Z', t, now)).toBe('wczoraj, 23:50');
+    // 00:10 dziś w Warszawie = 23:10 UTC poprzedniego dnia
+    expect(formatRelativeDateTime('2026-11-15T23:10:00.000Z', t, now)).toBe('dzisiaj, 00:10');
+    expect(formatRelativeDateTime('2026-11-14T22:50:00.000Z', t, now)).toBe('14.11.2026 23:50');
+  });
+
+  it('crosses the new year', () => {
+    const jan1 = new Date('2027-01-01T08:00:00.000Z');
+    expect(formatRelativeDay('2026-12-31T12:00:00.000Z', t, jan1)).toBe('Wczoraj');
+    expect(formatRelativeDay('2026-12-30T12:00:00.000Z', t, jan1)).toBe('30.12.2026');
+  });
+
+  it('is not fooled by the change to summer time (a day of 23 hours)', () => {
+    // 29.03.2027 00:30 w Warszawie (UTC+2) = 28.03 22:30 UTC; wczoraj 00:30 (UTC+1) = 27.03 23:30 UTC, 23 h wcześniej
+    const now2 = new Date('2027-03-28T22:30:00.000Z');
+    expect(formatRelativeDay('2027-03-27T23:15:00.000Z', t, now2)).toBe('Wczoraj');
+    expect(formatRelativeDay('2027-03-27T22:45:00.000Z', t, now2)).toBe('27.03.2027');
+    expect(formatRelativeDay('2027-03-28T22:15:00.000Z', t, now2)).toBe('Dzisiaj');
+  });
+
+  it('returns null for an empty value', () => {
+    expect(formatRelativeDateTime(null, t, now)).toBeNull();
+    expect(formatRelativeDay('', t, now)).toBeNull();
   });
 });

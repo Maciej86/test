@@ -160,6 +160,11 @@ Nowa akcja: dopisz ją do `BUTTON_ICONS` we froncie i w makietach oraz do tabeli
 - **Kolumna `DATE`** (dzień bez godziny: urlop, termin) przychodzi z bazy jako tekst `RRRR-MM-DD` (`dateStrings` w
   `backend/src/db/pool.ts`) i tak idzie w API i w schematach zod (`z.iso.date()`). **`DATETIME`** (chwila: utworzono,
   wysłano) jako `Date`, w JSON tekst ISO.
+- **Godziny w bazie zawsze w UTC** (`DATETIME`, `NOW()`), pula czyta je z `timezone: 'Z'`. Na ekranie pokazujesz je
+  tylko przez `formatDateTime` / `DateText` (strefa `Europe/Warsaw`). Nigdy nie przeliczasz strefy ręcznie.
+- Godzina względna („dzisiaj, 14:32”, „wczoraj, 23:50”) tylko przez `formatRelativeDateTime(value, t)`, nagłówek dnia
+  („Dzisiaj”, „Wczoraj”, data) przez `formatRelativeDay(value, t)` z `@app/shared`. Dni liczą po kalendarzu, nie
+  „teraz − 24 h”, więc zmiana czasu ich nie myli.
 - Obliczenia na datach: `dayjs` z `@app/shared` (`dayjs(a).add(1, 'day')`), dzisiaj: `todayIsoDate()`.
 - **Dni robocze i święta:** `getPolishHolidays(rok)` (z nazwą: `translateKey(t, holiday.label)`), `isHoliday`,
   `isWorkingDay`, `countWorkingDays(od, do, dodatkoweDniWolne?)` z `@app/shared`. Dodatkowe dni wolne firmy to tabela
