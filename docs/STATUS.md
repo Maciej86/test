@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.34
 
-**Następny krok:** Moduł Moje urlopy, etap makieta (wpisz `/stepkit:dalej` w nowej rozmowie).
+**Następny krok:** Moduł Typy umów, etap makieta (wpisz `/stepkit:dalej` w nowej rozmowie).
 
 ## Start aplikacji
 
@@ -25,16 +25,19 @@
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
-| 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
-| 8 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
-| 9 | Zadania | tasks | czeka | makieta | employees, notifications |
-| 10 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
-| 11 | Archiwum | archive | czeka | makieta | employees, tasks |
-| 12 | Moje konto | my-account | czeka | makieta | login |
-| 13 | Pulpit | dashboard | czeka | makieta | my-leave, leave-requests, tasks |
-| 14 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
+| 7 | Typy umów | contract-types | czeka | makieta | employees |
+| 8 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
+| 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
+| 10 | Zadania | tasks | czeka | makieta | employees, notifications |
+| 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
+| 12 | Archiwum | archive | czeka | makieta | employees, tasks |
+| 13 | Moje konto | my-account | czeka | makieta | login |
+| 14 | Pulpit | dashboard | czeka | makieta | my-leave, leave-requests, tasks |
+| 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-16: Nowy moduł 7 „Typy umów” (contract-types) przed „Moimi urlopami”: administrator prowadzi listę typów umów w menu „Ustawienia”; obecne 4 rodzaje umowy staną się typami na start.
 
 - 2026-11-16: Poprawka w Pracownikach (prośba użytkownika): nieobowiązkowe „Data zatrudnienia” i „Rodzaj umowy” (umowa o pracę, zlecenie, o dzieło, B2B) w oknach dodaj/edytuj i jako kolumny listy; wspólne pole daty `DateField`.
 

@@ -65,6 +65,7 @@ Panel (`NAVIGATION` w `shared/src/navigation.config.ts`):
 | Archiwum | archive | `/admin/archive` | admin |
 | Ustawienia (rozwijane, bez własnej strony; zmiana 2026-11-16) | settings | — | admin |
 | ↳ Typy urlopów | leave-types | `/admin/leave-types` | admin |
+| ↳ Typy umów | contract-types | `/admin/contract-types` | admin |
 | Moje konto | my-account | `/admin/my-account` | admin, employee |
 
 Bez pozycji w menu: dzwonek powiadomień w górnej belce (moduł `notifications`), ekran `/login`.
@@ -156,14 +157,15 @@ doda moduł Logowanie jako migrację **zaraz po** `users` (ma klucz obcy do `use
 | 4 | Typy urlopów | leave-types | login | — | formularz wniosku potrzebuje typów; mały moduł |
 | 5 | E-mail | email | login | — | przed pierwszym modułem, który wysyła e-mail (nowy wniosek → administrator) |
 | 6 | Powiadomienia | notifications | login | — | dzwonek w belce; używają go urlopy i zadania |
-| 7 | Moje urlopy | my-leave | employees, leave-types, email, notifications | — | najważniejsze na start: składanie i wycofywanie wniosków, liczenie dni roboczych, blokada przy braku dni, wydruk |
-| 8 | Wnioski urlopowe | leave-requests | my-leave | — | decyzje administratora: zatwierdź, odrzuć z powodem, anuluj, wydruk / PDF |
-| 9 | Zadania | tasks | employees, notifications | — | tablica z przeciąganiem, filtr „Tylko moje”, chowanie starych zrealizowanych |
-| 10 | Historia zmian | activity-log | employees, my-leave, leave-requests, tasks | — | ekran do wpisów, które zapisują wcześniejsze moduły |
-| 11 | Archiwum | archive | employees, tasks | — | wspólny ekran przywracania i usuwania na stałe |
-| 12 | Moje konto | my-account | login | — | zmiana własnego hasła i e-maila do powiadomień |
-| 13 | Pulpit | dashboard | my-leave, leave-requests, tasks | — | zbiera liczby z urlopów i zadań, więc na końcu |
-| 14 | Publikacja | deploy | wszystkie moduły | — | zawsze ostatni: OVH, domena, strona przerwy technicznej |
+| 7 | Typy umów | contract-types | employees | — | dodany 2026-11-16 na prośbę użytkownika: lista typów umów prowadzona przez administratora w „Ustawieniach”, zamiast stałej listy u pracownika |
+| 8 | Moje urlopy | my-leave | employees, leave-types, email, notifications | — | najważniejsze na start: składanie i wycofywanie wniosków, liczenie dni roboczych, blokada przy braku dni, wydruk |
+| 9 | Wnioski urlopowe | leave-requests | my-leave | — | decyzje administratora: zatwierdź, odrzuć z powodem, anuluj, wydruk / PDF |
+| 10 | Zadania | tasks | employees, notifications | — | tablica z przeciąganiem, filtr „Tylko moje”, chowanie starych zrealizowanych |
+| 11 | Historia zmian | activity-log | employees, my-leave, leave-requests, tasks | — | ekran do wpisów, które zapisują wcześniejsze moduły |
+| 12 | Archiwum | archive | employees, tasks | — | wspólny ekran przywracania i usuwania na stałe |
+| 13 | Moje konto | my-account | login | — | zmiana własnego hasła i e-maila do powiadomień |
+| 14 | Pulpit | dashboard | my-leave, leave-requests, tasks | — | zbiera liczby z urlopów i zadań, więc na końcu |
+| 15 | Publikacja | deploy | wszystkie moduły | — | zawsze ostatni: OVH, domena, strona przerwy technicznej |
 
 [decyzja AI] Urlopy (najważniejsze na start) zaczynają się od modułu 7, a nie zaraz po Logowaniu, bo wniosek potrzebuje
 pracowników z pulami, typów urlopów, e-maila i powiadomień. Moduły 3–6 są małe i budują tylko to, czego urlopy
