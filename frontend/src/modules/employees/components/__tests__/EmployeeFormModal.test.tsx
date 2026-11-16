@@ -188,6 +188,12 @@ describe('contract type field', () => {
     expect(await optionNames()).toEqual(['Umowa o pracę', 'Umowa zlecenie', 'B2B', 'Umowa o staż (ukryty)']);
   });
 
+  it('own hidden type still in a not yet refreshed options list → shown once, no crash', async () => {
+    mockOptions([...options, { id: 5, name: 'Umowa o staż' }]);
+    show({ ...jan, contractType: { id: 5, name: 'Umowa o staż', hidden: true } });
+    expect(await optionNames()).toEqual(['Umowa o pracę', 'Umowa zlecenie', 'B2B', 'Umowa o staż']);
+  });
+
   it('a person with a visible type gets no "(ukryty)" option', async () => {
     show(jan);
     const names = await optionNames();

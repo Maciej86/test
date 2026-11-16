@@ -487,3 +487,36 @@ describe('contract types at employees', () => {
     expect((await as(jan).get('/employees/contract-types')).status).toBe(403);
   });
 });
+
+describe('abuse', () => {
+  beforeEach(() => {
+    vi.mocked(q.insertUser).mockResolvedValue(7);
+    vi.mocked(ct.findContractType).mockResolvedValue({ id: 2, name: 'Umowa zlecenie', hidden: false });
+  });
+
+  it('contract type: forged fields (old ENUM, whole type object, column name) are dropped; only contractTypeId counts', async () => {
+    const forged = { ...newJan, contractTypeId: 2, contractType: { id: 5, name: 'Umowa o staż', hidden: false }, contract_type: 'b2b', contract_type_id: 5 };
+    expect((await as(anna).post('/employees', forged)).status).toBe(201);
+    const saved = vi.mocked(q.insertUser).mock.calls[0]![1] as unknown as Record<string, unknown>;
+    expect(saved.contractTypeId).toBe(2);
+    expect(saved).not.toHaveProperty('contractType');
+    expect(saved).not.toHaveProperty('contract_type');
+    expect(saved).not.toHaveProperty('contract_type_id');
+    expect(ct.findContractType).toHaveBeenCalledWith(conn, 2, { forShare: true });
+  });
+
+  it('contract type id that is not a positive whole number → 400 under the field, type never looked up', async () => {
+    for (const bad of [0, -1, 1.5, 'abc', '1e3', 99_999_999_999, true, [2], { id: 2 }]) {
+      const res = await as(anna).post('/employees', { ...newJan, contractTypeId: bad });
+      expect(res.status, String(bad)).toBe(400);
+      expect(res.body.error.fields.contractTypeId).toBeDefined();
+    }
+    expect(ct.findContractType).not.toHaveBeenCalled();
+    expect(q.insertUser).not.toHaveBeenCalled();
+  });
+
+  it('employee cannot read the contract type options of the employees module', async () => {
+    expect((await as(jan).get('/employees/contract-types')).status).toBe(403);
+    expect(ct.listSelectableContractTypes).not.toHaveBeenCalled();
+  });
+});

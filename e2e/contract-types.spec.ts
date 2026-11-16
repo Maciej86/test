@@ -106,3 +106,48 @@ test('pracownik nie widzi typów umów i nie wejdzie pod adres', async ({ page }
   await page.goto('/admin/contract-types');
   await expect(page.getByText('Nie masz dostępu do tej części aplikacji.')).toBeVisible();
 });
+
+test.describe('abuse', () => {
+  test('dwa dodania naraz tej samej nazwy (inna wielkość liter) → jedno dodane, drugie 409', async ({ page }) => {
+    const name = `E2E ${Date.now()} naraz`;
+    const responses = await Promise.all([
+      page.request.post('/api/contract-types', { data: { name } }),
+      page.request.post('/api/contract-types', { data: { name: name.toUpperCase() } }),
+    ]);
+    expect(responses.map((r) => r.status()).sort()).toEqual([201, 409]);
+    const list = (await (await page.request.get('/api/contract-types')).json()) as { items: { name: string }[] };
+    expect(list.items.filter((i) => i.name.toLowerCase() === name.toLowerCase())).toHaveLength(1);
+  });
+
+  test('sześć strzałek naraz → wszystkie przechodzą, żaden typ nie znika, typ da się dalej przesuwać', async ({ page }) => {
+    const name = `E2E ${Date.now()} strzałki`;
+    const created = (await (await page.request.post('/api/contract-types', { data: { name } })).json()) as { id: number };
+    const before = (await (await page.request.get('/api/contract-types')).json()) as { items: { id: number; hidden: boolean }[] };
+    const moves = await Promise.all(
+      Array.from({ length: 6 }, (_, i) => page.request.post(`/api/contract-types/${created.id}/move`, { data: { direction: i % 2 ? 'down' : 'up' } })),
+    );
+    expect(moves.map((r) => r.status())).toEqual([200, 200, 200, 200, 200, 200]);
+    const after = (await (await page.request.get('/api/contract-types')).json()) as { items: { id: number; hidden: boolean }[] };
+    expect(after.items.map((i) => i.id).sort()).toEqual(before.items.map((i) => i.id).sort());
+    // Strzałka „wyżej” na pierwszym miejscu: typ nie wypada poza listę i dalej da się go przesunąć.
+    for (let i = 0; i < before.items.length; i++) await page.request.post(`/api/contract-types/${created.id}/move`, { data: { direction: 'up' } });
+    const top = (await (await page.request.get('/api/contract-types')).json()) as { items: { id: number }[] };
+    expect(top.items[0]!.id).toBe(created.id);
+    await page.request.post(`/api/contract-types/${created.id}/hide`);
+  });
+
+  test('ukrycie typu w chwili zapisu pracownika z tym typem → oba kończą się poprawnie, bez błędu serwera', async ({ page }) => {
+    const name = `E2E ${Date.now()} wyścig`;
+    const created = (await (await page.request.post('/api/contract-types', { data: { name } })).json()) as { id: number };
+    const login = `e2e.tmp.${Date.now()}race@test.local`;
+    const employee = { firstName: 'Rafał', lastName: 'Wyścig', login, email: '', role: 'employee', password: 'Urlop-2026!', annualDays: 20, carriedDays: 0 };
+    const [save, hide] = await Promise.all([
+      page.request.post('/api/employees', { data: { ...employee, contractTypeId: created.id } }),
+      page.request.post(`/api/contract-types/${created.id}/hide`),
+    ]);
+    expect(hide.status()).toBe(200);
+    // Zapis przed ukryciem → 201 (osoba zachowuje typ), po ukryciu → 400 pod polem. Nigdy 500.
+    expect([201, 400]).toContain(save.status());
+    if (save.status() === 400) expect((await save.json()).error.fields.contractTypeId).toBe('employees.server.contract_type_unavailable');
+  });
+});

@@ -67,10 +67,13 @@ export const EmployeeFormModal = ({ opened, employee, year, onClose }: {
   });
 
   const contractTypes = useContractTypeOptions();
-  // Ukryty typ, który osoba już ma, zostaje do wyboru tylko u niej, na końcu listy.
-  const ownHidden = employee?.contractType?.hidden ? employee.contractType : null;
+  // Ukryty typ, który osoba już ma, zostaje do wyboru tylko u niej, na końcu listy. Tuż po ukryciu lista typów może
+  // jeszcze go mieć (przed odświeżeniem): wtedy nie dopisujemy go drugi raz, bo Select nie przyjmuje powtórzeń.
+  const visibleOptions = (contractTypes.data ?? []).map((c) => ({ value: String(c.id), label: c.name }));
+  const ownHiddenType = employee?.contractType?.hidden ? employee.contractType : null;
+  const ownHidden = ownHiddenType && !visibleOptions.some((o) => o.value === String(ownHiddenType.id)) ? ownHiddenType : null;
   const contractOptions = [
-    ...(contractTypes.data ?? []).map((c) => ({ value: String(c.id), label: c.name })),
+    ...visibleOptions,
     ...(ownHidden ? [{ value: String(ownHidden.id), label: `${ownHidden.name} ${t('hidden_suffix')}` }] : []),
   ];
 

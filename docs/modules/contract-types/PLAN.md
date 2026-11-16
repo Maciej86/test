@@ -144,3 +144,6 @@ Pracownicy wołają funkcje z `contract-types.queries.ts` (sekcja „Powiązania
   (równoczesne „Ukryj” czeka); mocniejszy test „bez (ukryty)” u osoby z widocznym typem.
 - Stare wpisy historii mają w `contract_type` kody (`employment`), nowe nazwy typów; ekran „Historia zmian” (moduł 11)
   ma pokazywać wartość tak, jak jest, bez tłumaczenia.
+- Testy w przeglądarce: zaraz po ukryciu typu okno pracownika z tym typem się wysypywało (lista typów z pamięci miała
+  jeszcze ten typ, a „własny ukryty” dopisywał go drugi raz). Poprawione z testem: własny ukryty dopisany tylko, gdy
+  go nie ma na liście.

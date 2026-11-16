@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.34
 
-**Następny krok:** Typy umów: testy (próby nadużyć, sprawdzenie w przeglądarce, potem `TESTS.md` z użytkownikiem).
+**Następny krok:** Typy umów: użytkownik przechodzi `docs/modules/contract-types/TESTS.md` i pisze „działa”.
 
 ## Start aplikacji
 
@@ -25,7 +25,7 @@
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
-| 7 | Typy umów | contract-types | w toku | testy | employees |
+| 7 | Typy umów | contract-types | w toku | testy (czeka na użytkownika) | employees |
 | 8 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |

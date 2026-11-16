@@ -43,4 +43,24 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180.
 
 ## Próby nadużyć
 
-(uzupełnione na etapie testów)
+- Pracownik wywołuje każdy adres API typów umów (lista, dodaj, zmień, przesuń, ukryj, przywróć) i listę typów
+  z modułu Pracownicy → 403, nic się nie zmienia: przeszła
+- Pracownik wpisuje adres ekranu `/admin/contract-types` → „Nie masz dostępu”, bez danych: przeszła (także w przeglądarce)
+- Podrobione pola w żądaniu typu (numer, pozycja, „ukryty”, liczba pracowników) → serwer je pomija, pozycję liczy sam: przeszła
+- Podrobione pola przy zapisie pracownika (stara wartość umowy, cały obiekt typu, nazwa kolumny z bazy) → liczy się
+  tylko numer typu: przeszła
+- Wybranie u pracownika cudzego ukrytego albo nieistniejącego typu → 400 pod polem: przeszła
+- Numer typu u pracownika jako 0, −1, 1,5, „abc”, „1e3”, ogromna liczba, tak/nie, lista, obiekt → 400 pod polem: przeszła
+- Złe dane typu (nazwa 1 albo 61 znaków, liczba zamiast tekstu, same spacje, brak nazwy) → 400 z błędem pola: przeszła
+- Numer w adresie zapisany inaczej niż samymi cyframi (`0`, `-1`, `1.5`, `1e3`, `abc`) → 404: przeszła
+- Dwa dodania naraz tej samej nazwy różniącej się wielkością liter (prawdziwa baza) → jedno dodane, drugie „Typ o tej
+  nazwie już jest.”: przeszła
+- Sześć strzałek naraz (prawdziwa baza) → wszystkie przechodzą, pozycje bez powtórzeń, żaden typ nie znika: przeszła
+- Ukrycie typu w chwili zapisu pracownika z tym typem (prawdziwa baza) → albo pracownik zapisany przed ukryciem, albo
+  400 pod polem; nigdy błąd serwera: przeszła
+- Usunięcie typu, który ma pracownik, wprost w bazie → baza odmawia (klucz obcy): przeszła
+- Nazwa z kodem strony (`<script>`) → widać ją jako zwykły tekst: przeszła
+- Podwójne kliknięcie „Przywróć” → jedno żądanie: przeszła
+- Ukrycie typu, a zaraz potem otwarcie okna pracownika z tym typem → ekran się wysypywał (typ dwa razy na liście):
+  naprawiona przy klikaniu w przeglądarce
+- Cudze dane, przejścia statusów, usuwanie: nie dotyczy (jeden wspólny słownik administratora, typów się nie usuwa)
