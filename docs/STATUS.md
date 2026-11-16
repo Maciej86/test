@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.34
 
-**Następny krok:** Moduł Typy umów, etap makieta (wpisz `/stepkit:dalej` w nowej rozmowie).
+**Następny krok:** Typy umów: odpowiedzi na 5 pytań w makiecie (http://localhost:5181/admin/contract-types).
 
 ## Start aplikacji
 
@@ -25,7 +25,7 @@
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
-| 7 | Typy umów | contract-types | czeka | makieta | employees |
+| 7 | Typy umów | contract-types | w toku | pytania | employees |
 | 8 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
@@ -36,6 +36,8 @@
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-16: Typy umów: makieta listy (kolejność strzałkami, „Pokaż ukryte”, kolumna „Pracownicy”), okna dodaj/edytuj (ostrzeżenie przy typie, który mają pracownicy) i ukryj, podgląd pola „Rodzaj umowy” w oknie pracownika; 5 pytań. Ikona menu: `file-signature`.
 
 - 2026-11-16: Nowy moduł 7 „Typy umów” (contract-types) przed „Moimi urlopami”: administrator prowadzi listę typów umów w menu „Ustawienia”; obecne 4 rodzaje umowy staną się typami na start.
 

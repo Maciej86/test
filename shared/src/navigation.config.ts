@@ -31,7 +31,10 @@ export const NAVIGATION: NavItem[] = [
     label: 'common.nav.settings',
     icon: 'settings',
     roles: ['admin'],
-    children: [{ key: 'leave-types', path: '/admin/leave-types', label: 'common.nav.leave_types', icon: 'tags', roles: ['admin'] }],
+    children: [
+      { key: 'leave-types', path: '/admin/leave-types', label: 'common.nav.leave_types', icon: 'tags', roles: ['admin'] },
+      { key: 'contract-types', path: '/admin/contract-types', label: 'common.nav.contract_types', icon: 'file-signature', roles: ['admin'] },
+    ],
   },
   { key: 'my-account', path: '/admin/my-account', label: 'common.nav.my_account', icon: 'user', roles: ['admin', 'employee'] },
 ];

@@ -9,6 +9,7 @@ import leaveRequests from '../locales/pl/leave-requests.json';
 import tasks from '../locales/pl/tasks.json';
 import employees from '../locales/pl/employees.json';
 import leaveTypes from '../locales/pl/leave-types.json';
+import contractTypes from '../locales/pl/contract-types.json';
 import activityLog from '../locales/pl/activity-log.json';
 import archive from '../locales/pl/archive.json';
 import myAccount from '../locales/pl/my-account.json';
@@ -20,7 +21,7 @@ import notifications from '../locales/pl/notifications.json';
  * Nowy język: skopiuj locales/pl do np. locales/en i dopisz go tutaj.
  */
 export const resources = {
-  pl: { common, server, validation, email, dashboard, 'my-leave': myLeave, 'leave-requests': leaveRequests, tasks, employees, 'leave-types': leaveTypes, 'activity-log': activityLog, archive, 'my-account': myAccount, login, notifications },
+  pl: { common, server, validation, email, dashboard, 'my-leave': myLeave, 'leave-requests': leaveRequests, tasks, employees, 'leave-types': leaveTypes, 'contract-types': contractTypes, 'activity-log': activityLog, archive, 'my-account': myAccount, login, notifications },
 } as const;
 
 export type Language = keyof typeof resources;
