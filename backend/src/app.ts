@@ -14,6 +14,7 @@ import { healthRoutes } from './modules/health/health.routes';
 import { authPublicRoutes, authRoutes } from './modules/auth/auth.routes';
 import { employeesRoutes } from './modules/employees/employees.routes';
 import { leaveTypesRoutes } from './modules/leave-types/leave-types.routes';
+import { notificationsRoutes } from './modules/notifications/notifications.routes';
 
 interface AppOptions {
   /** Dodatkowe trasy wymagające logowania (moduły dopisują się niżej; testy podają własne). */
@@ -52,6 +53,8 @@ export const createApp = (options: AppOptions = {}) => {
   // 3. Moduły, z rolami ich pozycji w navigation.config.ts: mountModule(api, 'employees', employeesRoutes);
   mountModule(api, 'employees', employeesRoutes);
   mountModule(api, 'leave-types', leaveTypesRoutes);
+  // Powiadomienia: bez pozycji w menu (dzwonek w belce), więc role jawnie.
+  mountModule(api, 'notifications', notificationsRoutes, ['admin', 'employee']);
   if (options.extraRoutes) api.use(options.extraRoutes);
   app.use('/api', api);
 

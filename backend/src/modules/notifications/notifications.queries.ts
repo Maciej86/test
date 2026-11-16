@@ -1,5 +1,5 @@
-import type { RowDataPacket } from 'mysql2';
-import type { NotificationType } from '@app/shared';
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
+import type { NotificationItem, NotificationType } from '@app/shared';
 import { pool } from '../../db/pool';
 
 /** Pula połączeń albo połączenie transakcji: oba mają `query`. */
@@ -41,4 +41,62 @@ export const activeUserIds = async (db: Db, ids: number[]): Promise<number[]> =>
 export const activeAdminIds = async (db: Db): Promise<number[]> => {
   const [rows] = await db.query<RowDataPacket[]>('SELECT id FROM users WHERE role = ? AND archived_at IS NULL ORDER BY id', ['admin']);
   return rows.map((r) => r.id as number);
+};
+
+interface NotificationRow extends RowDataPacket {
+  id: number;
+  type: NotificationType;
+  params: Record<string, string | number> | string;
+  actor_name: string | null;
+  link: string | null;
+  read_at: Date | null;
+  created_at: Date;
+}
+
+const toItem = (r: NotificationRow): NotificationItem => ({
+  id: r.id,
+  type: r.type,
+  // mysql2 zwykle oddaje kolumnę JSON jako obiekt; tekst zostawia, gdy baza zwróci go jako string.
+  params: typeof r.params === 'string' ? (JSON.parse(r.params) as Record<string, string | number>) : r.params,
+  actorName: r.actor_name,
+  link: r.link,
+  readAt: r.read_at ? r.read_at.toISOString() : null,
+  createdAt: r.created_at.toISOString(),
+});
+
+/** Powiadomienia jednej osoby, od najnowszych; `unreadOnly` = tylko nieprzeczytane. */
+export const listForUser = async (
+  db: Db,
+  userId: number,
+  { page, unreadOnly, limit }: { page: number; unreadOnly: boolean; limit: number },
+): Promise<{ items: NotificationItem[]; total: number }> => {
+  const unread = unreadOnly ? 1 : 0;
+  const [rows] = await db.query<NotificationRow[]>(
+    'SELECT id, type, params, actor_name, link, read_at, created_at FROM notifications WHERE user_id = ? AND (? = 0 OR read_at IS NULL) ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?',
+    [userId, unread, limit, (page - 1) * limit],
+  );
+  const [count] = await db.query<RowDataPacket[]>(
+    'SELECT COUNT(*) AS total FROM notifications WHERE user_id = ? AND (? = 0 OR read_at IS NULL)',
+    [userId, unread],
+  );
+  return { items: rows.map(toItem), total: Number(count[0]?.total ?? 0) };
+};
+
+export const countUnread = async (db: Db, userId: number): Promise<number> => {
+  const [rows] = await db.query<RowDataPacket[]>('SELECT COUNT(*) AS total FROM notifications WHERE user_id = ? AND read_at IS NULL', [userId]);
+  return Number(rows[0]?.total ?? 0);
+};
+
+/** Oznacza własne powiadomienie jako przeczytane (pierwsza data zostaje). `false` = nie ma albo cudze. */
+export const markRead = async (db: Db, userId: number, id: number): Promise<boolean> => {
+  const [result] = await db.query<ResultSetHeader>(
+    'UPDATE notifications SET read_at = COALESCE(read_at, NOW()) WHERE id = ? AND user_id = ?',
+    [id, userId],
+  );
+  return result.affectedRows > 0;
+};
+
+export const markAllRead = async (db: Db, userId: number): Promise<number> => {
+  const [result] = await db.query<ResultSetHeader>('UPDATE notifications SET read_at = NOW() WHERE user_id = ? AND read_at IS NULL', [userId]);
+  return result.affectedRows;
 };

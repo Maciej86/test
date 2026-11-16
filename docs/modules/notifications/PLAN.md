@@ -77,7 +77,7 @@ spoza menu dopięta w `buildAppRoutes.tsx`. Wygląd 1:1 z makiety (`mockups/src/
   archiwalni pominięci; duplikaty raz; pusto → brak `INSERT`; `notifyAdmins` bierze `activeAdminIds`; zły `link`
   → błąd; sprzątanie dostaje 90 i tylko odbiorców; SQL tylko z `?`. → `npm run check`
 
-- [ ] **3. Odczyt i trasy.** Zapytania: `countUnread(userId)`, `listForUser(userId, { page, unreadOnly, limit })
+- [x] **3. Odczyt i trasy.** Zapytania: `countUnread(userId)`, `listForUser(userId, { page, unreadOnly, limit })
   → { items, total }` (`ORDER BY created_at DESC, id DESC`, mapowanie na `NotificationItem`, `params` z JSON),
   `markRead(userId, id): Promise<boolean>` (`UPDATE … SET read_at = COALESCE(read_at, NOW()) WHERE id = ? AND
   user_id = ?`; `false`, gdy 0 dopasowanych), `markAllRead(userId): Promise<number>`.

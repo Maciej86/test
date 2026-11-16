@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.29
 
-**Następny krok:** Moduł Powiadomienia, implementacja: krok 3 z 8 (odczyt i trasy API).
+**Następny krok:** Moduł Powiadomienia, implementacja: krok 4 z 8 (menu i godziny na ekranie).
 
 ## Start aplikacji
 
@@ -24,7 +24,7 @@
 | 3 | Pracownicy | employees | zrobiony | zamknięcie | login |
 | 4 | Typy urlopów | leave-types | zrobiony | zamknięcie | login |
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
-| 6 | Powiadomienia | notifications | w toku | implementacja (krok 3/8) | login |
+| 6 | Powiadomienia | notifications | w toku | implementacja (krok 4/8) | login |
 | 7 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
 | 8 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 9 | Zadania | tasks | czeka | makieta | employees, notifications |

@@ -68,8 +68,31 @@ describe('notifications service', () => {
     expect(await s.notifyAdmins(conn, { ...input, actor: anna })).toBe(1);
   });
 
-  it.todo('getSummary: unread count and 8 latest');
-  it.todo('getList: page, unread filter, PAGE_SIZE');
-  it.todo('readOne: someone else\'s → 404');
-  it.todo('readAll returns updated count');
+  it('getSummary: unread count and 8 latest', async () => {
+    vi.mocked(q.countUnread).mockResolvedValue(3);
+    vi.mocked(q.listForUser).mockResolvedValue({ items: [], total: 12 });
+    expect(await s.getSummary(4)).toEqual({ unread: 3, latest: [] });
+    expect(q.listForUser).toHaveBeenCalledWith(expect.anything(), 4, { page: 1, unreadOnly: false, limit: 8 });
+  });
+
+  it('getList: page, unread filter, PAGE_SIZE', async () => {
+    vi.mocked(q.countUnread).mockResolvedValue(2);
+    vi.mocked(q.listForUser).mockResolvedValue({ items: [], total: 40 });
+    expect(await s.getList(4, { page: 2, unread: '1' })).toEqual({ items: [], total: 40, page: 2, pageSize: 25, unread: 2 });
+    expect(q.listForUser).toHaveBeenCalledWith(expect.anything(), 4, { page: 2, unreadOnly: true, limit: 25 });
+  });
+
+  it('readOne: someone else\'s → 404', async () => {
+    vi.mocked(q.markRead).mockResolvedValue(false);
+    expect(await s.readOne(4, 9)).toEqual({ error: { status: 404, message: 'server.not_found' } });
+    vi.mocked(q.markRead).mockResolvedValue(true);
+    expect(await s.readOne(4, 7)).toEqual({ ok: true });
+    expect(q.markRead).toHaveBeenLastCalledWith(expect.anything(), 4, 7);
+  });
+
+  it('readAll returns updated count', async () => {
+    vi.mocked(q.markAllRead).mockResolvedValue(5);
+    expect(await s.readAll(4)).toEqual({ updated: 5 });
+    expect(q.markAllRead).toHaveBeenCalledWith(expect.anything(), 4);
+  });
 });
