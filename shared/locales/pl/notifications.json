@@ -4,6 +4,7 @@
   "bell_unread": "Powiadomienia, nieprzeczytane: {{count}}",
   "mark_all_read": "Oznacz wszystkie jako przeczytane",
   "show_all": "Pokaż wszystkie",
+  "close": "Zamknij powiadomienia",
   "unread_label": "Nieprzeczytane",
   "filter_all": "Wszystkie",
   "filter_unread": "Nieprzeczytane ({{count}})",

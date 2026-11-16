@@ -17,21 +17,21 @@ pozycji w menu.
   **(polecam)**
 - b) Bez osobnej strony: w dzwonku przewijana lista wszystkich powiadomień
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 1a.
 
 ## 2. Kiedy powiadomienie przestaje być „nowe” (znika z licznika na dzwonku)?
 
 - a) Gdy je klikniesz; do tego przycisk „Oznacz wszystkie jako przeczytane” **(polecam)**
 - b) Wszystkie już przy otwarciu dzwonka
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 2a.
 
 ## 3. Jak szybko ma się pojawić nowe powiadomienie, gdy aplikacja jest otwarta?
 
 - a) Co minutę, a od razu, gdy wracasz do karty z aplikacją **(polecam)**
 - b) Tylko po odświeżeniu strony albo przejściu na inny ekran
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 3a.
 
 ## 4. Jak długo trzymać powiadomienia?
 
@@ -39,14 +39,14 @@ pozycji w menu.
 - b) Wszystkie zostają na zawsze
 - c) Każde da się usunąć ręcznie krzyżykiem, a starsze niż 90 dni znikają same
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 4a.
 
 ## 5. Gdy w firmie jest kilku administratorów, kto dostaje powiadomienie o nowym wniosku?
 
 - a) Każdy administrator dostaje własne powiadomienie i sam je odczytuje **(polecam)**
 - b) Gdy jeden administrator rozpatrzy wniosek, powiadomienie o nim znika u pozostałych
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 5a.
 
 ## 6. Czy teksty powiadomień są w porządku?
 
@@ -57,4 +57,4 @@ zadanie dla Ciebie” (tytuł i termin).
 - a) Tak jak w makiecie **(polecam)**
 - b) Poprawki (napisz, które)
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 6a.

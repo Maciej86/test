@@ -90,7 +90,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `/admin/activity-log`, `/api/activity-log` | admin | |
 | `/admin/archive`, `/api/archive` | admin | przywrócenie i usunięcie na stałe |
 | `/admin/my-account`, `/api/my-account` | admin, employee | tylko własne konto |
-| `/api/notifications` | admin, employee | `mountModule(api, 'notifications', …, ['admin', 'employee'])`; tylko własne |
+| `/admin/notifications`, `GET /api/notifications`, `GET /api/notifications/summary`, `POST /api/notifications/:id/read`, `POST /api/notifications/read-all` | admin, employee | `mountModule(api, 'notifications', …, ['admin', 'employee'])`; tylko własne (`req.user.id`), cudze → 404 |
 | `/api/email` | — | nie powstaje: moduł E-mail nie ma tras API (wysyłka wołana z kodu serwera) |
 
 ## 6. Dane

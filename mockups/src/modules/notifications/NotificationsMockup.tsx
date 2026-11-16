@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { formatDate } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { useMockupRole } from '../../common/mockupRole';
-import { Question, Questions } from '../../common/Question';
 import { EmptyNotifications } from './NotificationBell';
 import { NotificationItem } from './NotificationItem';
 import { mockNotificationsStore, useMockNotifications, type MockNotification } from './data';
@@ -34,79 +33,6 @@ const groupByDay = (items: MockNotification[], label: (d: Date) => string) => {
   return groups;
 };
 
-const MockupQuestions = () => (
-  <Questions>
-    <Question
-      number={1}
-      about="Strona „Wszystkie powiadomienia”"
-      options={[
-        { id: 'a', text: 'Dzwonek pokazuje 8 ostatnich, a „Pokaż wszystkie” otwiera tę stronę z całą listą i filtrem „Nieprzeczytane”' },
-        { id: 'b', text: 'Bez osobnej strony: w dzwonku przewijana lista wszystkich powiadomień' },
-      ]}
-      recommended="a"
-    >
-      Czy potrzebna jest osobna strona ze wszystkimi powiadomieniami?
-    </Question>
-    <Question
-      number={2}
-      about="Dzwonek"
-      options={[
-        { id: 'a', text: 'Powiadomienie staje się przeczytane, gdy je klikniesz; do tego przycisk „Oznacz wszystkie jako przeczytane”' },
-        { id: 'b', text: 'Wszystkie stają się przeczytane już przy otwarciu dzwonka' },
-      ]}
-      recommended="a"
-    >
-      Kiedy powiadomienie przestaje być „nowe” (znika z licznika na dzwonku)?
-    </Question>
-    <Question
-      number={3}
-      about="Dzwonek"
-      options={[
-        { id: 'a', text: 'Co minutę, a od razu, gdy wracasz do karty z aplikacją' },
-        { id: 'b', text: 'Tylko po odświeżeniu strony albo przejściu na inny ekran' },
-      ]}
-      recommended="a"
-    >
-      Jak szybko ma się pojawić nowe powiadomienie, gdy aplikacja jest otwarta?
-    </Question>
-    <Question
-      number={4}
-      about="Lista powiadomień"
-      options={[
-        { id: 'a', text: 'Przeczytane usuwają się same po 90 dniach, nieprzeczytane zostają' },
-        { id: 'b', text: 'Wszystkie zostają na zawsze' },
-        { id: 'c', text: 'Każde da się usunąć ręcznie krzyżykiem, a starsze niż 90 dni znikają same' },
-      ]}
-      recommended="a"
-    >
-      Jak długo trzymać powiadomienia?
-    </Question>
-    <Question
-      number={5}
-      about="Powiadomienia administratora"
-      options={[
-        { id: 'a', text: 'Każdy administrator dostaje własne powiadomienie i sam je odczytuje' },
-        { id: 'b', text: 'Gdy jeden administrator rozpatrzy wniosek, powiadomienie o nim znika u pozostałych' },
-      ]}
-      recommended="a"
-    >
-      Gdy w firmie jest kilku administratorów, kto dostaje powiadomienie o nowym wniosku?
-    </Question>
-    <Question
-      number={6}
-      about="Treść powiadomień"
-      options={[
-        { id: 'a', text: 'Tak jak w makiecie (przełącz „Oglądam jako” na Pracownika, żeby zobaczyć jego powiadomienia)' },
-        { id: 'b', text: 'Poprawki (napisz, które)' },
-      ]}
-      recommended="a"
-    >
-      Czy teksty powiadomień są w porządku? Administrator: nowy wniosek, wycofany wniosek. Pracownik: urlop
-      zatwierdzony, odrzucony (z powodem), anulowany, nowe zadanie dla Ciebie.
-    </Question>
-  </Questions>
-);
-
 /** Strona „Wszystkie powiadomienia”: bez pozycji w menu, otwierana z dzwonka. */
 export const NotificationsMockup = () => {
   const { t } = useTranslation('notifications');
@@ -123,8 +49,6 @@ export const NotificationsMockup = () => {
 
   return (
     <Stack gap="md">
-      <MockupQuestions />
-
       <Group gap="xs">
         <Text size="sm" c="dimmed">{t('mockup_state')}</Text>
         <SegmentedControl
