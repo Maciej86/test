@@ -86,7 +86,7 @@ leaveTypesRoutes)`. Front `modules/leave-types/`: `LeaveTypesPage.tsx`, `compone
     „Na żądanie” → 409 `name_taken`; nazwa ukrytego → `name_taken_hidden` z `hiddenType`; edycja „wypoczynkowy” tego
     samego typu → 200; edycja nieistniejącego → 404; `ER_DUP_ENTRY` → 409; 401 bez logowania, 403 dla `employee`.
 
-- [ ] **4. Przesuwanie, ukrywanie, przywracanie.** `moveType(id, direction): Promise<Result>`, `hideType(id)`,
+- [x] **4. Przesuwanie, ukrywanie, przywracanie.** `moveType(id, direction): Promise<Result>`, `hideType(id)`,
   `unhideType(id)`, każde w `withTransaction`. Trasy `POST /:id/move` (`validateBody(leaveTypeMoveSchema)`),
   `POST /:id/hide`, `POST /:id/unhide` (dwie ostatnie bez danych wejściowych: `// rule-ok: bez danych wejściowych,
   tylko numer z adresu`, jak w Pracownikach). Zasady: move zamienia `position` z sąsiadem z `lockVisible` (nie

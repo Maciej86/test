@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { leaveTypeSchema, type LeaveTypeData } from '@app/shared';
+import { leaveTypeMoveSchema, leaveTypeSchema, type LeaveTypeData, type LeaveTypeMoveInput } from '@app/shared';
 import { idParam, reply } from '../../middleware/routeHelpers';
 import { validateBody } from '../../middleware/validateBody';
-import { createType, listTypes, updateType } from './leave-types.service';
+import { createType, hideType, listTypes, moveType, unhideType, updateType } from './leave-types.service';
 
 /** Moduł Typy urlopów: podpięty w app.ts przez mountModule (rola admin z nawigacji). */
 export const leaveTypesRoutes = Router();
@@ -18,4 +18,19 @@ leaveTypesRoutes.post('/', validateBody(leaveTypeSchema), async (req, res) => {
 leaveTypesRoutes.put('/:id', validateBody(leaveTypeSchema), async (req, res) => {
   const id = idParam(res, req.params.id);
   if (id !== null) reply(res, await updateType(id, req.body as LeaveTypeData));
+});
+
+leaveTypesRoutes.post('/:id/move', validateBody(leaveTypeMoveSchema), async (req, res) => {
+  const id = idParam(res, req.params.id);
+  if (id !== null) reply(res, await moveType(id, (req.body as LeaveTypeMoveInput).direction));
+});
+
+leaveTypesRoutes.post('/:id/hide', async (req, res) => { // rule-ok: bez danych wejściowych, tylko numer z adresu
+  const id = idParam(res, req.params.id);
+  if (id !== null) reply(res, await hideType(id));
+});
+
+leaveTypesRoutes.post('/:id/unhide', async (req, res) => { // rule-ok: bez danych wejściowych, tylko numer z adresu
+  const id = idParam(res, req.params.id);
+  if (id !== null) reply(res, await unhideType(id));
 });

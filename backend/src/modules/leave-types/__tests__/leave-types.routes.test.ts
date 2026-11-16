@@ -40,6 +40,9 @@ const body = { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: '' };
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(s.updateType).mockResolvedValue({ ok: true });
+  vi.mocked(s.moveType).mockResolvedValue({ ok: true });
+  vi.mocked(s.hideType).mockResolvedValue({ ok: true });
+  vi.mocked(s.unhideType).mockResolvedValue({ ok: true });
 });
 
 describe('leave types routes', () => {
@@ -90,6 +93,25 @@ describe('leave types routes', () => {
     expect((await as(anna).put('/leave-types/abc', body)).status).toBe(404);
   });
 
-  it.todo('POST /leave-types/:id/move → ok; bad direction → 400');
-  it.todo('POST /leave-types/:id/hide and /unhide → ok and 409 rules');
+  it('POST /leave-types/:id/move → ok; bad direction → 400; bad id → 404', async () => {
+    expect((await as(anna).post('/leave-types/3/move', { direction: 'up' })).status).toBe(200);
+    expect(s.moveType).toHaveBeenCalledWith(3, 'up');
+    expect((await as(anna).post('/leave-types/3/move', { direction: 'left' })).status).toBe(400);
+    expect((await as(anna).post('/leave-types/x/move', { direction: 'down' })).status).toBe(404);
+    expect((await as(jan).post('/leave-types/3/move', { direction: 'up' })).status).toBe(403);
+  });
+
+  it('POST /leave-types/:id/hide and /unhide → ok and 409 rules', async () => {
+    expect((await as(anna).post('/leave-types/3/hide')).status).toBe(200);
+    expect(s.hideType).toHaveBeenCalledWith(3);
+    vi.mocked(s.hideType).mockResolvedValueOnce({ error: { status: 409, message: M.lastVisible } });
+    const last = await as(anna).post('/leave-types/3/hide');
+    expect(last.status).toBe(409);
+    expect(last.body.error.message).toBe(M.lastVisible);
+    expect((await as(anna).post('/leave-types/3/unhide')).status).toBe(200);
+    expect(s.unhideType).toHaveBeenCalledWith(3);
+    vi.mocked(s.unhideType).mockResolvedValueOnce({ error: { status: 409, message: M.notHidden } });
+    expect((await as(anna).post('/leave-types/3/unhide')).status).toBe(409);
+    expect((await as(jan).post('/leave-types/3/hide')).status).toBe(403);
+  });
 });

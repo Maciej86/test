@@ -74,8 +74,57 @@ describe('leave types service', () => {
     expect((await s.listTypes()).items).toHaveLength(1);
   });
 
-  it.todo('moveType swaps position with the visible neighbour (positions 1, 3, 4)');
-  it.todo('moveType at the edge → ok without writes; hidden or missing → 404');
-  it.todo('hideType: missing → 404, already hidden → 409, last visible → 409 last_visible');
-  it.todo('unhideType: missing → 404, visible → 409 not_hidden, restored at the end');
+  it('moveType swaps position with the visible neighbour (positions 1, 3, 4)', async () => {
+    vi.mocked(q.lockVisible).mockResolvedValue([{ id: 1, position: 1 }, { id: 3, position: 3 }, { id: 4, position: 4 }]);
+    expect(await s.moveType(3, 'up')).toEqual({ ok: true });
+    expect(q.setPosition).toHaveBeenCalledWith(conn, 3, 1);
+    expect(q.setPosition).toHaveBeenCalledWith(conn, 1, 3);
+    vi.mocked(q.setPosition).mockClear();
+    expect(await s.moveType(3, 'down')).toEqual({ ok: true });
+    expect(q.setPosition).toHaveBeenCalledWith(conn, 3, 4);
+    expect(q.setPosition).toHaveBeenCalledWith(conn, 4, 3);
+  });
+
+  it('moveType at the edge → ok without writes; hidden or missing → 404', async () => {
+    vi.mocked(q.lockVisible).mockResolvedValue([{ id: 1, position: 1 }, { id: 3, position: 3 }]);
+    expect(await s.moveType(1, 'up')).toEqual({ ok: true });
+    expect(await s.moveType(3, 'down')).toEqual({ ok: true });
+    expect(q.setPosition).not.toHaveBeenCalled();
+    expect(await s.moveType(5, 'up')).toEqual({ error: { status: 404, message: SERVER_MESSAGES.notFound } });
+  });
+
+  it('hideType: missing → 404, already hidden → 409, last visible → 409 last_visible', async () => {
+    vi.mocked(q.lockVisible).mockResolvedValue([{ id: 1, position: 1 }, { id: 3, position: 3 }]);
+    expect(await s.hideType(3)).toEqual({ ok: true });
+    expect(q.setHidden).toHaveBeenCalledWith(conn, 3);
+    vi.mocked(q.setHidden).mockClear();
+
+    vi.mocked(q.findLeaveType).mockResolvedValueOnce(null);
+    expect(await s.hideType(99)).toEqual({ error: { status: 404, message: SERVER_MESSAGES.notFound } });
+    vi.mocked(q.findLeaveType).mockResolvedValueOnce(typeRow({ hidden_at: new Date() }));
+    expect(await s.hideType(3)).toEqual({ error: { status: 409, message: M.alreadyHidden } });
+    vi.mocked(q.lockVisible).mockResolvedValue([{ id: 3, position: 3 }]);
+    expect(await s.hideType(3)).toEqual({ error: { status: 409, message: M.lastVisible } });
+    expect(q.setHidden).not.toHaveBeenCalled();
+  });
+
+  it('two hides one after another with two visible types → ok, then 409 last_visible', async () => {
+    const visible = [{ id: 1, position: 1 }, { id: 3, position: 3 }];
+    vi.mocked(q.lockVisible).mockImplementation(async () => [...visible]);
+    vi.mocked(q.setHidden).mockImplementation(async (_db, id) => { visible.splice(visible.findIndex((v) => v.id === id), 1); });
+    vi.mocked(q.findLeaveType).mockImplementation(async (_db, id) => typeRow({ id }));
+    expect(await s.hideType(1)).toEqual({ ok: true });
+    expect(await s.hideType(3)).toEqual({ error: { status: 409, message: M.lastVisible } });
+    // Blokada wierszy jest przed sprawdzeniem typu, żeby drugie „Ukryj” czekało na pierwsze.
+    expect(vi.mocked(q.lockVisible).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(q.findLeaveType).mock.invocationCallOrder[0]!);
+  });
+
+  it('unhideType: missing → 404, visible → 409 not_hidden, restored at the end', async () => {
+    vi.mocked(q.findLeaveType).mockResolvedValueOnce(typeRow({ hidden_at: new Date() }));
+    expect(await s.unhideType(3)).toEqual({ ok: true });
+    expect(q.setVisible).toHaveBeenCalledWith(conn, 3, 6);
+    vi.mocked(q.findLeaveType).mockResolvedValueOnce(null);
+    expect(await s.unhideType(99)).toEqual({ error: { status: 404, message: SERVER_MESSAGES.notFound } });
+    expect(await s.unhideType(3)).toEqual({ error: { status: 409, message: M.notHidden } });
+  });
 });

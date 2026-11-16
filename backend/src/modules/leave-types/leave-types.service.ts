@@ -1,4 +1,10 @@
-import { LEAVE_TYPE_MESSAGES as M, SERVER_MESSAGES, type LeaveTypeData, type LeaveTypesListResponse } from '@app/shared';
+import {
+  LEAVE_TYPE_MESSAGES as M,
+  SERVER_MESSAGES,
+  type LeaveTypeData,
+  type LeaveTypeDirection,
+  type LeaveTypesListResponse,
+} from '@app/shared';
 import { pool } from '../../db/pool';
 import { withTransaction } from '../../db/transaction';
 import { fail, type Result, type ServiceError } from '../../middleware/routeHelpers';
@@ -48,3 +54,39 @@ export const updateType = async (id: number, data: LeaveTypeData): Promise<Resul
   }
   return { ok: true };
 };
+
+/** Strzałka: zamiana pozycji z sąsiednim widocznym typem (pozycje mogą mieć luki po ukryciu). */
+export const moveType = async (id: number, direction: LeaveTypeDirection): Promise<Result> =>
+  withTransaction(async (conn) => {
+    const visible = await q.lockVisible(conn);
+    const index = visible.findIndex((v) => v.id === id);
+    if (index === -1) return notFound();
+    const neighbour = visible[direction === 'up' ? index - 1 : index + 1];
+    if (!neighbour) return { ok: true as const };
+    await q.setPosition(conn, id, neighbour.position);
+    await q.setPosition(conn, neighbour.id, visible[index]!.position);
+    return { ok: true as const };
+  });
+
+/** Ukrycie: znika z formularza nowego wniosku; zawsze zostaje co najmniej jeden widoczny typ. */
+export const hideType = async (id: number): Promise<Result> =>
+  withTransaction(async (conn) => {
+    // Najpierw blokada widocznych: drugie równoczesne „Ukryj” czeka i widzi już wynik pierwszego.
+    const visible = await q.lockVisible(conn);
+    const type = await q.findLeaveType(conn, id);
+    if (!type) return notFound();
+    if (type.hidden_at !== null) return fail(409, M.alreadyHidden);
+    if (visible.length <= 1) return fail(409, M.lastVisible);
+    await q.setHidden(conn, id);
+    return { ok: true as const };
+  });
+
+/** Przywrócenie: typ wraca na koniec widocznych. */
+export const unhideType = async (id: number): Promise<Result> =>
+  withTransaction(async (conn) => {
+    const type = await q.findLeaveType(conn, id);
+    if (!type) return notFound();
+    if (type.hidden_at === null) return fail(409, M.notHidden);
+    await q.setVisible(conn, id, (await q.maxPosition(conn)) + 1);
+    return { ok: true as const };
+  });
