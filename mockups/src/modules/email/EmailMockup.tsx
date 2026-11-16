@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Box, Button, Code, Divider, Group, Paper, SegmentedControl, Stack, Text, Title } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatDateTime } from '@app/shared';
-import { Question, Questions } from '../../common/Question';
 import { NEW_REQUEST_EMAIL as mail } from './data';
 
 const STATES = ['html', 'text', 'no_comment', 'mobile'] as const;
@@ -122,75 +121,6 @@ export const EmailMockup = () => {
 
   return (
     <Stack>
-      <Questions>
-        <Question
-          number={1}
-          about="Treść e-maila"
-          options={[
-            { id: 'a', text: 'Wszystko, co pomaga zdecydować: kto, typ, termin, dni robocze, z której puli, ile zostanie i komentarz pracownika' },
-            { id: 'b', text: 'To samo, ale bez komentarza (komentarz bywa prywatny; przeczytasz go w aplikacji)' },
-            { id: 'c', text: 'Tylko „Nowy wniosek od Jan Kowalski” i przycisk, szczegóły wyłącznie w aplikacji' },
-          ]}
-          recommended="a"
-        >
-          Co ma być w e-mailu o nowym wniosku?
-        </Question>
-        <Question
-          number={2}
-          about="Temat"
-          options={[
-            { id: 'a', text: '„Nowy wniosek urlopowy: Jan Kowalski, 08.02.2027–12.02.2027”: widać wszystko już na liście e-maili' },
-            { id: 'b', text: 'Krótko: „Nowy wniosek urlopowy”' },
-          ]}
-          recommended="a"
-        >
-          Jaki temat e-maila?
-        </Question>
-        <Question
-          number={3}
-          about="Od"
-          options={[
-            { id: 'a', text: 'Nazwa aplikacji: „Urlopy i zadania”' },
-            { id: 'b', text: 'Nazwa firmy (napisz jaka)' },
-          ]}
-          recommended="a"
-        >
-          Jaka nazwa nadawcy ma się pokazać w skrzynce?
-        </Question>
-        <Question
-          number={4}
-          about="Gdy e-mail nie wyjdzie"
-          options={[
-            { id: 'a', text: 'Wniosek i tak się zapisuje, pracownik nic nie widzi; administrator ma wniosek w aplikacji i w dzwonku, a błąd trafia do dziennika serwera' },
-            { id: 'b', text: 'Wniosek się zapisuje, a pracownik widzi dymek „Wniosek złożony, ale e-mail do administratora nie doszedł”' },
-          ]}
-          recommended="a"
-        >
-          Co, gdy wysyłka e-maila się nie uda (np. chwilowa awaria poczty)?
-        </Question>
-        <Question
-          number={5}
-          about="Prawdziwa wysyłka"
-          options={[
-            { id: 'a', text: 'Do publikacji e-maile łapie skrzynka testowa na Twoim komputerze (nikt ich nie dostaje); prawdziwą wysyłkę ustawimy przy publikacji, z adresem w Twojej domenie' },
-            { id: 'b', text: 'Już teraz, żebyś dostawał prawdziwe e-maile na swoją skrzynkę (darmowe konto w Mailgun, ok. 15 minut, działa tylko na adresy, które sam zatwierdzisz)' },
-          ]}
-          recommended="a"
-        >
-          Kiedy włączyć prawdziwą wysyłkę e-maili?
-        </Question>
-        <Question
-          number={6}
-          about="Przycisk „Otwórz wniosek”"
-          options={[
-            { id: 'a', text: 'Niezalogowany widzi ekran logowania, a po zalogowaniu wraca od razu do tego wniosku (tylko adresy w obrębie aplikacji)' },
-            { id: 'b', text: 'Po zalogowaniu zawsze Pulpit (jak dziś); wniosek szukasz na liście „Wnioski urlopowe”' },
-          ]}
-          recommended="a"
-        >
-          Przycisk prowadzi do wniosku w aplikacji. Co, gdy nie jesteś zalogowany?
-        </Question>
-      </Questions>
 
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">

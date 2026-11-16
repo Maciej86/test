@@ -15,21 +15,21 @@ z e-mailem do powiadomień (spec ogólny).
 - b) To samo, ale bez komentarza (komentarz bywa prywatny; przeczytasz go w aplikacji)
 - c) Tylko „Nowy wniosek od Jan Kowalski” i przycisk, szczegóły wyłącznie w aplikacji
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 1a.
 
 ## 2. Jaki temat e-maila?
 
 - a) „Nowy wniosek urlopowy: Jan Kowalski, 08.02.2027–12.02.2027”: widać wszystko już na liście e-maili **(polecam)**
 - b) Krótko: „Nowy wniosek urlopowy”
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 2a.
 
 ## 3. Jaka nazwa nadawcy ma się pokazać w skrzynce?
 
 - a) Nazwa aplikacji: „Urlopy i zadania” **(polecam)**
 - b) Nazwa firmy (napisz jaka)
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 3a.
 
 ## 4. Co, gdy wysyłka e-maila się nie uda (np. chwilowa awaria poczty)?
 
@@ -37,7 +37,7 @@ z e-mailem do powiadomień (spec ogólny).
   trafia do dziennika serwera **(polecam)**
 - b) Wniosek się zapisuje, a pracownik widzi dymek „Wniosek złożony, ale e-mail do administratora nie doszedł”
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 4a.
 
 ## 5. Kiedy włączyć prawdziwą wysyłkę e-maili?
 
@@ -46,7 +46,7 @@ z e-mailem do powiadomień (spec ogólny).
 - b) Już teraz, żebyś dostawał prawdziwe e-maile na swoją skrzynkę (darmowe konto w Mailgun, ok. 15 minut, działa
   tylko na adresy, które sam zatwierdzisz)
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 5a.
 
 ## 6. Przycisk „Otwórz wniosek”: co, gdy nie jesteś zalogowany?
 
@@ -57,4 +57,4 @@ zalogowaniu aplikacja zawsze przenosi na Pulpit.
   w obrębie aplikacji (zaczynające się od `/admin`), żeby link nie mógł przenieść na obcą stronę **(polecam)**
 - b) Po zalogowaniu zawsze Pulpit (jak dziś); wniosek szukasz na liście „Wnioski urlopowe”
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-16):** 6a.
