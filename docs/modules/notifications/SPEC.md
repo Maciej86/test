@@ -1,6 +1,6 @@
 # Spec: Powiadomienia
 
-**Data:** 2026-11-16 · **Status:** do akceptacji
+**Data:** 2026-11-16 · **Status:** zaakceptowany przez użytkownika 2026-11-16
 **Podstawa:** `QUESTIONS.md` (odpowiedzi 1a–6a), `SPEC-GENERAL.md` („Zasady wspólne”, tabela `notifications`),
 makieta `mockups/src/modules/notifications/`.
 
