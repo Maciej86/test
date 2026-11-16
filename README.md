@@ -5,6 +5,7 @@ Claude uzupełnia ją sam, gdy zmienia się port albo dochodzi coś nowego (np. 
 
 Dalsza praca: w Claude Code zacznij nową rozmowę: wpisz `/clear` i naciśnij Enter. To wyczyści tę rozmowę, ale cała
 praca zostaje zapisana w plikach i w git. Potem wpisz `/stepkit:dalej`.
+Pomysł, zmiana albo błąd: wpisz `/stepkit:zglos` i opisz to własnymi słowami.
 
 ## Uruchomienie
 
