@@ -149,12 +149,13 @@ ze specu: ta sama tabela).
   `/admin/leave-requests/24` z zachowanymi filtrami, „termin już minął”, „w archiwum”, puste stany → `npm run check`.
   _Uwaga:_ wyszukiwarka z opóźnieniem wydzielona z Pracowników do `frontend/src/common/SearchField.tsx` (z testem), używają jej oba moduły; dane do testów ekranów w `frontend/src/test/leaveRequestFixtures.ts` (test zasad pomija folder `test`).
 
-- [ ] 12. **Szczegóły** `components/DetailsDrawer.tsx` i `components/TeamStrip.tsx`: `Drawer` otwarty, gdy w adresie
+- [x] 12. **Szczegóły** `components/DetailsDrawer.tsx` i `components/TeamStrip.tsx`: `Drawer` otwarty, gdy w adresie
   jest `:id` (`useParams`); zamknięcie wraca na listę z tymi samymi parametrami; 404 → dymek „Nie ma takiego
   wniosku.” i lista. `TeamStrip` jak w makiecie (do 31 dni, dłuższy: lista osób z datami; święta z `getHoliday`,
   weekendy przekreślone, legenda, „W tym terminie nikt inny nie ma urlopu.”). Testy: pasek dla 21–24.12 (24.12
   przekreślony, Tomasz zielony 21–22), boks puli i zdanie „Po zatwierdzeniu zostanie 15 dni…”, przyciski zależne od
   statusu, zły numer w adresie → lista i dymek → `npm run check`.
+  _Uwaga:_ dane szczegółów pobiera strona (`useLeaveRequest`) i przekazuje do okna, żeby 404 i zły numer w adresie obsłużyć w jednym miejscu (dymek i powrót na listę).
 
 - [ ] 13. **Okna** `components/DecisionModals.tsx`: `ApproveModal` (`ConfirmModal` z `confirmColor="green"`, zdanie
   „W tym czasie urlop ma też: …” z zatwierdzonych `others`, żółta ramka przy minionym terminie), `RejectModal`

@@ -1,17 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Paper, Stack } from '@mantine/core';
 import { CalendarCheck, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { formatDate, leaveRequestsListQuerySchema, type LeaveRequestListItem } from '@app/shared';
 import { DataState } from '../../common/DataState';
 import { EmptyState } from '../../common/EmptyState';
 import { ListPagination } from '../../common/ListPagination';
 import { PageHeader } from '../../common/PageHeader';
+import { apiErrorKey } from '../../core/api/client';
+import { notify } from '../../core/notify';
 import { useListParams } from '../../core/useListParams';
 import { LeaveRequestsFilters } from './components/LeaveRequestsFilters';
 import { LeaveRequestCards, LeaveRequestsTable, type RowActions } from './components/LeaveRequestsTable';
-import { useLeaveRequests } from './leave-requests.api';
+import { DetailsDrawer } from './components/DetailsDrawer';
+import { useLeaveRequest, useLeaveRequests } from './leave-requests.api';
 
 const LIST_PATH = '/admin/leave-requests';
 const LIST_DEFAULTS = { page: 1, search: '', sort: 'default', dir: 'asc', status: 'pending' } as const;
@@ -30,6 +33,17 @@ export const LeaveRequestsPage = () => {
   const [params, setParams] = useListParams(leaveRequestsListQuerySchema, LIST_DEFAULTS);
   const requests = useLeaveRequests(params);
   const [, setDialog] = useState<DecisionDialog | null>(null);
+  // Numer wniosku z adresu: tylko same cyfry (jak idParam na serwerze); inny tekst = brak wniosku.
+  const { id: rawId } = useParams();
+  const id = rawId !== undefined && /^[1-9]\d{0,9}$/.test(rawId) ? Number(rawId) : null;
+  const details = useLeaveRequest(id);
+  const backToList = () => navigate(`${LIST_PATH}${location.search}`);
+  const missing = rawId !== undefined && (id === null || apiErrorKey(details.error) === 'server.not_found');
+  useEffect(() => {
+    if (!missing) return;
+    notify.error(t('not_found'));
+    navigate(`${LIST_PATH}${location.search}`, { replace: true });
+  }, [missing, navigate, location.search, t]);
   const data = requests.data;
   const filtered = params.status !== 'pending' || params.search !== '' || params.leaveTypeId !== undefined;
 
@@ -70,6 +84,15 @@ export const LeaveRequestsPage = () => {
           )
         )}
       </DataState>
+
+      <DetailsDrawer
+        id={missing ? null : id}
+        details={details}
+        onClose={backToList}
+        onApprove={actions.onApprove}
+        onReject={actions.onReject}
+        onCancel={actions.onCancel}
+      />
     </Stack>
   );
 };

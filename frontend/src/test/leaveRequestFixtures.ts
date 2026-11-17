@@ -1,3 +1,4 @@
+import { AxiosError, AxiosHeaders } from 'axios';
 import type { LeaveRequestDetails, LeaveRequestListItem, LeaveRequestsListResponse } from '@app/shared';
 
 /** Dane do testów ekranów modułu (jak w makiecie: Jan Kowalski, 26–27.11.2026). */
@@ -20,3 +21,9 @@ export const details = (o: Partial<LeaveRequestDetails> = {}): LeaveRequestDetai
   others: [],
   ...o,
 });
+
+/** Odpowiedź serwera z błędem (jak z axios), np. 404 albo 409 `already_decided`. */
+export const apiError = (status: number, error: Record<string, unknown>) => {
+  const config = { url: '/leave-requests', headers: new AxiosHeaders() };
+  return new AxiosError('fail', 'ERR', config, undefined, { status, statusText: String(status), headers: {}, config, data: { error } });
+};
