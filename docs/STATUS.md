@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moduł Wnioski urlopowe: makieta (`/stepkit:dalej`).
+**Następny krok:** Moduł Wnioski urlopowe: odpowiedzi na 9 pytań w makiecie (`docs/modules/leave-requests/QUESTIONS.md`).
 
 ## Start aplikacji
 
@@ -27,7 +27,7 @@
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
-| 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
+| 9 | Wnioski urlopowe | leave-requests | w toku | pytania | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-17: Wnioski urlopowe: makieta listy (zakładki statusów, wyszukiwarka, filtr typu i roku, kolumna „Zostało w puli”, karty na telefonie), szczegółów z prawej (pasek „Kto jeszcze ma wtedy wolne”, pula, decyzja), okien odrzucenia i anulowania z powodem; 9 pytań.
 - 2026-11-17: Poprawka (z `IDEAS.md`, potwierdzona: „działa”): dokończone porządki „wspólne zamiast kopii”: `notFound` i nowe `isDuplicateEntry` (`backend/src/db/errors.ts`) w serwerze, `currentYear` w `shared`, okno „Przywrócić konto?” na `ConfirmModal`, w makietach wspólne `ConfirmModal`, `PageHeader`, `EmptyState`, `ListPagination`.
 - 2026-11-17: Moduł Moje urlopy zrobiony (część 2 potwierdzona przez użytkownika: „działa”): pula i limity, składanie i wycofywanie wniosków z blokadami, powiadomienia i e-mail, PDF zatwierdzonego wniosku w nowej karcie (wspólne `backend/src/pdf/` dla modułu 9), `npm run my-leave:approve-test`.
 - 2026-11-17: Moje urlopy, część 2: zbudowane (kroki 0–7: `pdfmake`, wspólne `backend/src/pdf/` z `renderPdf` i `buildLeaveRequestPdf`, trasa `GET /api/my-leave/requests/:id/pdf`, przycisk „PDF”, `npm run my-leave:approve-test`), przegląd kodu z poprawkami, 9 prób nadużyć odpartych, sprawdzenie w przeglądarce, `npm run check` i 30 testów e2e zielone.

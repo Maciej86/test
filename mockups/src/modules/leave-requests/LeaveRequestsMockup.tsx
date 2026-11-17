@@ -1,104 +1,373 @@
-import { useState } from 'react';
-import { Badge, Button, Group, Modal, SegmentedControl, Stack, Table, Text, Textarea, TextInput, Title } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useState, type MouseEvent } from 'react';
+import { Badge, Button, Card, Group, Paper, SegmentedControl, Select, Stack, Table, Text, TextInput } from '@mantine/core';
+import { CalendarCheck, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { TABLE_MIN_WIDTH, formatDate } from '@app/shared';
+import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
-import { REQUESTS, type LeaveStatus } from './data';
+import { EmptyState } from '../../common/EmptyState';
+import { ListPagination } from '../../common/ListPagination';
+import { notify } from '../../common/notify';
+import { PageHeader } from '../../common/PageHeader';
+import { Question, Questions } from '../../common/Question';
+import { CancelModal, DetailsDrawer, RejectModal, STATUS_COLOR, Term, isLate, splitText } from './LeaveRequestModals';
+import { LEAVE_TYPES, POOLS, REQUESTS, YEARS, poolLeft, type MockRequest } from './data';
 
-const STATUS_COLOR: Record<LeaveStatus, string> = {
-  pending: 'yellow',
-  approved: 'green',
-  rejected: 'red',
-  withdrawn: 'gray',
-  cancelled: 'gray',
+const STATES = ['list', 'details', 'details_late', 'details_approved', 'reject', 'reject_error', 'cancel', 'cancel_started', 'already_decided', 'empty'] as const;
+type State = (typeof STATES)[number];
+
+const STATUS_FILTERS = ['pending', 'approved', 'rejected', 'cancelled', 'withdrawn', 'all'] as const;
+type StatusFilter = (typeof STATUS_FILTERS)[number];
+
+const byId = (id: number) => REQUESTS.find((r) => r.id === id)!;
+const pendingCount = REQUESTS.filter((r) => r.status === 'pending').length;
+const oldestPending = REQUESTS.filter((r) => r.status === 'pending').map((r) => r.createdAt).sort()[0]!;
+
+/** Czekające: najstarsze złożone na górze (czekają najdłużej). Pozostałe: od najnowszego terminu. */
+const sortRows = (rows: MockRequest[], status: StatusFilter) =>
+  [...rows].sort((a, b) =>
+    status === 'pending'
+      ? a.createdAt.localeCompare(b.createdAt)
+      : Number(b.status === 'pending') - Number(a.status === 'pending') || b.from.localeCompare(a.from),
+  );
+
+interface RowActions {
+  onDetails: (r: MockRequest) => void;
+  onReject: (r: MockRequest) => void;
+  onCancel: (r: MockRequest) => void;
+}
+
+const Actions = ({ r, onDetails, onReject, onCancel }: RowActions & { r: MockRequest }) => {
+  const { t } = useTranslation('leave-requests');
+  const stop = (fn: () => void) => (e: MouseEvent) => { e.stopPropagation(); fn(); };
+  if (r.status === 'pending') {
+    return (
+      <Group gap={4} justify="flex-end" wrap="nowrap">
+        <Button size="xs" color="green" leftSection={<ButtonIcon action="confirm" size={14} />} onClick={stop(() => notify.success(t('approved_done', { name: r.employee })))}>
+          {t('approve')}
+        </Button>
+        <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="cancel" size={14} />} onClick={stop(() => onReject(r))}>{t('reject')}</Button>
+      </Group>
+    );
+  }
+  if (r.status === 'approved') {
+    return (
+      <Group gap={4} justify="flex-end" wrap="nowrap">
+        <Button size="xs" variant="subtle" leftSection={<ButtonIcon action="print" size={14} />} onClick={stop(() => notify.success(t('pdf_mockup')))}>{t('pdf')}</Button>
+        <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="cancel" size={14} />} onClick={stop(() => onCancel(r))}>{t('cancel_leave')}</Button>
+      </Group>
+    );
+  }
+  return (
+    <Group justify="flex-end">
+      <Button size="xs" variant="subtle" leftSection={<ButtonIcon action="details" size={14} />} onClick={stop(() => onDetails(r))}>{t('details')}</Button>
+    </Group>
+  );
+};
+
+const PoolCell = ({ r }: { r: MockRequest }) => {
+  const { t } = useTranslation('leave-requests');
+  const pool = POOLS[r.employee];
+  if (!pool || !r.from.startsWith('2026')) return <Text span c="dimmed">{t('common:empty_value')}</Text>;
+  const left = poolLeft(pool);
+  return (
+    <Text size="sm" style={{ whiteSpace: 'nowrap' }}>
+      <Text span fw={700} c={left === 0 ? 'red.4' : undefined}>{left}</Text> <Text span c="dimmed">{t('pool_of', { total: pool.annual + pool.carried })}</Text>
+    </Text>
+  );
+};
+
+const StatusCell = ({ r }: { r: MockRequest }) => {
+  const { t } = useTranslation('leave-requests');
+  return (
+    <Stack gap={4} align="flex-start">
+      <Badge color={STATUS_COLOR[r.status]} variant="light" miw="max-content">{t(`status.${r.status}`)}</Badge>
+      {r.decidedBy && <Text size="xs" c="dimmed">{r.decidedBy}, <DateText value={r.decidedAt?.slice(0, 10)} /></Text>}
+      {r.reason && <Text size="xs" maw={240} lineClamp={2}>„{r.reason}”</Text>}
+    </Stack>
+  );
+};
+
+const RequestsTable = ({ rows, ...actions }: RowActions & { rows: MockRequest[] }) => {
+  const { t } = useTranslation('leave-requests');
+  return (
+    <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH + 300} visibleFrom="sm">
+      <Table verticalSpacing="sm" highlightOnHover>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>{t('col_employee')}</Table.Th>
+            <Table.Th>{t('col_dates')}</Table.Th>
+            <Table.Th>{t('col_type')}</Table.Th>
+            <Table.Th>{t('col_days')}</Table.Th>
+            <Table.Th>{t('col_left')}</Table.Th>
+            <Table.Th>{t('col_status')}</Table.Th>
+            <Table.Th>{t('col_created')}</Table.Th>
+            <Table.Th />
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {rows.map((r) => (
+            <Table.Tr key={r.id} onClick={() => actions.onDetails(r)} style={{ cursor: 'pointer' }}>
+              <Table.Td>
+                <Text fw={600}>{r.employee}</Text>
+                {r.comment && <Text size="xs" c="dimmed" maw={240} lineClamp={2}>{r.comment}</Text>}
+              </Table.Td>
+              <Table.Td>
+                <Text fw={600} style={{ whiteSpace: 'nowrap' }}><Term r={r} /></Text>
+                {isLate(r) && <Badge mt={4} size="sm" variant="light" color="yellow">{t('late')}</Badge>}
+              </Table.Td>
+              <Table.Td>{r.type}</Table.Td>
+              <Table.Td>
+                <Text fw={600}>{r.days}</Text>
+                <Text size="xs" c="dimmed">{r.status === 'pending' || r.status === 'approved' ? splitText(r, t) : t('split_returned')}</Text>
+              </Table.Td>
+              <Table.Td><PoolCell r={r} /></Table.Td>
+              <Table.Td><StatusCell r={r} /></Table.Td>
+              <Table.Td c="dimmed"><DateText value={r.createdAt.slice(0, 10)} /></Table.Td>
+              <Table.Td><Actions r={r} {...actions} /></Table.Td>
+            </Table.Tr>
+          ))}
+        </Table.Tbody>
+      </Table>
+    </Table.ScrollContainer>
+  );
+};
+
+/** Na telefonie każdy wniosek to karta; dotknięcie karty otwiera szczegóły. */
+const RequestCards = ({ rows, ...actions }: RowActions & { rows: MockRequest[] }) => {
+  const { t } = useTranslation('leave-requests');
+  return (
+    <Stack gap="sm" hiddenFrom="sm">
+      {rows.map((r) => (
+        <Card key={r.id} withBorder padding="md" onClick={() => actions.onDetails(r)} style={{ cursor: 'pointer' }}>
+          <Stack gap="xs">
+            <Group justify="space-between" align="flex-start" wrap="nowrap">
+              <Stack gap={0}>
+                <Text fw={600}>{r.employee}</Text>
+                <Text size="sm"><Term r={r} /></Text>
+                <Text size="sm" c="dimmed">{r.type}, {t('days', { count: r.days })}</Text>
+              </Stack>
+              <Badge color={STATUS_COLOR[r.status]} variant="light">{t(`status.${r.status}`)}</Badge>
+            </Group>
+            {isLate(r) && <Badge size="sm" variant="light" color="yellow" w="fit-content">{t('late')}</Badge>}
+            {r.comment && <Text size="sm" c="dimmed" lineClamp={2}>{r.comment}</Text>}
+            <Actions r={r} {...actions} />
+          </Stack>
+        </Card>
+      ))}
+    </Stack>
+  );
 };
 
 export const LeaveRequestsMockup = () => {
   const { t } = useTranslation('leave-requests');
-  const [filter, setFilter] = useState('pending');
-  const [rejectOpened, reject] = useDisclosure(false);
-  const rows = REQUESTS.filter((r) => filter === 'all' || r.status === filter);
+  const [state, setState] = useState<State>('list');
+  const [status, setStatus] = useState<StatusFilter>('pending');
+  const [year, setYear] = useState<string | null>('2026');
+  const [type, setType] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [details, setDetails] = useState<MockRequest | null>(null);
+  const [reject, setReject] = useState<{ r: MockRequest; error: boolean } | null>(null);
+  const [cancel, setCancel] = useState<MockRequest | null>(null);
+
+  const changeState = (s: State) => {
+    setState(s);
+    setDetails(null);
+    setReject(null);
+    setCancel(null);
+    if (s === 'details') setDetails(byId(24));
+    if (s === 'details_late') setDetails(byId(19));
+    if (s === 'details_approved') setDetails(byId(22));
+    if (s === 'reject') setReject({ r: byId(21), error: false });
+    if (s === 'reject_error') setReject({ r: byId(21), error: true });
+    if (s === 'cancel') setCancel(byId(22));
+    if (s === 'cancel_started') setCancel(byId(18));
+    if (s === 'already_decided') notify.error(t('already_decided', { name: 'Marek Nowicki' }));
+    if (s === 'empty') setStatus('pending');
+  };
+
+  const rows =
+    state === 'empty'
+      ? []
+      : sortRows(
+          REQUESTS.filter(
+            (r) =>
+              (status === 'all' || r.status === status) &&
+              (status === 'pending' || r.from.startsWith(year ?? '')) &&
+              (!type || r.type === type) &&
+              r.employee.toLowerCase().includes(search.trim().toLowerCase()),
+          ),
+          status,
+        );
+  const statusOptions = STATUS_FILTERS.map((s) => ({
+    value: s,
+    label: s === 'pending' ? t('filter_pending', { count: state === 'empty' ? 0 : pendingCount }) : t(`filter.${s}`),
+  }));
+  const actions: RowActions = { onDetails: setDetails, onReject: (r) => setReject({ r, error: false }), onCancel: setCancel };
 
   return (
     <Stack>
-
-      <Title order={2}>{t('title')}</Title>
-      <Group justify="space-between">
-        <SegmentedControl
-          value={filter}
-          onChange={setFilter}
-          data={[
-            { value: 'pending', label: t('filter_pending', { count: REQUESTS.filter((r) => r.status === 'pending').length }) },
-            { value: 'approved', label: t('status.approved') },
-            { value: 'rejected', label: t('status.rejected') },
-            { value: 'all', label: t('filter_all') },
+      <Questions>
+        <Question
+          number={1}
+          about={t('q.about_list')}
+          options={[
+            { id: 'a', text: t('q.q1a') },
+            { id: 'b', text: t('q.q1b') },
           ]}
+          recommended="a"
+        >
+          {t('q.q1')}
+        </Question>
+        <Question
+          number={2}
+          about={t('q.about_details')}
+          options={[
+            { id: 'a', text: t('q.q2a') },
+            { id: 'b', text: t('q.q2b') },
+            { id: 'c', text: t('q.q2c') },
+          ]}
+          recommended="a"
+        >
+          {t('q.q2')}
+        </Question>
+        <Question
+          number={3}
+          about={t('q.about_reject')}
+          options={[
+            { id: 'a', text: t('q.q3a') },
+            { id: 'b', text: t('q.q3b') },
+          ]}
+          recommended="a"
+        >
+          {t('q.q3')}
+        </Question>
+        <Question
+          number={4}
+          about={t('q.about_cancel')}
+          options={[
+            { id: 'a', text: t('q.q4a') },
+            { id: 'b', text: t('q.q4b') },
+          ]}
+          recommended="a"
+        >
+          {t('q.q4')}
+        </Question>
+        <Question
+          number={5}
+          about={t('q.about_cancel')}
+          options={[
+            { id: 'a', text: t('q.q5a') },
+            { id: 'b', text: t('q.q5b') },
+          ]}
+          recommended="a"
+        >
+          {t('q.q5')}
+        </Question>
+        <Question
+          number={6}
+          about={t('q.about_details')}
+          options={[
+            { id: 'a', text: t('q.q6a') },
+            { id: 'b', text: t('q.q6b') },
+          ]}
+          recommended="a"
+        >
+          {t('q.q6')}
+        </Question>
+        <Question
+          number={7}
+          about={t('q.about_list')}
+          options={[
+            { id: 'a', text: t('q.q7a') },
+            { id: 'b', text: t('q.q7b') },
+          ]}
+          recommended="a"
+        >
+          {t('q.q7')}
+        </Question>
+        <Question
+          number={8}
+          about={t('q.about_details')}
+          options={[
+            { id: 'a', text: t('q.q8a') },
+            { id: 'b', text: t('q.q8b') },
+          ]}
+          recommended="a"
+        >
+          {t('q.q8')}
+        </Question>
+        <Question number={9} about={t('q.about_fields')}>
+          {t('q.q9')}
+        </Question>
+      </Questions>
+
+      <Paper p="xs" bg="yellow.4" c="dark.9">
+        <Group gap="sm">
+          <Text size="sm" fw={600}>{t('mockup_state')}</Text>
+          <SegmentedControl
+            size="xs"
+            value={state}
+            onChange={(v) => changeState(v as State)}
+            data={STATES.map((s) => ({ value: s, label: t(`mockup_states.${s}`) }))}
+            style={{ flexWrap: 'wrap' }}
+          />
+        </Group>
+      </Paper>
+
+      <PageHeader
+        title={t('title')}
+        subtitle={state === 'empty' ? t('summary_none') : t('summary', { count: pendingCount, date: formatDate(oldestPending) })}
+      />
+
+      <SegmentedControl
+        visibleFrom="sm"
+        value={status}
+        onChange={(v) => setStatus(v as StatusFilter)}
+        data={statusOptions}
+        style={{ alignSelf: 'flex-start' }}
+      />
+      <Select hiddenFrom="sm" aria-label={t('col_status')} data={statusOptions} value={status} onChange={(v) => v && setStatus(v as StatusFilter)} allowDeselect={false} />
+
+      <Group gap="sm" align="flex-end">
+        <TextInput
+          placeholder={t('search')}
+          aria-label={t('search')}
+          leftSection={<Search size={16} />}
+          value={search}
+          onChange={(e) => setSearch(e.currentTarget.value)}
+          w={{ base: '100%', sm: 260 }}
         />
-        <TextInput placeholder={t('search')} w={260} />
+        {status !== 'pending' && (
+          <Select w={{ base: '100%', xs: 120 }} aria-label={t('year')} data={YEARS} value={year} onChange={setYear} allowDeselect={false} />
+        )}
+        <Select w={{ base: '100%', xs: 220 }} aria-label={t('type')} placeholder={t('type_all')} data={LEAVE_TYPES} value={type} onChange={setType} clearable />
       </Group>
 
-      <Table.ScrollContainer minWidth={820}>
-        <Table striped highlightOnHover>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>{t('col_employee')}</Table.Th>
-              <Table.Th>{t('col_type')}</Table.Th>
-              <Table.Th>{t('col_dates')}</Table.Th>
-              <Table.Th>{t('col_days')}</Table.Th>
-              <Table.Th>{t('col_left')}</Table.Th>
-              <Table.Th>{t('col_status')}</Table.Th>
-              <Table.Th />
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {rows.map((r) => (
-              <Table.Tr key={r.id}>
-                <Table.Td>
-                  <Text fw={500}>{r.employee}</Text>
-                  {r.comment && <Text size="xs" c="dimmed">{r.comment}</Text>}
-                </Table.Td>
-                <Table.Td>{r.type}</Table.Td>
-                <Table.Td>
-                  <DateText value={r.from} /> – <DateText value={r.to} />
-                </Table.Td>
-                <Table.Td>{r.days}</Table.Td>
-                <Table.Td>{r.left}</Table.Td>
-                <Table.Td>
-                  <Badge color={STATUS_COLOR[r.status]} variant="light">{t(`status.${r.status}`)}</Badge>
-                </Table.Td>
-                <Table.Td>
-                  <Group gap="xs" justify="flex-end" wrap="nowrap">
-                    {r.status === 'pending' && (
-                      <>
-                        <Button size="xs" color="green">{t('approve')}</Button>
-                        <Button size="xs" variant="default" onClick={reject.open}>{t('reject')}</Button>
-                      </>
-                    )}
-                    {r.status === 'approved' && (
-                      <>
-                        <Button size="xs" variant="subtle">{t('print')}</Button>
-                        <Button size="xs" variant="subtle" color="red">{t('cancel_leave')}</Button>
-                      </>
-                    )}
-                  </Group>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
-      {rows.length === 0 && <Text c="dimmed">{t('empty')}</Text>}
+      {rows.length === 0 ? (
+        <Paper withBorder>
+          {status === 'pending' && search === '' && !type ? (
+            <EmptyState icon={CalendarCheck} title={t('empty_pending_title')} text={t('empty_pending')} />
+          ) : (
+            <EmptyState icon={Search} text={t('no_results')} />
+          )}
+        </Paper>
+      ) : (
+        <>
+          <RequestsTable rows={rows} {...actions} />
+          <RequestCards rows={rows} {...actions} />
+          <ListPagination data={{ total: status === 'all' ? 63 : rows.length, pageSize: 25 }} page={1} onChange={() => undefined} />
+        </>
+      )}
 
-      <Modal opened={rejectOpened} onClose={reject.close} title={t('reject_title')}>
-        <Stack>
-          <Text size="sm">{t('reject_text')}</Text>
-          <Textarea label={t('reject_reason')} autosize minRows={3} />
-          <Group justify="flex-end">
-            <Button variant="default" onClick={reject.close}>{t('back')}</Button>
-            <Button color="red" onClick={reject.close}>{t('reject')}</Button>
-          </Group>
-        </Stack>
-      </Modal>
+      <DetailsDrawer
+        request={details}
+        onClose={() => setDetails(null)}
+        onReject={(r) => setReject({ r, error: false })}
+        onCancel={setCancel}
+      />
+      {reject && <RejectModal key={`${reject.r.id}-${reject.error}`} request={reject.r} showError={reject.error} onClose={() => setReject(null)} />}
+      {cancel && <CancelModal key={cancel.id} request={cancel} onClose={() => setCancel(null)} />}
     </Stack>
   );
 };
