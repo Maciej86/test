@@ -112,3 +112,83 @@ test('pracownik składa wniosek, widzi blokady i go wycofuje; administrator dost
   await expect(page.getByText('dni do wykorzystania (z 20)')).toBeVisible();
   await expect(page.getByText('20', { exact: true }).first()).toBeVisible();
 });
+
+test.describe('abuse', () => {
+  /** Konto pracownika z pulą 20 dni (przez API administratora) i jego własna karta przeglądarki po ustawieniu hasła. */
+  const employeePage = async (admin: Page, browser: import('@playwright/test').Browser, firstName: string) => {
+    const login = `e2e.tmp.${Date.now()}${Math.floor(Math.random() * 1000)}@test.local`;
+    const temporary = 'Urlop-2026!';
+    const created = await admin.request.post('/api/employees', {
+      data: { firstName, lastName: 'Nadużycie', login, email: '', role: 'employee', password: temporary, annualDays: 20, carriedDays: 0 },
+    });
+    expect(created.status()).toBe(201);
+    const page = await (await browser.newContext()).newPage();
+    await logInWithOwnPassword(page, login, temporary);
+    return page;
+  };
+  const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+  test('limit typu, cudze wnioski, podrobione pola, dwa wycofania naraz, HTML w komentarzu', async ({ page, browser }) => {
+    test.setTimeout(90_000);
+    const week2 = new Date(monday.getTime() + 7 * DAY);
+    const week3 = new Date(monday.getTime() + 14 * DAY);
+    test.skip(new Date(week3.getTime() + 2 * DAY).getUTCFullYear() !== todayUtc().getUTCFullYear(), 'za blisko końca roku');
+
+    await logIn(page, ADMIN, password());
+    await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+    const anna = await employeePage(page, browser, 'Anna');
+    const bartek = await employeePage(page, browser, 'Bartek');
+    const overview = (await (await anna.request.get('/api/my-leave/overview')).json()) as { types: { id: number; name: string; yearlyLimit: number | null }[] };
+    const vacation = overview.types.find((t) => t.yearlyLimit === null)!;
+    const limited = overview.types.find((t) => t.yearlyLimit !== null && t.yearlyLimit >= 2 && t.yearlyLimit <= 8)!;
+    const span = Math.floor(limited.yearlyLimit! / 2) + 1;
+    const range = (start: Date) => ({ dateFrom: iso(start), dateTo: iso(new Date(start.getTime() + (span - 1) * DAY)) });
+
+    // 1. Dwa wnioski naraz, razem ponad limit typu: przechodzi jeden, drugi 409.
+    const both = await Promise.all([
+      anna.request.post('/api/my-leave/requests', { data: { leaveTypeId: limited.id, ...range(monday) } }),
+      anna.request.post('/api/my-leave/requests', { data: { leaveTypeId: limited.id, ...range(week2) } }),
+    ]);
+    expect(both.map((r) => r.status()).sort()).toEqual([201, 409]);
+    const refused = both.find((r) => r.status() === 409)!;
+    expect((await refused.json()).error.message).toBe('my-leave.server.limit_exceeded');
+
+    // 2. Podrobione pola: status, dni, rok puli, właściciel i decyzja liczy serwer.
+    const forged = await anna.request.post('/api/my-leave/requests', {
+      data: {
+        leaveTypeId: vacation.id, dateFrom: iso(week3), dateTo: iso(week3), comment: '<script>alert(1)</script>',
+        userId: 1, status: 'approved', workingDays: 0, daysFromCarried: 15, poolYear: 2030, decidedByName: 'Ktoś', decidedAt: '2020-01-01',
+      },
+    });
+    expect(forged.status()).toBe(201);
+    const saved = (await forged.json()) as { id: number; status: string; workingDays: number; daysFromCarried: number; poolYear: number; decidedByName: string | null };
+    expect(saved).toMatchObject({ status: 'pending', workingDays: 1, daysFromCarried: 0, poolYear: todayUtc().getUTCFullYear(), decidedByName: null });
+
+    // 3. Cudzy wniosek: Bartek go nie widzi i nie wycofa (404 jak nieistniejący).
+    expect((await bartek.request.post(`/api/my-leave/requests/${saved.id}/withdraw`)).status()).toBe(404);
+    const bartekList = (await (await bartek.request.get('/api/my-leave/requests')).json()) as { items: unknown[] };
+    expect(bartekList.items).toHaveLength(0);
+
+    // 4. Administrator nie składa wniosków (403).
+    expect((await page.request.post('/api/my-leave/requests', { data: { leaveTypeId: vacation.id, dateFrom: iso(week3), dateTo: iso(week3) } })).status()).toBe(403);
+
+    // 5. HTML w komentarzu widać jako zwykły tekst.
+    await anna.goto('/admin/my-leave');
+    await expect(anna.getByRole('row', { name: /<script>alert\(1\)<\/script>/ })).toBeVisible();
+
+    // 6. Dwa wycofania naraz: jedno przechodzi, drugie 409; wycofanego nie wycofa się ponownie.
+    const withdraws = await Promise.all([
+      anna.request.post(`/api/my-leave/requests/${saved.id}/withdraw`),
+      anna.request.post(`/api/my-leave/requests/${saved.id}/withdraw`),
+    ]);
+    expect(withdraws.map((r) => r.status()).sort()).toEqual([200, 409]);
+
+    // 7. Złe dane: odwrócone daty, za długi komentarz, przeszłość → 400 przy polu.
+    const reversed = await anna.request.post('/api/my-leave/requests', { data: { leaveTypeId: vacation.id, dateFrom: iso(week3), dateTo: iso(monday) } });
+    expect((await reversed.json()).error.fields).toEqual({ dateTo: 'my-leave.validation.dates_order' });
+    const long = await anna.request.post('/api/my-leave/requests', { data: { leaveTypeId: vacation.id, dateFrom: iso(week3), dateTo: iso(week3), comment: 'x'.repeat(501) } });
+    expect(long.status()).toBe(400);
+    const past = await anna.request.post('/api/my-leave/requests', { data: { leaveTypeId: vacation.id, dateFrom: iso(new Date(todayUtc().getTime() - 2 * DAY)), dateTo: iso(todayUtc()) } });
+    expect([400, 409]).toContain(past.status());
+  });
+});

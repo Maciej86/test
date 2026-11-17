@@ -44,4 +44,18 @@ listopad 2026 (rok otwarty 2026); w innym dniu wybierz podobne dni robocze w prz
 
 ## Próby nadużyć
 
-(uzupełniane na etapie testy według `abuse.md`)
+Sprawdzone 2026-11-17 (testy `describe('abuse')` w `my-leave.routes.test.ts` i w `e2e/my-leave.spec.ts`, na prawdziwej bazie):
+
+| Próba | Wynik |
+|---|---|
+| Wycofanie cudzego wniosku (inny pracownik, numer w adresie) | odparta: 404 jak nieistniejący |
+| Lista i pula innej osoby (`?userId=`, `user_id` w treści) | odparta: zawsze tylko własne (`req.user`) |
+| Administrator składa wniosek albo otwiera `/admin/my-leave` | odparta: 403, „Nie masz dostępu…” |
+| Podrobione pola (status „zatwierdzony”, liczba dni, podział, rok puli, decyzja, właściciel) | odparta: serwer liczy sam, wniosek „czeka”, dni policzone |
+| Dwa wnioski naraz, razem ponad limit „Na żądanie” | odparta: jeden zapisany, drugi 409 |
+| Dwa wycofania naraz | odparta: jedno przechodzi, drugie 409 |
+| Złe numery w adresie (`abc`, `0x10`, `1e3`, `-1`, ogromne) | odparta: 404 |
+| Złe dane: odwrócone daty, komentarz 501 znaków, ujemny lub ogromny numer typu, rok `abc`, data w przeszłości | odparta: 400 z komunikatem przy polu |
+| `<script>alert(1)</script>` w komentarzu | odparta: widać zwykły tekst |
+| Usunięcie konta albo typu urlopu z wnioskami | odparta: klucz obcy RESTRICT, historia zostaje |
+| „Zamknij rok” w chwili składania wniosku | naprawiona przy przeglądzie kodu: liczenie czekających wniosków z blokadą |

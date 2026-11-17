@@ -115,3 +115,58 @@ describe('my leave routes', () => {
     expect((await as(jan).post('/my-leave/requests/21/withdraw')).status).toBe(409);
   });
 });
+
+describe('abuse', () => {
+  it('forged request ids in the address → 404 without touching the service', async () => {
+    for (const id of ['0', '-1', '1.5', 'abc', '0x10', '007', '99999999999']) {
+      expect((await as(jan).post(`/my-leave/requests/${id}/withdraw`)).status).toBe(404);
+    }
+    expect(s.withdrawRequest).not.toHaveBeenCalled();
+  });
+
+  it('forged owner in the address or body is ignored: always req.user', async () => {
+    vi.mocked(s.getMyLeaveOverview).mockResolvedValue({ pool: {} } as never);
+    vi.mocked(s.listMyRequests).mockResolvedValue({ year: 2026, items: [] });
+    vi.mocked(s.withdrawRequest).mockResolvedValue({ ok: true });
+    await as(jan).get('/my-leave/overview?userId=1&user_id=1');
+    expect(s.getMyLeaveOverview).toHaveBeenCalledWith(7);
+    await as(jan).get('/my-leave/requests?userId=1');
+    expect(s.listMyRequests).toHaveBeenCalledWith(7, undefined);
+    await as(jan).post('/my-leave/requests/21/withdraw', { userId: 1, status: 'approved' });
+    expect(s.withdrawRequest).toHaveBeenCalledWith(21, { id: 7, name: 'Jan Kowalski' });
+  });
+
+  it('forged computed fields never reach the service (status, days, split, pool year, decision)', async () => {
+    vi.mocked(s.createRequest).mockResolvedValue({ id: 33 } as never);
+    await as(jan).post('/my-leave/requests', {
+      ...body, userId: 1, status: 'approved', workingDays: 0, daysFromCarried: 99, daysFromAnnual: 0, poolYear: 2030,
+      decidedBy: 1, decidedByName: 'Ktoś', decidedAt: '2026-01-01', createdAt: '2000-01-01',
+    });
+    expect(s.createRequest).toHaveBeenCalledWith(body, { id: 7, name: 'Jan Kowalski' });
+  });
+
+  it('bad data → 400 with field messages: type id negative or huge, reversed dates, too long comment, bad year', async () => {
+    for (const leaveTypeId of [-1, 0, 1.5, 99999999999, 'abc']) {
+      const res = await as(jan).post('/my-leave/requests', { ...body, leaveTypeId });
+      expect(res.status).toBe(400);
+      expect(res.body.error.fields.leaveTypeId).toBeDefined();
+    }
+    expect((await as(jan).post('/my-leave/requests', { ...body, dateFrom: '2026-12-31', dateTo: '2026-12-21' })).body.error.fields).toEqual({ dateTo: M.datesOrder });
+    expect((await as(jan).post('/my-leave/requests', { ...body, comment: 'x'.repeat(501) })).body.error.fields).toEqual({ comment: 'validation.too_long' });
+    expect((await as(jan).get('/my-leave/requests?year=99999999999999999999')).status).toBe(400);
+    expect(s.createRequest).not.toHaveBeenCalled();
+  });
+
+  it('HTML in the comment is passed on as plain text (React shows it as text)', async () => {
+    vi.mocked(s.createRequest).mockResolvedValue({ id: 33 } as never);
+    await as(jan).post('/my-leave/requests', { ...body, comment: '<script>alert(1)</script>' });
+    expect(s.createRequest).toHaveBeenCalledWith({ ...body, comment: '<script>alert(1)</script>' }, expect.anything());
+  });
+
+  it('deleting a person or a leave type with requests is blocked (RESTRICT): history does not vanish', async () => {
+    const { readFileSync } = await import('node:fs');
+    const sql = readFileSync(new URL('../../../../migrations/017_leave_requests.sql', import.meta.url), 'utf8');
+    expect(sql).toMatch(/\(user_id\) REFERENCES users \(id\) ON DELETE RESTRICT/);
+    expect(sql).toMatch(/\(leave_type_id\) REFERENCES leave_types \(id\) ON DELETE RESTRICT/);
+  });
+});
