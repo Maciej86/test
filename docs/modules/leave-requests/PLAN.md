@@ -58,7 +58,7 @@ ze specu: ta sama tabela).
     the confirm button”; to samo w `mockups/src/common/ConfirmModal.tsx` z testem; okno zatwierdzenia w makiecie
     dostaje `confirmColor="green"` → `npm run check`.
 
-- [ ] 2. **Wspólne dane PDF:** `backend/src/pdf/leaveRequestPdfData.ts`: `findRequestForPdf(db, id: number, userId?:
+- [x] 2. **Wspólne dane PDF:** `backend/src/pdf/leaveRequestPdfData.ts`: `findRequestForPdf(db, id: number, userId?:
   number): Promise<PdfRequestRow | null>` (bez `userId` dowolny wniosek; z nim tylko własny) i `toPdfData(row):
   LeaveRequestPdfData`. Test `pdf/__tests__/leaveRequestPdfData.test.ts` (z `userId` cudzy → null; bez → wiersz;
   `toPdfData` zamienia daty na ISO). `my-leave.service.getRequestPdf` używa obu; `findOwnRequestForPdf` znika;

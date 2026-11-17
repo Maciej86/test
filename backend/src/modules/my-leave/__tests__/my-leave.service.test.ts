@@ -12,10 +12,10 @@ vi.mock('../my-leave.queries', () => ({
   sumPoolUsage: vi.fn(),
   insertRequest: vi.fn(),
   findOwnRequest: vi.fn(),
-  findOwnRequestForPdf: vi.fn(),
   setWithdrawn: vi.fn(),
   toRequest: vi.fn(),
 }));
+vi.mock('../../../pdf/leaveRequestPdfData', async (orig) => ({ ...(await orig<object>()), findRequestForPdf: vi.fn() }));
 vi.mock('../../employees/employees.queries', () => ({ findOpenPoolOfUser: vi.fn() }));
 vi.mock('../../leave-types/leave-types.queries', () => ({ listSelectableLeaveTypes: vi.fn(), findSelectableLeaveType: vi.fn() }));
 vi.mock('../../notifications/notifications.service', () => ({ notifyAdmins: vi.fn() }));
@@ -25,6 +25,7 @@ const q = await import('../my-leave.queries');
 const employees = await import('../../employees/employees.queries');
 const leaveTypes = await import('../../leave-types/leave-types.queries');
 const s = await import('../my-leave.service');
+const { findRequestForPdf } = await import('../../../pdf/leaveRequestPdfData');
 const { pool } = await import('../../../db/pool');
 const { withTransaction } = await import('../../../db/transaction');
 const { logActivity } = await import('../../../db/activityLog');
@@ -258,21 +259,21 @@ describe('getRequestPdf', () => {
   } as never;
 
   it('own approved request → file name and PDF, looked up with req.user id', async () => {
-    vi.mocked(q.findOwnRequestForPdf).mockResolvedValue(approved);
+    vi.mocked(findRequestForPdf).mockResolvedValue(approved);
     const result = await s.getRequestPdf(21, 7);
-    expect(q.findOwnRequestForPdf).toHaveBeenCalledWith(pool, 21, 7);
+    expect(findRequestForPdf).toHaveBeenCalledWith(pool, 21, 7);
     if ('error' in result) throw new Error('expected a PDF');
     expect(result.fileName).toBe('wniosek-urlopowy-21.pdf');
     expect(result.pdf.subarray(0, 4).toString('latin1')).toBe('%PDF');
   });
 
   it('someone else or missing → 404', async () => {
-    vi.mocked(q.findOwnRequestForPdf).mockResolvedValue(null);
+    vi.mocked(findRequestForPdf).mockResolvedValue(null);
     expect(await s.getRequestPdf(21, 7)).toEqual({ error: { status: 404, message: 'server.not_found' } });
   });
 
   it.each(['pending', 'rejected', 'withdrawn', 'cancelled'])('%s → 409 not_approved', async (status) => {
-    vi.mocked(q.findOwnRequestForPdf).mockResolvedValue({ ...(approved as object), status } as never);
+    vi.mocked(findRequestForPdf).mockResolvedValue({ ...(approved as object), status } as never);
     expect(await s.getRequestPdf(21, 7)).toEqual({ error: { status: 409, message: M.notApproved } });
   });
 });

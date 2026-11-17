@@ -12,6 +12,7 @@ import {
 import { diffChanges, logActivity } from '../../db/activityLog';
 import { pool } from '../../db/pool';
 import { buildLeaveRequestPdf, leaveRequestPdfFileName } from '../../pdf/leaveRequestPdf';
+import { findRequestForPdf, toPdfData } from '../../pdf/leaveRequestPdfData';
 import { renderPdf } from '../../pdf/renderPdf';
 import { withTransaction } from '../../db/transaction';
 import type { NewLeaveRequestEmailData } from '../../email/templates/newLeaveRequest';
@@ -199,26 +200,9 @@ export const withdrawRequest = async (id: number, actor: Actor): Promise<Result>
 
 /** PDF własnego zatwierdzonego wniosku (do wydruku i podpisu); cudzy albo brak → 404, inny status → 409. */
 export const getRequestPdf = async (id: number, userId: number): Promise<Result<{ fileName: string; pdf: Buffer }>> => {
-  const row = await q.findOwnRequestForPdf(pool, id, userId);
+  const row = await findRequestForPdf(pool, id, userId);
   if (!row) return notFound();
   if (row.status !== 'approved') return fail(409, M.notApproved);
-  const pdf = await renderPdf(
-    buildLeaveRequestPdf({
-      id: row.id,
-      createdAt: row.created_at.toISOString(),
-      employeeName: row.employee_name,
-      leaveTypeName: row.leave_type_name,
-      deductsPool: Boolean(row.deducts_pool),
-      dateFrom: row.date_from,
-      dateTo: row.date_to,
-      workingDays: row.working_days,
-      daysFromCarried: row.days_from_carried,
-      daysFromAnnual: row.days_from_annual,
-      poolYear: row.pool_year,
-      comment: row.comment,
-      decidedByName: row.decided_by_name,
-      decidedAt: row.decided_at ? row.decided_at.toISOString() : null,
-    }),
-  );
+  const pdf = await renderPdf(buildLeaveRequestPdf(toPdfData(row)));
   return { fileName: leaveRequestPdfFileName(row.id), pdf };
 };
