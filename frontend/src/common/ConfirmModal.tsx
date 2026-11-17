@@ -17,6 +17,7 @@ export const ConfirmModal = ({
   title,
   confirmLabel,
   confirmAction,
+  cancelLabel,
   danger = false,
   loading = false,
   onConfirm,
@@ -26,6 +27,8 @@ export const ConfirmModal = ({
   title: string;
   confirmLabel: string;
   confirmAction: ButtonAction;
+  /** Napis zamiast „Anuluj”, np. „Zostaw” przy wycofaniu wniosku. */
+  cancelLabel?: string;
   danger?: boolean;
   loading?: boolean;
   onConfirm: () => void;
@@ -38,7 +41,7 @@ export const ConfirmModal = ({
       <Stack>
         {children}
         <Group justify="flex-end">
-          <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
+          <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{cancelLabel ?? t('cancel')}</Button>
           <Button color={danger ? 'red' : undefined} leftSection={<ButtonIcon action={confirmAction} />} loading={loading} onClick={onConfirm}>
             {confirmLabel}
           </Button>

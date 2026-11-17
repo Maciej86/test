@@ -31,6 +31,13 @@ describe('ConfirmModal', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it('cancelLabel replaces "Anuluj" (e.g. "Zostaw"), still closes', () => {
+    const { onClose } = setup({ cancelLabel: 'Zostaw' });
+    expect(screen.queryByRole('button', { name: 'Anuluj' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Zostaw' }));
+    expect(onClose).toHaveBeenCalled();
+  });
+
   it('danger makes the confirm button red', () => {
     setup({ danger: true });
     expect(screen.getByRole('button', { name: 'Ukryj' }).getAttribute('style') ?? '').toContain('red');

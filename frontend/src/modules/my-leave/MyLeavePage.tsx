@@ -7,7 +7,9 @@ import { DataState } from '../../common/DataState';
 import { PageHeader } from '../../common/PageHeader';
 import { useListParams } from '../../core/useListParams';
 import { LimitsCard, PoolCard } from './components/PoolCards';
+import { RequestModal } from './components/RequestModal';
 import { RequestCards, RequestsTable } from './components/RequestsTable';
+import { WithdrawModal } from './components/WithdrawModal';
 import { useMyLeaveOverview, useMyRequests } from './my-leave.api';
 
 /** Ekran „Moje urlopy” (pracownik): pula i limity roku otwartego, wnioski z wybranego roku, złożenie i wycofanie. */
@@ -16,7 +18,7 @@ export const MyLeavePage = () => {
   const overview = useMyLeaveOverview();
   const [params, setParams] = useListParams(myLeaveRequestsQuerySchema, {});
   const requests = useMyRequests(params.year);
-  const [, setDialog] = useState<{ kind: 'new' } | { kind: 'withdraw'; request: MyLeaveRequest } | null>(null);
+  const [dialog, setDialog] = useState<{ kind: 'new' } | { kind: 'withdraw'; request: MyLeaveRequest } | null>(null);
 
   const data = overview.data;
   const shownYear = requests.data?.year ?? params.year ?? data?.pool.year;
@@ -30,6 +32,10 @@ export const MyLeavePage = () => {
   );
   const items = requests.data?.items ?? [];
   const onWithdraw = (request: MyLeaveRequest) => setDialog({ kind: 'withdraw', request });
+  const close = () => setDialog(null);
+  const showYearOf = (request: MyLeaveRequest) => {
+    if (request.poolYear !== shownYear) setParams({ year: request.poolYear });
+  };
 
   return (
     <Stack>
@@ -62,6 +68,9 @@ export const MyLeavePage = () => {
         <RequestsTable rows={items} onWithdraw={onWithdraw} />
         <RequestCards rows={items} onWithdraw={onWithdraw} />
       </DataState>
+
+      {dialog?.kind === 'new' && data && <RequestModal overview={data} onClose={close} onSubmitted={showYearOf} />}
+      {dialog?.kind === 'withdraw' && <WithdrawModal request={dialog.request} onClose={close} />}
     </Stack>
   );
 };

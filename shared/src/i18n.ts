@@ -40,8 +40,8 @@ export const createI18n = (lng: Language = 'pl'): i18n => {
   return instance;
 };
 
-/** Tłumaczy klucz w formie '<namespace>.<reszta>', np. 'server.no_access'. */
-export const translateKey = (t: i18n['t'], key: string): string => {
+/** Tłumaczy klucz w formie '<namespace>.<reszta>', np. 'server.no_access'; `values` = liczby do tekstu (np. z błędu 409). */
+export const translateKey = (t: i18n['t'], key: string, values: Record<string, unknown> = {}): string => {
   const [ns, ...rest] = key.split('.');
-  return t(rest.join('.'), { ns }) as string;
+  return t(rest.join('.'), { ...values, ns }) as string;
 };

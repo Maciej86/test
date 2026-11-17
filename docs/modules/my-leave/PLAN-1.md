@@ -132,15 +132,17 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   `?year=abc` → rok otwarty → `npm run check`.
   _Uwaga:_ `useListParams` nie dopisuje już `page=1` do adresu listy bez stron (test w `useListParams.test.tsx`). Rok listy: bez `?year` serwer bierze rok otwarty, więc lista nie czeka na pulę. Komponenty: `PoolCards.tsx` (pula i limity), `RequestsTable.tsx` (tabela, karty, `splitText`).
 
-- [ ] 11. **Okno „Złóż wniosek”** (`RequestModal`, `DayStrip`): `useForm` + `zodResolver(leaveRequestSchema)`,
+- [x] 11. **Okno „Złóż wniosek”** (`RequestModal`, `DayStrip`): `useForm` + `zodResolver(leaveRequestSchema)`,
   `DateField` z `minDate` = dziś, „Do” dopasowuje się do „Od”, ramka z `checkLeaveRequest` (te same teksty co
   makieta), przycisk wyłączony bez `ok`, błąd serwera przy polu / w ramce, dymek po zapisie. Testy: 7 dni dla 21–31.12,
   ramki: zajęty termin, przyszły rok, limit, za mało dni, brak dni roboczych; przycisk wyłączony; wysyła tylko pola
   schematu; błąd 409 zostawia okno; `DayStrip`: Wigilia przekreślona z nazwą, termin > 45 dni bez paska →
   `npm run check`.
+  _Uwaga:_ `translateKey` w `@app/shared` przyjmuje wartości do tekstu (komunikat 409 z liczbami w ramce okna; test `i18n.test.ts`). Komentarz ma stałe 3 linie zamiast `autosize` (`autosize` nie działa w środowisku testów). Ramka w osobnym `RequestCheck.tsx`; po zapisie lista pokazuje rok nowego wniosku.
 
-- [ ] 12. **Wycofanie na ekranie:** `ConfirmModal` z tekstem z liczbą dni (bez zdania o puli dla typu bez
+- [x] 12. **Wycofanie na ekranie:** `ConfirmModal` z tekstem z liczbą dni (bez zdania o puli dla typu bez
   odejmowania), dymek, błąd zostawia okno. Testy ekranu → `npm run check`.
+  _Uwaga:_ `ConfirmModal` dostał nieobowiązkowe `cancelLabel` („Zostaw”), z testem. Nowe teksty: `withdraw_text_no_pool`, `withdrawn_done_no_pool`.
 
 - [ ] 13. **Test w przeglądarce** `e2e/my-leave.spec.ts` ze scenariuszy `TESTS-1.md` (pracownik: złożenie, blokady,
   wycofanie, pusty rok; administrator: dzwonek, „Pracownicy” z czekającymi, zablokowane „Zamknij rok”, brak dostępu)

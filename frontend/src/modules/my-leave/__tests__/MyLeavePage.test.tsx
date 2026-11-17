@@ -1,7 +1,8 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import type { AxiosRequestConfig } from 'axios';
+import { AxiosError, AxiosHeaders, type AxiosRequestConfig } from 'axios';
 import type { MyLeaveOverview, MyLeaveRequest } from '@app/shared';
 import { api } from '../../../core/api/client';
+import { notify } from '../../../core/notify';
 import { renderRoutes } from '../../../test/render';
 import { MyLeavePage } from '../MyLeavePage';
 
@@ -142,5 +143,63 @@ describe('MyLeavePage', () => {
     expect(await screen.findByText('Nie masz jeszcze puli dni urlopu. Poproś administratora o jej ustawienie.')).toBeInTheDocument();
   });
 
-  it.todo('withdraw: confirm text with days, toast, error keeps the window');
+  it('Złóż wniosek opens the request window with the types', async () => {
+    mockApi();
+    show();
+    await screen.findByText('Urlop w 2026');
+    fireEvent.click(screen.getAllByRole('button', { name: 'Złóż wniosek' })[0]!);
+    expect(await screen.findByRole('dialog', { name: 'Złóż wniosek' })).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Wypoczynkowy')).toBeInTheDocument();
+  });
+
+  it('after submitting, the list shows the year of the new request', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-17T10:00:00Z'));
+    mockApi();
+    vi.spyOn(api, 'post').mockResolvedValue({ data: request({ id: 40, dateFrom: '2026-12-21', dateTo: '2026-12-31' }) });
+    const { router } = show('/admin/my-leave?year=2025');
+    await table();
+    fireEvent.click(screen.getAllByRole('button', { name: 'Złóż wniosek' })[0]!);
+    const dialog = await screen.findByRole('dialog', { name: 'Złóż wniosek' });
+    fireEvent.change(within(dialog).getByRole('textbox', { name: /^Od/ }), { target: { value: '21.12.2026' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Złóż wniosek' }));
+    await waitFor(() => expect(router.state.location.search).toBe('?year=2026'));
+    vi.useRealTimers();
+  });
+
+  it('withdraw: confirm text with days; Zostaw changes nothing; Wycofaj sends, toast', async () => {
+    mockApi();
+    const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { ok: true } });
+    const success = vi.spyOn(notify, 'success');
+    show();
+    fireEvent.click(within(await rowOf('Wyjazd rodzinny.')).getByRole('button', { name: 'Wycofaj' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Wycofać wniosek?' });
+    expect(within(dialog).getByText(/^Wypoczynkowy,/)).toHaveTextContent('Wypoczynkowy, 26.11.2026 – 27.11.2026 (2 dni robocze).');
+    expect(within(dialog).getByText(/2 zarezerwowane dni wrócą do puli/)).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Zostaw' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(post).not.toHaveBeenCalled();
+
+    fireEvent.click(within(await rowOf('Wyjazd rodzinny.')).getByRole('button', { name: 'Wycofaj' }));
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Wycofaj' }));
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/my-leave/requests/21/withdraw'));
+    expect(success).toHaveBeenCalledWith('Wniosek wycofany. Dni wróciły do puli.');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('withdraw of a type without pool: no sentence about the pool; error keeps the window', async () => {
+    const config = { url: '/my-leave/requests/9/withdraw', headers: new AxiosHeaders() };
+    mockApi({ items: [request({ id: 9, leaveTypeName: 'Okolicznościowy', deductsPool: false, daysFromAnnual: 0, comment: 'Ślub siostry.' })] });
+    vi.spyOn(api, 'post').mockRejectedValue(
+      new AxiosError('fail', 'ERR', config, undefined, { status: 409, statusText: 'x', headers: {}, config, data: { error: { message: 'my-leave.server.not_pending' } } }),
+    );
+    const error = vi.spyOn(notify, 'error');
+    show();
+    fireEvent.click(within(await rowOf('Ślub siostry.')).getByRole('button', { name: 'Wycofaj' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Wycofać wniosek?' });
+    expect(within(dialog).queryByText(/puli/)).not.toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Wycofaj' }));
+    await waitFor(() => expect(error).toHaveBeenCalledWith('Tego wniosku nie można już wycofać, bo nie czeka na decyzję. Odśwież stronę.'));
+    expect(screen.getByRole('dialog', { name: 'Wycofać wniosek?' })).toBeInTheDocument();
+  });
 });
