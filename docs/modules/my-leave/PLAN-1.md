@@ -73,7 +73,7 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
     wczoraj → past_date, 2027 przy puli 2026 → pool_not_ready, 2025 → year_closed → `npm run check`.
   _Uwaga:_ `checkLeaveRequest` przyjmuje typ bez `id` i zawsze z datami (puste pola obsługuje okno); `busy` niesie też nazwę typu i status, żeby ramka „termin zajęty” mówiła, na który wniosek zachodzi (jak w makiecie). `leaveTypeId` przez `wholeNumber` (Select daje tekst). Nowy klucz `my-leave.server.type_unavailable` dla ukrytego albo nieistniejącego typu.
 
-- [ ] 4. **Zapytania** `backend/src/modules/my-leave/my-leave.queries.ts` (wszystkie z `userId` w `WHERE`):
+- [x] 4. **Zapytania** `backend/src/modules/my-leave/my-leave.queries.ts` (wszystkie z `userId` w `WHERE`):
   `listRequests(db, userId, year)`, `listRequestYears(db, userId)`, `listBusy(db, userId, year)`,
   `sumTypeUsage(db, userId, year)` (dni czekających+zatwierdzonych per typ), `insertRequest(db, row)`,
   `findOwnRequest(db, id, userId)`, `setWithdrawn(db, id, userId)` (`WHERE status = 'pending'`, zwraca liczbę zmian);
@@ -82,13 +82,15 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   W `employees.queries.ts`: `findOpenPoolOfUser(db, userId, lock: boolean)` (`… closed_at IS NULL … FOR UPDATE`).
   Testy (`pool.query` podmieniony): parametry `?`, `userId` w każdym zapytaniu, `FOR UPDATE` przy `lock` →
   `npm run check`.
+  _Uwaga:_ `findOpenPoolOfUser` ma dwa pełne zapytania (z blokadą i bez), bo test zasad nie pozwala wstawiać tekstu do SQL; lista kolumn wniosku to jedna stała w `my-leave.queries.ts` z `// rule-ok`. Statusy idą do SQL jako parametry `?`. Daty z godziną jako tekst ISO (jak w Powiadomieniach).
 
-- [ ] 5. **Odczyt:** `my-leave.service.ts`: `getMyLeaveOverview(userId): Promise<MyLeaveOverview | null>` i
+- [x] 5. **Odczyt:** `my-leave.service.ts`: `getMyLeaveOverview(userId): Promise<MyLeaveOverview | null>` i
   `listMyRequests(userId, year?)` (kolejność: czekające, potem `date_from` malejąco); trasy `GET /my-leave/overview`
   (brak puli → 404), `GET /my-leave/requests` (`validateQuery(myLeaveRequestsQuerySchema)`); `mountModule(api,
   'my-leave', myLeaveRoutes)` w `app.ts`. Testy tras: 401 bez logowania, 403 administrator, 200 z danymi tylko
   `req.user.id`, `?year=abc` → 400; usługi: liczby puli (`leftDays` = pula + zaległe − zatwierdzone − czekające,
   `leftCarriedDays`), `usedOfLimit`, lata z rokiem otwartym → `npm run check`.
+  _Uwaga:_ Moje urlopy biorą pulę wprost z `findOpenPoolOfUser` w `employees.queries.ts` (tak jak Pracownicy biorą typy umów z `contract-types.queries.ts`); osobne `getOpenPool` w `employees.service.ts` tylko przekazywałoby wywołanie dalej.
 
 - [ ] 6. **Złożenie wniosku:** `createRequest(input: LeaveRequestInput, actor): Promise<Result<MyLeaveRequest>>`
   w `withTransaction`: `findOpenPoolOfUser(conn, actor.id, true)` (brak → 404), `findSelectableLeaveType` (brak →

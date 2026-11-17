@@ -171,6 +171,20 @@ export const findPool = async (db: Db, userId: number, year: number): Promise<Po
   return rows[0] ?? null;
 };
 
+/**
+ * Pula otwarta osoby (bez closed_at). `lock`: blokada wiersza do końca transakcji, żeby dwa wnioski złożone naraz
+ * liczyły dni po kolei (moduł Moje urlopy).
+ */
+export const findOpenPoolOfUser = async (db: Db, userId: number, lock: boolean): Promise<PoolRow | null> => {
+  const [rows] = await db.query<PoolRow[]>(
+    lock
+      ? 'SELECT id, user_id, year, annual_days, carried_days, closed_at FROM leave_pools WHERE user_id = ? AND closed_at IS NULL ORDER BY year LIMIT 1 FOR UPDATE'
+      : 'SELECT id, user_id, year, annual_days, carried_days, closed_at FROM leave_pools WHERE user_id = ? AND closed_at IS NULL ORDER BY year LIMIT 1',
+    [userId],
+  );
+  return rows[0] ?? null;
+};
+
 export const upsertPool = async (db: Db, userId: number, year: number, annualDays: number, carriedDays: number): Promise<void> => {
   await db.query(
     'INSERT INTO leave_pools (user_id, year, annual_days, carried_days) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE annual_days = VALUES(annual_days), carried_days = VALUES(carried_days)',
