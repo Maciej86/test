@@ -9,7 +9,6 @@ import { EmptyState } from '../../common/EmptyState';
 import { ListPagination } from '../../common/ListPagination';
 import { notify } from '../../common/notify';
 import { PageHeader } from '../../common/PageHeader';
-import { Question, Questions } from '../../common/Question';
 import { ApproveModal, CancelModal, DetailsDrawer, RejectModal, STATUS_COLOR, Term, isLate, splitText } from './LeaveRequestModals';
 import { LEAVE_TYPES, POOLS, REQUESTS, YEARS, poolLeft, type MockRequest } from './data';
 
@@ -211,90 +210,6 @@ export const LeaveRequestsMockup = () => {
 
   return (
     <Stack>
-      <Questions>
-        <Question
-          number={2}
-          about={t('q.about_details')}
-          options={[
-            { id: 'a', text: t('q.q2a') },
-            { id: 'b', text: t('q.q2b') },
-            { id: 'c', text: t('q.q2c') },
-          ]}
-          recommended="a"
-        >
-          {t('q.q2')}
-        </Question>
-        <Question
-          number={3}
-          about={t('q.about_reject')}
-          options={[
-            { id: 'a', text: t('q.q3a') },
-            { id: 'b', text: t('q.q3b') },
-          ]}
-          recommended="a"
-        >
-          {t('q.q3')}
-        </Question>
-        <Question
-          number={4}
-          about={t('q.about_cancel')}
-          options={[
-            { id: 'a', text: t('q.q4a') },
-            { id: 'b', text: t('q.q4b') },
-          ]}
-          recommended="a"
-        >
-          {t('q.q4')}
-        </Question>
-        <Question
-          number={5}
-          about={t('q.about_cancel')}
-          options={[
-            { id: 'a', text: t('q.q5a') },
-            { id: 'b', text: t('q.q5b') },
-          ]}
-          recommended="a"
-        >
-          {t('q.q5')}
-        </Question>
-        <Question
-          number={6}
-          about={t('q.about_details')}
-          options={[
-            { id: 'a', text: t('q.q6a') },
-            { id: 'b', text: t('q.q6b') },
-          ]}
-          recommended="a"
-        >
-          {t('q.q6')}
-        </Question>
-        <Question
-          number={7}
-          about={t('q.about_list')}
-          options={[
-            { id: 'a', text: t('q.q7a') },
-            { id: 'b', text: t('q.q7b') },
-          ]}
-          recommended="a"
-        >
-          {t('q.q7')}
-        </Question>
-        <Question
-          number={8}
-          about={t('q.about_details')}
-          options={[
-            { id: 'a', text: t('q.q8a') },
-            { id: 'b', text: t('q.q8b') },
-          ]}
-          recommended="a"
-        >
-          {t('q.q8')}
-        </Question>
-        <Question number={9} about={t('q.about_fields')}>
-          {t('q.q9')}
-        </Question>
-      </Questions>
-
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">
           <Text size="sm" fw={600}>{t('mockup_state')}</Text>

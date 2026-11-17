@@ -27,14 +27,14 @@ i „Zatwierdź”.
 - b) Tylko urlopy zatwierdzone
 - c) Nie pokazywać paska
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 2a.
 
 ## 3. Powód odrzucenia
 
 - a) Obowiązkowy: pracownik zawsze dowie się dlaczego **(polecam)**
 - b) Nieobowiązkowy
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 3a.
 
 ## 4. Który zatwierdzony urlop można anulować
 
@@ -42,14 +42,14 @@ i „Zatwierdź”.
   przyszedł do pracy); przy takim okno pokazuje żółte ostrzeżenie **(polecam)**
 - b) Tylko taki, który jeszcze się nie zaczął
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 4a.
 
 ## 5. Powód anulowania
 
 - a) Obowiązkowy, jak przy odrzuceniu **(polecam)**
 - b) Nieobowiązkowy
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 5a.
 
 ## 6. Wniosek, którego termin minął przed decyzją
 
@@ -57,7 +57,7 @@ i „Zatwierdź”.
   **(polecam)**
 - b) Aplikacja sama go odrzuca następnego dnia
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 6a.
 
 ## 7. Układ listy
 
@@ -66,7 +66,7 @@ i „Zatwierdź”.
   i filtr typu urlopu **(polecam)**
 - b) Jedna lista wszystkich wniosków od najnowszych, czekające na górze
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 7a.
 
 ## 8. Link z e-maila i z powiadomienia o nowym wniosku
 
@@ -74,7 +74,7 @@ i „Zatwierdź”.
   **(polecam)**
 - b) Otwiera samą listę czekających
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 8a.
 
 ## 9. Zasady pól
 
@@ -85,4 +85,4 @@ i „Zatwierdź”.
 
 Odpowiedz „ok” albo popraw pojedyncze pola.
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 9 ok.
