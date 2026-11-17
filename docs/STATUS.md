@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moje urlopy: makieta (`/stepkit:dalej`).
+**Następny krok:** Moje urlopy: pytania (odpowiedzi na 9 pytań w makiecie, `/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -26,7 +26,7 @@
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
-| 8 | Moje urlopy | my-leave | czeka | makieta | employees, leave-types, email, notifications |
+| 8 | Moje urlopy | my-leave | w toku | pytania | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-17: Moje urlopy: makieta (pula roku otwartego z paskiem i limitami typów, tabela wniosków z wyborem roku, okno wniosku z paskiem dni i liczeniem na bieżąco, stany: za mało dni, limit typu, termin zajęty, przyszły rok, wycofanie, podgląd PDF); 9 pytań.
 - 2026-11-16: Porządki „wspólne zamiast kopii”: `ConfirmModal`, `PageHeader`, `EmptyState`, `ListPagination` (`frontend/src/common/`) i `useListParams` (`frontend/src/core/`) w Pracownikach, Typach urlopów, Typach umów i Powiadomieniach; okno potwierdzenia przy błędzie zostaje otwarte.
 - 2026-11-16: Aktualizacja stepkit 0.1.34 → 0.1.36: wspólne pole daty i grupy w menu bez własnej strony były już w projekcie; nowa zasada „Wspólne zamiast kopii” (przed planem sprawdzam, czy coś podobnego już jest, i przenoszę do wspólnego miejsca).
 - 2026-11-16: Moduł Typy umów zrobiony (potwierdzony przez użytkownika): słownik typów umów w „Ustawieniach” (kolejność strzałkami, dodawanie, zmiana nazwy, ukrywanie i przywracanie, 4 typy na start), pole „Rodzaj umowy” u pracownika z typów (`users.contract_type_id`), pracownik zachowuje ukryty typ.
