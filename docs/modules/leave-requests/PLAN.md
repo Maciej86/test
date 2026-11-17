@@ -110,14 +110,14 @@ ze specu: ta sama tabela).
     zmienionych) → `npm run check`.
   _Uwaga:_ `findOpenPools` i `isPoolOpen` są w `leave-requests.queries.ts` (zapytania tylko tego modułu); typ `PoolRow` z Pracowników.
 
-- [ ] 7. **Usługa: lista i szczegóły** (`leave-requests.service.ts`): `listLeaveRequests(query)` (pozycje z
+- [x] 7. **Usługa: lista i szczegóły** (`leave-requests.service.ts`): `listLeaveRequests(query)` (pozycje z
   `poolLeft` z `findOpenPools` + `getPoolUsage`, `canCancel` = `approved` i pula `pool_year` otwarta, `employeeArchived`,
   `pendingCount`, `oldestPendingAt`, `years` (+ bieżący rok), `leaveTypes` z `listLeaveTypes`);
   `getLeaveRequest(id)`: 404 albo `LeaveRequestDetails` (`pool` roku wniosku, gdy otwarta; `others` tylko przy
   `pending`/`approved`). Testy: „Zostało w puli” Jana = 19 z 30 przy danych jak w makiecie, brak puli → `null`,
   rok zamknięty → `canCancel` false, `others` dla 21–24.12 = Tomasz 21–22.12 → `npm run check`.
 
-- [ ] 8. **Usługa: decyzje** (`approveRequest(id, actor)`, `rejectRequest(id, reason, actor)`,
+- [x] 8. **Usługa: decyzje** (`approveRequest(id, actor)`, `rejectRequest(id, reason, actor)`,
   `cancelRequest(id, reason, actor)`), każda w `withTransaction`: `findRequest(…, { lock: true })` → 404; zły status
   → 409 `already_decided` z `{ status, decidedByName }` (anulowanie: nie `approved` → 409 `not_approved`); anulowanie
   przy zamkniętej puli → 409 `year_closed`; `setDecision` (0 → 409 `already_decided`); `logActivity` (`status` i
@@ -126,6 +126,7 @@ ze specu: ta sama tabela).
   (`Promise.all`) → jeden `{ ok }`, jeden 409, jeden wpis historii, jedno powiadomienie; wycofany w międzyczasie →
   409 `status: 'withdrawn'`; wniosek osoby w archiwum → można zatwierdzić; pula po odrzuceniu i anulowaniu wraca
   (`getPoolUsage`) → `npm run check`.
+  _Uwaga:_ pole z aktualnym statusem wniosku w błędzie 409 nazywa się `current` (`status` to już kod HTTP); anulowanie wniosku już anulowanego → `already_decided`, innego niezatwierdzonego → `not_approved`.
 
 - [ ] 9. **Trasy** `leave-requests.routes.ts` i `mountModule(api, 'leave-requests', leaveRequestsRoutes)` w
   `app.ts`: `GET /` (`validateQuery`), `GET /:id`, `POST /:id/approve`, `POST /:id/reject` i `/:id/cancel`
