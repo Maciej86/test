@@ -64,7 +64,7 @@ ze specu: ta sama tabela).
   `toPdfData` zamienia daty na ISO). `my-leave.service.getRequestPdf` używa obu; `findOwnRequestForPdf` znika;
   testy PDF Moich urlopów zielone → `npm run check`.
 
-- [ ] 3. **Trasy podstron:** `NavItem.detailPath?: boolean` w `shared/src/navigation.ts`; `buildRoutes` dla takiej
+- [x] 3. **Trasy podstron:** `NavItem.detailPath?: boolean` w `shared/src/navigation.ts`; `buildRoutes` dla takiej
   pozycji dodaje trasę `${path}/:id` z tą samą stroną (i `NoAccess` dla roli bez dostępu). `leave-requests`
   w `navigation.config.ts` dostaje `detailPath: true`. Testy w `core/routes/__tests__/buildRoutes.test.tsx`:
   `/admin/leave-requests/24` → strona wniosków (admin), `NoAccess` (pracownik); pozycja bez `detailPath` nie ma

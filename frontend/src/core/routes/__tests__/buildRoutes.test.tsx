@@ -28,6 +28,25 @@ describe('buildRoutes', () => {
   });
 });
 
+describe('buildRoutes with a detail address', () => {
+  const withDetail: NavItem = { ...adminOnly, detailPath: true };
+
+  it('detailPath adds <path>/:id with the same page', async () => {
+    renderRoutes(buildRoutes([withDetail], { reports: Page }, admin), '/admin/reports/24');
+    expect(await screen.findByText('Strona testowa')).toBeInTheDocument();
+  });
+
+  it('the detail address is blocked for a role without access too', async () => {
+    renderRoutes(buildRoutes([withDetail], { reports: Page }, user), '/admin/reports/24');
+    expect(await screen.findByText('Nie masz dostępu do tej części aplikacji.')).toBeInTheDocument();
+  });
+
+  it('an item without detailPath has no /:id address', () => {
+    expect(buildRoutes([adminOnly], { reports: Page }, admin).map((r) => r.path)).toEqual(['/admin/reports']);
+    expect(buildRoutes([withDetail], { reports: Page }, admin).map((r) => r.path)).toEqual(['/admin/reports', '/admin/reports/:id']);
+  });
+});
+
 describe('buildRoutes with a group', () => {
   const group: NavItem = {
     key: 'settings', path: '/admin/settings', label: 'common.nav.settings', icon: 'settings', roles: ['admin'],

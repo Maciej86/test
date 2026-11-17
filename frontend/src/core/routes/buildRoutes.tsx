@@ -6,12 +6,16 @@ import { NoAccess } from '../../common/NoAccess';
 
 export type Pages = Record<string, ComponentType>;
 
-/** Trasa dla każdej pozycji nawigacji (grupa z pozycjami pod sobą nie ma własnej strony); brak strony = MissingScreen, brak uprawnień = NoAccess. */
+/**
+ * Trasa dla każdej pozycji nawigacji (grupa z pozycjami pod sobą nie ma własnej strony); brak strony = MissingScreen, brak
+ * uprawnień = NoAccess. Pozycja z `detailPath` ma też adres `<path>/:id` z tą samą stroną.
+ */
 export const buildRoutes = (items: NavItem[], pages: Pages, user: SessionUser | null): RouteObject[] => {
-  return flattenNav(items).filter((item) => !item.children).map((item) => {
+  return flattenNav(items).filter((item) => !item.children).flatMap((item) => {
     const Page = pages[item.key];
     let element = Page ? <Page /> : <MissingScreen />;
     if (!canSee(item, user)) element = <NoAccess />;
-    return { path: item.path, element };
+    const route = { path: item.path, element };
+    return item.detailPath ? [route, { path: `${item.path}/:id`, element }] : [route];
   });
 };

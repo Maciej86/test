@@ -17,6 +17,8 @@ export interface NavItem {
   icon: string;
   roles: Role[];
   children?: NavItem[];
+  /** Strona ma też adres szczegółów `<path>/:id` (np. `/admin/leave-requests/24` z e-maila); ta sama strona i role. */
+  detailPath?: boolean;
 }
 
 /** Pozycja strony dla odwiedzających (bez ról). */
