@@ -1,6 +1,6 @@
 # Spec: Wnioski urlopowe
 
-**Data:** 2026-11-17 · **Status:** do akceptacji
+**Data:** 2026-11-17 · **Status:** zaakceptowany przez użytkownika 2026-11-17
 **Podstawa:** `QUESTIONS.md` (odpowiedzi 2026-11-17: 1b, 2a–8a, zasady pól ok), `SPEC-GENERAL.md`, makieta
 `mockups/src/modules/leave-requests/`, `docs/modules/my-leave/SPEC.md` (te same wnioski, pula, PDF)
 

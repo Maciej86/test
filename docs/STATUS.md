@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moduł Wnioski urlopowe: akceptacja specu (`docs/modules/leave-requests/SPEC.md`).
+**Następny krok:** Moduł Wnioski urlopowe: akceptacja planu (`docs/modules/leave-requests/PLAN.md`).
 
 ## Start aplikacji
 
@@ -27,7 +27,7 @@
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
-| 9 | Wnioski urlopowe | leave-requests | w toku | spec | my-leave |
+| 9 | Wnioski urlopowe | leave-requests | w toku | plan | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-17: Wnioski urlopowe: spec zaakceptowany (zatwierdzenie z oknem, powód odrzucenia i anulowania obowiązkowy, `reject_reason` → `decision_reason`, adres szczegółów `/admin/leave-requests/:id`, bez podziału na części).
 - 2026-11-17: Wnioski urlopowe: odpowiedzi 2a–8a, zasady pól ok (pasek z zatwierdzonymi i czekającymi, powód odrzucenia i anulowania obowiązkowy 3–500 znaków, anulowanie każdego urlopu z niezamkniętego roku, miniony termin można rozpatrzyć, na start „Czekają”, link z e-maila otwiera szczegóły).
 - 2026-11-17: Wnioski urlopowe: odpowiedź 1b, zatwierdzenie z oknem potwierdzenia „Zatwierdzić wniosek?”.
 - 2026-11-17: Wnioski urlopowe: makieta listy (zakładki statusów, wyszukiwarka, filtr typu i roku, kolumna „Zostało w puli”, karty na telefonie), szczegółów z prawej (pasek „Kto jeszcze ma wtedy wolne”, pula, decyzja), okien odrzucenia i anulowania z powodem; 9 pytań.
