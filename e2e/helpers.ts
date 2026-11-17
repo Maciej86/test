@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Browser, type Page } from '@playwright/test';
 
 // Wspólne kroki testów w przeglądarce. Konto administratora i hasło zakłada e2e/global-setup.ts.
 export const ADMIN = 'e2e.admin@test.local';
@@ -45,4 +45,38 @@ export const logInWithOwnPassword = async (page: Page, login: string, temporary:
   await page.getByLabel('Powtórz nowe hasło').fill('Wlasne-haslo-7');
   await page.getByRole('button', { name: 'Zapisz i przejdź dalej' }).click();
   await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+};
+
+/* Daty do testów urlopów: liczone od dziś (UTC), żeby testy działały każdego dnia. */
+export const DAY = 24 * 60 * 60 * 1000;
+const pad = (n: number) => String(n).padStart(2, '0');
+/** `DD.MM.RRRR`, tak jak wpisuje się datę w polu. */
+export const typed = (d: Date) => `${pad(d.getUTCDate())}.${pad(d.getUTCMonth() + 1)}.${d.getUTCFullYear()}`;
+/** `RRRR-MM-DD`, tak jak daty idą do API. */
+export const iso = (d: Date) => d.toISOString().slice(0, 10);
+export const todayUtc = () => {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+};
+/** Pierwszy dzień tygodnia `weekday` (0 = niedziela) co najmniej `minAhead` dni od dziś. */
+export const next = (weekday: number, minAhead: number) => {
+  let d = new Date(todayUtc().getTime() + minAhead * DAY);
+  while (d.getUTCDay() !== weekday) d = new Date(d.getTime() + DAY);
+  return d;
+};
+
+/**
+ * Konto pracownika z pulą 20 dni (przez API zalogowanego administratora `admin`) i jego własna karta przeglądarki
+ * po ustawieniu hasła (`Wlasne-haslo-7`).
+ */
+export const employee = async (admin: Page, browser: Browser, firstName: string, lastName = 'Nadużycie') => {
+  const login = `e2e.tmp.${Date.now()}${Math.floor(Math.random() * 1000)}@test.local`;
+  const temporary = 'Urlop-2026!';
+  const created = await admin.request.post('/api/employees', {
+    data: { firstName, lastName, login, email: '', role: 'employee', password: temporary, annualDays: 20, carriedDays: 0 },
+  });
+  expect(created.status()).toBe(201);
+  const page = await (await browser.newContext()).newPage();
+  await logInWithOwnPassword(page, login, temporary);
+  return { page, login };
 };

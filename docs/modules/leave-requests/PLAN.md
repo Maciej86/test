@@ -165,15 +165,17 @@ ze specu: ta sama tabela).
   inny błąd: dymek, okno otwarte. Testy dla każdego z tych przypadków → `npm run check`.
   _Uwaga:_ okno zatwierdzenia samo pobiera szczegóły wniosku (`useLeaveRequest`), żeby z listy też pokazać „W tym czasie urlop ma też…”; pole powodu ma stałe 3 wiersze (`autosize` nie działa w testach).
 
-- [ ] 14. **Makieta i dane testowe:** w makiecie przycisk w oknie zatwierdzenia zielony (krok 1). `seedE2e.ts`: dla
+- [x] 14. **Makieta i dane testowe:** w makiecie przycisk w oknie zatwierdzenia zielony (krok 1). `seedE2e.ts`: dla
   e2e potrzebny wniosek czekający konta e2e pracownika (przez API w teście, jak w `my-leave.spec.ts`); usunięcie
   wniosków kont tymczasowych już jest. `npm run my-leave:approve-test` zostaje (szybkie zatwierdzenie do prób
   ręcznych) → `npm run check`.
+  _Uwaga:_ zielony przycisk w makiecie zrobiony już w kroku 1; wnioski kont tymczasowych seed czyścił już wcześniej, więc bez zmian w `seedE2e.ts`.
 
-- [ ] 15. **E2e** `e2e/leave-requests.spec.ts`: pracownik składa wniosek → administrator otwiera
+- [x] 15. **E2e** `e2e/leave-requests.spec.ts`: pracownik składa wniosek → administrator otwiera
   `/admin/leave-requests/<id>`, widzi pasek i pulę, zatwierdza w oknie → status „Zatwierdzony”, pracownik ma
   powiadomienie; anulowanie z powodem → pracownik widzi powód w „Moich urlopach”; odrzucenie bez powodu → błąd pod
   polem; pracownik na `/admin/leave-requests` → brak dostępu. `npm run test:e2e` zielone.
+  _Uwaga:_ pomocniki dat i `employee()` (pracownik z pulą przez API) przeniesione z `my-leave.spec.ts` do `e2e/helpers.ts`; pusty powód pokazuje „To pole jest wymagane.” (jak każde puste pole obowiązkowe); długi test Typów umów dostał limit 60 s, bo przy wszystkich testach naraz nie mieścił się w 30 s. 31 testów e2e zielonych.
 
 - [ ] 16. **Przegląd kodu** całego modułu (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami,
   bez `it.todo` w folderach modułu → `npm run check`, `npm run test:e2e`.

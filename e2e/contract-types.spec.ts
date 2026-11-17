@@ -29,6 +29,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('administrator dodaje, zmienia, przesuwa, wybiera u pracownika, ukrywa i przywraca typ umowy', async ({ page }) => {
+  // Długi scenariusz (kilka okien i przeładowań); przy wszystkich testach naraz potrzebuje więcej niż domyślne 30 s.
+  test.setTimeout(60_000);
   const stamp = Date.now();
   const name = `E2E ${stamp}`;
   const renamed = `E2E ${stamp} staż`;

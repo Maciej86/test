@@ -1,25 +1,10 @@
 import { execFileSync } from 'node:child_process';
 import { expect, test, type Page } from '@playwright/test';
-import { ADMIN, addEmployee, logIn, logInWithOwnPassword, logOut, password } from './helpers';
+import { ADMIN, DAY, addEmployee, employee, iso, logIn, logInWithOwnPassword, logOut, next, password, todayUtc, typed } from './helpers';
 
 // Scenariusze z docs/modules/my-leave/TESTS-1.md. Pracownika zakłada test (e2e.tmp.*, pula 20 dni), a seed usuwa go
 // razem z wnioskami przy następnym uruchomieniu. Daty liczone od dziś: najbliższy poniedziałek i wtorek (co najmniej
 // 2 dni naprzód), najbliższy weekend i styczeń następnego roku.
-
-const DAY = 24 * 60 * 60 * 1000;
-const pad = (n: number) => String(n).padStart(2, '0');
-/** `DD.MM.RRRR`, tak jak wpisuje się datę w polu. */
-const typed = (d: Date) => `${pad(d.getUTCDate())}.${pad(d.getUTCMonth() + 1)}.${d.getUTCFullYear()}`;
-const todayUtc = () => {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-};
-/** Pierwszy dzień tygodnia `weekday` (0 = niedziela) co najmniej `minAhead` dni od dziś. */
-const next = (weekday: number, minAhead: number) => {
-  let d = new Date(todayUtc().getTime() + minAhead * DAY);
-  while (d.getUTCDay() !== weekday) d = new Date(d.getTime() + DAY);
-  return d;
-};
 
 const monday = next(1, 2);
 const tuesday = new Date(monday.getTime() + DAY);
@@ -115,21 +100,8 @@ test('pracownik składa wniosek, widzi blokady i go wycofuje; administrator dost
 });
 
 test.describe('abuse', () => {
-  /** Konto pracownika z pulą 20 dni (przez API administratora) i jego własna karta przeglądarki po ustawieniu hasła. */
-  const employee = async (admin: Page, browser: import('@playwright/test').Browser, firstName: string) => {
-    const login = `e2e.tmp.${Date.now()}${Math.floor(Math.random() * 1000)}@test.local`;
-    const temporary = 'Urlop-2026!';
-    const created = await admin.request.post('/api/employees', {
-      data: { firstName, lastName: 'Nadużycie', login, email: '', role: 'employee', password: temporary, annualDays: 20, carriedDays: 0 },
-    });
-    expect(created.status()).toBe(201);
-    const page = await (await browser.newContext()).newPage();
-    await logInWithOwnPassword(page, login, temporary);
-    return { page, login };
-  };
   const employeePage = async (admin: Page, browser: import('@playwright/test').Browser, firstName: string) =>
     (await employee(admin, browser, firstName)).page;
-  const iso = (d: Date) => d.toISOString().slice(0, 10);
 
   test('PDF: cudzy wniosek, bez logowania, administrator, wniosek nie zatwierdzony, dwa pobrania naraz', async ({ page, browser }) => {
     test.setTimeout(90_000);
