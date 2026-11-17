@@ -49,7 +49,7 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   w `seedE2e.test.ts` (kolejność zapytań: `DELETE FROM leave_requests …` przed `DELETE FROM users …`) → `npm run check`.
   _Uwaga:_ test migracji w osobnym pliku `my-leave.migration.test.ts`; stałe `LEAVE_REQUEST_COMMENT_MAX` i `LEAVE_REQUEST_STATUSES` powstały już tu (test migracji je porównuje). `npm run migrate` czeka na uruchomienie Dockera (baza nie działała).
 
-- [ ] 3. **Wspólne zasady w `shared`:**
+- [x] 3. **Wspólne zasady w `shared`:**
   - `shared/src/constants/myLeave.ts`: `LEAVE_REQUEST_COMMENT_MAX = 500`, `LEAVE_REQUEST_STATUSES` (5 statusów),
     `LEAVE_REQUEST_YEAR_MIN = 2000`, `LEAVE_REQUEST_YEAR_MAX = 2100`, `MY_LEAVE_MESSAGES` (klucze
     `my-leave.server.*` i `my-leave.validation.*` ze `SPEC-1.md`, „Teksty”), `EMPLOYEE_MESSAGES.pendingRequests =
@@ -71,6 +71,7 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
     przy zostałych 4 zaległych, typ bez odejmowania → 0/0 i `leftAfter: null`, brzeg nakładania (Od = cudze Do) →
     overlap, sobota–niedziela → no_working_days, limit 1 + 4 > 4 → limit_exceeded, 4 > 3 zostałe → not_enough_days,
     wczoraj → past_date, 2027 przy puli 2026 → pool_not_ready, 2025 → year_closed → `npm run check`.
+  _Uwaga:_ `checkLeaveRequest` przyjmuje typ bez `id` i zawsze z datami (puste pola obsługuje okno); `busy` niesie też nazwę typu i status, żeby ramka „termin zajęty” mówiła, na który wniosek zachodzi (jak w makiecie). `leaveTypeId` przez `wholeNumber` (Select daje tekst). Nowy klucz `my-leave.server.type_unavailable` dla ukrytego albo nieistniejącego typu.
 
 - [ ] 4. **Zapytania** `backend/src/modules/my-leave/my-leave.queries.ts` (wszystkie z `userId` w `WHERE`):
   `listRequests(db, userId, year)`, `listRequestYears(db, userId)`, `listBusy(db, userId, year)`,
