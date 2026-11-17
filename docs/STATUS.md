@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moduł Wnioski urlopowe: spec (`/stepkit:dalej`).
+**Następny krok:** Moduł Wnioski urlopowe: akceptacja specu (`docs/modules/leave-requests/SPEC.md`).
 
 ## Start aplikacji
 
