@@ -18,6 +18,7 @@ import {
   type EmployeeListItem,
 } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
+import { ConfirmModal } from '../../../common/ConfirmModal';
 import { DateField } from '../../../common/DateField';
 import { apiErrorBody, apiErrorFields, apiErrorMessage } from '../../../core/api/client';
 import { fieldError } from '../../../core/fieldError';
@@ -224,19 +225,18 @@ export const EmployeeFormModal = ({ opened, employee, year, onClose }: {
         </Stack>
       </form>
 
-      <Modal opened={confirmRestore} onClose={() => setConfirmRestore(false)} title={t('restore_title', { name: archived?.name })} size="sm">
-        <Stack>
+      {confirmRestore && (
+        <ConfirmModal
+          title={t('restore_title', { name: archived?.name })}
+          confirmLabel={t('restore_confirm')}
+          confirmAction="restore"
+          loading={restore.isPending}
+          onConfirm={doRestore}
+          onClose={() => setConfirmRestore(false)}
+        >
           <Text size="sm">{t('restore_text')}</Text>
-          <Group justify="flex-end">
-            <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={() => setConfirmRestore(false)}>
-              {t('cancel')}
-            </Button>
-            <Button leftSection={<ButtonIcon action="restore" />} loading={restore.isPending} onClick={doRestore}>
-              {t('restore_confirm')}
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+        </ConfirmModal>
+      )}
     </Modal>
   );
 };

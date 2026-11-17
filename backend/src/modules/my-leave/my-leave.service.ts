@@ -1,6 +1,7 @@
 import {
   checkLeaveRequest,
   MY_LEAVE_MESSAGES as M,
+  currentYear,
   todayIsoDate,
   type LeaveRequestCheck,
   type LeaveRequestData,
@@ -63,7 +64,7 @@ export const getMyLeaveOverview = async (userId: number): Promise<MyLeaveOvervie
 
 /** Wnioski osoby z wybranego roku; bez roku: rok otwarty (bez puli: bieżący rok). */
 export const listMyRequests = async (userId: number, year?: number): Promise<MyLeaveRequestsResponse> => {
-  const listYear = year ?? (await findOpenPoolOfUser(pool, userId, false))?.year ?? Number(todayIsoDate().slice(0, 4));
+  const listYear = year ?? (await findOpenPoolOfUser(pool, userId, false))?.year ?? currentYear();
   return { year: listYear, items: await q.listRequests(pool, userId, listYear) };
 };
 

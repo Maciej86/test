@@ -2,6 +2,7 @@ import { Alert, Anchor, Button, Group, Modal, Stack, Text, TextInput } from '@ma
 import { CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { ConfirmModal } from '../../common/ConfirmModal';
 import { notify } from '../../common/notify';
 import { TAKEN_HIDDEN_NAME, TAKEN_NAME, type MockContractType } from './data';
 
@@ -50,17 +51,16 @@ export const ContractTypeModal = ({ contractType, nameTaken = false, onClose }: 
 
 export const HideModal = ({ contractType, onClose }: { contractType: MockContractType | null; onClose: () => void }) => {
   const { t } = useTranslation('contract-types');
+  if (!contractType) return null;
   return (
-    <Modal opened={contractType !== null} onClose={onClose} title={t('hide_title', { name: contractType?.name })}>
-      <Stack>
-        <Text>{t('hide_text', { count: contractType?.employees ?? 0 })}</Text>
-        <Group justify="flex-end">
-          <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-          <Button leftSection={<ButtonIcon action="hide" />} onClick={() => { notify.success(t('hidden_done')); onClose(); }}>
-            {t('hide')}
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
+    <ConfirmModal
+      title={t('hide_title', { name: contractType.name })}
+      confirmLabel={t('hide')}
+      confirmAction="hide"
+      onConfirm={() => { notify.success(t('hidden_done')); onClose(); }}
+      onClose={onClose}
+    >
+      <Text>{t('hide_text', { count: contractType.employees })}</Text>
+    </ConfirmModal>
   );
 };

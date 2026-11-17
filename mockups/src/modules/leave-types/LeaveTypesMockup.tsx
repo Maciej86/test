@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ActionIcon, Badge, Button, Card, Group, Paper, SegmentedControl, Stack, Switch, Table, Text, Title } from '@mantine/core';
+import { ActionIcon, Badge, Button, Card, Group, Paper, SegmentedControl, Stack, Switch, Table, Text } from '@mantine/core';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { PageHeader } from '../../common/PageHeader';
 import { notify } from '../../common/notify';
 import { HideModal, LeaveTypeModal } from './LeaveTypeModals';
 import { LEAVE_TYPES, type MockLeaveType } from './data';
@@ -165,20 +166,20 @@ export const LeaveTypesMockup = () => {
         </Group>
       </Paper>
 
-      <Group justify="space-between" align="flex-end">
-        <Stack gap={2}>
-          <Title order={1}>{t('title')}</Title>
-          <Text c="dimmed" size="sm">{t('summary', { visible: visible.length, hidden: hidden.length })}</Text>
-        </Stack>
-        <Group gap="md">
-          <Switch
-            label={t('show_hidden', { count: hidden.length })}
-            checked={showHidden}
-            onChange={(e) => setShowHidden(e.currentTarget.checked)}
-          />
-          <Button leftSection={<ButtonIcon action="add" />} onClick={() => setForm({ leaveType: null })}>{t('add')}</Button>
-        </Group>
-      </Group>
+      <PageHeader
+        title={t('title')}
+        subtitle={t('summary', { visible: visible.length, hidden: hidden.length })}
+        actions={
+          <>
+            <Switch
+              label={t('show_hidden', { count: hidden.length })}
+              checked={showHidden}
+              onChange={(e) => setShowHidden(e.currentTarget.checked)}
+            />
+            <Button leftSection={<ButtonIcon action="add" />} onClick={() => setForm({ leaveType: null })}>{t('add')}</Button>
+          </>
+        }
+      />
 
       <LeaveTypesTable rows={rows} visibleCount={visible.length} {...actions} />
       <LeaveTypeCards rows={rows} visibleCount={visible.length} {...actions} />

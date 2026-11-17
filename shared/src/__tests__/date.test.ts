@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createI18n } from '../i18n';
 import {
+  currentYear,
   formatDate,
   formatDateParts,
   formatDateTime,
@@ -37,6 +38,17 @@ describe('date formatting', () => {
 
   it('gives today as YYYY-MM-DD', () => {
     expect(todayIsoDate()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe('currentYear', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('is the year in the app time zone: 31.12 23:30 UTC is already the next year in Warsaw', () => {
+    vi.useFakeTimers({ now: new Date('2026-12-31T23:30:00.000Z') });
+    expect(currentYear()).toBe(2027);
+    vi.setSystemTime(new Date('2026-06-15T10:00:00.000Z'));
+    expect(currentYear()).toBe(2026);
   });
 });
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Paper, Stack, Tooltip } from '@mantine/core';
 import { Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { employeesListQuerySchema, todayIsoDate, type EmployeeListItem } from '@app/shared';
+import { currentYear, employeesListQuerySchema, type EmployeeListItem } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
 import { EmptyState } from '../../common/EmptyState';
@@ -32,8 +32,8 @@ export const EmployeesListPage = () => {
   const [dialog, setDialog] = useState<EmployeeDialog | null>(null);
   const close = () => setDialog(null);
   const data = employees.data;
-  const year = data?.openYear ?? Number(todayIsoDate().slice(0, 4));
-  const canCloseYear = year <= Number(todayIsoDate().slice(0, 4));
+  const year = data?.openYear ?? currentYear();
+  const canCloseYear = year <= currentYear();
   const filtered = params.search !== '' || params.role !== undefined;
   const onlyAdmins = data !== undefined && data.counts.all === data.counts.admins;
   const actions = {

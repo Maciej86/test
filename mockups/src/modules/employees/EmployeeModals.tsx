@@ -18,8 +18,9 @@ import {
 } from '@mantine/core';
 import { CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { TABLE_MIN_WIDTH, translateKey } from '@app/shared';
+import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { ConfirmModal } from '../../common/ConfirmModal';
 import { DateField } from '../../common/DateField';
 import { notify } from '../../common/notify';
 import { ARCHIVED_DUPLICATE, CONTRACT_TYPE_NAMES, EMPLOYEES, GENERATED_PASSWORD, POOL_YEAR, poolParts, type MockEmployee } from './data';
@@ -143,24 +144,24 @@ export const PasswordModal = ({ employee, onClose }: { employee: MockEmployee | 
 
 export const ArchiveModal = ({ employee, onClose }: { employee: MockEmployee | null; onClose: () => void }) => {
   const { t } = useTranslation('employees');
+  if (!employee) return null;
   return (
-    <Modal opened={employee !== null} onClose={onClose} title={t('archive_title', { name: employee?.name })}>
-      <Stack>
-        <List size="sm" spacing={6}>
-          <List.Item>{t('archive_logout')}</List.Item>
-          <List.Item>{t('archive_keeps')}</List.Item>
-          {employee && employee.pendingRequests > 0 && <List.Item>{t('archive_pending', { count: employee.pendingRequests })}</List.Item>}
-          {employee && employee.tasks > 0 && <List.Item>{t('archive_tasks', { count: employee.tasks })}</List.Item>}
-        </List>
-        <Text size="sm" c="dimmed">{t('archive_restore_hint')}</Text>
-        <Group justify="flex-end">
-          <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-          <Button color="red" leftSection={<ButtonIcon action="archive" />} onClick={() => { notify.success(t('archived')); onClose(); }}>
-            {t('archive')}
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
+    <ConfirmModal
+      title={t('archive_title', { name: employee.name })}
+      confirmLabel={t('archive')}
+      confirmAction="archive"
+      danger
+      onConfirm={() => { notify.success(t('archived')); onClose(); }}
+      onClose={onClose}
+    >
+      <List size="sm" spacing={6}>
+        <List.Item>{t('archive_logout')}</List.Item>
+        <List.Item>{t('archive_keeps')}</List.Item>
+        {employee.pendingRequests > 0 && <List.Item>{t('archive_pending', { count: employee.pendingRequests })}</List.Item>}
+        {employee.tasks > 0 && <List.Item>{t('archive_tasks', { count: employee.tasks })}</List.Item>}
+      </List>
+      <Text size="sm" c="dimmed">{t('archive_restore_hint')}</Text>
+    </ConfirmModal>
   );
 };
 

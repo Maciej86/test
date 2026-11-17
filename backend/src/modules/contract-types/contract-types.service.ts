@@ -1,16 +1,15 @@
 import {
   CONTRACT_TYPE_MESSAGES as M,
-  SERVER_MESSAGES,
   type ContractTypeData,
   type ContractTypeDirection,
   type ContractTypesListResponse,
 } from '@app/shared';
 import { pool } from '../../db/pool';
 import { withTransaction } from '../../db/transaction';
-import { fail, type Result, type ServiceError } from '../../middleware/routeHelpers';
+import { isDuplicateEntry } from '../../db/errors';
+import { fail, notFound, type Result, type ServiceError } from '../../middleware/routeHelpers';
 import * as q from './contract-types.queries';
 
-const notFound = () => fail(404, SERVER_MESSAGES.notFound);
 const nameTaken = () => fail(409, M.nameTaken, { fields: { name: M.nameTaken } });
 
 /** Nazwa zajęta: przez widoczny typ zwykły błąd, przez ukryty podpowiedź „Przywróć go”. */
@@ -22,7 +21,6 @@ const nameConflict = async (db: q.Db, name: string, exceptId: number | null): Pr
 };
 
 /** Wyścig dwóch zapisów: unikalny indeks w bazie odrzuca drugi; zamieniamy to na ten sam błąd pola. */
-const isDuplicate = (error: unknown) => error instanceof Error && (error as { code?: string }).code === 'ER_DUP_ENTRY';
 
 export const listTypes = async (): Promise<ContractTypesListResponse> => ({ items: await q.listContractTypes(pool) });
 
@@ -36,7 +34,7 @@ export const createType = async (data: ContractTypeData): Promise<Result<{ id: n
       return { id: await q.insertContractType(conn, data, position) };
     });
   } catch (error) {
-    if (isDuplicate(error)) return nameTaken();
+    if (isDuplicateEntry(error)) return nameTaken();
     throw error;
   }
 };
@@ -49,7 +47,7 @@ export const updateType = async (id: number, data: ContractTypeData): Promise<Re
   try {
     await q.updateContractType(pool, id, data);
   } catch (error) {
-    if (isDuplicate(error)) return nameTaken();
+    if (isDuplicateEntry(error)) return nameTaken();
     throw error;
   }
   return { ok: true };

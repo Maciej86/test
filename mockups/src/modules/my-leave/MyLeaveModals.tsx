@@ -4,6 +4,7 @@ import { AlertTriangle, CalendarRange, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { countWorkingDays, dayjs } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { ConfirmModal } from '../../common/ConfirmModal';
 import { DateField } from '../../common/DateField';
 import { DateText } from '../../common/DateText';
 import { notify } from '../../common/notify';
@@ -180,24 +181,23 @@ export const RequestModal = ({ initial, onClose }: {
 
 export const WithdrawModal = ({ request, onClose }: { request: MockRequest | null; onClose: () => void }) => {
   const { t } = useTranslation('my-leave');
+  if (!request) return null;
   return (
-    <Modal opened={request !== null} onClose={onClose} title={t('withdraw_title')}>
-      {request && (
-        <Stack>
-          <Text>
-            {request.type}, <DateText value={request.from} /> – <DateText value={request.to} />{' '}
-            ({t('days', { count: request.days })}).
-          </Text>
-          <Text size="sm" c="dimmed">{t('withdraw_text', { count: request.fromCarried + request.fromAnnual })}</Text>
-          <Group justify="flex-end">
-            <Button variant="default" onClick={onClose}>{t('keep')}</Button>
-            <Button color="red" leftSection={<ButtonIcon action="cancel" />} onClick={() => { notify.success(t('withdrawn_done')); onClose(); }}>
-              {t('withdraw')}
-            </Button>
-          </Group>
-        </Stack>
-      )}
-    </Modal>
+    <ConfirmModal
+      title={t('withdraw_title')}
+      confirmLabel={t('withdraw')}
+      confirmAction="cancel"
+      cancelLabel={t('keep')}
+      danger
+      onConfirm={() => { notify.success(t('withdrawn_done')); onClose(); }}
+      onClose={onClose}
+    >
+      <Text>
+        {request.type}, <DateText value={request.from} /> – <DateText value={request.to} />{' '}
+        ({t('days', { count: request.days })}).
+      </Text>
+      <Text size="sm" c="dimmed">{t('withdraw_text', { count: request.fromCarried + request.fromAnnual })}</Text>
+    </ConfirmModal>
   );
 };
 

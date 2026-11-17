@@ -122,6 +122,25 @@ describe('EmployeeFormModal', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('restore fails → error notice, the restore window stays open to try again', async () => {
+    vi.spyOn(api, 'post').mockImplementation(async (url: string) => {
+      if (url === '/employees') throw conflict({ login: 'employees.server.login_taken_archived' }, { id: 9, name: 'Ewa Mazur' });
+      throw new Error('network');
+    });
+    const error = vi.spyOn(notify, 'error');
+    const { onClose } = show(null);
+    fill('Imię', 'Ewa');
+    fill('Nazwisko', 'Mazur');
+    fill('Login', 'ewa.mazur@firma.pl');
+    fill('Hasło tymczasowe', 'Urlop-2026');
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Przywróć konto zamiast zakładać nowe' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Przywróć konto' }));
+    await waitFor(() => expect(error).toHaveBeenCalled());
+    expect(screen.getByRole('button', { name: 'Przywróć konto' })).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it('switching to Administrator with an empty pool field still saves', async () => {
     const put = vi.spyOn(api, 'put').mockResolvedValue({ data: { ok: true } });
     show(jan);

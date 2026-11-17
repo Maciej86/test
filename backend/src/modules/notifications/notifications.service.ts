@@ -2,7 +2,6 @@ import {
   NOTIFICATION_BELL_LIMIT,
   NOTIFICATION_KEEP_DAYS,
   isPanelLink,
-  SERVER_MESSAGES,
   type NotificationsListResponse,
   type NotificationsQuery,
   type NotificationsSummary,
@@ -10,7 +9,7 @@ import {
 } from '@app/shared';
 import { PAGE_SIZE } from '../../config/constants';
 import { pool } from '../../db/pool';
-import { fail, type Result } from '../../middleware/routeHelpers';
+import { notFound, type Result } from '../../middleware/routeHelpers';
 import {
   activeIdsByRole,
   activeUserIds,
@@ -74,7 +73,7 @@ export const getList = async (userId: number, query: NotificationsQuery): Promis
 };
 
 export const readOne = async (userId: number, id: number): Promise<Result> => {
-  return (await markRead(pool, userId, id)) ? { ok: true } : fail(404, SERVER_MESSAGES.notFound);
+  return (await markRead(pool, userId, id)) ? { ok: true } : notFound();
 };
 
 export const readAll = async (userId: number): Promise<{ updated: number }> => {

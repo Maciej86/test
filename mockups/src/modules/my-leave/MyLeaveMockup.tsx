@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Badge, Button, Card, Grid, Group, Paper, Progress, SegmentedControl, Select, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core';
+import { Badge, Button, Card, Grid, Group, Paper, Progress, SegmentedControl, Select, Stack, Table, Text, Title } from '@mantine/core';
 import { CalendarDays } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { EmptyState } from '../../common/EmptyState';
+import { PageHeader } from '../../common/PageHeader';
 import { DateText } from '../../common/DateText';
 import { InfoCard } from '../../common/InfoCard';
 import { PrintPreview, RequestModal, WithdrawModal } from './MyLeaveModals';
@@ -209,11 +211,11 @@ const EmptyRequests = ({ onNew }: { onNew: () => void }) => {
   const { t } = useTranslation('my-leave');
   return (
     <Paper withBorder p="xl">
-      <Stack align="center" gap="sm">
-        <ThemeIcon variant="light" size={48} radius="md"><CalendarDays size={26} /></ThemeIcon>
-        <Text ta="center">{t('empty')}</Text>
-        <Button leftSection={<ButtonIcon action="add" />} onClick={onNew}>{t('new_request')}</Button>
-      </Stack>
+      <EmptyState
+        icon={CalendarDays}
+        text={t('empty')}
+        action={<Button leftSection={<ButtonIcon action="add" />} onClick={onNew}>{t('new_request')}</Button>}
+      />
     </Paper>
   );
 };
@@ -260,13 +262,15 @@ export const MyLeaveMockup = () => {
         </Group>
       </Paper>
 
-      <Group justify="space-between" align="flex-end">
-        <Stack gap={2}>
-          <Title order={1}>{t('title')}</Title>
-          <Text c="dimmed" size="sm">{t('summary')}</Text>
-        </Stack>
-        <Button leftSection={<ButtonIcon action="add" />} onClick={openNew}>{t('new_request')}</Button>
-      </Group>
+      <PageHeader
+        title={t('title')}
+        subtitle={t('summary')}
+        actions={
+          <>
+            <Button leftSection={<ButtonIcon action="add" />} onClick={openNew}>{t('new_request')}</Button>
+          </>
+        }
+      />
 
       <Grid>
         <Grid.Col span={{ base: 12, md: 8 }}><PoolCard /></Grid.Col>

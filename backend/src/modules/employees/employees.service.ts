@@ -1,7 +1,6 @@
 import {
   EMPLOYEE_MESSAGES,
-  SERVER_MESSAGES,
-  todayIsoDate,
+  currentYear,
   type CloseYearInput,
   type CloseYearPreview,
   type EmployeeCreateData,
@@ -16,14 +15,14 @@ import { PAGE_SIZE } from '../../config/constants';
 import { diffChanges, logActivity } from '../../db/activityLog';
 import { pool } from '../../db/pool';
 import { withTransaction } from '../../db/transaction';
-import { fail, type Actor, type Result, type ServiceError } from '../../middleware/routeHelpers';
+import { isDuplicateEntry } from '../../db/errors';
+import { fail, notFound, type Actor, type Result, type ServiceError } from '../../middleware/routeHelpers';
 import { findContractType, listSelectableContractTypes } from '../contract-types/contract-types.queries';
 import { countPendingRequests, sumPoolUsage } from '../my-leave/my-leave.queries';
 import * as q from './employees.queries';
 
 
 /** Bieżący rok kalendarzowy w strefie aplikacji. */
-export const currentYear = () => Number(todayIsoDate().slice(0, 4));
 
 /** Rok otwarty: najmniejszy rok z niezamkniętą pulą; bez pul bieżący rok. */
 export const getOpenYear = async (db: q.Db = pool): Promise<number> => {
@@ -98,8 +97,8 @@ const findConflict = async (db: q.Db, login: string, email: string | null, excep
 
 /** Wyścig dwóch zapisów: unikalny indeks w bazie odrzuca drugi; zamieniamy to na ten sam błąd pola. */
 const duplicateError = (error: unknown): { error: ServiceError } | null => {
-  if (!(error instanceof Error) || (error as { code?: string }).code !== 'ER_DUP_ENTRY') return null;
-  const field = error.message.includes('uq_users_email') ? 'email' : 'login';
+  if (!isDuplicateEntry(error)) return null;
+  const field = isDuplicateEntry(error, 'uq_users_email') ? 'email' : 'login';
   const key = field === 'email' ? EMPLOYEE_MESSAGES.emailTaken : EMPLOYEE_MESSAGES.loginTaken;
   return fail(409, key, { fields: { [field]: key } });
 };
@@ -183,7 +182,6 @@ export const createEmployee = async (input: EmployeeCreateData, actor: Actor): P
   }
 };
 
-const notFound = () => fail(404, SERVER_MESSAGES.notFound);
 
 /** Konto spoza archiwum albo null. */
 const findActiveEmployee = async (db: q.Db, id: number) => {

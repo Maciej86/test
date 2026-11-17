@@ -63,6 +63,11 @@ export const todayIsoDate = (): string => {
   return dayjs().tz(APP_TIME_ZONE).format(ISO_DATE_FORMAT);
 };
 
+/** Bieżący rok w strefie aplikacji (31.12 o 23:30 UTC to w Warszawie już nowy rok). Serwer i ekrany liczą go tak samo. */
+export const currentYear = (): number => {
+  return Number(todayIsoDate().slice(0, 4));
+};
+
 /** Data wpisana ręcznie w polu daty: `01.03.2024` albo `1.3.2024` → `2024-03-01`; inna lub nieistniejąca → null. */
 export const parseTypedDate = (text: string): string | null => {
   const parts = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(text.trim());

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ActionIcon, Badge, Button, Card, Group, Paper, SegmentedControl, Select, Stack, Switch, Table, Text, Title } from '@mantine/core';
+import { ActionIcon, Badge, Button, Card, Group, Paper, SegmentedControl, Select, Stack, Switch, Table, Text } from '@mantine/core';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { PageHeader } from '../../common/PageHeader';
 import { notify } from '../../common/notify';
 import { ContractTypeModal, HideModal } from './ContractTypeModals';
 import { CONTRACT_TYPES, type MockContractType } from './data';
@@ -177,22 +178,22 @@ export const ContractTypesMockup = () => {
         </Group>
       </Paper>
 
-      <Group justify="space-between" align="flex-end">
-        <Stack gap={2}>
-          <Title order={1}>{t('title')}</Title>
-          <Text c="dimmed" size="sm">{t('summary', { visible: visible.length, hidden: hidden.length })}</Text>
-        </Stack>
-        <Group gap="md">
-          {hidden.length > 0 && (
-            <Switch
-              label={t('show_hidden', { count: hidden.length })}
-              checked={showHidden}
-              onChange={(e) => setShowHidden(e.currentTarget.checked)}
-            />
-          )}
-          <Button leftSection={<ButtonIcon action="add" />} onClick={() => setForm({ contractType: null })}>{t('add')}</Button>
-        </Group>
-      </Group>
+      <PageHeader
+        title={t('title')}
+        subtitle={t('summary', { visible: visible.length, hidden: hidden.length })}
+        actions={
+          <>
+            {hidden.length > 0 && (
+              <Switch
+                label={t('show_hidden', { count: hidden.length })}
+                checked={showHidden}
+                onChange={(e) => setShowHidden(e.currentTarget.checked)}
+              />
+            )}
+            <Button leftSection={<ButtonIcon action="add" />} onClick={() => setForm({ contractType: null })}>{t('add')}</Button>
+          </>
+        }
+      />
 
       {state === 'employee_field' ? (
         <EmployeeFieldPreview />

@@ -12,15 +12,15 @@ import {
   Table,
   Text,
   TextInput,
-  ThemeIcon,
-  Title,
   Tooltip,
 } from '@mantine/core';
 import { Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { TABLE_MIN_WIDTH, translateKey } from '@app/shared';
+import { TABLE_MIN_WIDTH } from '@app/shared';
 import { DateText } from '../../common/DateText';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { EmptyState } from '../../common/EmptyState';
+import { PageHeader } from '../../common/PageHeader';
 import { ArchiveModal, CloseYearModal, EmployeeModal, PasswordModal } from './EmployeeModals';
 import { PoolLegend, PoolMeter } from './PoolMeter';
 import { EMPLOYEES, POOL_YEAR, type MockEmployee } from './data';
@@ -133,16 +133,16 @@ const EmployeeCards = ({ rows, ...actions }: RowActions & { rows: MockEmployee[]
   );
 };
 
-const EmptyState = ({ onAdd }: { onAdd: () => void }) => {
+const EmptyEmployees = ({ onAdd }: { onAdd: () => void }) => {
   const { t } = useTranslation('employees');
   return (
     <Paper withBorder p="xl">
-      <Stack align="center" gap="sm" ta="center" py="lg">
-        <ThemeIcon variant="light" size={48} radius="md"><Users size={26} /></ThemeIcon>
-        <Title order={3}>{t('empty_title')}</Title>
-        <Text c="dimmed" maw={460}>{t('empty_text')}</Text>
-        <Button mt="xs" leftSection={<ButtonIcon action="add" />} onClick={onAdd}>{t('add')}</Button>
-      </Stack>
+      <EmptyState
+        icon={Users}
+        title={t('empty_title')}
+        text={t('empty_text')}
+        action={<Button mt="xs" leftSection={<ButtonIcon action="add" />} onClick={onAdd}>{t('add')}</Button>}
+      />
     </Paper>
   );
 };
@@ -179,18 +179,18 @@ export const EmployeesMockup = () => {
         </Group>
       </Paper>
 
-      <Group justify="space-between" align="flex-end">
-        <Stack gap={2}>
-          <Title order={1}>{t('title')}</Title>
-          <Text c="dimmed" size="sm">{t('summary', { count: rows.length || 1, admins: 1 })}</Text>
-        </Stack>
-        <Group gap="xs">
-          <Button variant="default" leftSection={<ButtonIcon action="close_year" />} onClick={() => setCloseYear(true)} disabled={state === 'empty'}>
-            {t('close_year', { year: POOL_YEAR })}
-          </Button>
-          <Button leftSection={<ButtonIcon action="add" />} onClick={() => setForm({ employee: null })}>{t('add')}</Button>
-        </Group>
-      </Group>
+      <PageHeader
+        title={t('title')}
+        subtitle={t('summary', { count: rows.length || 1, admins: 1 })}
+        actions={
+          <>
+            <Button variant="default" leftSection={<ButtonIcon action="close_year" />} onClick={() => setCloseYear(true)} disabled={state === 'empty'}>
+              {t('close_year', { year: POOL_YEAR })}
+            </Button>
+            <Button leftSection={<ButtonIcon action="add" />} onClick={() => setForm({ employee: null })}>{t('add')}</Button>
+          </>
+        }
+      />
 
       <Group gap="sm" align="flex-end">
         <TextInput
@@ -230,7 +230,7 @@ export const EmployeesMockup = () => {
         <>
           <EmployeesTable rows={rows} {...actions} />
           <EmployeeCards rows={rows} {...actions} />
-          {state === 'empty' && <EmptyState onAdd={() => setForm({ employee: null })} />}
+          {state === 'empty' && <EmptyEmployees onAdd={() => setForm({ employee: null })} />}
         </>
       )}
 

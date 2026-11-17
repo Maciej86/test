@@ -2,6 +2,7 @@ import { Alert, Anchor, Button, Group, Modal, NumberInput, Stack, Switch, Text, 
 import { CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { ConfirmModal } from '../../common/ConfirmModal';
 import { notify } from '../../common/notify';
 import { TAKEN_NAME, type MockLeaveType } from './data';
 
@@ -65,17 +66,16 @@ export const LeaveTypeModal = ({ leaveType, nameTaken = false, onClose }: {
 
 export const HideModal = ({ leaveType, onClose }: { leaveType: MockLeaveType | null; onClose: () => void }) => {
   const { t } = useTranslation('leave-types');
+  if (!leaveType) return null;
   return (
-    <Modal opened={leaveType !== null} onClose={onClose} title={t('hide_title', { name: leaveType?.name })}>
-      <Stack>
-        <Text>{t('hide_text', { count: leaveType?.requests ?? 0 })}</Text>
-        <Group justify="flex-end">
-          <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-          <Button leftSection={<ButtonIcon action="hide" />} onClick={() => { notify.success(t('hidden_done')); onClose(); }}>
-            {t('hide')}
-          </Button>
-        </Group>
-      </Stack>
-    </Modal>
+    <ConfirmModal
+      title={t('hide_title', { name: leaveType.name })}
+      confirmLabel={t('hide')}
+      confirmAction="hide"
+      onConfirm={() => { notify.success(t('hidden_done')); onClose(); }}
+      onClose={onClose}
+    >
+      <Text>{t('hide_text', { count: leaveType.requests })}</Text>
+    </ConfirmModal>
   );
 };
