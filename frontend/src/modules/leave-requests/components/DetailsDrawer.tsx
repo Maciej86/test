@@ -124,6 +124,8 @@ export const DetailsDrawer = ({ id, details, onClose, ...actions }: Omit<RowActi
       size={phone ? '100%' : 'xl'}
       title={id !== null ? t('details_title', { id }) : ''}
       closeButtonProps={{ 'aria-label': t('close') }}
+      // Tytuł jak nagłówek karty w księdze wyglądu (szeryfowy, h3).
+      styles={{ title: { fontFamily: 'var(--mantine-font-family-headings)', fontSize: 'var(--mantine-h3-font-size)', fontWeight: 600 } }}
     >
       <DataState query={details}>{details.data && <Content r={details.data} actions={actions} />}</DataState>
     </Drawer>
