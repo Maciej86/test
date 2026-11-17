@@ -93,7 +93,7 @@ ze specu: ta sama tabela).
   `npm run check`.
   _Uwaga:_ jedyna „kolumna sortowania” w `listQuerySchema` to stała `'default'` (kolejność ustala serwer według zakładki, odpowiedź 7a).
 
-- [ ] 6. **Zapytania** `backend/src/modules/leave-requests/leave-requests.queries.ts` (testy na bazie, wzór
+- [x] 6. **Zapytania** `backend/src/modules/leave-requests/leave-requests.queries.ts` (testy na bazie, wzór
   `my-leave.queries.test.ts`):
   - `listRequests(db, f: { status, year, leaveTypeId, search, page }): Promise<{ rows, total }>`: z `users`
     (`employee_name`, `archived_at`) i `leave_types`; `status ≠ pending` → filtr `pool_year = year`; szukanie
@@ -108,6 +108,7 @@ ze specu: ta sama tabela).
   - `setDecision(db, id, { from: status, to: status, actor, reason }): Promise<number>` (`UPDATE … WHERE id = ? AND
     status = ?`, ustawia `decided_by`, `decided_by_name`, `decided_at = NOW()`, `decision_reason`; zwraca liczbę
     zmienionych) → `npm run check`.
+  _Uwaga:_ `findOpenPools` i `isPoolOpen` są w `leave-requests.queries.ts` (zapytania tylko tego modułu); typ `PoolRow` z Pracowników.
 
 - [ ] 7. **Usługa: lista i szczegóły** (`leave-requests.service.ts`): `listLeaveRequests(query)` (pozycje z
   `poolLeft` z `findOpenPools` + `getPoolUsage`, `canCancel` = `approved` i pula `pool_year` otwarta, `employeeArchived`,
