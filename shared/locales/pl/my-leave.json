@@ -105,5 +105,21 @@
     "form_next_year": "Wniosek na przyszły rok",
     "withdraw": "Wycofanie",
     "print": "Wydruk"
+  },
+  "server": {
+    "no_pool": "Nie masz jeszcze puli dni urlopu. Poproś administratora o jej ustawienie.",
+    "type_unavailable": "Tego typu urlopu nie można już wybrać. Odśwież stronę.",
+    "no_working_days": "W tym terminie nie ma dni roboczych. Zmień termin.",
+    "pool_not_ready": "Pula na {{year}} nie jest jeszcze ustalona. Wniosek na {{year}} złożysz, gdy administrator zamknie rok {{openYear}}.",
+    "year_closed": "Rok {{year}} jest już zamknięty. Wybierz termin w roku otwartym.",
+    "overlap": "Ten termin jest już we wniosku. Zmień termin albo wycofaj tamten wniosek.",
+    "not_enough_days": "Za mało dni: wniosek ma {{days}}, a możesz wykorzystać jeszcze {{left}}.",
+    "limit_exceeded": "Przekroczony limit: {{leaveType}}. Limit to {{limit}} dni, wykorzystano już {{used}}, a wniosek ma {{days}}.",
+    "not_pending": "Tego wniosku nie można już wycofać, bo nie czeka na decyzję. Odśwież stronę."
+  },
+  "validation": {
+    "past_date": "Data „Od” nie może być wcześniejsza niż dziś.",
+    "dates_order": "Data „Do” nie może być wcześniejsza niż „Od”.",
+    "same_year": "Obie daty muszą być w tym samym roku. Urlop na przełomie lat złóż jako dwa wnioski."
   }
 }

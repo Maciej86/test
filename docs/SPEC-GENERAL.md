@@ -83,6 +83,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `/change-password`, `POST /api/auth/change-password` | zalogowany | tylko z hasłem tymczasowym (inaczej 409); z hasłem tymczasowym każda inna trasa za logowaniem daje 403 `server.password_change_required` |
 | `/admin`, `/api/dashboard` | admin, employee | treść zależna od roli; employee tylko własne dane |
 | `/admin/my-leave`, `/api/my-leave` | employee | tylko własne wnioski i pule (`req.user.id`) |
+| `GET /api/my-leave/overview`, `GET/POST /api/my-leave/requests`, `POST /api/my-leave/requests/:id/withdraw` | employee | `mountModule(api, 'my-leave', …)`; każde zapytanie z `req.user.id`, cudzy wniosek → 404; administrator 403 |
 | `/admin/leave-requests`, `/api/leave-requests` | admin | |
 | `/admin/tasks`, `/api/tasks` | admin, employee | wspólna tablica, każdy edytuje wszystko |
 | `/admin/employees`, `/api/employees` | admin | także pule i „Zamknij rok” |

@@ -119,7 +119,7 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   wyłączonym przyciskiem; `toPool` z podziałem z kolumn; `requestsCount` → `npm run check`.
   _Uwaga:_ osobne `getOpenPool` w Pracownikach nie powstało (krok 5). Tekst ramki ma odmianę (`close_year_pending_one/few/many`); przycisk w makiecie Pracowników też wyłączony.
 
-- [ ] 9. **Mapa dostępu** w `SPEC-GENERAL.md` (wiersz `GET /api/my-leave/overview`, `GET/POST
+- [x] 9. **Mapa dostępu** w `SPEC-GENERAL.md` (wiersz `GET /api/my-leave/overview`, `GET/POST
   /api/my-leave/requests`, `POST /api/my-leave/requests/:id/withdraw`, employee, tylko własne); teksty
   `server.*` i `validation.*` w `my-leave.json`, `employees.server.pending_requests` w `employees.json`.
   `routeProtection.test.ts` zielony → `npm run check`.
