@@ -17,6 +17,9 @@ import type { PoolRow } from '../employees/employees.queries';
 import { getPoolUsage, type PoolUsageDays } from '../employees/employees.service';
 import { listLeaveTypes } from '../leave-types/leave-types.queries';
 import { notifyUsers } from '../notifications/notifications.service';
+import { buildLeaveRequestPdf, leaveRequestPdfFileName } from '../../pdf/leaveRequestPdf';
+import { findRequestForPdf, toPdfData } from '../../pdf/leaveRequestPdfData';
+import { renderPdf } from '../../pdf/renderPdf';
 import * as q from './leave-requests.queries';
 
 /** Pula z liczbami: dni do wykorzystania = pula + zaległe − zatwierdzone − czekające (jak w „Moich urlopach”). */
@@ -135,3 +138,11 @@ export const cancelRequest = (id: number, reason: string, actor: Actor): Promise
   decide(id, actor, { from: 'approved', to: 'cancelled', type: 'leave_cancelled', reason }, async (conn, r) =>
     (await q.isPoolOpen(conn, r.userId, r.poolYear)) ? null : fail(409, M.yearClosed, { year: r.poolYear }),
   );
+
+/** PDF dowolnego zatwierdzonego wniosku (ten sam dokument co w „Moich urlopach”). */
+export const getLeaveRequestPdf = async (id: number): Promise<Result<{ fileName: string; pdf: Buffer }>> => {
+  const row = await findRequestForPdf(pool, id);
+  if (!row) return notFound();
+  if (row.status !== 'approved') return fail(409, M.notApproved);
+  return { fileName: leaveRequestPdfFileName(row.id), pdf: await renderPdf(buildLeaveRequestPdf(toPdfData(row))) };
+};

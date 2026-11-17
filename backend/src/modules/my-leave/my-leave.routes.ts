@@ -7,6 +7,7 @@ import {
   type MyLeaveRequestsQuery,
 } from '@app/shared';
 import { sendError } from '../../middleware/errors';
+import { sendInlinePdf } from '../../pdf/sendInlinePdf';
 import { actorOf, idParam, reply } from '../../middleware/routeHelpers';
 import { validateBody } from '../../middleware/validateBody';
 import { validateQuery } from '../../middleware/validateQuery';
@@ -34,16 +35,11 @@ myLeaveRoutes.post('/requests/:id/withdraw', async (req, res) => { // rule-ok: b
   if (id !== null) reply(res, await withdrawRequest(id, actorOf(req.user)));
 });
 
-/** PDF zatwierdzonego wniosku: otwiera się w nowej karcie (inline), nie zostaje w pamięci przeglądarki (no-store). */
+/** PDF własnego zatwierdzonego wniosku (w nowej karcie). */
 myLeaveRoutes.get('/requests/:id/pdf', async (req, res) => {
   const id = idParam(res, req.params.id);
   if (id === null) return;
   const result = await getRequestPdf(id, req.user!.id);
   if ('error' in result) return reply(res, result);
-  res.set({
-    'Content-Type': 'application/pdf',
-    'Content-Disposition': `inline; filename="${result.fileName}"`,
-    'Cache-Control': 'no-store',
-  });
-  res.send(result.pdf);
+  sendInlinePdf(res, result.fileName, result.pdf);
 });

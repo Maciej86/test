@@ -128,11 +128,12 @@ ze specu: ta sama tabela).
   (`getPoolUsage`) → `npm run check`.
   _Uwaga:_ pole z aktualnym statusem wniosku w błędzie 409 nazywa się `current` (`status` to już kod HTTP); anulowanie wniosku już anulowanego → `already_decided`, innego niezatwierdzonego → `not_approved`.
 
-- [ ] 9. **Trasy** `leave-requests.routes.ts` i `mountModule(api, 'leave-requests', leaveRequestsRoutes)` w
+- [x] 9. **Trasy** `leave-requests.routes.ts` i `mountModule(api, 'leave-requests', leaveRequestsRoutes)` w
   `app.ts`: `GET /` (`validateQuery`), `GET /:id`, `POST /:id/approve`, `POST /:id/reject` i `/:id/cancel`
   (`validateBody(leaveDecisionReasonSchema)`), `GET /:id/pdf` (`findRequestForPdf(db, id)`, tylko `approved`, inaczej
   409 `not_approved`; nagłówki jak w Moich urlopach). Testy: 401, 403 (pracownik), 404 dla `abc`/`0`/`999999`,
   400 bez powodu, PDF `application/pdf` + `inline`. Wiersz w „Mapie dostępu” `SPEC-GENERAL.md` → `npm run check`.
+  _Uwaga:_ nagłówki PDF wydzielone do `backend/src/pdf/sendInlinePdf.ts` (używają obie trasy PDF); PDF administratora w `getLeaveRequestPdf` usługi.
 
 - [ ] 10. **Hooki** `frontend/src/modules/leave-requests/leave-requests.api.ts`: `useLeaveRequests(query)`,
   `useLeaveRequest(id | null)`, `useApproveRequest()`, `useRejectRequest()`, `useCancelRequest()` (po sukcesie

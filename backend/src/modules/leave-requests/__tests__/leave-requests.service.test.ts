@@ -18,6 +18,7 @@ vi.mock('../leave-requests.queries', () => ({
 vi.mock('../../employees/employees.service', () => ({ getPoolUsage: vi.fn() }));
 vi.mock('../../leave-types/leave-types.queries', () => ({ listLeaveTypes: vi.fn() }));
 vi.mock('../../notifications/notifications.service', () => ({ notifyUsers: vi.fn() }));
+vi.mock('../../../pdf/leaveRequestPdfData', async (orig) => ({ ...(await orig<object>()), findRequestForPdf: vi.fn() }));
 
 const q = await import('../leave-requests.queries');
 const { getPoolUsage } = await import('../../employees/employees.service');
@@ -178,5 +179,25 @@ describe('leave requests: decisions', () => {
   it('request of an archived employee can be approved', async () => {
     vi.mocked(q.findRequest).mockResolvedValue(item({ employeeArchived: true }));
     expect(await s.approveRequest(21, anna)).toEqual({ ok: true });
+  });
+});
+
+describe('leave requests: PDF', () => {
+  it('any approved request → PDF; missing → 404; other status → 409 not_approved', async () => {
+    const { findRequestForPdf } = await import('../../../pdf/leaveRequestPdfData');
+    const row = {
+      id: 21, employee_name: 'Jan Kowalski', leave_type_name: 'Wypoczynkowy', deducts_pool: 1, date_from: '2026-12-21', date_to: '2026-12-31',
+      working_days: 7, days_from_carried: 2, days_from_annual: 5, pool_year: 2026, comment: null, status: 'approved',
+      decided_by_name: 'Anna Nowak', decided_at: new Date('2026-12-02T09:00:00Z'), created_at: new Date('2026-11-17T09:00:00Z'),
+    } as never;
+    const find = vi.mocked(findRequestForPdf).mockResolvedValueOnce(row);
+    const result = await s.getLeaveRequestPdf(21);
+    expect(find).toHaveBeenCalledWith(expect.anything(), 21);
+    if ('error' in result) throw new Error('expected a PDF');
+    expect(result.pdf.subarray(0, 4).toString('latin1')).toBe('%PDF');
+    find.mockResolvedValueOnce(null);
+    expect(await s.getLeaveRequestPdf(21)).toEqual({ error: { status: 404, message: 'server.not_found' } });
+    find.mockResolvedValueOnce({ ...(row as object), status: 'pending' } as never);
+    expect(await s.getLeaveRequestPdf(21)).toEqual({ error: { status: 409, message: M.notApproved } });
   });
 });

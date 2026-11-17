@@ -85,7 +85,8 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `/admin/my-leave`, `/api/my-leave` | employee | tylko własne wnioski i pule (`req.user.id`) |
 | `GET /api/my-leave/overview`, `GET/POST /api/my-leave/requests`, `POST /api/my-leave/requests/:id/withdraw` | employee | `mountModule(api, 'my-leave', …)`; każde zapytanie z `req.user.id`, cudzy wniosek → 404; administrator 403 |
 | `GET /api/my-leave/requests/:id/pdf` | employee | tylko własny (cudzy → 404) i tylko zatwierdzony (inaczej 409); PDF `inline`, `no-store` |
-| `/admin/leave-requests`, `/api/leave-requests` | admin | |
+| `/admin/leave-requests`, `/admin/leave-requests/:id`, `/api/leave-requests` | admin | adres `/:id` otwiera szczegóły wniosku (link z e-maila i z dzwonka) |
+| `GET /api/leave-requests`, `GET /api/leave-requests/:id`, `POST /api/leave-requests/:id/approve`, `/:id/reject`, `/:id/cancel`, `GET /api/leave-requests/:id/pdf` | admin | `mountModule(api, 'leave-requests', …)`; kto decyduje = `req.user`; nieistniejący → 404; decyzja na rozpatrzonym → 409 `already_decided`; anulowanie w zamkniętym roku → 409 `year_closed`; PDF tylko zatwierdzonego (inaczej 409) |
 | `/admin/tasks`, `/api/tasks` | admin, employee | wspólna tablica, każdy edytuje wszystko |
 | `/admin/employees`, `/api/employees` | admin | także pule i „Zamknij rok” |
 | `GET/POST /api/employees`, `PUT /api/employees/:id`, `POST /api/employees/:id/password`, `/:id/archive`, `/:id/restore`, `GET/POST /api/employees/close-year`, `GET /api/employees/contract-types` | admin | `mountModule(api, 'employees', …)`; własnej roli i własnego konta do archiwum nie (409) |
