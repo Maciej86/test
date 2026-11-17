@@ -38,3 +38,7 @@ describe('route helpers', () => {
     expect(ok.json).toHaveBeenCalledWith({ id: 3 });
   });
 });
+
+describe('notFound', () => {
+  it.todo('notFound → 404 server.not_found');
+});

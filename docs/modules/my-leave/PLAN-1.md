@@ -30,11 +30,12 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
 
 ## Kroki
 
-- [ ] 0. **Szkielet testów** (`it.todo`, po jednym na wymaganie): `shared/src/schemas/__tests__/myLeave.test.ts`,
+- [x] 0. **Szkielet testów** (`it.todo`, po jednym na wymaganie): `shared/src/schemas/__tests__/myLeave.test.ts`,
   `shared/src/__tests__/leaveRequestCheck.test.ts`, `backend/src/modules/my-leave/__tests__/`
   (`my-leave.queries.test.ts`, `my-leave.service.test.ts`, `my-leave.routes.test.ts`), dopiski w testach Pracowników
   i Typów urlopów, `frontend/src/modules/my-leave/__tests__/MyLeavePage.test.tsx`, `…/components/__tests__/`
   (`RequestModal.test.tsx`, `DayStrip.test.tsx`), `e2e/my-leave.spec.ts` (scenariusze z `TESTS-1.md`) → `npm run check`.
+  _Uwaga:_ testy Pracowników i Typów urlopów nie dostały `it.todo` (test zasad nie pozwala na nie w zrobionym module); powstają od razu jako prawdziwe w kroku 8.
 
 - [ ] 1. **`notFound()` wspólne:** `export const notFound = (): Result => fail(404, SERVER_MESSAGES.notFound)`
   w `routeHelpers.ts`; test w `backend/src/middleware/__tests__/routeHelpers.test.ts` (status 404, klucz) →

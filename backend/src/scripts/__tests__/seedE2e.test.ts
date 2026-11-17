@@ -55,3 +55,7 @@ describe('seedE2eNotifications', () => {
     expect(inserts.filter(([sql]) => sql.includes('NULL FROM'))).toHaveLength(2);
   });
 });
+
+describe('seedE2e: leave requests', () => {
+  it.todo('removes leave requests of temporary accounts and types before deleting them');
+});
