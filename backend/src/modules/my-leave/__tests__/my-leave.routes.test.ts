@@ -79,7 +79,39 @@ describe('my leave routes', () => {
     expect((await as(jan).get('/my-leave/requests?year=1999')).status).toBe(400);
   });
 
-  it.todo('POST /my-leave/requests → 201; user id from req.user, server-counted values ignored');
-  it.todo('POST /my-leave/requests with bad data → 400 with fields');
-  it.todo('POST /my-leave/requests/:id/withdraw → 200; abc → 404');
+  it('POST /my-leave/requests → 201; user id from req.user, server-counted values ignored', async () => {
+    vi.mocked(s.createRequest).mockResolvedValue({ id: 33 } as never);
+    const res = await as(jan).post('/my-leave/requests', { ...body, leaveTypeId: '1', userId: 1, workingDays: 1, daysFromCarried: 9, status: 'approved' });
+    expect(res.status).toBe(201);
+    expect(res.body).toEqual({ id: 33 });
+    expect(s.createRequest).toHaveBeenCalledWith(body, { id: 7, name: 'Jan Kowalski' });
+  });
+
+  it('POST /my-leave/requests with bad data → 400 with fields; refused → 409 with data', async () => {
+    const bad = await as(jan).post('/my-leave/requests', { leaveTypeId: '', dateFrom: '2026-12-21', dateTo: '2026-12-20', comment: 'a'.repeat(501) });
+    expect(bad.status).toBe(400);
+    expect(bad.body.error.fields).toEqual({ leaveTypeId: 'validation.required', comment: 'validation.too_long' });
+    const order = await as(jan).post('/my-leave/requests', { ...body, dateTo: '2026-12-20' });
+    expect(order.body.error.fields).toEqual({ dateTo: M.datesOrder });
+    expect(s.createRequest).not.toHaveBeenCalled();
+
+    vi.mocked(s.createRequest).mockResolvedValue({ error: { status: 409, message: M.notEnoughDays, days: 7, left: 3, pending: 2 } });
+    const refused = await as(jan).post('/my-leave/requests', body);
+    expect(refused.status).toBe(409);
+    expect(refused.body).toEqual({ error: { message: M.notEnoughDays, days: 7, left: 3, pending: 2 } });
+  });
+  it('POST /my-leave/requests/:id/withdraw → 200 for req.user; abc → 404; refused → 409', async () => {
+    vi.mocked(s.withdrawRequest).mockResolvedValue({ ok: true });
+    const res = await as(jan).post('/my-leave/requests/21/withdraw', { userId: 1 });
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ ok: true });
+    expect(s.withdrawRequest).toHaveBeenCalledWith(21, { id: 7, name: 'Jan Kowalski' });
+
+    expect((await as(jan).post('/my-leave/requests/abc/withdraw')).status).toBe(404);
+    expect((await as(jan).post('/my-leave/requests/1e3/withdraw')).status).toBe(404);
+    expect(s.withdrawRequest).toHaveBeenCalledTimes(1);
+
+    vi.mocked(s.withdrawRequest).mockResolvedValue({ error: { status: 409, message: M.notPending } });
+    expect((await as(jan).post('/my-leave/requests/21/withdraw')).status).toBe(409);
+  });
 });

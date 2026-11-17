@@ -92,7 +92,7 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   `leftCarriedDays`), `usedOfLimit`, lata z rokiem otwartym → `npm run check`.
   _Uwaga:_ Moje urlopy biorą pulę wprost z `findOpenPoolOfUser` w `employees.queries.ts` (tak jak Pracownicy biorą typy umów z `contract-types.queries.ts`); osobne `getOpenPool` w `employees.service.ts` tylko przekazywałoby wywołanie dalej.
 
-- [ ] 6. **Złożenie wniosku:** `createRequest(input: LeaveRequestInput, actor): Promise<Result<MyLeaveRequest>>`
+- [x] 6. **Złożenie wniosku:** `createRequest(input: LeaveRequestInput, actor): Promise<Result<MyLeaveRequest>>`
   w `withTransaction`: `findOpenPoolOfUser(conn, actor.id, true)` (brak → 404), `findSelectableLeaveType` (brak →
   400 pole `leaveTypeId`), `checkLeaveRequest` z `todayIsoDate()` (nie ok → `past_date` 400 przy `dateFrom`, reszta
   409 z danymi), `insertRequest`, `logActivity` (`create`), `notifyAdmins` (`leave_request_new`, params `employee,
@@ -101,8 +101,9 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   201). Testy: każdy kod błędu z `SPEC-1.md` (API), `user_id` z `req.user` mimo `userId` w treści, liczby liczone
   przez serwer mimo `workingDays` w treści, blokada `FOR UPDATE` przed liczeniem, powiadomienie w transakcji, e-mail
   po niej z danymi (`leftAfter`), błąd e-maila nie psuje odpowiedzi → `npm run check`.
+  _Uwaga:_ limit typu w odpowiedzi 409 ma też nazwę typu (`leaveType`), żeby komunikat ją pokazał. E-mail wysyłany po zatwierdzeniu transakcji, z `.catch` (błąd zapisuje się w dzienniku serwera).
 
-- [ ] 7. **Wycofanie:** `withdrawRequest(id, actor): Promise<Result>` w transakcji: `findOwnRequest` (brak/cudzy →
+- [x] 7. **Wycofanie:** `withdrawRequest(id, actor): Promise<Result>` w transakcji: `findOwnRequest` (brak/cudzy →
   `notFound()`), status ≠ `pending` → 409 `not_pending`, `setWithdrawn` (0 zmian → 409), `logActivity` (`status`,
   `pending → withdrawn`), `notifyAdmins` (`leave_request_withdrawn`). Trasa `POST /my-leave/requests/:id/withdraw`
   (`idParam`). Testy: 404 cudzy, 404 `abc`, 409 zatwierdzony, 409 drugi raz, 200 → `npm run check`.
