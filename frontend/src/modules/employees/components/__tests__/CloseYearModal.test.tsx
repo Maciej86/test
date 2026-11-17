@@ -94,3 +94,18 @@ describe('CloseYearModal, PasswordModal, ArchiveModal', () => {
     expect(onClose).toHaveBeenCalled();
   });
 });
+
+describe('CloseYearModal: pending requests', () => {
+  it('pending requests → yellow box with the count and disabled close button', async () => {
+    vi.spyOn(api, 'get').mockResolvedValue({ data: { ...preview, pendingRequests: 2 } });
+    renderWithProviders(<CloseYearModal opened onClose={vi.fn()} />);
+    expect(await screen.findByText('Najpierw rozpatrz 2 wnioski czekające na decyzję. Wtedy zamkniesz rok.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Zamknij rok 2026' })).toBeDisabled();
+  });
+
+  it('one pending request → singular text', async () => {
+    vi.spyOn(api, 'get').mockResolvedValue({ data: { ...preview, pendingRequests: 1 } });
+    renderWithProviders(<CloseYearModal opened onClose={vi.fn()} />);
+    expect(await screen.findByText('Najpierw rozpatrz 1 wniosek czekający na decyzję. Wtedy zamkniesz rok.')).toBeInTheDocument();
+  });
+});

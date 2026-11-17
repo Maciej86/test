@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moje urlopy, część 1/2: implementacja, krok 8 (`/stepkit:dalej`).
+**Następny krok:** Moje urlopy, część 1/2: implementacja, krok 9 (`/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -26,7 +26,7 @@
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
-| 8 | Moje urlopy | my-leave | w toku | implementacja, część 1/2 (krok 8/14) | employees, leave-types, email, notifications |
+| 8 | Moje urlopy | my-leave | w toku | implementacja, część 1/2 (krok 9/14) | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |

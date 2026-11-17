@@ -64,7 +64,10 @@
   "password_saved": "Ustawiono hasło tymczasowe.",
   "close_year": "Zamknij rok {{year}}",
   "close_year_intro": "Niewykorzystane dni z {{year}} przejdą na {{next}} jako zaległy urlop i dodadzą się do nowej puli. Sprawdź pule na {{next}} i zatwierdź. Zamknięcia nie da się cofnąć; pojedyncze pule poprawisz potem w „Edytuj”.",
-  "close_year_pending": "Wnioski czekające na decyzję: {{count}}. Jeśli zatwierdzisz je po zamknięciu roku, dni zejdą z puli na {{next}}.",
+  "close_year_pending_one": "Najpierw rozpatrz {{count}} wniosek czekający na decyzję. Wtedy zamkniesz rok.",
+  "close_year_pending_few": "Najpierw rozpatrz {{count}} wnioski czekające na decyzję. Wtedy zamkniesz rok.",
+  "close_year_pending_many": "Najpierw rozpatrz {{count}} wniosków czekających na decyzję. Wtedy zamkniesz rok.",
+  "close_year_pending_other": "Najpierw rozpatrz wnioski czekające na decyzję ({{count}}). Wtedy zamkniesz rok.",
   "close_col_left": "Zostało w {{year}}",
   "close_col_total": "Razem w {{year}}",
   "close_col_annual": "Pula na {{year}}",
@@ -99,7 +102,8 @@
     "not_archived": "To konto nie jest w archiwum.",
     "year_not_open": "Ten rok jest już zamknięty. Odśwież stronę.",
     "year_too_early": "Tego roku nie można jeszcze zamknąć.",
-    "contract_type_unavailable": "Tego typu umowy nie można już wybrać. Odśwież stronę."
+    "contract_type_unavailable": "Tego typu umowy nie można już wybrać. Odśwież stronę.",
+    "pending_requests": "Najpierw rozpatrz wnioski czekające na decyzję z tego roku. Wtedy zamkniesz rok."
   },
   "close_year_later": "Rok {{year}} zamkniesz w {{year}}.",
   "email_taken_archived": "Ten e-mail ma konto w archiwum: {{name}}.",

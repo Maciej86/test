@@ -18,6 +18,7 @@ import { pool } from '../../db/pool';
 import { withTransaction } from '../../db/transaction';
 import { fail, type Result, type ServiceError } from '../../middleware/routeHelpers';
 import { findContractType, listSelectableContractTypes } from '../contract-types/contract-types.queries';
+import { countPendingRequests, sumPoolUsage } from '../my-leave/my-leave.queries';
 import * as q from './employees.queries';
 
 /** Kto wykonuje zmianę (z `req.user`). */
@@ -34,18 +35,29 @@ export const getOpenYear = async (db: q.Db = pool): Promise<number> => {
   return (await q.minOpenYear(db)) ?? currentYear();
 };
 
-/**
- * Wykorzystane (zatwierdzone) i czekające dni z puli. Wniosków jeszcze nie ma, więc na razie zera;
- * moduł „Moje urlopy” podmieni tę funkcję na liczenie z leave_requests.
- */
-export const getPoolUsage = async (userIds: number[], _year: number): Promise<Map<number, { usedDays: number; pendingDays: number }>> => {
-  return new Map(userIds.map((id) => [id, { usedDays: 0, pendingDays: 0 }]));
+/** Dni z wniosków dla puli: zatwierdzone (z tego z zaległego) i czekające na decyzję. */
+export interface PoolUsageDays {
+  usedDays: number;
+  pendingDays: number;
+  usedCarried: number;
+}
+
+const NO_USAGE: PoolUsageDays = { usedDays: 0, pendingDays: 0, usedCarried: 0 };
+
+/** Wykorzystane (zatwierdzone) i czekające dni z puli, z wniosków modułu Moje urlopy (zapisany podział). */
+export const getPoolUsage = async (userIds: number[], year: number, db: q.Db = pool): Promise<Map<number, PoolUsageDays>> => {
+  const usage = await sumPoolUsage(db, userIds, year);
+  return new Map(
+    userIds.map((id) => {
+      const u = usage.get(id);
+      return [id, u ? { usedDays: u.usedCarried + u.usedAnnual, pendingDays: u.pendingCarried + u.pendingAnnual, usedCarried: u.usedCarried } : NO_USAGE];
+    }),
+  );
 };
 
-/** Pula z liczbami do pokazania: zaległe schodzą pierwsze. */
-export const toPool = (year: number, annualDays: number, carriedDays: number, usage: { usedDays: number; pendingDays: number }): EmployeePool => {
-  const usedFromCarried = Math.min(usage.usedDays, carriedDays);
-  const leftCarriedDays = carriedDays - usedFromCarried;
+/** Pula z liczbami do pokazania: zaległe schodzą pierwsze (ile z zaległego, zapisał wniosek przy złożeniu). */
+export const toPool = (year: number, annualDays: number, carriedDays: number, usage: PoolUsageDays): EmployeePool => {
+  const leftCarriedDays = Math.max(0, carriedDays - usage.usedCarried);
   const leftDays = Math.max(0, annualDays + carriedDays - usage.usedDays);
   return { year, annualDays, carriedDays, usedDays: usage.usedDays, pendingDays: usage.pendingDays, leftDays, leftCarriedDays };
 };
@@ -67,7 +79,7 @@ export const listEmployeesPage = async (query: EmployeesListQuery, me: Actor): P
     isMe: r.id === me.id,
     pool:
       r.role === 'employee' && r.annual_days !== null
-        ? toPool(year, r.annual_days, r.carried_days ?? 0, usage.get(r.id) ?? { usedDays: 0, pendingDays: 0 })
+        ? toPool(year, r.annual_days, r.carried_days ?? 0, usage.get(r.id) ?? NO_USAGE)
         : null,
   }));
   return { items, total, page: query.page, pageSize: PAGE_SIZE, openYear: year, counts: await q.countEmployees(pool) };
@@ -264,11 +276,9 @@ export const restoreEmployee = async (id: number, actor: Actor): Promise<Result>
   });
 };
 
-const leftDaysByUser = async (pools: q.YearPoolRow[], year: number): Promise<Map<number, number>> => {
-  const usage = await getPoolUsage(pools.map((p) => p.user_id), year);
-  return new Map(
-    pools.map((p) => [p.user_id, toPool(year, p.annual_days, p.carried_days, usage.get(p.user_id) ?? { usedDays: 0, pendingDays: 0 }).leftDays]),
-  );
+const leftDaysByUser = async (pools: q.YearPoolRow[], year: number, db: q.Db = pool): Promise<Map<number, number>> => {
+  const usage = await getPoolUsage(pools.map((p) => p.user_id), year, db);
+  return new Map(pools.map((p) => [p.user_id, toPool(year, p.annual_days, p.carried_days, usage.get(p.user_id) ?? NO_USAGE).leftDays]));
 };
 
 /** Podgląd okna „Zamknij rok”: pracownicy spoza archiwum z pulą roku otwartego. */
@@ -280,8 +290,7 @@ export const getCloseYearPreview = async (): Promise<CloseYearPreview> => {
     year,
     nextYear: year + 1,
     canClose: year <= currentYear(),
-    // Wnioski czekające na decyzję policzy moduł „Moje urlopy”.
-    pendingRequests: 0,
+    pendingRequests: await countPendingRequests(pool, year),
     rows: pools.map((p) => ({ userId: p.user_id, name: p.name, left: left.get(p.user_id) ?? 0, annualDays: p.annual_days })),
   };
 };
@@ -296,7 +305,9 @@ export const closeYear = async (input: CloseYearInput, actor: Actor): Promise<Re
     if (input.year !== year) return fail(409, EMPLOYEE_MESSAGES.yearNotOpen);
     if (year > currentYear()) return fail(409, EMPLOYEE_MESSAGES.yearTooEarly);
     const pools = await q.findOpenPoolsForYear(conn, year);
-    const left = await leftDaysByUser(pools, year);
+    // Dni z czekających wniosków przeszłyby na następny rok podwójnie: najpierw decyzje (pule są już zablokowane).
+    if ((await countPendingRequests(conn, year)) > 0) return fail(409, EMPLOYEE_MESSAGES.pendingRequests);
+    const left = await leftDaysByUser(pools, year, conn);
     const typed = new Map(input.pools.map((p) => [p.userId, p.annualDays]));
     for (const p of pools) {
       const annual = typed.get(p.user_id) ?? p.annual_days;
@@ -323,7 +334,7 @@ export const getPool = async (userId: number, year: number): Promise<EmployeePoo
   if (!user || user.role !== 'employee') return null;
   const row = await q.findPool(pool, userId, year);
   if (!row) return null;
-  const usage = (await getPoolUsage([userId], year)).get(userId) ?? { usedDays: 0, pendingDays: 0 };
+  const usage = (await getPoolUsage([userId], year)).get(userId) ?? NO_USAGE;
   return toPool(year, row.annual_days, row.carried_days, usage);
 };
 

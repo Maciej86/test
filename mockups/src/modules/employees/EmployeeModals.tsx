@@ -176,7 +176,7 @@ export const CloseYearModal = ({ opened, onClose }: { opened: boolean; onClose: 
       <Stack>
         <Text size="sm">{t('close_year_intro', { year: POOL_YEAR, next })}</Text>
         {pending > 0 && (
-          <Alert color="yellow" icon={<CircleAlert size={18} />}>{t('close_year_pending', { count: pending, next })}</Alert>
+          <Alert color="yellow" icon={<CircleAlert size={18} />}>{t('close_year_pending', { count: pending })}</Alert>
         )}
         <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH}>
           <Table verticalSpacing="xs">
@@ -216,7 +216,7 @@ export const CloseYearModal = ({ opened, onClose }: { opened: boolean; onClose: 
         </Table.ScrollContainer>
         <Group justify="flex-end">
           <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-          <Button leftSection={<ButtonIcon action="close_year" />} onClick={() => { notify.success(t('close_done', { year: POOL_YEAR, next })); onClose(); }}>
+          <Button leftSection={<ButtonIcon action="close_year" />} disabled={pending > 0} onClick={() => { notify.success(t('close_done', { year: POOL_YEAR, next })); onClose(); }}>
             {t('close_confirm', { year: POOL_YEAR })}
           </Button>
         </Group>

@@ -21,7 +21,7 @@ const toSelectable = (r: LeaveTypeRow): SelectableLeaveType => ({
   yearlyLimit: r.yearly_limit,
 });
 
-/** Lista na ekran: widoczne według kolejności, potem ukryte alfabetycznie. Liczbę wniosków dopisze „Moje urlopy”. */
+/** Lista na ekran: widoczne według kolejności, potem ukryte alfabetycznie. Liczbę wniosków dopisuje usługa (z Moich urlopów). */
 export const listLeaveTypes = async (db: Db): Promise<LeaveTypeItem[]> => {
   const [rows] = await db.query<LeaveTypeRow[]>(
     'SELECT id, name, deducts_pool, yearly_limit, position, hidden_at FROM leave_types ORDER BY hidden_at IS NOT NULL, CASE WHEN hidden_at IS NULL THEN position END, name',

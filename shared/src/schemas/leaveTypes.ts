@@ -24,7 +24,7 @@ export interface LeaveTypeItem {
   deductsPool: boolean;
   yearlyLimit: number | null;
   hidden: boolean;
-  /** W ilu wnioskach typ jest użyty (liczy moduł Moje urlopy; do tego czasu 0). */
+  /** W ilu wnioskach typ jest użyty (liczy moduł Moje urlopy, wszystkie statusy). */
   requestsCount: number;
 }
 

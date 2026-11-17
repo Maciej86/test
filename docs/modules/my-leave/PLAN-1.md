@@ -108,7 +108,7 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   `pending → withdrawn`), `notifyAdmins` (`leave_request_withdrawn`). Trasa `POST /my-leave/requests/:id/withdraw`
   (`idParam`). Testy: 404 cudzy, 404 `abc`, 409 zatwierdzony, 409 drugi raz, 200 → `npm run check`.
 
-- [ ] 8. **Pracownicy i Typy urlopów:** `getPoolUsage` z `sumPoolUsage` (usedDays = zatwierdzone, pendingDays =
+- [x] 8. **Pracownicy i Typy urlopów:** `getPoolUsage` z `sumPoolUsage` (usedDays = zatwierdzone, pendingDays =
   czekające, `usedCarried` do `toPool`); `toPool(year, annual, carried, usage)` bierze `leftCarriedDays = carried −
   usedCarried`; `getOpenPool` w `employees.service.ts`; `getCloseYearPreview().pendingRequests =
   countPendingRequests(year)`; `closeYear` → 409 `EMPLOYEE_MESSAGES.pendingRequests`, gdy > 0 (w transakcji).
@@ -117,6 +117,7 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   (`mockups/src/modules/employees/EmployeeModals.tsx`). `listTypes` w Typach urlopów: `requestsCount` z
   `countRequestsByLeaveType`. Testy: zamknięcie z czekającym → 409 i nic nie zapisane; podgląd z liczbą; ekran z
   wyłączonym przyciskiem; `toPool` z podziałem z kolumn; `requestsCount` → `npm run check`.
+  _Uwaga:_ osobne `getOpenPool` w Pracownikach nie powstało (krok 5). Tekst ramki ma odmianę (`close_year_pending_one/few/many`); przycisk w makiecie Pracowników też wyłączony.
 
 - [ ] 9. **Mapa dostępu** w `SPEC-GENERAL.md` (wiersz `GET /api/my-leave/overview`, `GET/POST
   /api/my-leave/requests`, `POST /api/my-leave/requests/:id/withdraw`, employee, tylko własne); teksty

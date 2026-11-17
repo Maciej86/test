@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn() } }));
 const conn = { query: vi.fn() };
 vi.mock('../../../db/transaction', () => ({ withTransaction: vi.fn(async (work: (c: unknown) => unknown) => work(conn)) }));
+vi.mock('../../my-leave/my-leave.queries', () => ({ countRequestsByLeaveType: vi.fn() }));
 vi.mock('../leave-types.queries', () => ({
   listLeaveTypes: vi.fn(),
   findLeaveType: vi.fn(),
@@ -17,6 +18,7 @@ vi.mock('../leave-types.queries', () => ({
 }));
 
 const q = await import('../leave-types.queries');
+const myLeave = await import('../../my-leave/my-leave.queries');
 const s = await import('../leave-types.service');
 const { LEAVE_TYPE_MESSAGES: M, SERVER_MESSAGES } = await import('@app/shared');
 
@@ -69,9 +71,13 @@ describe('leave types service', () => {
     expect(await s.updateType(99, data)).toEqual({ error: { status: 404, message: SERVER_MESSAGES.notFound } });
   });
 
-  it('listTypes returns items', async () => {
-    vi.mocked(q.listLeaveTypes).mockResolvedValue([{ id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, hidden: false, requestsCount: 0 }]);
-    expect((await s.listTypes()).items).toHaveLength(1);
+  it('listTypes fills requestsCount from Moje urlopy (0 for types without requests)', async () => {
+    vi.mocked(q.listLeaveTypes).mockResolvedValue([
+      { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, hidden: false, requestsCount: 0 },
+      { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, hidden: false, requestsCount: 0 },
+    ]);
+    vi.mocked(myLeave.countRequestsByLeaveType).mockResolvedValue(new Map([[1, 3]]));
+    expect((await s.listTypes()).items.map((i) => i.requestsCount)).toEqual([3, 0]);
   });
 
   it('moveType swaps position with the visible neighbour (positions 1, 3, 4)', async () => {

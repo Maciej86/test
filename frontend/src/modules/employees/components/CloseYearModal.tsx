@@ -37,7 +37,7 @@ export const CloseYearModal = ({ opened, onClose }: { opened: boolean; onClose: 
             <Text size="sm">{t('close_year_intro', { year: data.year, next: data.nextYear })}</Text>
             {data.pendingRequests > 0 && (
               <Alert color="yellow" icon={<CircleAlert size={18} />}>
-                {t('close_year_pending', { count: data.pendingRequests, next: data.nextYear })}
+                {t('close_year_pending', { count: data.pendingRequests })}
               </Alert>
             )}
             {data.rows.length === 0 ? (
@@ -82,7 +82,7 @@ export const CloseYearModal = ({ opened, onClose }: { opened: boolean; onClose: 
             )}
             <Group justify="flex-end">
               <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-              <Button leftSection={<ButtonIcon action="close_year" />} loading={closeYear.isPending} disabled={!data.canClose || data.rows.length === 0} onClick={confirm}>
+              <Button leftSection={<ButtonIcon action="close_year" />} loading={closeYear.isPending} disabled={!data.canClose || data.rows.length === 0 || data.pendingRequests > 0} onClick={confirm}>
                 {t('close_confirm', { year: data.year })}
               </Button>
             </Group>

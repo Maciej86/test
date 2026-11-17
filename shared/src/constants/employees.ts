@@ -26,4 +26,6 @@ export const EMPLOYEE_MESSAGES = {
   yearNotOpen: 'employees.server.year_not_open',
   yearTooEarly: 'employees.server.year_too_early',
   contractTypeUnavailable: 'employees.server.contract_type_unavailable',
+  /** „Zamknij rok” przy wnioskach czekających na decyzję (moduł Moje urlopy). */
+  pendingRequests: 'employees.server.pending_requests',
 } as const;

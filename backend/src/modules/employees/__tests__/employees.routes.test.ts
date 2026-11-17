@@ -28,11 +28,13 @@ vi.mock('../employees.queries', () => ({
   listActiveUsers: vi.fn(),
 }));
 vi.mock('../../contract-types/contract-types.queries', () => ({ findContractType: vi.fn(), listSelectableContractTypes: vi.fn() }));
+vi.mock('../../my-leave/my-leave.queries', () => ({ sumPoolUsage: vi.fn(), countPendingRequests: vi.fn() }));
 process.env.JWT_SECRET = 'test-secret-test-secret-test-secret';
 
 const users = await import('../../../auth/users.queries');
 const q = await import('../employees.queries');
 const ct = await import('../../contract-types/contract-types.queries');
+const myLeave = await import('../../my-leave/my-leave.queries');
 const { logActivity } = await import('../../../db/activityLog');
 const { withTransaction } = await import('../../../db/transaction');
 const { createApp } = await import('../../../app');
@@ -64,6 +66,8 @@ const historyOf = () => vi.mocked(logActivity).mock.calls.map((c) => c[1]);
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(q.minOpenYear).mockResolvedValue(2026);
+  vi.mocked(myLeave.sumPoolUsage).mockImplementation(async (_db, ids) => new Map(ids.map((id) => [id, { usedCarried: 0, usedAnnual: 0, pendingCarried: 0, pendingAnnual: 0 }])));
+  vi.mocked(myLeave.countPendingRequests).mockResolvedValue(0);
   vi.mocked(q.findAccountsWithLoginOrEmail).mockResolvedValue([]);
   vi.mocked(q.countEmployees).mockResolvedValue({ all: 2, admins: 1 });
 });
@@ -71,6 +75,14 @@ beforeEach(() => {
 describe('employees routes', () => {
   it('GET /employees without login → 401', async () => {
     expect((await as(null).get('/employees')).status).toBe(401);
+  });
+
+  it('GET /employees: pool shows approved and pending days from Moje urlopy', async () => {
+    vi.mocked(q.listEmployees).mockResolvedValue({ rows: [row({})] as never, total: 1 });
+    vi.mocked(myLeave.sumPoolUsage).mockResolvedValue(new Map([[2, { usedCarried: 4, usedAnnual: 5, pendingCarried: 0, pendingAnnual: 7 }]]));
+    const res = await as(anna).get('/employees');
+    expect(res.body.items[0].pool).toEqual({ year: 2026, annualDays: 26, carriedDays: 4, usedDays: 9, pendingDays: 7, leftDays: 21, leftCarriedDays: 0 });
+    expect(myLeave.sumPoolUsage).toHaveBeenCalledWith(expect.anything(), [2], 2026);
   });
 
   it('GET /employees as employee → 403', async () => {
@@ -376,6 +388,35 @@ describe('employees routes', () => {
       action: 'update', entityType: 'leave_pools', entityId: 2,
       changes: { closed_year: { before: null, after: thisYear }, annual_days: { before: 26, after: 24 }, carried_days: { before: 4, after: 30 } },
     }));
+  });
+
+  it('GET /employees/close-year: pending requests of the closed year are counted', async () => {
+    vi.mocked(q.findOpenPoolsForYear).mockResolvedValue([yearPool({})] as never);
+    vi.mocked(myLeave.countPendingRequests).mockResolvedValue(2);
+    const res = await as(anna).get('/employees/close-year');
+    expect(res.body.pendingRequests).toBe(2);
+    expect(myLeave.countPendingRequests).toHaveBeenCalledWith(expect.anything(), 2026);
+  });
+
+  it('POST /employees/close-year with a pending request → 409 pending_requests, nothing saved', async () => {
+    vi.mocked(q.minOpenYear).mockResolvedValue(thisYear);
+    vi.mocked(q.findOpenPoolsForYear).mockResolvedValue([yearPool({ year: thisYear })] as never);
+    vi.mocked(myLeave.countPendingRequests).mockResolvedValue(1);
+    const res = await as(anna).post('/employees/close-year', { year: thisYear, pools: [] });
+    expect(res.status).toBe(409);
+    expect(res.body.error.message).toBe('employees.server.pending_requests');
+    expect(myLeave.countPendingRequests).toHaveBeenCalledWith(conn, thisYear);
+    expect(q.closePool).not.toHaveBeenCalled();
+    expect(q.upsertPool).not.toHaveBeenCalled();
+  });
+
+  it('POST /employees/close-year carries days left after approved requests (pending would be blocked)', async () => {
+    vi.mocked(q.minOpenYear).mockResolvedValue(thisYear);
+    vi.mocked(q.findOpenPoolsForYear).mockResolvedValue([yearPool({ year: thisYear })] as never);
+    vi.mocked(myLeave.sumPoolUsage).mockResolvedValue(new Map([[2, { usedCarried: 4, usedAnnual: 5, pendingCarried: 0, pendingAnnual: 0 }]]));
+    await as(anna).post('/employees/close-year', { year: thisYear, pools: [] });
+    expect(myLeave.sumPoolUsage).toHaveBeenCalledWith(conn, [2], thisYear);
+    expect(q.upsertPool).toHaveBeenCalledWith(conn, 2, thisYear + 1, 26, 21);
   });
 
   it('POST /employees/close-year twice for the same year → 409 year_not_open', async () => {
