@@ -6,7 +6,6 @@ import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { InfoCard } from '../../common/InfoCard';
-import { Question, Questions } from '../../common/Question';
 import { PrintPreview, RequestModal, WithdrawModal } from './MyLeaveModals';
 import { FORM_EXAMPLES, LEAVE_TYPES, MY_REQUESTS, POOL, REQUEST_YEARS, type LeaveStatus, type MockRequest } from './data';
 
@@ -248,103 +247,6 @@ export const MyLeaveMockup = () => {
 
   return (
     <Stack>
-      <Questions>
-        <Question
-          number={1}
-          about="Okno „Złóż wniosek”"
-          options={[
-            { id: 'a', text: 'Wniosek mieści się w jednym roku i liczy się z puli tego roku. Na daty z przyszłego roku można złożyć wniosek dopiero, gdy administrator zrobi „Zamknij rok” (wtedy znana jest pula). Urlop na przełomie lat = dwa wnioski.' },
-            { id: 'b', text: 'Wniosek na daty z przyszłego roku można złożyć od razu; dni liczą się z obecnej puli' },
-          ]}
-          recommended="a"
-        >
-          Co z urlopem na przyszły rok (np. 11–15.01.2027 składany w listopadzie)? Stan makiety „Wniosek na przyszły rok”.
-        </Question>
-        <Question
-          number={2}
-          about="Okno „Złóż wniosek”"
-          options={[
-            { id: 'a', text: 'Nie da się złożyć wniosku na więcej dni, niż zostało; dni z wniosków czekających na decyzję też się liczą (są zarezerwowane)' },
-            { id: 'b', text: 'Liczą się tylko wnioski zatwierdzone; czekające nie blokują kolejnych' },
-            { id: 'c', text: 'Można złożyć, aplikacja tylko ostrzega, a decyduje administrator' },
-          ]}
-          recommended="a"
-        >
-          Blokada przy braku dni: jak ją liczyć? Stan „Za mało dni”.
-        </Question>
-        <Question
-          number={3}
-          about="Okno „Złóż wniosek”, pole „Od”"
-          options={[
-            { id: 'a', text: 'Najwcześniej od dziś' },
-            { id: 'b', text: 'Także do 14 dni wstecz (np. urlop na żądanie zgłoszony po fakcie)' },
-          ]}
-          recommended="a"
-        >
-          Czy pracownik może złożyć wniosek na dni, które już minęły?
-        </Question>
-        <Question
-          number={4}
-          about="Okno „Złóż wniosek”"
-          options={[
-            { id: 'a', text: 'Nie: termin nie może zachodzić na inny wniosek czekający albo zatwierdzony' },
-            { id: 'b', text: 'Tak, decyduje administrator' },
-          ]}
-          recommended="a"
-        >
-          Czy dwa wnioski mogą mieć wspólne dni? Stan „Termin zajęty”.
-        </Question>
-        <Question
-          number={5}
-          about="Tabela „Moje wnioski”"
-          options={[
-            { id: 'a', text: 'Wniosku się nie poprawia: czekający można wycofać i złożyć nowy' },
-            { id: 'b', text: 'Wniosek czekający na decyzję można też poprawić (przycisk „Edytuj”)' },
-          ]}
-          recommended="a"
-        >
-          Pomyłka w terminie: jak ją naprawić?
-        </Question>
-        <Question
-          number={6}
-          about="Wydruk / PDF"
-          options={[
-            { id: 'a', text: 'Treść jak w podglądzie (stan „Wydruk”), z miejscami na dwa podpisy; przycisk otwiera PDF w nowej karcie, tam drukujesz albo zapisujesz plik' },
-            { id: 'b', text: 'Bez miejsc na podpisy (sama informacja o zatwierdzeniu w aplikacji)' },
-          ]}
-          recommended="a"
-        >
-          Co ma być na wydruku zatwierdzonego wniosku? Napisz też, jeśli czegoś brakuje (np. nazwa firmy, stanowisko).
-        </Question>
-        <Question
-          number={7}
-          about="Tabela „Moje wnioski”"
-          options={[
-            { id: 'a', text: 'Wybór roku nad tabelą (domyślnie bieżący); czekające na górze, potem od najnowszego' },
-            { id: 'b', text: 'Wszystkie lata naraz, z filtrem statusu' },
-          ]}
-          recommended="a"
-        >
-          Jak przeglądać starsze wnioski?
-        </Question>
-        <Question number={8} about="Okno „Złóż wniosek”: zasady pól">
-          Typ urlopu: wymagany, tylko widoczne typy. Od: wymagana data, najwcześniej dziś (pytanie 3). Do: wymagana,
-          nie wcześniej niż „Od”, ten sam rok (pytanie 1). Termin musi mieć co najmniej 1 dzień roboczy. Komentarz:
-          nieobowiązkowy, do 500 znaków (zobaczy go administrator i będzie na wydruku). Odpowiedz „ok” albo popraw pole.
-        </Question>
-        <Question
-          number={9}
-          about="Powiązania z innymi modułami"
-          options={[
-            { id: 'a', text: 'Nowy wniosek: powiadomienie w dzwonku i e-mail do administratorów. Wycofanie: samo powiadomienie. Dni czekające widać u administratora w „Pracownikach” (pasek puli, żółta ramka w „Zamknij rok”)' },
-            { id: 'b', text: 'Jak a, ale przy wycofaniu też e-mail' },
-          ]}
-          recommended="a"
-        >
-          Co widzą inni, gdy złożysz albo wycofasz wniosek?
-        </Question>
-      </Questions>
-
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">
           <Text size="sm" fw={600}>{t('mockup_state')}</Text>

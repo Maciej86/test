@@ -16,7 +16,7 @@ jasne, weekendy i święta przekreślone (np. Wigilia 24.12). Wniosek się nie u
   **(polecam)**
 - b) Wniosek na daty z przyszłego roku można złożyć od razu; dni liczą się z obecnej puli
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 1a.
 
 ## 2. Blokada przy braku dni
 
@@ -25,28 +25,28 @@ jasne, weekendy i święta przekreślone (np. Wigilia 24.12). Wniosek się nie u
 - b) Liczą się tylko wnioski zatwierdzone; czekające nie blokują kolejnych
 - c) Można złożyć, aplikacja tylko ostrzega, a decyduje administrator
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 2a.
 
 ## 3. Wniosek na dni, które minęły
 
 - a) Najwcześniej od dziś **(polecam)**
 - b) Także do 14 dni wstecz (np. urlop na żądanie zgłoszony po fakcie)
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 3a.
 
 ## 4. Wnioski ze wspólnymi dniami
 
 - a) Nie: termin nie może zachodzić na inny wniosek czekający albo zatwierdzony **(polecam)**
 - b) Tak, decyduje administrator
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 4a.
 
 ## 5. Pomyłka w terminie
 
 - a) Wniosku się nie poprawia: czekający można wycofać i złożyć nowy **(polecam)**
 - b) Wniosek czekający na decyzję można też poprawić (przycisk „Edytuj”)
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 5a.
 
 ## 6. Wydruk / PDF zatwierdzonego wniosku
 
@@ -57,14 +57,14 @@ jasne, weekendy i święta przekreślone (np. Wigilia 24.12). Wniosek się nie u
 
 Czegoś brakuje (np. nazwa firmy, stanowisko)? Dopisz.
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 6a (nic nie brakuje).
 
 ## 7. Starsze wnioski
 
 - a) Wybór roku nad tabelą (domyślnie bieżący); czekające na górze, potem od najnowszego terminu **(polecam)**
 - b) Wszystkie lata naraz, z filtrem statusu
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 7a.
 
 ## 8. Zasady pól (okno „Złóż wniosek”)
 
@@ -78,7 +78,7 @@ Czegoś brakuje (np. nazwa firmy, stanowisko)? Dopisz.
 
 Odpowiedz „ok” albo popraw pole.
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** ok.
 
 ## 9. Powiązania z innymi modułami
 
@@ -86,4 +86,4 @@ Odpowiedz „ok” albo popraw pole.
   widać u administratora w „Pracownikach” (pasek puli, żółta ramka w „Zamknij rok”) **(polecam)**
 - b) Jak a, ale przy wycofaniu też e-mail
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 9a.
