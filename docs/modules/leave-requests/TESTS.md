@@ -4,7 +4,7 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180.
 
 **Dane do sprawdzenia** (dodałem je przy sprawdzaniu w przeglądarce): pracownik **Kasia Przeglądarka** z dwoma wnioskami
 na 1 dzień: 24.11.2026 (już zatwierdzony) i 01.12.2026 (czeka na decyzję). Zalogujesz się na nią loginem
-`e2e.tmp.browser1794954752059@test.local` i hasłem testowym `Test-haslo-123!`. To konto testowe: zniknie przy
+`e2e.tmp.browser1794954977069@test.local` i hasłem testowym `Test-haslo-123!`. To konto testowe: zniknie przy
 następnym uruchomieniu testów w przeglądarce (`npm run test:e2e`).
 
 ## Jako administrator (Twoje konto)
