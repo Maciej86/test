@@ -230,6 +230,7 @@ export const ApproveModal = ({ request: r, onClose }: { request: MockRequest; on
       title={t('approve_title')}
       confirmLabel={t('approve')}
       confirmAction="confirm"
+      confirmColor="green"
       cancelLabel={t('back')}
       onConfirm={() => { notify.success(t('approved_done', { name: r.employee })); onClose(); }}
       onClose={onClose}

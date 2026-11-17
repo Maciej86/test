@@ -46,7 +46,7 @@ ze specu: ta sama tabela).
   Testy zmian w zrobionych modułach (Moje urlopy, Powiadomienia, trasy, `ConfirmModal`) od razu prawdziwe w swoich
   krokach (test zasad nie pozwala na `it.todo` w zrobionym module) → `npm run check`.
 
-- [ ] 1. **Wspólne klocki frontu:**
+- [x] 1. **Wspólne klocki frontu:**
   - `frontend/src/common/LeaveRequestParts.tsx`: `LEAVE_STATUS_COLOR: Record<LeaveRequestStatus, string>` (z
     `DESIGN.md`: yellow, green, red, gray, red), `LeaveStatusBadge({ status })` (`Badge variant="light"`,
     `miw="max-content"`, tekst `my-leave:status.<status>`), `LeaveDates({ from, to })` (jeden dzień bez „–”),

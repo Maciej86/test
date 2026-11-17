@@ -3,7 +3,7 @@ import { Alert, Text } from '@mantine/core';
 import { AlertTriangle, CalendarRange, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { LeaveRequestCheck } from '@app/shared';
-import { Dates } from './RequestsTable';
+import { LeaveDates } from '../../../common/LeaveRequestParts';
 
 /** Wynik sprawdzenia w oknie: brak terminu, „Do” przed „Od” (błąd przy polu) albo wynik `checkLeaveRequest`. */
 export type RequestCheckState = { kind: 'empty' } | { kind: 'order' } | LeaveRequestCheck;
@@ -54,7 +54,7 @@ export const RequestCheck = ({ check, poolYear, typeName }: { check: RequestChec
       return (
         <Blocked title={t('check_overlap_title')}>
           {t('check_overlap', { type: check.other.leaveTypeName, status: t(`status.${check.other.status}`) })}{' '}
-          <Dates from={check.other.dateFrom} to={check.other.dateTo} />.
+          <LeaveDates from={check.other.dateFrom} to={check.other.dateTo} />.
         </Blocked>
       );
     case 'no_working_days':

@@ -5,7 +5,7 @@ import { ConfirmModal } from '../../../common/ConfirmModal';
 import { apiErrorMessage } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
 import { useWithdrawRequest } from '../my-leave.api';
-import { Dates } from './RequestsTable';
+import { LeaveDates } from '../../../common/LeaveRequestParts';
 
 /** „Wycofać wniosek?”: termin i liczba dni; zdanie o puli tylko przy typie, który odejmuje dni. Błąd zostawia okno. */
 export const WithdrawModal = ({ request, onClose }: { request: MyLeaveRequest; onClose: () => void }) => {
@@ -35,7 +35,7 @@ export const WithdrawModal = ({ request, onClose }: { request: MyLeaveRequest; o
       onClose={onClose}
     >
       <Text>
-        {request.leaveTypeName}, <Dates from={request.dateFrom} to={request.dateTo} /> ({t('days', { count: request.workingDays })}).
+        {request.leaveTypeName}, <LeaveDates from={request.dateFrom} to={request.dateTo} /> ({t('days', { count: request.workingDays })}).
       </Text>
       <Text size="sm" c="dimmed">{reserved > 0 ? t('withdraw_text', { count: reserved }) : t('withdraw_text_no_pool')}</Text>
     </ConfirmModal>

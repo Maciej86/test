@@ -43,6 +43,11 @@ describe('ConfirmModal', () => {
     expect(screen.getByRole('button', { name: 'Ukryj' }).getAttribute('style') ?? '').toContain('red');
   });
 
+  it('confirmColor colours the confirm button (e.g. green for approval)', () => {
+    setup({ confirmColor: 'green' });
+    expect(screen.getByRole('button', { name: 'Ukryj' }).getAttribute('style') ?? '').toContain('green');
+  });
+
   it('loading blocks the confirm button', () => {
     setup({ loading: true });
     expect(screen.getByRole('button', { name: 'Ukryj' })).toHaveAttribute('data-loading', 'true');
