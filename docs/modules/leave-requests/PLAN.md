@@ -135,10 +135,11 @@ ze specu: ta sama tabela).
   400 bez powodu, PDF `application/pdf` + `inline`. Wiersz w „Mapie dostępu” `SPEC-GENERAL.md` → `npm run check`.
   _Uwaga:_ nagłówki PDF wydzielone do `backend/src/pdf/sendInlinePdf.ts` (używają obie trasy PDF); PDF administratora w `getLeaveRequestPdf` usługi.
 
-- [ ] 10. **Hooki** `frontend/src/modules/leave-requests/leave-requests.api.ts`: `useLeaveRequests(query)`,
+- [x] 10. **Hooki** `frontend/src/modules/leave-requests/leave-requests.api.ts`: `useLeaveRequests(query)`,
   `useLeaveRequest(id | null)`, `useApproveRequest()`, `useRejectRequest()`, `useCancelRequest()` (po sukcesie
   i po 409 odświeżają listę, szczegóły i licznik powiadomień), `leaveRequestPdfUrl(id)`. Testy (wzór
   `my-leave.api.test.tsx`): adresy, odświeżenie po sukcesie i po 409 → `npm run check`.
+  _Uwaga:_ po decyzji odświeżam też Pracowników (pula osoby), a nie licznik powiadomień: decyzja nie zmienia powiadomień administratora.
 
 - [ ] 11. **Ekran listy** `LeaveRequestsPage.tsx` (+ `components/LeaveRequestsTable.tsx`, `…Cards.tsx`,
   `…Filters.tsx`), wpis w `core/routes/pages.ts`: nagłówek z podsumowaniem, zakładki (telefon: `Select`), filtry
