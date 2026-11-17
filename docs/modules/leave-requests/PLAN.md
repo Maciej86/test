@@ -157,12 +157,13 @@ ze specu: ta sama tabela).
   statusu, zły numer w adresie → lista i dymek → `npm run check`.
   _Uwaga:_ dane szczegółów pobiera strona (`useLeaveRequest`) i przekazuje do okna, żeby 404 i zły numer w adresie obsłużyć w jednym miejscu (dymek i powrót na listę).
 
-- [ ] 13. **Okna** `components/DecisionModals.tsx`: `ApproveModal` (`ConfirmModal` z `confirmColor="green"`, zdanie
+- [x] 13. **Okna** `components/DecisionModals.tsx`: `ApproveModal` (`ConfirmModal` z `confirmColor="green"`, zdanie
   „W tym czasie urlop ma też: …” z zatwierdzonych `others`, żółta ramka przy minionym terminie), `RejectModal`
   i `CancelModal` (pole powodu z `leaveDecisionReasonSchema`, błąd pod polem, `fieldError` dla 400 z serwera, żółta
   ramka przy zaczętym urlopie, zdanie o puli). Po sukcesie: dymek, zamknięcie okna i szczegółów; 409
   `already_decided`: dymek („rozpatrzył już …” albo „Pracownik wycofał ten wniosek.”), zamknięcie, odświeżenie;
   inny błąd: dymek, okno otwarte. Testy dla każdego z tych przypadków → `npm run check`.
+  _Uwaga:_ okno zatwierdzenia samo pobiera szczegóły wniosku (`useLeaveRequest`), żeby z listy też pokazać „W tym czasie urlop ma też…”; pole powodu ma stałe 3 wiersze (`autosize` nie działa w testach).
 
 - [ ] 14. **Makieta i dane testowe:** w makiecie przycisk w oknie zatwierdzenia zielony (krok 1). `seedE2e.ts`: dla
   e2e potrzebny wniosek czekający konta e2e pracownika (przez API w teście, jak w `my-leave.spec.ts`); usunięcie

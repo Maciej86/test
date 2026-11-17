@@ -76,6 +76,19 @@ describe('LeaveRequestsPage', () => {
     expect(within(rejected).getByRole('button', { name: 'Szczegóły' })).toBeInTheDocument();
   });
 
+  it('row buttons open the decision windows', async () => {
+    show(list([requestItem(), requestItem({ id: 22, employeeName: 'Magdalena Lewandowska', status: 'approved', canCancel: true })], { pendingCount: 1 }), '/admin/leave-requests?status=all');
+    const table = await screen.findByRole('table');
+    fireEvent.click(within(within(table).getByText('Jan Kowalski').closest('tr')!).getByRole('button', { name: 'Zatwierdź' }));
+    expect(await screen.findByText('Zatwierdzić wniosek?')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Wróć' }));
+    fireEvent.click(within(within(table).getByText('Jan Kowalski').closest('tr')!).getByRole('button', { name: 'Odrzuć' }));
+    expect(await screen.findByText('Odrzucenie wniosku')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Wróć' }));
+    fireEvent.click(within(within(table).getByText('Magdalena Lewandowska').closest('tr')!).getByRole('button', { name: 'Anuluj urlop' }));
+    expect(await screen.findByText('Anulowanie urlopu')).toBeInTheDocument();
+  });
+
   it('empty pending tab and no results show their messages', async () => {
     show(list([], { pendingCount: 0 }));
     expect(await screen.findByText('Wszystko rozpatrzone')).toBeInTheDocument();

@@ -13,14 +13,22 @@ import { notify } from '../../core/notify';
 import { useListParams } from '../../core/useListParams';
 import { LeaveRequestsFilters } from './components/LeaveRequestsFilters';
 import { LeaveRequestCards, LeaveRequestsTable, type RowActions } from './components/LeaveRequestsTable';
+import { ApproveModal, CancelModal, RejectModal } from './components/DecisionModals';
 import { DetailsDrawer } from './components/DetailsDrawer';
 import { useLeaveRequest, useLeaveRequests } from './leave-requests.api';
 
 const LIST_PATH = '/admin/leave-requests';
 const LIST_DEFAULTS = { page: 1, search: '', sort: 'default', dir: 'asc', status: 'pending' } as const;
 
-/** Otwarte okno decyzji (kroki 12–13: szczegóły i okna). */
+/** Otwarte okno decyzji. */
 export type DecisionDialog = { kind: 'approve' | 'reject' | 'cancel'; request: LeaveRequestListItem };
+
+const WINDOWS = { approve: ApproveModal, reject: RejectModal, cancel: CancelModal };
+
+const DecisionWindow = ({ dialog, onClose, onDone }: { dialog: DecisionDialog; onClose: () => void; onDone: () => void }) => {
+  const Window = WINDOWS[dialog.kind];
+  return <Window request={dialog.request} onClose={onClose} onDone={onDone} />;
+};
 
 /**
  * „Wnioski urlopowe” (administrator): lista z zakładkami i filtrami w adresie. Adres `/admin/leave-requests/:id`
@@ -32,7 +40,7 @@ export const LeaveRequestsPage = () => {
   const location = useLocation();
   const [params, setParams] = useListParams(leaveRequestsListQuerySchema, LIST_DEFAULTS);
   const requests = useLeaveRequests(params);
-  const [, setDialog] = useState<DecisionDialog | null>(null);
+  const [dialog, setDialog] = useState<DecisionDialog | null>(null);
   // Numer wniosku z adresu: tylko same cyfry (jak idParam na serwerze); inny tekst = brak wniosku.
   const { id: rawId } = useParams();
   const id = rawId !== undefined && /^[1-9]\d{0,9}$/.test(rawId) ? Number(rawId) : null;
@@ -93,6 +101,10 @@ export const LeaveRequestsPage = () => {
         onReject={actions.onReject}
         onCancel={actions.onCancel}
       />
+      {dialog && (
+        // Po decyzji zamykają się też szczegóły (gdy były otwarte), lista zostaje z tymi samymi filtrami.
+        <DecisionWindow key={`${dialog.kind}-${dialog.request.id}`} dialog={dialog} onClose={() => setDialog(null)} onDone={() => rawId !== undefined && backToList()} />
+      )}
     </Stack>
   );
 };
