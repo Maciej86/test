@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moje urlopy: spec (`/stepkit:dalej`).
+**Następny krok:** Moje urlopy, część 1/2: plan (`/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -26,7 +26,7 @@
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
-| 8 | Moje urlopy | my-leave | w toku | spec | employees, leave-types, email, notifications |
+| 8 | Moje urlopy | my-leave | w toku | plan, część 1/2 | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
@@ -37,6 +37,8 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-17: Moje urlopy: spec zaakceptowany (`SPEC.md` ogólny, `SPEC-1.md` część 1).
+- 2026-11-17: Moje urlopy: moduł w dwóch częściach (1: wnioski i pula, 2: wydruk PDF); „Zamknij rok” zablokowany, dopóki są wnioski czekające z zamykanego roku (odpowiedź a).
 - 2026-11-17: Moje urlopy: odpowiedzi 1a–9a, zasady pól ok (wniosek w jednym roku, przyszły rok po „Zamknij rok”; czekające rezerwują dni; od dziś; bez nakładania się; bez edycji, tylko wycofanie; PDF z podpisami; wybór roku; e-mail tylko przy nowym wniosku).
 - 2026-11-17: Moje urlopy: makieta (pula roku otwartego z paskiem i limitami typów, tabela wniosków z wyborem roku, okno wniosku z paskiem dni i liczeniem na bieżąco, stany: za mało dni, limit typu, termin zajęty, przyszły rok, wycofanie, podgląd PDF); 9 pytań.
 - 2026-11-16: Porządki „wspólne zamiast kopii”: `ConfirmModal`, `PageHeader`, `EmptyState`, `ListPagination` (`frontend/src/common/`) i `useListParams` (`frontend/src/core/`) w Pracownikach, Typach urlopów, Typach umów i Powiadomieniach; okno potwierdzenia przy błędzie zostaje otwarte.

@@ -238,3 +238,9 @@ Moduł Typy umów (`docs/modules/contract-types/SPEC.md`) zastąpił stałą lis
 
 Lista korzysta ze wspólnych klocków: `PageHeader` (nagłówek), `useListParams` (`frontend/src/core/`, parametry w adresie), `ListPagination` (stronicowanie), `EmptyState` (pusty stan) i `ConfirmModal` (okno „Do archiwum”).
 „Nikt nie pasuje do …” ma teraz wygląd pustego stanu: ikona lupy, zdanie i przycisk „Wyczyść wyszukiwanie” pod nim, na środku.
+
+## Zmiany po zamknięciu modułu
+
+- 2026-11-17 (moduł Moje urlopy, odpowiedź a): „Zamknij rok” jest zablokowany, dopóki są wnioski czekające z zamykanego
+  roku (żółta ramka „Najpierw rozpatrz…”, wyłączony przycisk, 409 `employees.pending_requests`). Zastępuje to dawną
+  zapowiedź, że wniosek zatwierdzony po zamknięciu zejdzie z puli następnego roku. Budowa: `my-leave/SPEC-1.md`.
