@@ -36,7 +36,7 @@ const PoolBox = ({ r, pool }: { r: LeaveRequestDetails; pool: NonNullable<LeaveR
           <Progress.Section value={pct(pool.pending)} color="yellow.6" />
           <Progress.Section value={pct(pool.left)} color="navy.6" />
         </Progress.Root>
-        <Text size="xs" c="dimmed">{t('pool_line', { used: pool.used, pending: pool.pending, carried: pool.carriedDays })}</Text>
+        <Text size="xs" c="dimmed">{t(r.status === 'approved' ? 'pool_line_approved' : 'pool_line', { used: pool.used, pending: pool.pending, carried: pool.carriedDays })}</Text>
         {r.status === 'pending' && <Text size="sm">{r.deductsPool ? t('pool_after_approve', { count: pool.left }) : t('pool_no_deduct')}</Text>}
       </Stack>
     </Paper>

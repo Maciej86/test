@@ -69,6 +69,14 @@ describe('my leave queries', () => {
     expect(calls[0]![1]).toEqual(['withdrawn', 21, 7, 'pending']);
   });
 
+  it('sumPoolUsage with lock reads the latest state (FOR SHARE), e.g. in „Zamknij rok” after a decision', async () => {
+    const { db, calls } = spyDb([]);
+    await q.sumPoolUsage(db, [7], 2026, { lock: true });
+    expect(calls[0]![0]).toMatch(/FOR SHARE$/);
+    await q.sumPoolUsage(db, [7], 2026);
+    expect(calls[1]![0]).not.toMatch(/FOR SHARE/);
+  });
+
   it('sumPoolUsage: approved and pending days per user from saved columns; no users → no query', async () => {
     const { db, calls, query } = spyDb([{ user_id: 7, used_carried: '4', used_annual: '5', pending_carried: '0', pending_annual: '2' }]);
     expect(await q.sumPoolUsage(db, [7, 8], 2026)).toEqual(

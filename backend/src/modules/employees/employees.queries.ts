@@ -1,6 +1,7 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { EmployeeSort, Role } from '@app/shared';
 import { pool } from '../../db/pool';
+import { likePattern } from '../../db/like';
 
 /** Pula połączeń albo połączenie transakcji: oba mają `query`. */
 export type Db = Pick<typeof pool, 'query'>;
@@ -56,8 +57,6 @@ const ORDER_BY: Record<EmployeeSort, Record<'asc' | 'desc', string>> = {
     desc: "u.role = 'admin', p.annual_days + p.carried_days DESC, u.last_name ASC, u.first_name ASC",
   },
 };
-
-const likePattern = (search: string) => `%${search.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
 
 /** Konta spoza archiwum z pulą na podany rok (strona listy). */
 export const listEmployees = async (
@@ -198,12 +197,12 @@ export interface YearPoolRow extends PoolRow {
   archived_at: Date | null;
 }
 
-/** Wszystkie otwarte pule danego roku (także osób w archiwum), z imieniem i rolą. */
+/** Wszystkie otwarte pule danego roku (także osób w archiwum), z imieniem i rolą; blokada samych pul (nie kont). */
 export const findOpenPoolsForYear = async (db: Db, year: number): Promise<YearPoolRow[]> => {
   const [rows] = await db.query<YearPoolRow[]>(
     `SELECT p.id, p.user_id, p.year, p.annual_days, p.carried_days, p.closed_at, u.name, u.role, u.archived_at
      FROM leave_pools p JOIN users u ON u.id = p.user_id
-     WHERE p.year = ? AND p.closed_at IS NULL ORDER BY u.last_name, u.first_name FOR UPDATE`,
+     WHERE p.year = ? AND p.closed_at IS NULL ORDER BY u.last_name, u.first_name FOR UPDATE OF p`,
     [year],
   );
   return rows;

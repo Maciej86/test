@@ -148,7 +148,7 @@ export const CancelModal = ({ request: r, ...props }: ModalProps) => {
   const days = reserved(r);
   const confirm = () => {
     const text = reason.check();
-    if (text !== null) cancel.mutate({ id: r.id, reason: text }, { onSuccess: outcome.onSuccess(t('cancelled_done', { name: r.employeeName })), onError: outcome.onError });
+    if (text !== null) cancel.mutate({ id: r.id, reason: text }, { onSuccess: outcome.onSuccess(t(days > 0 ? 'cancelled_done' : 'cancelled_done_no_pool', { name: r.employeeName })), onError: outcome.onError });
   };
   return (
     <ConfirmModal title={t('cancel_title')} confirmLabel={t('cancel_leave')} confirmAction="cancel" cancelLabel={t('back')} danger loading={cancel.isPending} onConfirm={confirm} onClose={props.onClose}>

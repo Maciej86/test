@@ -89,6 +89,12 @@ describe('LeaveRequestsPage', () => {
     expect(await screen.findByText('Anulowanie urlopu')).toBeInTheDocument();
   });
 
+  it('an empty page after the last request on it was decided goes back to page 1, not to "Wszystko rozpatrzone"', async () => {
+    const { router } = show(list([], { total: 25, pendingCount: 25 }), '/admin/leave-requests?page=2');
+    await waitFor(() => expect(router.state.location.search).toBe(''));
+    expect(screen.queryByText('Wszystko rozpatrzone')).toBeNull();
+  });
+
   it('empty pending tab and no results show their messages', async () => {
     show(list([], { pendingCount: 0 }));
     expect(await screen.findByText('Wszystko rozpatrzone')).toBeInTheDocument();

@@ -138,7 +138,11 @@ export interface PoolUsage {
 }
 
 /** Zatwierdzone i czekające dni z puli osób w roku puli, z zapisanego podziału (zaległe / pula roczna). */
-export const sumPoolUsage = async (db: Db, userIds: number[], year: number): Promise<Map<number, PoolUsage>> => {
+/**
+ * `lock`: odczyt z blokadą (FOR SHARE) widzi najnowszy stan, a nie migawkę z początku transakcji; „Zamknij rok” liczy
+ * tak dni do przeniesienia po decyzji, którą inny administrator zapisał w tej samej chwili.
+ */
+export const sumPoolUsage = async (db: Db, userIds: number[], year: number, opts: { lock?: boolean } = {}): Promise<Map<number, PoolUsage>> => {
   const usage = new Map<number, PoolUsage>(userIds.map((id) => [id, { usedCarried: 0, usedAnnual: 0, pendingCarried: 0, pendingAnnual: 0 }]));
   if (userIds.length === 0) return usage;
   const [rows] = await db.query<RowDataPacket[]>(
@@ -147,7 +151,7 @@ export const sumPoolUsage = async (db: Db, userIds: number[], year: number): Pro
        SUM(CASE WHEN status = ? THEN days_from_annual ELSE 0 END) AS used_annual,
        SUM(CASE WHEN status = ? THEN days_from_carried ELSE 0 END) AS pending_carried,
        SUM(CASE WHEN status = ? THEN days_from_annual ELSE 0 END) AS pending_annual
-     FROM leave_requests WHERE user_id IN (?) AND pool_year = ? AND status IN (?) GROUP BY user_id`,
+     FROM leave_requests WHERE user_id IN (?) AND pool_year = ? AND status IN (?) GROUP BY user_id${opts.lock ? ' FOR SHARE' : ''}`, // rule-ok: dopisana tylko stała blokada, dane idą przez ?
     [APPROVED, APPROVED, PENDING, PENDING, userIds, year, ACTIVE],
   );
   for (const r of rows) {

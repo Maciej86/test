@@ -34,4 +34,20 @@ describe('SearchField', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Wyczyść' }));
     expect(screen.getByRole('textbox', { name: 'Szukaj' })).toHaveValue('');
   });
+
+  it('a trailing space survives the pause (the address keeps the trimmed text): "Jan " then "K" gives "Jan K"', () => {
+    vi.useFakeTimers();
+    const Host = () => {
+      const [value, setValue] = useState('');
+      // Jak adres listy: schemat przycina spacje na brzegach.
+      return <SearchField label="Szukaj" value={value} onChange={(s) => setValue(s.trim())} />;
+    };
+    renderWithProviders(<Host />);
+    const input = screen.getByRole('textbox', { name: 'Szukaj' });
+    fireEvent.change(input, { target: { value: 'Jan ' } });
+    act(() => vi.advanceTimersByTime(300));
+    expect(input).toHaveValue('Jan ');
+    fireEvent.change(input, { target: { value: 'Jan K' } });
+    expect(input).toHaveValue('Jan K');
+  });
 });

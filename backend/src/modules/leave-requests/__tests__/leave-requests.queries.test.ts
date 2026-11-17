@@ -46,6 +46,12 @@ describe('leave requests queries', () => {
     expect(all.calls[0]![1]).toEqual([2026, 25, 0]);
   });
 
+  it('listRequests: % and _ in the search are searched literally, not as wildcards', async () => {
+    const { db, calls } = spyDb([], [{ total: 0 }]);
+    await q.listRequests(db, filters({ search: '_%' }));
+    expect(calls[0]![1]).toContain('%\\_\\%%');
+  });
+
   it('listRequests orders pending by created_at ASC and others by date_from DESC; page 2 uses OFFSET', async () => {
     const pending = spyDb([], [{ total: 0 }]);
     await q.listRequests(pending.db, filters());
@@ -83,7 +89,8 @@ describe('leave requests queries', () => {
   it('findRequest locks the row FOR UPDATE only with lock', async () => {
     const locked = spyDb([]);
     expect(await q.findRequest(locked.db, 21, { lock: true })).toBeNull();
-    expect(locked.calls[0]![0]).toMatch(/FOR UPDATE$/);
+    // Tylko wiersz wniosku: blokada konta pracownika i typu urlopu czekałaby na „Zamknij rok” (zakleszczenie).
+    expect(locked.calls[0]![0]).toMatch(/FOR UPDATE OF r$/);
     expect(locked.calls[0]![1]).toEqual([21]);
     const plain = spyDb([]);
     await q.findRequest(plain.db, 21);

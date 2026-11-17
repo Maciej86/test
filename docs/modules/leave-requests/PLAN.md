@@ -177,5 +177,6 @@ ze specu: ta sama tabela).
   polem; pracownik na `/admin/leave-requests` → brak dostępu. `npm run test:e2e` zielone.
   _Uwaga:_ pomocniki dat i `employee()` (pracownik z pulą przez API) przeniesione z `my-leave.spec.ts` do `e2e/helpers.ts`; pusty powód pokazuje „To pole jest wymagane.” (jak każde puste pole obowiązkowe); długi test Typów umów dostał limit 60 s, bo przy wszystkich testach naraz nie mieścił się w 30 s. 31 testów e2e zielonych.
 
-- [ ] 16. **Przegląd kodu** całego modułu (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami,
+- [x] 16. **Przegląd kodu** całego modułu (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testami,
   bez `it.todo` w folderach modułu → `npm run check`, `npm run test:e2e`.
+  _Uwaga:_ przegląd (osobny recenzent): poprawione z testami: spacja na końcu w wyszukiwarce (też Pracownicy), blokady przy decyzji i „Zamknij rok” (`FOR UPDATE OF r`, `FOR UPDATE OF p`, świeży odczyt dni z `FOR SHARE`), wspólne `likePattern` w `backend/src/db/like.ts` (`%` i `_` dosłownie), powrót na stronę 1 z pustej strony, trzy teksty (anulowanie typu bez odejmowania, „do wykorzystania: N”, pula zatwierdzonego). Na etap testy: próby nadużyć (`describe('abuse')`) i dwóch administratorów naraz na prawdziwej bazie. Odłożone drobne: dwie osoby o tym samym imieniu i nazwisku łączą się w jeden wiersz paska.

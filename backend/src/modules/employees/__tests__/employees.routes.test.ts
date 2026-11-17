@@ -82,7 +82,7 @@ describe('employees routes', () => {
     vi.mocked(myLeave.sumPoolUsage).mockResolvedValue(new Map([[2, { usedCarried: 4, usedAnnual: 5, pendingCarried: 0, pendingAnnual: 7 }]]));
     const res = await as(anna).get('/employees');
     expect(res.body.items[0].pool).toEqual({ year: 2026, annualDays: 26, carriedDays: 4, usedDays: 9, pendingDays: 7, leftDays: 21, leftCarriedDays: 0 });
-    expect(myLeave.sumPoolUsage).toHaveBeenCalledWith(expect.anything(), [2], 2026);
+    expect(myLeave.sumPoolUsage).toHaveBeenCalledWith(expect.anything(), [2], 2026, {});
   });
 
   it('GET /employees as employee → 403', async () => {
@@ -384,6 +384,8 @@ describe('employees routes', () => {
     expect(q.upsertPool).toHaveBeenCalledWith(conn, 2, thisYear + 1, 24, 30);
     expect(q.upsertPool).toHaveBeenCalledWith(conn, 9, thisYear + 1, 20, 20);
     expect(withTransaction).toHaveBeenCalledTimes(1);
+    // Wykorzystane dni czytane z blokadą: decyzja innego administratora w tej samej chwili jest już widoczna.
+    expect(myLeave.sumPoolUsage).toHaveBeenCalledWith(conn, expect.any(Array), thisYear, { lock: true });
     expect(historyOf()).toContainEqual(expect.objectContaining({
       action: 'update', entityType: 'leave_pools', entityId: 2,
       changes: { closed_year: { before: null, after: thisYear }, annual_days: { before: 26, after: 24 }, carried_days: { before: 4, after: 30 } },
@@ -415,7 +417,7 @@ describe('employees routes', () => {
     vi.mocked(q.findOpenPoolsForYear).mockResolvedValue([yearPool({ year: thisYear })] as never);
     vi.mocked(myLeave.sumPoolUsage).mockResolvedValue(new Map([[2, { usedCarried: 4, usedAnnual: 5, pendingCarried: 0, pendingAnnual: 0 }]]));
     await as(anna).post('/employees/close-year', { year: thisYear, pools: [] });
-    expect(myLeave.sumPoolUsage).toHaveBeenCalledWith(conn, [2], thisYear);
+    expect(myLeave.sumPoolUsage).toHaveBeenCalledWith(conn, [2], thisYear, { lock: true });
     expect(q.upsertPool).toHaveBeenCalledWith(conn, 2, thisYear + 1, 26, 21);
   });
 

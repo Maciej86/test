@@ -50,7 +50,7 @@ describe('employees service', () => {
       [2, { usedDays: 9, pendingDays: 2, usedCarried: 4 }],
       [3, { usedDays: 0, pendingDays: 0, usedCarried: 0 }],
     ]);
-    expect(myLeave.sumPoolUsage).toHaveBeenCalledWith(pool, [2, 3], 2026);
+    expect(myLeave.sumPoolUsage).toHaveBeenCalledWith(pool, [2, 3], 2026, {});
   });
 
   it('listActiveUsers passes on the query that skips archived accounts', async () => {

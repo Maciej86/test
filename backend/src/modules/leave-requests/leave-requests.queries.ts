@@ -1,6 +1,7 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { LeaveRequestFilter, LeaveRequestStatus } from '@app/shared';
 import { PAGE_SIZE } from '../../config/constants';
+import { likePattern } from '../../db/like';
 import type { pool } from '../../db/pool';
 import type { Actor } from '../../middleware/routeHelpers';
 import type { PoolRow } from '../employees/employees.queries';
@@ -111,7 +112,7 @@ export const listRequests = async (db: Db, f: ListFilters): Promise<{ rows: Requ
   }
   if (f.search !== '') {
     where.push('u.name LIKE ?');
-    params.push(`%${f.search}%`);
+    params.push(likePattern(f.search));
   }
   const whereSql = where.length > 0 ? `WHERE ${where.join(' AND ')}` : '';
   const order = f.status === 'pending' ? 'r.created_at ASC, r.id ASC' : 'r.date_from DESC, r.id DESC';
@@ -136,10 +137,13 @@ export const listRequestYears = async (db: Db): Promise<number[]> => {
   return rows.map((r) => Number(r.pool_year));
 };
 
-/** Jeden wniosek; `lock`: blokada wiersza do końca transakcji (decyzje dwóch administratorów po kolei). */
+/**
+ * Jeden wniosek; `lock`: blokada samego wiersza wniosku do końca transakcji (decyzje dwóch administratorów po kolei).
+ * `OF r`: bez blokady konta pracownika i typu urlopu, na które czeka „Zamknij rok” (inaczej zakleszczenie).
+ */
 export const findRequest = async (db: Db, id: number, opts: { lock?: boolean } = {}): Promise<RequestItem | null> => {
   const [rows] = await db.query<RequestRow[]>(
-    `${SELECT_REQUEST} ${FROM} WHERE r.id = ?${opts.lock ? ' FOR UPDATE' : ''}`, // rule-ok: stałe z tego pliku, numer przez ?
+    `${SELECT_REQUEST} ${FROM} WHERE r.id = ?${opts.lock ? ' FOR UPDATE OF r' : ''}`, // rule-ok: stałe z tego pliku, numer przez ?
     [id],
   );
   return rows[0] ? toItem(rows[0]) : null;

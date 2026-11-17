@@ -54,6 +54,11 @@ export const LeaveRequestsPage = () => {
   }, [missing, navigate, location.search, t]);
   const data = requests.data;
   const filtered = params.status !== 'pending' || params.search !== '' || params.leaveTypeId !== undefined;
+  // Ostatni wniosek ze strony 2+ rozpatrzony: pusta strona to nie „Wszystko rozpatrzone”, tylko powrót na stronę 1.
+  const emptyLaterPage = data !== undefined && data.items.length === 0 && params.page > 1;
+  useEffect(() => {
+    if (emptyLaterPage) setParams({ page: 1 });
+  }, [emptyLaterPage, setParams]);
 
   const actions: RowActions = {
     onDetails: (r) => navigate(`${LIST_PATH}/${r.id}${location.search}`),
@@ -74,7 +79,7 @@ export const LeaveRequestsPage = () => {
       <LeaveRequestsFilters value={params} data={data} onChange={setParams} />
 
       <DataState query={requests}>
-        {data && data.items.length === 0 ? (
+        {emptyLaterPage ? null : data && data.items.length === 0 ? (
           <Paper withBorder>
             {filtered ? (
               <EmptyState icon={Search} text={t('no_results')} />

@@ -26,7 +26,8 @@ export const SearchField = ({ label, value, onChange, w = { base: '100%', sm: 34
     onChange(s);
   }, SEARCH_DELAY_MS);
   useEffect(() => {
-    if (value === sent.current) return;
+    // Adres przechowuje tekst bez spacji na brzegach: „Jan ” wysłane z pola wraca jako „Jan” i to nie jest zmiana z zewnątrz.
+    if (value === sent.current.trim()) return;
     send.cancel();
     sent.current = value;
     setText(value);

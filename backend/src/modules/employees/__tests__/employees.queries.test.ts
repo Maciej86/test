@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn() } }));
-const { insertUser, listEmployees, setTemporaryPassword, updateUser } = await import('../employees.queries');
+const { findOpenPoolsForYear, insertUser, listEmployees, setTemporaryPassword, updateUser } = await import('../employees.queries');
 
 const fakeDb = (rows: unknown[][]) => {
   const query = vi.fn();
@@ -64,5 +64,11 @@ describe('employees queries', () => {
     const db = fakeDb([[], [{ total: 0 }]]);
     await listEmployees(db, { search: '50%_', sort: 'name', dir: 'asc', page: 1, pageSize: 25, year: 2026 });
     expect(db.query.mock.calls[0]![1]).toContain('%50\\%\\_%');
+  });
+
+  it('findOpenPoolsForYear locks only the pools (FOR UPDATE OF p), not the accounts', async () => {
+    const db = { query: vi.fn().mockResolvedValue([[]]) };
+    await findOpenPoolsForYear(db, 2026);
+    expect(db.query.mock.calls[0]![0]).toMatch(/FOR UPDATE OF p$/);
   });
 });

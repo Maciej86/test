@@ -68,6 +68,7 @@ describe('DetailsDrawer', () => {
     expect(within(d).getByRole('button', { name: 'Anuluj urlop' })).toBeInTheDocument();
     expect(within(d).getByRole('link', { name: 'PDF' })).toHaveAttribute('href', expect.stringMatching(/\/leave-requests\/22\/pdf$/));
     expect(within(d).getByText('Zatwierdził(a)')).toBeInTheDocument();
+    expect(within(d).getByText(/^Wykorzystane: 9 \(razem z tym wnioskiem\), czeka na decyzję: 2/)).toBeInTheDocument();
   });
 
   it('decided request: no strip, no pool, no decision buttons, reason shown', async () => {

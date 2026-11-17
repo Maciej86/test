@@ -39,8 +39,8 @@ export interface PoolUsageDays {
 const NO_USAGE: PoolUsageDays = { usedDays: 0, pendingDays: 0, usedCarried: 0 };
 
 /** Wykorzystane (zatwierdzone) i czekające dni z puli, z wniosków modułu Moje urlopy (zapisany podział). */
-export const getPoolUsage = async (userIds: number[], year: number, db: q.Db = pool): Promise<Map<number, PoolUsageDays>> => {
-  const usage = await sumPoolUsage(db, userIds, year);
+export const getPoolUsage = async (userIds: number[], year: number, db: q.Db = pool, opts: { lock?: boolean } = {}): Promise<Map<number, PoolUsageDays>> => {
+  const usage = await sumPoolUsage(db, userIds, year, opts);
   return new Map(
     userIds.map((id) => {
       const u = usage.get(id);
@@ -269,8 +269,8 @@ export const restoreEmployee = async (id: number, actor: Actor): Promise<Result>
   });
 };
 
-const leftDaysByUser = async (pools: q.YearPoolRow[], year: number, db: q.Db = pool): Promise<Map<number, number>> => {
-  const usage = await getPoolUsage(pools.map((p) => p.user_id), year, db);
+const leftDaysByUser = async (pools: q.YearPoolRow[], year: number, db: q.Db = pool, opts: { lock?: boolean } = {}): Promise<Map<number, number>> => {
+  const usage = await getPoolUsage(pools.map((p) => p.user_id), year, db, opts);
   return new Map(pools.map((p) => [p.user_id, toPool(year, p.annual_days, p.carried_days, usage.get(p.user_id) ?? NO_USAGE).leftDays]));
 };
 
@@ -300,7 +300,8 @@ export const closeYear = async (input: CloseYearInput, actor: Actor): Promise<Re
     const pools = await q.findOpenPoolsForYear(conn, year);
     // Dni z czekających wniosków przeszłyby na następny rok podwójnie: najpierw decyzje (pule są już zablokowane).
     if ((await countPendingRequests(conn, year)) > 0) return fail(409, EMPLOYEE_MESSAGES.pendingRequests);
-    const left = await leftDaysByUser(pools, year, conn);
+    // Z blokadą: decyzja innego administratora z tej samej chwili (anulowanie, zatwierdzenie) jest już policzona.
+    const left = await leftDaysByUser(pools, year, conn, { lock: true });
     const typed = new Map(input.pools.map((p) => [p.userId, p.annualDays]));
     for (const p of pools) {
       const annual = typed.get(p.user_id) ?? p.annual_days;

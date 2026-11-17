@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moduł Wnioski urlopowe: implementacja, krok 16 z `PLAN.md` (`/stepkit:dalej`).
+**Następny krok:** Moduł Wnioski urlopowe: testy (próby nadużyć, sprawdzenie w przeglądarce, `TESTS.md`).
 
 ## Start aplikacji
 
@@ -27,7 +27,7 @@
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
-| 9 | Wnioski urlopowe | leave-requests | w toku | implementacja (krok 16/17) | my-leave |
+| 9 | Wnioski urlopowe | leave-requests | w toku | testy | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-17: Wnioski urlopowe: zbudowane (kroki 0–16: lista z zakładkami i filtrami, szczegóły pod `/admin/leave-requests/:id` z paskiem „Kto jeszcze ma wtedy wolne”, zatwierdzenie w oknie, odrzucenie i anulowanie z powodem, PDF, powiadomienia), przegląd kodu z poprawkami, `npm run check` i 31 testów e2e zielone. Wspólne: `LeaveRequestParts`, `SearchField`, `sendInlinePdf`, `leaveRequestPdfData`, `likePattern`, adresy podstron (`detailPath`).
 - 2026-11-17: Wnioski urlopowe: spec zaakceptowany (zatwierdzenie z oknem, powód odrzucenia i anulowania obowiązkowy, `reject_reason` → `decision_reason`, adres szczegółów `/admin/leave-requests/:id`, bez podziału na części).
 - 2026-11-17: Wnioski urlopowe: odpowiedzi 2a–8a, zasady pól ok (pasek z zatwierdzonymi i czekającymi, powód odrzucenia i anulowania obowiązkowy 3–500 znaków, anulowanie każdego urlopu z niezamkniętego roku, miniony termin można rozpatrzyć, na start „Czekają”, link z e-maila otwiera szczegóły).
 - 2026-11-17: Wnioski urlopowe: odpowiedź 1b, zatwierdzenie z oknem potwierdzenia „Zatwierdzić wniosek?”.

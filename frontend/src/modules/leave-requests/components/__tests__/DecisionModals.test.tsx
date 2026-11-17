@@ -64,11 +64,21 @@ describe('decision modals', () => {
     const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { ok: true } });
     const { onDone } = show((p) => <CancelModal request={requestItem({ status: 'approved', dateFrom: '2020-01-10', dateTo: '2020-01-13', poolLeft: { left: 19, total: 30 } })} {...p} />);
     expect(screen.getByText(/Ten urlop już się zaczął albo minął/)).toBeInTheDocument();
-    expect(screen.getByText('2 dni wrócą do puli. Jan Kowalski będzie mieć wtedy 21 dni do wykorzystania.')).toBeInTheDocument();
+    expect(screen.getByText('2 dni wrócą do puli. Jan Kowalski będzie mieć wtedy do wykorzystania: 21.')).toBeInTheDocument();
     fireEvent.change(reasonField(), { target: { value: 'Pracował w tym czasie.' } });
     fireEvent.click(screen.getByRole('button', { name: 'Anuluj urlop' }));
     await waitFor(() => expect(post).toHaveBeenCalledWith('/leave-requests/21/cancel', { reason: 'Pracował w tym czasie.' }));
     await waitFor(() => expect(onDone).toHaveBeenCalled());
+  });
+
+  it('cancel of a type that does not deduct: no sentence about days returning, also in the notice', async () => {
+    vi.spyOn(api, 'post').mockResolvedValue({ data: { ok: true } });
+    const success = vi.spyOn(notify, 'success');
+    show((p) => <CancelModal request={requestItem({ status: 'approved', deductsPool: false, daysFromAnnual: 0 })} {...p} />);
+    expect(screen.getByText('Ten typ urlopu nie odejmuje dni z puli, więc pula się nie zmieni.')).toBeInTheDocument();
+    fireEvent.change(reasonField(), { target: { value: 'Ślub przełożony.' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Anuluj urlop' }));
+    await waitFor(() => expect(success).toHaveBeenCalledWith('Urlop anulowany. Jan Kowalski dostaje powiadomienie z powodem.'));
   });
 
   it('409 already_decided: notice with who decided, window closes, details stay', async () => {
