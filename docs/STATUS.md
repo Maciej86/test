@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moje urlopy, część 2/2 (wydruk PDF): użytkownik przechodzi `docs/modules/my-leave/TESTS-2.md` i potwierdza „działa”; potem zamknięcie modułu.
+**Następny krok:** Moduł Wnioski urlopowe: makieta (`/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -26,7 +26,7 @@
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
-| 8 | Moje urlopy | my-leave | w toku | testy, część 2/2 | employees, leave-types, email, notifications |
+| 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
@@ -37,50 +37,15 @@
 
 ## Ostatnie decyzje
 
-- 2026-11-17: Moje urlopy, część 2: zbudowane (kroki 0–7: `pdfmake`, wspólne `backend/src/pdf/` z `renderPdf` i `buildLeaveRequestPdf`, trasa `GET /api/my-leave/requests/:id/pdf`, przycisk „PDF”, `npm run my-leave:approve-test`), przegląd kodu z poprawkami, 9 prób nadużyć odpartych, sprawdzenie w przeglądarce, `npm run check` i 30 testów e2e zielone; czeka na sprawdzenie przez użytkownika.
-
+- 2026-11-17: Moduł Moje urlopy zrobiony (część 2 potwierdzona przez użytkownika: „działa”): pula i limity, składanie i wycofywanie wniosków z blokadami, powiadomienia i e-mail, PDF zatwierdzonego wniosku w nowej karcie (wspólne `backend/src/pdf/` dla modułu 9), `npm run my-leave:approve-test`.
+- 2026-11-17: Moje urlopy, część 2: zbudowane (kroki 0–7: `pdfmake`, wspólne `backend/src/pdf/` z `renderPdf` i `buildLeaveRequestPdf`, trasa `GET /api/my-leave/requests/:id/pdf`, przycisk „PDF”, `npm run my-leave:approve-test`), przegląd kodu z poprawkami, 9 prób nadużyć odpartych, sprawdzenie w przeglądarce, `npm run check` i 30 testów e2e zielone.
 - 2026-11-17: Moje urlopy: plan części 2 zaakceptowany (8 kroków, od szkieletu testów do przeglądu kodu).
-
 - 2026-11-17: Moje urlopy: spec części 2 zaakceptowany (`SPEC-2.md`: przycisk „PDF” przy zatwierdzonym wniosku otwiera PDF w nowej karcie, dokument we wspólnym `backend/src/pdf/` dla modułu 9, polecenie `npm run my-leave:approve-test` do sprawdzenia przed modułem 9).
-
 - 2026-11-17: Moje urlopy, część 1 (wnioski i pula) gotowa, potwierdzona przez użytkownika („działa”).
-- 2026-11-17: Moje urlopy, część 1: próby nadużyć (11, wszystkie odparte) jako testy, sprawdzenie w przeglądarce obu ról; czeka na sprawdzenie przez użytkownika.
+- 2026-11-17: Moje urlopy, część 1: próby nadużyć (11, wszystkie odparte) jako testy, sprawdzenie w przeglądarce obu ról.
 - 2026-11-17: Moje urlopy, część 1: zbudowane (kroki 0–14, przegląd kodu z poprawkami: blokada przy liczeniu czekających wniosków w „Zamknij rok”, odświeżenie po odmowie serwera), `npm run check` i 27 testów e2e zielone.
 - 2026-11-17: Moje urlopy: plan części 1 zaakceptowany (15 kroków, od szkieletu testów do przeglądu kodu).
 - 2026-11-17: Moje urlopy: spec zaakceptowany (`SPEC.md` ogólny, `SPEC-1.md` część 1).
 - 2026-11-17: Moje urlopy: moduł w dwóch częściach (1: wnioski i pula, 2: wydruk PDF); „Zamknij rok” zablokowany, dopóki są wnioski czekające z zamykanego roku (odpowiedź a).
 - 2026-11-17: Moje urlopy: odpowiedzi 1a–9a, zasady pól ok (wniosek w jednym roku, przyszły rok po „Zamknij rok”; czekające rezerwują dni; od dziś; bez nakładania się; bez edycji, tylko wycofanie; PDF z podpisami; wybór roku; e-mail tylko przy nowym wniosku).
 - 2026-11-17: Moje urlopy: makieta (pula roku otwartego z paskiem i limitami typów, tabela wniosków z wyborem roku, okno wniosku z paskiem dni i liczeniem na bieżąco, stany: za mało dni, limit typu, termin zajęty, przyszły rok, wycofanie, podgląd PDF); 9 pytań.
-- 2026-11-16: Porządki „wspólne zamiast kopii”: `ConfirmModal`, `PageHeader`, `EmptyState`, `ListPagination` (`frontend/src/common/`) i `useListParams` (`frontend/src/core/`) w Pracownikach, Typach urlopów, Typach umów i Powiadomieniach; okno potwierdzenia przy błędzie zostaje otwarte.
-- 2026-11-16: Aktualizacja stepkit 0.1.34 → 0.1.36: wspólne pole daty i grupy w menu bez własnej strony były już w projekcie; nowa zasada „Wspólne zamiast kopii” (przed planem sprawdzam, czy coś podobnego już jest, i przenoszę do wspólnego miejsca).
-- 2026-11-16: Moduł Typy umów zrobiony (potwierdzony przez użytkownika): słownik typów umów w „Ustawieniach” (kolejność strzałkami, dodawanie, zmiana nazwy, ukrywanie i przywracanie, 4 typy na start), pole „Rodzaj umowy” u pracownika z typów (`users.contract_type_id`), pracownik zachowuje ukryty typ.
-
-- 2026-11-16: Typy umów: zbudowane (kroki 0–9, przegląd kodu z poprawkami), `npm run check` i wszystkie testy e2e zielone; umowy pracowników przepisane na typy ze słownika (1 z 12 kont miało umowę, po zmianie tak samo).
-
-- 2026-11-16: Typy umów: plan zaakceptowany (10 kroków, od szkieletu testów do przeglądu kodu).
-
-- 2026-11-16: Typy umów: spec zaakceptowany (słownik z kolejnością i ukrywaniem, `users.contract_type_id` zamiast stałej listy, pracownik zachowuje ukryty typ).
-
-- 2026-11-16: Typy umów: odpowiedzi 1a–4a, zasady pól ok (pracownik zachowuje ukryty typ, kolejność strzałkami, kolumna „Pracownicy”, tylko nazwa).
-
-- 2026-11-16: Typy umów: makieta listy (kolejność strzałkami, „Pokaż ukryte”, kolumna „Pracownicy”), okna dodaj/edytuj (ostrzeżenie przy typie, który mają pracownicy) i ukryj, podgląd pola „Rodzaj umowy” w oknie pracownika; 5 pytań. Ikona menu: `file-signature`.
-
-- 2026-11-16: Nowy moduł 7 „Typy umów” (contract-types) przed „Moimi urlopami”: administrator prowadzi listę typów umów w menu „Ustawienia”; obecne 4 rodzaje umowy staną się typami na start.
-
-- 2026-11-16: Poprawka w Pracownikach (prośba użytkownika): nieobowiązkowe „Data zatrudnienia” i „Rodzaj umowy” (umowa o pracę, zlecenie, o dzieło, B2B) w oknach dodaj/edytuj i jako kolumny listy; wspólne pole daty `DateField`.
-
-- 2026-11-16: Aktualizacja stepkit 0.1.33 → 0.1.34: pomysły, zmiany i błędy zgłaszane poleceniem `/stepkit:zglos` (linia w README).
-
-- 2026-11-16: Aktualizacja stepkit 0.1.29 → 0.1.33: baza w strefie UTC (`--default-time-zone=+00:00`), wspólne `formatRelativeDateTime`/`formatRelativeDay` w `shared/src/date.ts` zamiast własnych w Powiadomieniach, README: nowa rozmowa przez `/clear`. Powrót po zalogowaniu, `timezone: 'Z'` i podświetlenie menu projekt już miał.
-
-- 2026-11-16: Moduł Powiadomienia zrobiony (potwierdzony przez użytkownika): dzwonek w belce (okienko na komputerze, panel na cały ekran na telefonie), strona `/admin/notifications`, `notifyUsers`/`notifyAdmins` dla urlopów i zadań, `npm run notifications:test`; poprawka: godziny z bazy czytane w UTC (`timezone: 'Z'`).
-
-- 2026-11-16: Powiadomienia: spec zaakceptowany (dzwonek, strona „wszystkie”, `notifyUsers`/`notifyAdmins` dla kolejnych modułów, `npm run notifications:test`).
-
-- 2026-11-16: Powiadomienia: odpowiedzi 1a–6a (strona „wszystkie”, przeczytane po kliknięciu, odświeżanie co minutę, przeczytane usuwane po 90 dniach, każdy administrator osobno, teksty ok).
-
-- 2026-11-16: Powiadomienia: makieta dzwonka w belce (licznik nieprzeczytanych, 8 ostatnich, „Oznacz wszystkie jako przeczytane”) i strony „wszystkie” (grupy po dniach, filtr „Nieprzeczytane”); 6 pytań.
-
-- 2026-11-16: Moduł E-mail zrobiony (potwierdzony przez użytkownika): e-mail „Nowy wniosek urlopowy” do administratorów z e-mailem (`emailAdminsAboutNewRequest`, woła go „Moje urlopy” bez czekania), skrzynka testowa Mailpit (port 8026), `npm run email:test`, po zalogowaniu powrót na otwierany adres w panelu (`?next=`, `safeNextPath`).
-
-- 2026-11-16: Skrzynka testowa Mailpit na porcie 8026 (`MAILPIT_PORT` w `.env`), bo 8025 zajmuje inny projekt.
