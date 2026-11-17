@@ -14,3 +14,13 @@ describe('translateKey', () => {
     );
   });
 });
+
+describe('leave decision notifications', () => {
+  const i18n = createI18n();
+
+  it('cancelled leave shows the reason (and no "days returned", which is wrong for types that do not deduct)', () => {
+    expect(
+      i18n.t('notifications:types.leave_cancelled.detail', { leaveType: 'Okolicznościowy', dateFrom: '14.05.2026', dateTo: '15.05.2026', reason: 'Ślub przełożony.' }),
+    ).toBe('Okolicznościowy, 14.05.2026 – 15.05.2026. Powód: Ślub przełożony.');
+  });
+});

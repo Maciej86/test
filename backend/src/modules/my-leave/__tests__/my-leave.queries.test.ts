@@ -13,7 +13,7 @@ const spyDb = (result: unknown = []) => {
 };
 const requestRow = (o: Record<string, unknown> = {}) => ({
   id: 21, leave_type_name: 'Wypoczynkowy', deducts_pool: 1, date_from: '2026-11-26', date_to: '2026-11-27', working_days: 2,
-  days_from_carried: 0, days_from_annual: 2, pool_year: 2026, comment: null, status: 'pending', reject_reason: null,
+  days_from_carried: 0, days_from_annual: 2, pool_year: 2026, comment: null, status: 'pending', decision_reason: null,
   decided_by_name: null, decided_at: null, created_at: new Date('2026-11-16T08:12:00Z'), ...o,
 });
 
@@ -41,7 +41,7 @@ describe('my leave queries', () => {
     expect(calls[0]![1]).toEqual([7, 2026, 'pending']);
     expect(items[0]).toEqual({
       id: 21, leaveTypeName: 'Wypoczynkowy', deductsPool: false, dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2,
-      daysFromCarried: 0, daysFromAnnual: 2, poolYear: 2026, comment: 'Ślub siostry.', status: 'pending', rejectReason: null,
+      daysFromCarried: 0, daysFromAnnual: 2, poolYear: 2026, comment: 'Ślub siostry.', status: 'pending', decisionReason: null,
       decidedByName: null, decidedAt: null, createdAt: '2026-11-16T08:12:00.000Z',
     });
   });

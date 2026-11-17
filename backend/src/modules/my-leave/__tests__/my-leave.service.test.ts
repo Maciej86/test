@@ -184,7 +184,7 @@ describe('my leave service: create', () => {
     expect(notifyAdmins).toHaveBeenCalledWith(conn, {
       type: 'leave_request_new',
       params: { employee: 'Jan Kowalski', leaveType: 'Wypoczynkowy', dateFrom: '2026-12-21', dateTo: '2026-12-31', days: 7 },
-      link: '/admin/leave-requests',
+      link: '/admin/leave-requests/33',
       actor: jan,
     });
     expect(emailAdminsAboutNewRequest).toHaveBeenCalledWith({
@@ -244,7 +244,7 @@ describe('my leave service: withdraw', () => {
     expect(notifyAdmins).toHaveBeenCalledWith(conn, {
       type: 'leave_request_withdrawn',
       params: { employee: 'Jan Kowalski', leaveType: 'Wypoczynkowy', dateFrom: '2026-11-26', dateTo: '2026-11-27' },
-      link: '/admin/leave-requests',
+      link: '/admin/leave-requests/21',
       actor: jan,
     });
   });

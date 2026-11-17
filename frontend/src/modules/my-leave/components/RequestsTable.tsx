@@ -16,7 +16,7 @@ const StatusCell = ({ r }: { r: MyLeaveRequest }) => {
           {r.decidedByName}, <DateText value={r.decidedAt} />
         </Text>
       )}
-      {r.rejectReason && <Text size="xs" maw={280}>{t('quoted', { text: r.rejectReason })}</Text>}
+      {r.decisionReason && <Text size="xs" maw={280}>{t('quoted', { text: r.decisionReason })}</Text>}
     </Stack>
   );
 };
@@ -98,7 +98,7 @@ export const RequestCards = ({ rows, onWithdraw }: RowActions & { rows: MyLeaveR
               <LeaveStatusBadge status={r.status} />
             </Group>
             {r.comment && <Text size="sm" c="dimmed">{r.comment}</Text>}
-            {r.rejectReason && <Text size="sm">{t('quoted', { text: r.rejectReason })}</Text>}
+            {r.decisionReason && <Text size="sm">{t('quoted', { text: r.decisionReason })}</Text>}
             <Group justify="flex-end"><Actions r={r} onWithdraw={onWithdraw} /></Group>
           </Stack>
         </Card>

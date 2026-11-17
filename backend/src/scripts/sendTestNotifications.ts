@@ -13,7 +13,7 @@ const SAMPLES: { role: 'admin' | 'employee'; type: NotificationType; link: strin
   { role: 'admin', type: 'leave_request_withdrawn', link: '/admin/leave-requests', params: { employee: 'Piotr Zieliński', leaveType: 'Wypoczynkowy', dateFrom: '2026-12-23', dateTo: '2026-12-31' } },
   { role: 'employee', type: 'leave_approved', link: '/admin/my-leave', params: { leaveType: 'Wypoczynkowy', dateFrom: '2027-02-08', dateTo: '2027-02-12' } },
   { role: 'employee', type: 'leave_rejected', link: '/admin/my-leave', params: { leaveType: 'Na żądanie', dateFrom: '2026-12-04', dateTo: '2026-12-04', reason: 'tego dnia audyt klienta, potrzebna cała ekipa' } },
-  { role: 'employee', type: 'leave_cancelled', link: '/admin/my-leave', params: { leaveType: 'Wypoczynkowy', dateFrom: '2026-11-16', dateTo: '2026-11-17' } },
+  { role: 'employee', type: 'leave_cancelled', link: '/admin/my-leave', params: { leaveType: 'Wypoczynkowy', dateFrom: '2026-11-16', dateTo: '2026-11-17', reason: 'Ustaliliśmy przesunięcie urlopu na styczeń.' } },
   { role: 'employee', type: 'task_assigned', link: '/admin/tasks', params: { task: 'Inwentaryzacja magazynu w Poznaniu', dueDate: '2026-11-20' } },
 ];
 

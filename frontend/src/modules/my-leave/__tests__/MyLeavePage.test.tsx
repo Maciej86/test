@@ -19,14 +19,14 @@ const overview: MyLeaveOverview = {
 
 const request = (o: Partial<MyLeaveRequest>): MyLeaveRequest => ({
   id: 21, leaveTypeName: 'Wypoczynkowy', deductsPool: true, dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2,
-  daysFromCarried: 0, daysFromAnnual: 2, poolYear: 2026, comment: 'Wyjazd rodzinny.', status: 'pending', rejectReason: null,
+  daysFromCarried: 0, daysFromAnnual: 2, poolYear: 2026, comment: 'Wyjazd rodzinny.', status: 'pending', decisionReason: null,
   decidedByName: null, decidedAt: null, createdAt: '2026-11-16T08:12:00.000Z', ...o,
 });
 
 const requests = [
   request({}),
   request({ id: 18, leaveTypeName: 'Na żądanie', dateFrom: '2026-10-09', dateTo: '2026-10-09', workingDays: 1, daysFromAnnual: 1, comment: null, status: 'approved', decidedByName: 'Anna Nowak', decidedAt: '2026-10-09T06:05:00.000Z' }),
-  request({ id: 15, dateFrom: '2026-08-03', dateTo: '2026-08-14', workingDays: 10, daysFromAnnual: 10, comment: null, status: 'rejected', decidedByName: 'Anna Nowak', decidedAt: '2026-06-23T08:15:00.000Z', rejectReason: 'Inwentaryzacja.' }),
+  request({ id: 15, dateFrom: '2026-08-03', dateTo: '2026-08-14', workingDays: 10, daysFromAnnual: 10, comment: null, status: 'rejected', decidedByName: 'Anna Nowak', decidedAt: '2026-06-23T08:15:00.000Z', decisionReason: 'Inwentaryzacja.' }),
   request({ id: 12, dateFrom: '2026-07-06', dateTo: '2026-07-13', workingDays: 6, daysFromCarried: 4, daysFromAnnual: 2, comment: null, status: 'approved', decidedByName: 'Anna Nowak', decidedAt: '2026-06-02T07:30:00.000Z' }),
   request({ id: 10, leaveTypeName: 'Okolicznościowy', deductsPool: false, dateFrom: '2026-05-14', dateTo: '2026-05-15', daysFromAnnual: 0, comment: null, status: 'approved' }),
 ];
@@ -130,6 +130,14 @@ describe('MyLeavePage', () => {
     expect(within(rows[3]!).getByText('4 z zaległego, 2 z puli 2026')).toBeInTheDocument();
     expect(within(rows[4]!).getByText('nie odejmuje z puli')).toBeInTheDocument();
     expect(within(await table()).getAllByRole('button', { name: 'Wycofaj' })).toHaveLength(1);
+  });
+
+  it('cancelled request shows who cancelled and the reason (decisionReason)', async () => {
+    mockApi({ items: [request({ id: 4, leaveTypeName: 'Typ D', status: 'cancelled', decidedByName: 'Anna Nowak', decidedAt: '2026-02-10T14:20:00.000Z', decisionReason: 'Przesunięty na marzec.' })] });
+    show();
+    const row = await rowOf('Typ D');
+    expect(within(row).getByText('Anulowany')).toBeInTheDocument();
+    expect(within(row).getByText('„Przesunięty na marzec.”')).toBeInTheDocument();
   });
 
   it('empty year shows empty state with Złóż wniosek', async () => {

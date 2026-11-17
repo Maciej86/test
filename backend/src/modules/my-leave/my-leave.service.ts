@@ -23,8 +23,8 @@ import { findSelectableLeaveType, listSelectableLeaveTypes } from '../leave-type
 import { notifyAdmins } from '../notifications/notifications.service';
 import * as q from './my-leave.queries';
 
-/** Gdzie administrator rozpatruje wnioski (link w powiadomieniu). */
-const LEAVE_REQUESTS_LINK = '/admin/leave-requests';
+/** Szczegóły wniosku u administratora (link w powiadomieniu; ten sam adres co w e-mailu). */
+const requestLink = (id: number) => `/admin/leave-requests/${id}`;
 
 /** Liczby puli roku otwartego: zostało = pula + zaległe − zatwierdzone − czekające (nigdy poniżej 0). */
 const poolNumbers = (row: PoolRow, usage: q.PoolUsage): MyLeaveOverview['pool'] => {
@@ -151,7 +151,7 @@ export const createRequest = async (input: LeaveRequestData, actor: Actor): Prom
     await notifyAdmins(conn, {
       type: 'leave_request_new',
       params: { employee: actor.name, leaveType: type.name, dateFrom: row.dateFrom, dateTo: row.dateTo, days: row.workingDays },
-      link: LEAVE_REQUESTS_LINK,
+      link: requestLink(id),
       actor,
     });
     email = {
@@ -192,7 +192,7 @@ export const withdrawRequest = async (id: number, actor: Actor): Promise<Result>
     await notifyAdmins(conn, {
       type: 'leave_request_withdrawn',
       params: { employee: actor.name, leaveType: request.leave_type_name, dateFrom: request.date_from, dateTo: request.date_to },
-      link: LEAVE_REQUESTS_LINK,
+      link: requestLink(id),
       actor,
     });
     return { ok: true as const };

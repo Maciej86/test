@@ -32,7 +32,7 @@
     },
     "leave_cancelled": {
       "title": "Urlop anulowany",
-      "detail": "{{leaveType}}, {{dateFrom}} – {{dateTo}}. Dni wróciły do puli."
+      "detail": "{{leaveType}}, {{dateFrom}} – {{dateTo}}. Powód: {{reason}}"
     },
     "task_assigned": {
       "title": "Nowe zadanie dla Ciebie",

@@ -21,3 +21,12 @@ describe('migration 017_leave_requests', () => {
     expect(sql.match(/CREATE TABLE/g)).toHaveLength(1);
   });
 });
+
+describe('migration 018_leave_requests_decision_reason', () => {
+  const sql018 = readFileSync(new URL('../../../../migrations/018_leave_requests_decision_reason.sql', import.meta.url), 'utf8');
+
+  it('renames reject_reason to decision_reason (reason of a rejection or a cancellation), one change only', () => {
+    expect(sql018).toMatch(/ALTER TABLE leave_requests RENAME COLUMN reject_reason TO decision_reason;/);
+    expect(sql018.match(/ALTER TABLE/g)).toHaveLength(1);
+  });
+});

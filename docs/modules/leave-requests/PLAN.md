@@ -70,7 +70,7 @@ ze specu: ta sama tabela).
   `/admin/leave-requests/24` → strona wniosków (admin), `NoAccess` (pracownik); pozycja bez `detailPath` nie ma
   trasy `/:id`. Podświetlenie menu na podstronie: istniejący test `NavMenu` → `npm run check`.
 
-- [ ] 4. **Migracja i zmiany w Moich urlopach i Powiadomieniach:**
+- [x] 4. **Migracja i zmiany w Moich urlopach i Powiadomieniach:**
   - `backend/migrations/018_leave_requests_decision_reason.sql`: `ALTER TABLE leave_requests RENAME COLUMN
     reject_reason TO decision_reason;` → `npm run migrate`. Test w `my-leave.migration.test.ts`: plik 018 zmienia
     nazwę kolumny.

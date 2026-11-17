@@ -81,7 +81,7 @@ export interface MyLeaveRequest {
   poolYear: number;
   comment: string | null;
   status: LeaveRequestStatus;
-  rejectReason: string | null;
+  decisionReason: string | null;
   decidedByName: string | null;
   decidedAt: string | null;
   createdAt: string;

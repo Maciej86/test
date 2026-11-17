@@ -32,6 +32,8 @@ describe('sendTestNotifications', () => {
       ['leave_cancelled', [2], '/admin/my-leave'],
       ['task_assigned', [2], '/admin/tasks'],
     ]);
+    const cancelled = vi.mocked(s.notifyUsers).mock.calls.find(([, input]) => input.type === 'leave_cancelled')![1];
+    expect(cancelled.params).toHaveProperty('reason');
     const actor = vi.mocked(s.notifyUsers).mock.calls[0]![1].actor;
     expect(actor).toEqual({ id: 0, name: 'Powiadomienie testowe' });
   });

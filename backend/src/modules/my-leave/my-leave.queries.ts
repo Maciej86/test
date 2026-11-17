@@ -26,14 +26,14 @@ export interface RequestRow extends RowDataPacket {
   pool_year: number;
   comment: string | null;
   status: LeaveRequestStatus;
-  reject_reason: string | null;
+  decision_reason: string | null;
   decided_by_name: string | null;
   decided_at: Date | null;
   created_at: Date;
 }
 
 const REQUEST_COLUMNS = `r.id, r.user_id, r.leave_type_id, lt.name AS leave_type_name, lt.deducts_pool, r.date_from, r.date_to, r.working_days,
-  r.days_from_carried, r.days_from_annual, r.pool_year, r.comment, r.status, r.reject_reason, r.decided_by_name, r.decided_at, r.created_at
+  r.days_from_carried, r.days_from_annual, r.pool_year, r.comment, r.status, r.decision_reason, r.decided_by_name, r.decided_at, r.created_at
   FROM leave_requests r JOIN leave_types lt ON lt.id = r.leave_type_id`;
 
 export const toRequest = (r: RequestRow): MyLeaveRequest => ({
@@ -48,7 +48,7 @@ export const toRequest = (r: RequestRow): MyLeaveRequest => ({
   poolYear: r.pool_year,
   comment: r.comment,
   status: r.status,
-  rejectReason: r.reject_reason,
+  decisionReason: r.decision_reason,
   decidedByName: r.decided_by_name,
   decidedAt: r.decided_at ? r.decided_at.toISOString() : null,
   createdAt: r.created_at.toISOString(),
