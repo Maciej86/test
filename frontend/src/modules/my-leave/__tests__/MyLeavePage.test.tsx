@@ -231,3 +231,43 @@ describe('MyLeavePage', () => {
     expect(screen.getByRole('dialog', { name: 'Wycofać wniosek?' })).toBeInTheDocument();
   });
 });
+
+describe('MyLeavePage pdf button', () => {
+  it('approved request has a PDF link to /api/my-leave/requests/<id>/pdf in a new tab', async () => {
+    mockApi();
+    show();
+    const link = within(await rowOf('Na żądanie')).getByRole('link', { name: 'PDF' });
+    expect(link).toHaveAttribute('href', '/api/my-leave/requests/18/pdf');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
+    expect(within(await rowOf('Okolicznościowy')).getByRole('link', { name: 'PDF' })).toHaveAttribute('href', '/api/my-leave/requests/10/pdf');
+  });
+
+  it('pending has Withdraw without PDF; rejected, withdrawn, cancelled have neither', async () => {
+    mockApi({
+      items: [
+        request({ id: 31, leaveTypeName: 'Typ A' }),
+        request({ id: 32, leaveTypeName: 'Typ B', status: 'rejected' }),
+        request({ id: 33, leaveTypeName: 'Typ C', status: 'withdrawn' }),
+        request({ id: 34, leaveTypeName: 'Typ D', status: 'cancelled' }),
+      ],
+    });
+    show();
+    const pending = await rowOf('Typ A');
+    expect(within(pending).getByRole('button', { name: 'Wycofaj' })).toBeInTheDocument();
+    expect(within(pending).queryByRole('link', { name: 'PDF' })).toBeNull();
+    for (const name of ['Typ B', 'Typ C', 'Typ D']) {
+      const row = await rowOf(name);
+      expect(within(row).queryByRole('link', { name: 'PDF' })).toBeNull();
+      expect(within(row).queryByRole('button', { name: 'Wycofaj' })).toBeNull();
+    }
+  });
+
+  it('phone cards have the same PDF link', async () => {
+    mockApi();
+    show();
+    await table();
+    const links = screen.getAllByRole('link', { name: 'PDF', hidden: true }).map((a) => a.getAttribute('href'));
+    expect(links.filter((h) => h === '/api/my-leave/requests/18/pdf')).toHaveLength(2);
+  });
+});

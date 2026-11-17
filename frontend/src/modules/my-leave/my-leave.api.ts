@@ -39,3 +39,6 @@ export const useCreateRequest = () => {
 export const useWithdrawRequest = () => {
   return useMyLeaveMutation((id: number) => api.post(`/my-leave/requests/${id}/withdraw`));
 };
+
+/** Adres PDF zatwierdzonego wniosku: zwykły odnośnik do nowej karty (ciasteczko logowania dołącza przeglądarka). */
+export const myLeavePdfUrl = (id: number): string => `${api.defaults.baseURL}/my-leave/requests/${id}/pdf`;

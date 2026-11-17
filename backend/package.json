@@ -12,6 +12,7 @@
     "admin": "tsx src/scripts/createAdmin.ts",
     "email:test": "tsx src/scripts/sendTestEmail.ts",
     "notifications:test": "tsx src/scripts/sendTestNotifications.ts",
+    "my-leave:approve-test": "tsx src/scripts/approveTestLeaveRequest.ts",
     "seed:e2e": "tsx src/scripts/seedE2e.ts"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.24.6",
     "nodemailer": "^10.6.0",
+    "pdfmake": "^0.3.14",
     "tsx": "^4.23.15",
     "zod": "^4.6.7"
   }

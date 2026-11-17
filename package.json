@@ -17,6 +17,7 @@
     "admin": "npm run admin -w @app/backend",
     "email:test": "npm run email:test -w @app/backend --",
     "notifications:test": "npm run notifications:test -w @app/backend",
+    "my-leave:approve-test": "npm run my-leave:approve-test -w @app/backend --",
     "check": "npm run typecheck --workspaces --if-present && npm test --workspaces --if-present",
     "test": "npm test --workspaces --if-present",
     "test:e2e": "playwright test -c e2e",

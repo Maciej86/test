@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { expect, test, type Page } from '@playwright/test';
 import { ADMIN, addEmployee, logIn, logInWithOwnPassword, logOut, password } from './helpers';
 
@@ -115,7 +116,7 @@ test('pracownik składa wniosek, widzi blokady i go wycofuje; administrator dost
 
 test.describe('abuse', () => {
   /** Konto pracownika z pulą 20 dni (przez API administratora) i jego własna karta przeglądarki po ustawieniu hasła. */
-  const employeePage = async (admin: Page, browser: import('@playwright/test').Browser, firstName: string) => {
+  const employee = async (admin: Page, browser: import('@playwright/test').Browser, firstName: string) => {
     const login = `e2e.tmp.${Date.now()}${Math.floor(Math.random() * 1000)}@test.local`;
     const temporary = 'Urlop-2026!';
     const created = await admin.request.post('/api/employees', {
@@ -124,9 +125,42 @@ test.describe('abuse', () => {
     expect(created.status()).toBe(201);
     const page = await (await browser.newContext()).newPage();
     await logInWithOwnPassword(page, login, temporary);
-    return page;
+    return { page, login };
   };
+  const employeePage = async (admin: Page, browser: import('@playwright/test').Browser, firstName: string) =>
+    (await employee(admin, browser, firstName)).page;
   const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+  test('PDF: cudzy wniosek, bez logowania, administrator, wniosek nie zatwierdzony, dwa pobrania naraz', async ({ page, browser }) => {
+    test.setTimeout(90_000);
+    test.skip(tuesday.getUTCFullYear() !== todayUtc().getUTCFullYear(), 'koniec roku: brak dni roboczych w roku otwartym');
+    await logIn(page, ADMIN, password());
+    await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+    const { page: anna, login: annaLogin } = await employee(page, browser, 'Anna');
+    const bartek = await employeePage(page, browser, 'Bartek');
+    const types = ((await (await anna.request.get('/api/my-leave/overview')).json()) as { types: { id: number; yearlyLimit: number | null }[] }).types;
+    const vacation = types.find((t) => t.yearlyLimit === null)!;
+    const submit = async (day: Date) =>
+      ((await (await anna.request.post('/api/my-leave/requests', { data: { leaveTypeId: vacation.id, dateFrom: iso(day), dateTo: iso(day) } })).json()) as { id: number }).id;
+    const approvedId = await submit(monday);
+    execFileSync('npm', ['run', 'my-leave:approve-test', '-w', '@app/backend', '--', annaLogin], { stdio: 'pipe' });
+    const pendingId = await submit(tuesday);
+    const pdf = (id: number, p: Page = anna) => p.request.get(`/api/my-leave/requests/${id}/pdf`);
+
+    // Własny zatwierdzony: 200; dwa pobrania naraz: oba 200 (odczyt niczego nie zmienia).
+    expect((await Promise.all([pdf(approvedId), pdf(approvedId)])).map((r) => r.status())).toEqual([200, 200]);
+    // Cudzy: 404 jak nieistniejący, także z podrobionym właścicielem w adresie.
+    expect((await pdf(approvedId, bartek)).status()).toBe(404);
+    expect((await bartek.request.get(`/api/my-leave/requests/${approvedId}/pdf?userId=1`)).status()).toBe(404);
+    // Czekający i wycofany: 409.
+    expect((await pdf(pendingId)).status()).toBe(409);
+    expect((await anna.request.post(`/api/my-leave/requests/${pendingId}/withdraw`)).status()).toBe(200);
+    expect((await pdf(pendingId)).status()).toBe(409);
+    // Administrator: 403. Bez logowania: 401.
+    expect((await pdf(approvedId, page)).status()).toBe(403);
+    const stranger = await (await browser.newContext()).newPage();
+    expect((await pdf(approvedId, stranger)).status()).toBe(401);
+  });
 
   test('limit typu, cudze wnioski, podrobione pola, dwa wycofania naraz, HTML w komentarzu', async ({ page, browser }) => {
     test.setTimeout(90_000);
@@ -191,4 +225,51 @@ test.describe('abuse', () => {
     const past = await anna.request.post('/api/my-leave/requests', { data: { leaveTypeId: vacation.id, dateFrom: iso(new Date(todayUtc().getTime() - 2 * DAY)), dateTo: iso(todayUtc()) } });
     expect([400, 409]).toContain(past.status());
   });
+});
+
+// Scenariusze z docs/modules/my-leave/TESTS-2.md. Zatwierdza polecenie testowe (moduł „Wnioski urlopowe” jeszcze nie
+// istnieje), tylko wniosek tej tymczasowej osoby (login w poleceniu), więc testy uruchomione naraz sobie nie przeszkadzają.
+test('PDF: przycisk tylko przy zatwierdzonym wniosku, PDF otwiera się w nowej karcie, cudzy i administrator bez dostępu', async ({ page, context }) => {
+  test.setTimeout(60_000);
+  test.skip(tuesday.getUTCFullYear() !== todayUtc().getUTCFullYear(), 'koniec roku: brak dni roboczych w roku otwartym');
+
+  await logIn(page, ADMIN, password());
+  await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+  const { login, temporary } = await addEmployee(page, 'Zofia Wydrukowa');
+  await logOut(page);
+
+  await logInWithOwnPassword(page, login, temporary);
+  await page.goto('/admin/my-leave');
+  await page.getByRole('button', { name: 'Złóż wniosek' }).first().click();
+  const dialog = page.getByRole('dialog', { name: 'Złóż wniosek' });
+  await fillDates(page, typed(monday), typed(tuesday));
+  await dialog.getByLabel('Komentarz dla administratora').fill('Zażółć gęślą jaźń.');
+  await dialog.getByRole('button', { name: 'Złóż wniosek' }).click();
+  const row = page.getByRole('row', { name: /Zażółć gęślą jaźń/ });
+  await expect(row).toContainText('Czeka na decyzję');
+  await expect(row.getByRole('link', { name: 'PDF' })).toHaveCount(0);
+
+  execFileSync('npm', ['run', 'my-leave:approve-test', '-w', '@app/backend', '--', login], { stdio: 'pipe' });
+  await page.reload();
+  await expect(row).toContainText('Zatwierdzony');
+  await expect(row.getByRole('button', { name: 'Wycofaj' })).toHaveCount(0);
+  const link = row.getByRole('link', { name: 'PDF' });
+  await expect(link).toHaveAttribute('target', '_blank');
+
+  const [tab] = await Promise.all([context.waitForEvent('page'), link.click()]);
+  const href = (await link.getAttribute('href'))!;
+  const pdf = await page.request.get(href);
+  expect(pdf.status()).toBe(200);
+  expect(pdf.headers()['content-type']).toBe('application/pdf');
+  expect(pdf.headers()['content-disposition']).toMatch(/^inline; filename="wniosek-urlopowy-\d+\.pdf"$/);
+  expect((await pdf.body()).subarray(0, 4).toString('latin1')).toBe('%PDF');
+  await tab.close();
+
+  // Cudzy numer: 404; administrator: 403.
+  const id = Number(href.match(/requests\/(\d+)\/pdf/)![1]);
+  expect((await page.request.get(`/api/my-leave/requests/${id + 100000}/pdf`)).status()).toBe(404);
+  await logOut(page);
+  await logIn(page, ADMIN, password());
+  await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+  expect((await page.request.get(href)).status()).toBe(403);
 });

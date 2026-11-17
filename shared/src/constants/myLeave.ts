@@ -21,6 +21,7 @@ export const MY_LEAVE_MESSAGES = {
   notEnoughDays: 'my-leave.server.not_enough_days',
   limitExceeded: 'my-leave.server.limit_exceeded',
   notPending: 'my-leave.server.not_pending',
+  notApproved: 'my-leave.server.not_approved',
   typeUnavailable: 'my-leave.server.type_unavailable',
   pastDate: 'my-leave.validation.past_date',
   datesOrder: 'my-leave.validation.dates_order',

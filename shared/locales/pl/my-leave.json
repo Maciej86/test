@@ -96,10 +96,14 @@
   "print_employee": "Pracownik",
   "print_decision": "Decyzja",
   "print_approved_by": "Zatwierdził(a) {{name}},",
+  "print_approved": "Zatwierdzony",
   "print_sign_employee": "podpis pracownika",
   "print_sign_manager": "podpis przełożonego",
   "print_mockup_note": "w makiecie przycisk nic nie otwiera",
   "print_open": "Otwórz PDF",
+  "print_file_name": "wniosek-urlopowy-{{id}}.pdf",
+  "approve_test_done": "Zatwierdzony wniosek nr {{id}} ({{employee}}) jako {{admin}}. W „Moich urlopach” tej osoby jest teraz przycisk „PDF”.",
+  "approve_test_none": "Nie ma wniosków czekających na decyzję. Złóż wniosek w „Moich urlopach” i uruchom polecenie jeszcze raz.",
   "close": "Zamknij",
   "mockup_state": "Pokaż stan:",
   "mockup_states": {
@@ -122,7 +126,8 @@
     "overlap": "Ten termin jest już we wniosku. Zmień termin albo wycofaj tamten wniosek.",
     "not_enough_days": "Za mało dni: wniosek ma {{days}}, a możesz wykorzystać jeszcze {{left}}.",
     "limit_exceeded": "Przekroczony limit: {{leaveType}}. Limit to {{limit}} dni, wykorzystano już {{used}}, a wniosek ma {{days}}.",
-    "not_pending": "Tego wniosku nie można już wycofać, bo nie czeka na decyzję. Odśwież stronę."
+    "not_pending": "Tego wniosku nie można już wycofać, bo nie czeka na decyzję. Odśwież stronę.",
+    "not_approved": "Wydrukować można tylko zatwierdzony wniosek."
   },
   "validation": {
     "past_date": "Data „Od” nie może być wcześniejsza niż dziś.",

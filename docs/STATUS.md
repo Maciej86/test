@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moje urlopy, część 2/2 (wydruk PDF): spec (`/stepkit:dalej`).
+**Następny krok:** Moje urlopy, część 2/2 (wydruk PDF): użytkownik przechodzi `docs/modules/my-leave/TESTS-2.md` i potwierdza „działa”; potem zamknięcie modułu.
 
 ## Start aplikacji
 
@@ -26,7 +26,7 @@
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
-| 8 | Moje urlopy | my-leave | w toku | spec, część 2/2 | employees, leave-types, email, notifications |
+| 8 | Moje urlopy | my-leave | w toku | testy, część 2/2 | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
@@ -36,6 +36,12 @@
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
+
+- 2026-11-17: Moje urlopy, część 2: zbudowane (kroki 0–7: `pdfmake`, wspólne `backend/src/pdf/` z `renderPdf` i `buildLeaveRequestPdf`, trasa `GET /api/my-leave/requests/:id/pdf`, przycisk „PDF”, `npm run my-leave:approve-test`), przegląd kodu z poprawkami, 9 prób nadużyć odpartych, sprawdzenie w przeglądarce, `npm run check` i 30 testów e2e zielone; czeka na sprawdzenie przez użytkownika.
+
+- 2026-11-17: Moje urlopy: plan części 2 zaakceptowany (8 kroków, od szkieletu testów do przeglądu kodu).
+
+- 2026-11-17: Moje urlopy: spec części 2 zaakceptowany (`SPEC-2.md`: przycisk „PDF” przy zatwierdzonym wniosku otwiera PDF w nowej karcie, dokument we wspólnym `backend/src/pdf/` dla modułu 9, polecenie `npm run my-leave:approve-test` do sprawdzenia przed modułem 9).
 
 - 2026-11-17: Moje urlopy, część 1 (wnioski i pula) gotowa, potwierdzona przez użytkownika („działa”).
 - 2026-11-17: Moje urlopy, część 1: próby nadużyć (11, wszystkie odparte) jako testy, sprawdzenie w przeglądarce obu ról; czeka na sprawdzenie przez użytkownika.

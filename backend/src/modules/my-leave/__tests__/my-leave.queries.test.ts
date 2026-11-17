@@ -106,3 +106,15 @@ describe('my leave queries', () => {
     expect(calls[0]![1]).toEqual([7]);
   });
 });
+
+describe('my leave pdf query', () => {
+  it('findOwnRequestForPdf filters by request id and user id and joins the employee name', async () => {
+    const { db, calls } = spyDb([requestRow({ status: 'approved', employee_name: 'Jan Kowalski' })]);
+    const row = await q.findOwnRequestForPdf(db, 21, 7);
+    expect(calls[0]![0]).toMatch(/JOIN users u ON u\.id = r\.user_id/);
+    expect(calls[0]![0]).toMatch(/r\.id = \? AND r\.user_id = \?/);
+    expect(calls[0]![1]).toEqual([21, 7]);
+    expect(row?.employee_name).toBe('Jan Kowalski');
+    expect(await q.findOwnRequestForPdf(spyDb([]).db, 21, 7)).toBeNull();
+  });
+});

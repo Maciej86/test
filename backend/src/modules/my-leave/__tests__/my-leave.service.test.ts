@@ -12,6 +12,7 @@ vi.mock('../my-leave.queries', () => ({
   sumPoolUsage: vi.fn(),
   insertRequest: vi.fn(),
   findOwnRequest: vi.fn(),
+  findOwnRequestForPdf: vi.fn(),
   setWithdrawn: vi.fn(),
   toRequest: vi.fn(),
 }));
@@ -245,5 +246,33 @@ describe('my leave service: withdraw', () => {
       link: '/admin/leave-requests',
       actor: jan,
     });
+  });
+});
+
+describe('getRequestPdf', () => {
+  const approved = {
+    id: 21, user_id: 7, leave_type_name: 'Wypoczynkowy', deducts_pool: 1, date_from: '2026-12-21', date_to: '2026-12-31',
+    working_days: 7, days_from_carried: 2, days_from_annual: 5, pool_year: 2026, comment: null, status: 'approved',
+    decided_by_name: 'Anna Nowak', decided_at: new Date('2026-12-02T09:00:00Z'), created_at: new Date('2026-11-17T09:00:00Z'),
+    employee_name: 'Jan Kowalski',
+  } as never;
+
+  it('own approved request → file name and PDF, looked up with req.user id', async () => {
+    vi.mocked(q.findOwnRequestForPdf).mockResolvedValue(approved);
+    const result = await s.getRequestPdf(21, 7);
+    expect(q.findOwnRequestForPdf).toHaveBeenCalledWith(pool, 21, 7);
+    if ('error' in result) throw new Error('expected a PDF');
+    expect(result.fileName).toBe('wniosek-urlopowy-21.pdf');
+    expect(result.pdf.subarray(0, 4).toString('latin1')).toBe('%PDF');
+  });
+
+  it('someone else or missing → 404', async () => {
+    vi.mocked(q.findOwnRequestForPdf).mockResolvedValue(null);
+    expect(await s.getRequestPdf(21, 7)).toEqual({ error: { status: 404, message: 'server.not_found' } });
+  });
+
+  it.each(['pending', 'rejected', 'withdrawn', 'cancelled'])('%s → 409 not_approved', async (status) => {
+    vi.mocked(q.findOwnRequestForPdf).mockResolvedValue({ ...(approved as object), status } as never);
+    expect(await s.getRequestPdf(21, 7)).toEqual({ error: { status: 409, message: M.notApproved } });
   });
 });

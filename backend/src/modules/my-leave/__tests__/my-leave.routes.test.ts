@@ -9,6 +9,7 @@ vi.mock('../my-leave.service', () => ({
   listMyRequests: vi.fn(),
   createRequest: vi.fn(),
   withdrawRequest: vi.fn(),
+  getRequestPdf: vi.fn(),
 }));
 process.env.JWT_SECRET = 'test-secret-test-secret-test-secret';
 
@@ -116,7 +117,56 @@ describe('my leave routes', () => {
   });
 });
 
+describe('my leave pdf route', () => {
+  const pdf = Buffer.from('%PDF-1.3 test');
+
+  it('GET /my-leave/requests/:id/pdf → 200 %PDF with content type, inline file name and no-store', async () => {
+    vi.mocked(s.getRequestPdf).mockResolvedValue({ fileName: 'wniosek-urlopowy-21.pdf', pdf });
+    const res = await as(jan).get('/my-leave/requests/21/pdf?userId=1').buffer(true);
+    expect(res.status).toBe(200);
+    expect(s.getRequestPdf).toHaveBeenCalledWith(21, 7);
+    expect(res.headers['content-type']).toBe('application/pdf');
+    expect(res.headers['content-disposition']).toBe('inline; filename="wniosek-urlopowy-21.pdf"');
+    expect(res.headers['cache-control']).toBe('no-store');
+    expect(Buffer.from(res.body as Buffer).subarray(0, 4).toString('latin1')).toBe('%PDF');
+  });
+
+  it('pdf without login → 401, as admin → 403', async () => {
+    expect((await as(null).get('/my-leave/requests/21/pdf')).status).toBe(401);
+    expect((await as(anna).get('/my-leave/requests/21/pdf')).status).toBe(403);
+    expect(s.getRequestPdf).not.toHaveBeenCalled();
+  });
+
+  it('pdf of someone else, missing, 1e3, 0x10, 007 → 404', async () => {
+    for (const id of ['1e3', '0x10', '007', 'abc']) {
+      expect((await as(jan).get(`/my-leave/requests/${id}/pdf`)).status).toBe(404);
+    }
+    expect(s.getRequestPdf).not.toHaveBeenCalled();
+    vi.mocked(s.getRequestPdf).mockResolvedValue({ error: { status: 404, message: 'server.not_found' } });
+    const res = await as(jan).get('/my-leave/requests/22/pdf');
+    expect(res.status).toBe(404);
+    expect(res.headers['content-type']).toMatch(/json/);
+  });
+
+  it('pdf of pending, rejected, withdrawn, cancelled → 409 not_approved', async () => {
+    vi.mocked(s.getRequestPdf).mockResolvedValue({ error: { status: 409, message: M.notApproved } });
+    const res = await as(jan).get('/my-leave/requests/21/pdf');
+    expect(res.status).toBe(409);
+    expect(res.body).toEqual({ error: { message: M.notApproved } });
+  });
+});
+
 describe('abuse', () => {
+  it('pdf: forged ids in the address → 404 without touching the service; owner from the query string ignored', async () => {
+    for (const id of ['0', '-1', '1.5', 'abc', '0x10', '007', '1e3', '99999999999', '21;DROP']) {
+      expect((await as(jan).get(`/my-leave/requests/${encodeURIComponent(id)}/pdf`)).status).toBe(404);
+    }
+    expect(s.getRequestPdf).not.toHaveBeenCalled();
+    vi.mocked(s.getRequestPdf).mockResolvedValue({ error: { status: 404, message: 'server.not_found' } });
+    await as(jan).get('/my-leave/requests/21/pdf?userId=1&user_id=1');
+    expect(s.getRequestPdf).toHaveBeenCalledWith(21, 7);
+  });
+
   it('forged request ids in the address → 404 without touching the service', async () => {
     for (const id of ['0', '-1', '1.5', 'abc', '0x10', '007', '99999999999']) {
       expect((await as(jan).post(`/my-leave/requests/${id}/withdraw`)).status).toBe(404);

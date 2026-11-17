@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH, type LeaveRequestStatus, type MyLeaveRequest } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DateText } from '../../../common/DateText';
+import { myLeavePdfUrl } from '../my-leave.api';
 
 /** Kolory statusów z księgi wyglądu (DESIGN.md, „Statusy”). */
 export const STATUS_COLOR: Record<LeaveRequestStatus, string> = {
@@ -58,6 +59,13 @@ export interface RowActions {
 
 const Actions = ({ r, onWithdraw }: RowActions & { r: MyLeaveRequest }) => {
   const { t } = useTranslation('my-leave');
+  if (r.status === 'approved') {
+    return (
+      <Button component="a" href={myLeavePdfUrl(r.id)} target="_blank" rel="noopener" size="xs" variant="subtle" leftSection={<ButtonIcon action="print" size={14} />}>
+        {t('print')}
+      </Button>
+    );
+  }
   if (r.status !== 'pending') return null;
   return (
     <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="cancel" size={14} />} onClick={() => onWithdraw(r)}>

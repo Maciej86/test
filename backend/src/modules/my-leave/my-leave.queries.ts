@@ -116,6 +116,19 @@ export const findOwnRequest = async (db: Db, id: number, userId: number): Promis
   return rows[0] ?? null;
 };
 
+export interface PdfRequestRow extends RequestRow {
+  employee_name: string;
+}
+
+/** Własny wniosek z imieniem i nazwiskiem osoby (do PDF); cudzy albo brak → null. */
+export const findOwnRequestForPdf = async (db: Db, id: number, userId: number): Promise<PdfRequestRow | null> => {
+  const [rows] = await db.query<PdfRequestRow[]>(
+    `SELECT u.name AS employee_name, ${REQUEST_COLUMNS} JOIN users u ON u.id = r.user_id WHERE r.id = ? AND r.user_id = ?`, // rule-ok: wstawiona tylko stała lista kolumn REQUEST_COLUMNS z tego pliku, dane idą przez ?
+    [id, userId],
+  );
+  return rows[0] ?? null;
+};
+
 /** Wycofanie: tylko czekający wniosek tej osoby; zwraca liczbę zmienionych (0 = już nie czekał). */
 export const setWithdrawn = async (db: Db, id: number, userId: number): Promise<number> => {
   const [result] = await db.query<ResultSetHeader>('UPDATE leave_requests SET status = ? WHERE id = ? AND user_id = ? AND status = ?', [

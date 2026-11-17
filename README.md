@@ -27,6 +27,10 @@ z Claude. Potem logujesz się na http://localhost:5180/login. Kolejne konta zak�
 **Powiadomienia testowe:** `npm run notifications:test` dopisuje każdemu aktywnemu kontu przykładowe powiadomienia
 (administratorom o wnioskach, pracownikom o decyzjach i zadaniu). Zobaczysz je w dzwonku w górnej belce panelu.
 
+**Zatwierdzenie testowe:** `npm run my-leave:approve-test` zatwierdza najnowszy wniosek czekający na decyzję (jako
+pierwszy administrator), żeby sprawdzić przycisk „PDF” w „Moich urlopach”, zanim powstanie moduł „Wnioski urlopowe”.
+Możesz podać login pracownika: `npm run my-leave:approve-test -- jan.kowalski@firma.pl`. Na serwerze nie działa.
+
 Wyłączenie bazy: `npm run db:stop`. Dane zostają, przy następnym `npm run db` wszystko wróci.
 
 ## Gdzie co podejrzeć
