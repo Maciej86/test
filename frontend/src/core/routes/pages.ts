@@ -7,6 +7,7 @@ import { LeaveTypesPage } from '../../modules/leave-types/LeaveTypesPage';
 import { ContractTypesPage } from '../../modules/contract-types/ContractTypesPage';
 import { NotificationsPage } from '../../modules/notifications/NotificationsPage';
 import { MyLeavePage } from '../../modules/my-leave/MyLeavePage';
+import { LeaveRequestsPage } from '../../modules/leave-requests/LeaveRequestsPage';
 
 /** Ekran każdej pozycji nawigacji (klucz = NavItem.key). Nowy moduł dopisuje się tutaj. */
 export const PAGES: Pages = {
@@ -17,6 +18,7 @@ export const PAGES: Pages = {
   'leave-types': LeaveTypesPage,
   'contract-types': ContractTypesPage,
   'my-leave': MyLeavePage,
+  'leave-requests': LeaveRequestsPage,
   // Bez pozycji w menu: adres w buildAppRoutes (NOTIFICATIONS_PATH).
   notifications: NotificationsPage,
 };

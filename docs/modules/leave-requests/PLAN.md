@@ -141,12 +141,13 @@ ze specu: ta sama tabela).
   `my-leave.api.test.tsx`): adresy, odświeżenie po sukcesie i po 409 → `npm run check`.
   _Uwaga:_ po decyzji odświeżam też Pracowników (pula osoby), a nie licznik powiadomień: decyzja nie zmienia powiadomień administratora.
 
-- [ ] 11. **Ekran listy** `LeaveRequestsPage.tsx` (+ `components/LeaveRequestsTable.tsx`, `…Cards.tsx`,
+- [x] 11. **Ekran listy** `LeaveRequestsPage.tsx` (+ `components/LeaveRequestsTable.tsx`, `…Cards.tsx`,
   `…Filters.tsx`), wpis w `core/routes/pages.ts`: nagłówek z podsumowaniem, zakładki (telefon: `Select`), filtry
   w adresie (`useListParams(leaveRequestsListQuerySchema, …)`), tabela/karty z kolumnami i akcjami ze specu,
   „Anuluj urlop” tylko przy `canCancel`, „PDF” otwiera `leaveRequestPdfUrl` w nowej karcie, puste stany, `DataState`,
   `ListPagination`. Testy: domyślnie „Czekają (3)”, zmiana zakładki pokazuje rok, kliknięcie wiersza → adres
   `/admin/leave-requests/24` z zachowanymi filtrami, „termin już minął”, „w archiwum”, puste stany → `npm run check`.
+  _Uwaga:_ wyszukiwarka z opóźnieniem wydzielona z Pracowników do `frontend/src/common/SearchField.tsx` (z testem), używają jej oba moduły; dane do testów ekranów w `frontend/src/test/leaveRequestFixtures.ts` (test zasad pomija folder `test`).
 
 - [ ] 12. **Szczegóły** `components/DetailsDrawer.tsx` i `components/TeamStrip.tsx`: `Drawer` otwarty, gdy w adresie
   jest `:id` (`useParams`); zamknięcie wraca na listę z tymi samymi parametrami; 404 → dymek „Nie ma takiego
