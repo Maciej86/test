@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { createI18n, translateKey } from '../../i18n';
 import {
   FIELD_MESSAGES,
+  addressNumber,
   email,
   iban,
   money,
@@ -199,5 +200,13 @@ describe('isoDate', () => {
       expect(isoDate.safeParse(bad).error?.issues[0]?.message).toBe(FIELD_MESSAGES.date);
     }
     expect(isoDate.safeParse('').error?.issues[0]?.message).toBe(FIELD_MESSAGES.required);
+  });
+});
+
+describe('addressNumber', () => {
+  it('a number from the address: digits only without a leading zero (like idParam), or a number from a field', () => {
+    expect(addressNumber.parse('3')).toBe(3);
+    expect(addressNumber.parse(2026)).toBe(2026);
+    for (const bad of ['0x10', '1e3', '007', '3.0', ' 3', '-1', '0', '', 'abc', 0, -2, 1.5]) expect(addressNumber.safeParse(bad).success).toBe(false);
   });
 });

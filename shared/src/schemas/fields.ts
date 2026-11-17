@@ -177,3 +177,9 @@ export const newPassword = textInput()
   .min(PASSWORD_MIN, M.passwordRules)
   .refine(fitsBcrypt, M.tooLong)
   .refine((v) => /\d/.test(v) && /[^\p{L}\p{N}]/u.test(v), M.passwordRules);
+
+/**
+ * Numer z adresu strony (filtr listy, np. `?leaveTypeId=3`): same cyfry bez zera na początku, jak `idParam` na serwerze,
+ * więc `0x10`, `1e3` czy `007` nie stają się innym numerem. Ekran podaje też liczbę (wybór w polu).
+ */
+export const addressNumber = z.union([z.number().int().positive(), z.string().regex(/^[1-9]\d{0,9}$/).transform(Number)]);

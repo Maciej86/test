@@ -7,19 +7,13 @@ import {
   type LeaveRequestFilter,
 } from '../constants/leaveRequests';
 import { LEAVE_REQUEST_YEAR_MAX, LEAVE_REQUEST_YEAR_MIN, type LeaveRequestStatus } from '../constants/myLeave';
-import { text } from './fields';
+import { addressNumber, text } from './fields';
 import { listQuerySchema } from './list';
 
 /** Okna „Odrzucenie wniosku” i „Anulowanie urlopu”: powód obowiązkowy, 3–500 znaków po przycięciu spacji. */
 export const leaveDecisionReasonSchema = z.object({
   reason: text(LEAVE_DECISION_REASON_MAX).pipe(z.string().min(LEAVE_DECISION_REASON_MIN, M.reasonMin)),
 });
-
-/**
- * Numer z adresu: same cyfry bez zera na początku (jak `idParam` na serwerze), więc `0x10`, `1e3` czy `007` nie stają
- * się innym numerem. Ekran podaje też liczbę (wybór w polu), stąd oba warianty.
- */
-const addressNumber = z.union([z.number().int().positive(), z.string().regex(/^[1-9]\d{0,9}$/).transform(Number)]);
 
 /**
  * Lista wniosków z adresu: zakładka (domyślnie czekające), rok puli (poza „Czekają”; brak = bieżący), typ urlopu,
