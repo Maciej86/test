@@ -40,4 +40,13 @@ describe('leaveRequestsListQuerySchema', () => {
     expect(q.leaveTypeId).toBeUndefined();
     expect(leaveRequestsListQuerySchema.parse({ year: '1999' }).year).toBeUndefined();
   });
+
+  it('numbers from the address are digits only (like idParam): 0x10, 1e3, 007, 3.0 → none', () => {
+    for (const v of ['0x10', '1e3', '007', '3.0', ' 3']) {
+      const q = leaveRequestsListQuerySchema.parse({ status: 'approved', leaveTypeId: v, year: v === '1e3' ? '2.026e3' : `0x7E${v.length}` });
+      expect(q.leaveTypeId).toBeUndefined();
+      expect(q.year).toBeUndefined();
+    }
+    expect(leaveRequestsListQuerySchema.parse({ leaveTypeId: 3, year: 2026 })).toMatchObject({ leaveTypeId: 3, year: 2026 });
+  });
 });

@@ -16,14 +16,20 @@ export const leaveDecisionReasonSchema = z.object({
 });
 
 /**
+ * Numer z adresu: same cyfry bez zera na początku (jak `idParam` na serwerze), więc `0x10`, `1e3` czy `007` nie stają
+ * się innym numerem. Ekran podaje też liczbę (wybór w polu), stąd oba warianty.
+ */
+const addressNumber = z.union([z.number().int().positive(), z.string().regex(/^[1-9]\d{0,9}$/).transform(Number)]);
+
+/**
  * Lista wniosków z adresu: zakładka (domyślnie czekające), rok puli (poza „Czekają”; brak = bieżący), typ urlopu,
  * szukanie po pracowniku, strona. Kolejność ustala serwer (odpowiedź 7a), więc jedyna „kolumna sortowania” to stała.
  * Złe wartości z adresu wracają do domyślnych zamiast błędu.
  */
 export const leaveRequestsListQuerySchema = listQuerySchema(['default']).extend({
   status: z.enum(LEAVE_REQUEST_FILTERS).catch('pending').default('pending'),
-  year: z.coerce.number().int().min(LEAVE_REQUEST_YEAR_MIN).max(LEAVE_REQUEST_YEAR_MAX).optional().catch(undefined),
-  leaveTypeId: z.coerce.number().int().positive().max(2_147_483_647).optional().catch(undefined),
+  year: addressNumber.pipe(z.number().min(LEAVE_REQUEST_YEAR_MIN).max(LEAVE_REQUEST_YEAR_MAX)).optional().catch(undefined),
+  leaveTypeId: addressNumber.pipe(z.number().max(2_147_483_647)).optional().catch(undefined),
 });
 
 export type LeaveDecisionReasonInput = z.input<typeof leaveDecisionReasonSchema>;

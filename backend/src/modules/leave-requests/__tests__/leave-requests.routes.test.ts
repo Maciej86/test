@@ -102,3 +102,52 @@ describe('leave requests routes', () => {
     expect((await as(anna).get('/leave-requests/21/pdf')).status).toBe(409);
   });
 });
+
+describe('abuse', () => {
+  const IDS = ['0', '-1', '1.5', 'abc', '0x10', '007', '1e3', '99999999999', '21;DROP'];
+
+  it('forged ids in the address → 404 for every route, without touching the service', async () => {
+    for (const id of IDS) {
+      const at = `/leave-requests/${encodeURIComponent(id)}`;
+      expect((await as(anna).get(at)).status).toBe(404);
+      expect((await as(anna).post(`${at}/approve`)).status).toBe(404);
+      expect((await as(anna).post(`${at}/reject`, { reason: 'Powód.' })).status).toBe(404);
+      expect((await as(anna).post(`${at}/cancel`, { reason: 'Powód.' })).status).toBe(404);
+      expect((await as(anna).get(`${at}/pdf`)).status).toBe(404);
+    }
+    for (const fn of [s.getLeaveRequest, s.approveRequest, s.rejectRequest, s.cancelRequest, s.getLeaveRequestPdf]) expect(fn).not.toHaveBeenCalled();
+  });
+
+  it('forged decision fields in the body never reach the service: only id, reason and req.user', async () => {
+    vi.mocked(s.approveRequest).mockResolvedValue({ ok: true });
+    vi.mocked(s.rejectRequest).mockResolvedValue({ ok: true });
+    vi.mocked(s.cancelRequest).mockResolvedValue({ ok: true });
+    const forged = { reason: 'Powód.', status: 'approved', decidedBy: 99, decidedByName: 'Ktoś', decidedAt: '2020-01-01', userId: 7, poolYear: 2030, workingDays: 0 };
+    await as(anna).post('/leave-requests/21/approve', forged);
+    await as(anna).post('/leave-requests/21/reject', forged);
+    await as(anna).post('/leave-requests/21/cancel', forged);
+    const actor = { id: 1, name: 'Anna Nowak' };
+    expect(s.approveRequest).toHaveBeenCalledWith(21, actor);
+    expect(s.rejectRequest).toHaveBeenCalledWith(21, 'Powód.', actor);
+    expect(s.cancelRequest).toHaveBeenCalledWith(21, 'Powód.', actor);
+  });
+
+  it('bad reasons → 400 under reason: missing, not text, too short, over 500 characters', async () => {
+    for (const body of [{}, { reason: 123 }, { reason: ['a', 'b', 'c'] }, { reason: 'ab' }, { reason: 'x'.repeat(501) }]) {
+      const res = await as(anna).post('/leave-requests/21/reject', body);
+      expect(res.status).toBe(400);
+      expect(res.body.error.fields).toHaveProperty('reason');
+    }
+    expect(s.rejectRequest).not.toHaveBeenCalled();
+  });
+
+  it('list query: unknown filters and injected values are dropped or fall back to defaults', async () => {
+    vi.mocked(s.listLeaveRequests).mockResolvedValue({ items: [] } as never);
+    await as(anna).get(`/leave-requests?status=${encodeURIComponent("pending' OR 1=1 --")}&year=1e3&leaveTypeId=0x10&page=-5&userId=7`);
+    const query = vi.mocked(s.listLeaveRequests).mock.calls[0]![0];
+    expect(query).toMatchObject({ status: 'pending', page: 1 });
+    expect(query.year).toBeUndefined();
+    expect(query.leaveTypeId).toBeUndefined();
+    expect(query).not.toHaveProperty('userId');
+  });
+});
