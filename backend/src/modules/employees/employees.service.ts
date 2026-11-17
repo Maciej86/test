@@ -16,16 +16,11 @@ import { PAGE_SIZE } from '../../config/constants';
 import { diffChanges, logActivity } from '../../db/activityLog';
 import { pool } from '../../db/pool';
 import { withTransaction } from '../../db/transaction';
-import { fail, type Result, type ServiceError } from '../../middleware/routeHelpers';
+import { fail, type Actor, type Result, type ServiceError } from '../../middleware/routeHelpers';
 import { findContractType, listSelectableContractTypes } from '../contract-types/contract-types.queries';
 import { countPendingRequests, sumPoolUsage } from '../my-leave/my-leave.queries';
 import * as q from './employees.queries';
 
-/** Kto wykonuje zmianę (z `req.user`). */
-export interface Actor {
-  id: number;
-  name: string;
-}
 
 /** Bieżący rok kalendarzowy w strefie aplikacji. */
 export const currentYear = () => Number(todayIsoDate().slice(0, 4));

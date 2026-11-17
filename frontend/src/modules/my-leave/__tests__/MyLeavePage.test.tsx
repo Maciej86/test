@@ -61,6 +61,34 @@ describe('MyLeavePage', () => {
     expect(screen.getByText('Pula na rok: 26 dni, zaległy urlop z 2025: 4 dni. Zaległy urlop schodzi pierwszy.')).toBeInTheDocument();
   });
 
+  it('pool lowered below used days: legend never shows a negative number', async () => {
+    mockApi({ overview: { ...overview, pool: { ...overview.pool, annualDays: 5, usedCarried: 0, usedAnnual: 8, pendingDays: 0, leftDays: 1, leftCarriedDays: 4 } } });
+    show();
+    const legend = await screen.findByTestId('pool-legend');
+    expect(legend).toHaveTextContent('0 zostało z puli rocznej');
+    expect(legend).not.toHaveTextContent('-');
+  });
+
+  it('server refused the request (409) → pool and busy dates are fetched again', async () => {
+    const get = mockApi();
+    const config = { url: '/my-leave/requests', headers: new AxiosHeaders() };
+    vi.spyOn(api, 'post').mockRejectedValue(
+      new AxiosError('fail', 'ERR', config, undefined, { status: 409, statusText: 'x', headers: {}, config, data: { error: { message: 'my-leave.server.overlap' } } }),
+    );
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-17T10:00:00Z'));
+    show();
+    await table();
+    const before = get.mock.calls.filter(([url]) => url === '/my-leave/overview').length;
+    fireEvent.click(screen.getAllByRole('button', { name: 'Złóż wniosek' })[0]!);
+    const dialog = await screen.findByRole('dialog', { name: 'Złóż wniosek' });
+    fireEvent.change(within(dialog).getByRole('textbox', { name: /^Od/ }), { target: { value: '21.12.2026' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Złóż wniosek' }));
+    expect(await within(dialog).findByText(/Ten termin jest już we wniosku/)).toBeInTheDocument();
+    await waitFor(() => expect(get.mock.calls.filter(([url]) => url === '/my-leave/overview').length).toBeGreaterThan(before));
+    vi.useRealTimers();
+  });
+
   it('no days left → the big number is red', async () => {
     mockApi({ overview: { ...overview, pool: { ...overview.pool, leftDays: 0 } } });
     show();

@@ -20,12 +20,15 @@ export const useMyRequests = (year: number | undefined) => {
   });
 };
 
-/** Każda zmiana odświeża pulę i listy wniosków. */
+/**
+ * Każda zmiana odświeża pulę i listy wniosków, także po odmowie serwera (np. wniosek z innej karty zajął termin),
+ * żeby ramka w oknie liczyła już na nowych danych.
+ */
 const useMyLeaveMutation = <T, R>(fn: (input: T) => Promise<R>) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: fn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: KEY }),
   });
 };
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { Response } from 'express';
-import { fail, idParam, notFound, reply } from '../routeHelpers';
+import { actorOf, fail, idParam, notFound, reply } from '../routeHelpers';
 
 const fakeRes = () => {
   const res = { status: vi.fn(), json: vi.fn() };
@@ -45,5 +45,11 @@ describe('notFound', () => {
     const res = fakeRes();
     reply(res, notFound());
     expect(res.status).toHaveBeenCalledWith(404);
+  });
+});
+
+describe('actorOf', () => {
+  it('takes only id and name of the logged-in person (req.user)', () => {
+    expect(actorOf({ id: 7, name: 'Jan Kowalski', role: 'employee', mustChangePassword: false })).toEqual({ id: 7, name: 'Jan Kowalski' });
   });
 });

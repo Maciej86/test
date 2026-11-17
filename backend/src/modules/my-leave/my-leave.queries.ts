@@ -160,9 +160,15 @@ export const sumPoolUsage = async (db: Db, userIds: number[], year: number): Pro
   return usage;
 };
 
-/** Wnioski czekające na decyzję z roku puli (blokują „Zamknij rok”). */
+/**
+ * Wnioski czekające na decyzję z roku puli (blokują „Zamknij rok”). Odczyt z blokadą (FOR SHARE) widzi najnowszy
+ * stan, a nie migawkę z początku transakcji: wniosek złożony w chwili zamykania roku też się policzy.
+ */
 export const countPendingRequests = async (db: Db, year: number): Promise<number> => {
-  const [rows] = await db.query<RowDataPacket[]>('SELECT COUNT(*) AS total FROM leave_requests WHERE pool_year = ? AND status = ?', [year, PENDING]);
+  const [rows] = await db.query<RowDataPacket[]>('SELECT COUNT(*) AS total FROM leave_requests WHERE pool_year = ? AND status = ? FOR SHARE', [
+    year,
+    PENDING,
+  ]);
   return Number(rows[0]?.total ?? 0);
 };
 

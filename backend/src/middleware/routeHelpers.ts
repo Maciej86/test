@@ -20,6 +20,14 @@ export const fail = (status: number, message: string, extra: Omit<ServiceError, 
   error: { ...extra, status, message },
 });
 
+/** Kto wykonuje zmianę: numer i imię z nazwiskiem zalogowanej osoby (`req.user`), nigdy z treści żądania. */
+export interface Actor {
+  id: number;
+  name: string;
+}
+
+export const actorOf = (user: Express.Request['user']): Actor => ({ id: user!.id, name: user!.name });
+
 /** Rekord nie istnieje albo jest poza zasięgiem tej osoby (cudzy rekord też daje 404, nie 403). */
 export const notFound = (): { error: ServiceError } => fail(404, SERVER_MESSAGES.notFound);
 

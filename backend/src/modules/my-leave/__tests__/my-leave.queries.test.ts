@@ -87,6 +87,8 @@ describe('my leave queries', () => {
     const { db, calls } = spyDb([{ total: 2 }]);
     expect(await q.countPendingRequests(db, 2026)).toBe(2);
     expect(calls[0]![1]).toEqual([2026, 'pending']);
+    // Odczyt z blokadą widzi wniosek zapisany przez inną transakcję w trakcie „Zamknij rok”.
+    expect(calls[0]![0]).toMatch(/FOR SHARE$/);
   });
 
   it('countRequestsByLeaveType counts all requests per type', async () => {

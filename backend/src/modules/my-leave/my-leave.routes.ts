@@ -7,16 +7,13 @@ import {
   type MyLeaveRequestsQuery,
 } from '@app/shared';
 import { sendError } from '../../middleware/errors';
-import { idParam, reply } from '../../middleware/routeHelpers';
+import { actorOf, idParam, reply } from '../../middleware/routeHelpers';
 import { validateBody } from '../../middleware/validateBody';
 import { validateQuery } from '../../middleware/validateQuery';
-import type { Actor } from '../employees/employees.service';
 import { createRequest, getMyLeaveOverview, listMyRequests, withdrawRequest } from './my-leave.service';
 
 /** Moduł Moje urlopy: podpięty w app.ts przez mountModule (rola employee z nawigacji). Zawsze tylko req.user. */
 export const myLeaveRoutes = Router();
-
-const actorOf = (user: Express.Request['user']): Actor => ({ id: user!.id, name: user!.name });
 
 myLeaveRoutes.get('/overview', async (req, res) => {
   const overview = await getMyLeaveOverview(req.user!.id);

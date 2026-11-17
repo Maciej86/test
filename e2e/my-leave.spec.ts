@@ -34,6 +34,8 @@ const fillDates = async (page: Page, from: string, to: string) => {
 };
 
 test('pracownik składa wniosek, widzi blokady i go wycofuje; administrator dostaje powiadomienie', async ({ page }) => {
+  // Dwie osoby i kilka logowań: więcej czasu niż domyślne 30 s.
+  test.setTimeout(60_000);
   test.skip(tuesday.getUTCFullYear() !== todayUtc().getUTCFullYear(), 'koniec roku: brak dni roboczych w roku otwartym');
 
   await logIn(page, ADMIN, password());
@@ -77,6 +79,7 @@ test('pracownik składa wniosek, widzi blokady i go wycofuje; administrator dost
 
   // Administrator: dzwonek, pula z czekającymi dniami, zablokowane „Zamknij rok”, brak „Moich urlopów”.
   await logIn(page, ADMIN, password());
+  await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
   await page.getByRole('button', { name: /Powiadomienia/ }).click();
   await expect(page.getByText('Nowy wniosek: Marek Urlopowy').first()).toBeVisible();
   await page.keyboard.press('Escape');
@@ -95,6 +98,7 @@ test('pracownik składa wniosek, widzi blokady i go wycofuje; administrator dost
 
   // Pracownik wycofuje wniosek: „Zostaw” nic nie zmienia, „Wycofaj” oddaje dni.
   await logIn(page, login, 'Wlasne-haslo-7');
+  await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
   await page.goto('/admin/my-leave');
   await row.getByRole('button', { name: 'Wycofaj' }).click();
   const withdraw = page.getByRole('dialog', { name: 'Wycofać wniosek?' });

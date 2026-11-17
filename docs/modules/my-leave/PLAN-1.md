@@ -144,9 +144,11 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   odejmowania), dymek, błąd zostawia okno. Testy ekranu → `npm run check`.
   _Uwaga:_ `ConfirmModal` dostał nieobowiązkowe `cancelLabel` („Zostaw”), z testem. Nowe teksty: `withdraw_text_no_pool`, `withdrawn_done_no_pool`.
 
-- [ ] 13. **Test w przeglądarce** `e2e/my-leave.spec.ts` ze scenariuszy `TESTS-1.md` (pracownik: złożenie, blokady,
+- [x] 13. **Test w przeglądarce** `e2e/my-leave.spec.ts` ze scenariuszy `TESTS-1.md` (pracownik: złożenie, blokady,
   wycofanie, pusty rok; administrator: dzwonek, „Pracownicy” z czekającymi, zablokowane „Zamknij rok”, brak dostępu)
   → `npm run check`, `npm run test:e2e`.
+  _Uwaga:_ migracja 017 wgrana po uruchomieniu Dockera. Test ma 60 s (dwie osoby, kilka logowań) i czeka na Pulpit po każdym logowaniu. `npm run test:e2e`: 27/27 (raz „Typy umów” przekroczyły 30 s przy równoległym uruchomieniu; osobno i w kolejnym pełnym przebiegu zielone).
 
-- [ ] 14. **Przegląd kodu** całej części jednym recenzentem (lista kontrolna z `CONVENTIONS.md`), poprawki z testem,
+- [x] 14. **Przegląd kodu** całej części jednym recenzentem (lista kontrolna z `CONVENTIONS.md`), poprawki z testem,
   `npm run check`; potem etap **testy** (`abuse.md`, `browser.md`).
+  _Uwaga:_ recenzent: brak krytycznych. Poprawione z testem: (1) „Zamknij rok” liczy czekające wnioski odczytem z blokadą `FOR SHARE` (wcześniej mógł nie zauważyć wniosku złożonego w tej samej chwili); (2) po odmowie serwera ekran pobiera pulę i terminy od nowa (`onSettled`); (3) pasek puli bez ujemnej liczby po obniżeniu puli; (4) `actorOf` i `Actor` we wspólnym `routeHelpers.ts` zamiast kopii. Odłożone: komunikat serwera „termin zajęty” bez dat tamtego wniosku (ramka okna je pokazuje).

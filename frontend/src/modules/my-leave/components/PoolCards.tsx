@@ -14,7 +14,8 @@ export const PoolCard = ({ pool }: { pool: MyLeaveOverview['pool'] }) => {
     { key: 'used', value: pool.usedCarried + pool.usedAnnual, color: 'dark.4' },
     { key: 'pending', value: pool.pendingDays, color: 'yellow.6' },
     { key: 'carried', value: pool.leftCarriedDays, color: 'navy.3' },
-    { key: 'annual', value: pool.leftDays - pool.leftCarriedDays, color: 'navy.6' },
+    // Pula obniżona poniżej wykorzystanych dni: zostało z puli rocznej to 0, nie liczba ujemna.
+    { key: 'annual', value: Math.max(0, pool.leftDays - pool.leftCarriedDays), color: 'navy.6' },
   ];
   const pct = (days: number) => (total === 0 ? 0 : (days / total) * 100);
 

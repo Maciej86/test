@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moje urlopy, część 1/2: implementacja, krok 13 (`/stepkit:dalej`).
+**Następny krok:** Moje urlopy, część 1/2: testy (próby nadużyć, potem użytkownik przechodzi `TESTS-1.md`).
 
 ## Start aplikacji
 
@@ -26,7 +26,7 @@
 | 5 | E-mail | email | zrobiony | zamknięcie | login |
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
-| 8 | Moje urlopy | my-leave | w toku | implementacja, część 1/2 (krok 13/14) | employees, leave-types, email, notifications |
+| 8 | Moje urlopy | my-leave | w toku | testy, część 1/2 | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | czeka | makieta | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-17: Moje urlopy, część 1: zbudowane (kroki 0–14, przegląd kodu z poprawkami: blokada przy liczeniu czekających wniosków w „Zamknij rok”, odświeżenie po odmowie serwera), `npm run check` i 27 testów e2e zielone.
 - 2026-11-17: Moje urlopy: plan części 1 zaakceptowany (15 kroków, od szkieletu testów do przeglądu kodu).
 - 2026-11-17: Moje urlopy: spec zaakceptowany (`SPEC.md` ogólny, `SPEC-1.md` część 1).
 - 2026-11-17: Moje urlopy: moduł w dwóch częściach (1: wnioski i pula, 2: wydruk PDF); „Zamknij rok” zablokowany, dopóki są wnioski czekające z zamykanego roku (odpowiedź a).
