@@ -14,3 +14,4 @@ export * from './schemas/leaveTypes';
 export * from './schemas/contractTypes';
 export * from './schemas/notifications';
 export * from './schemas/myLeave';
+export * from './schemas/leaveRequests';

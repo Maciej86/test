@@ -112,5 +112,16 @@
     "cancel_started": "Anulowanie minionego",
     "already_decided": "Już rozpatrzony",
     "empty": "Nic nie czeka"
+  },
+  "employee_archived": "w archiwum",
+  "withdrawn_meanwhile": "Pracownik wycofał ten wniosek. Lista jest odświeżona.",
+  "not_found": "Nie ma takiego wniosku.",
+  "server": {
+    "already_decided": "Ten wniosek został już rozpatrzony. Lista jest odświeżona.",
+    "not_approved": "Można to zrobić tylko z zatwierdzonym wnioskiem.",
+    "year_closed": "Rok {{year}} jest już zamknięty, więc tego urlopu nie można anulować."
+  },
+  "validation": {
+    "reason_min": "Wpisz powód (co najmniej 3 znaki). Pracownik zobaczy go w powiadomieniu."
   }
 }

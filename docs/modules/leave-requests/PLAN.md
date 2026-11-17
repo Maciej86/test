@@ -81,7 +81,7 @@ ze specu: ta sama tabela).
   - `notifications.json`: `leave_cancelled.detail` = „{{leaveType}}, {{dateFrom}} – {{dateTo}}. Powód: {{reason}}”;
     `sendTestNotifications.ts` podaje `reason`; test tekstu w testach powiadomień → `npm run check`.
 
-- [ ] 5. **`shared`:** `shared/src/constants/leaveRequests.ts`: `LEAVE_DECISION_REASON_MIN = 3`,
+- [x] 5. **`shared`:** `shared/src/constants/leaveRequests.ts`: `LEAVE_DECISION_REASON_MIN = 3`,
   `LEAVE_DECISION_REASON_MAX = 500`, `LEAVE_REQUESTS_MESSAGES` (`leave-requests.server.already_decided`,
   `…not_approved`, `…year_closed`, `leave-requests.validation.reason_min`), `LEAVE_REQUEST_FILTERS =
   [...LEAVE_REQUEST_STATUSES, 'all']`. `shared/src/schemas/leaveRequests.ts`: `leaveDecisionReasonSchema`
@@ -91,6 +91,7 @@ ze specu: ta sama tabela).
   `LeaveRequestsListResponse` (pola jak w `SPEC.md`, „API”). Testy: powód `"   "`, `"ab"`, `" abc "` → `"abc"`,
   500 / 501 znaków; `status=xyz` → `pending`, `year=abc` → brak, `leaveTypeId=-1` → brak; eksport w `index.ts` →
   `npm run check`.
+  _Uwaga:_ jedyna „kolumna sortowania” w `listQuerySchema` to stała `'default'` (kolejność ustala serwer według zakładki, odpowiedź 7a).
 
 - [ ] 6. **Zapytania** `backend/src/modules/leave-requests/leave-requests.queries.ts` (testy na bazie, wzór
   `my-leave.queries.test.ts`):
