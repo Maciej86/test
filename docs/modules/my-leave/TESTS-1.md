@@ -40,7 +40,7 @@ listopad 2026 (rok otwarty 2026); w innym dniu wybierz podobne dni robocze w prz
 4. Po wycofaniu (krok 11 pracownika): dzwonek „Wniosek wycofany”, w „Pracownikach” dopisek o czekających znika.
 5. „Ustawienia → Typy urlopów” → w kolumnie „Wnioski” przy „Wypoczynkowy” liczba złożonych wniosków (także
    wycofanych); w „Edytuj” żółta ramka o typie użytym we wnioskach.
-6. W menu administratora nie ma „Moje urlopy”; adres http://localhost:5180/admin/my-leave pokazuje „Brak dostępu”.
+6. W menu administratora nie ma „Moje urlopy”; adres http://localhost:5180/admin/my-leave pokazuje „Nie masz dostępu do tej części aplikacji.”
 
 ## Próby nadużyć
 
