@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moduł Wnioski urlopowe: użytkownik przechodzi `docs/modules/leave-requests/TESTS.md` i potwierdza „działa”.
+**Następny krok:** Moduł Zadania: makieta (`/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -27,7 +27,7 @@
 | 6 | Powiadomienia | notifications | zrobiony | zamknięcie | login |
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
-| 9 | Wnioski urlopowe | leave-requests | w toku | testy | my-leave |
+| 9 | Wnioski urlopowe | leave-requests | zrobiony | zamknięcie | my-leave |
 | 10 | Zadania | tasks | czeka | makieta | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-17: Moduł Wnioski urlopowe zrobiony (potwierdzony przez użytkownika: „działa”): lista z zakładkami i filtrami, szczegóły pod `/admin/leave-requests/:id` (link z e-maila i dzwonka) z paskiem „Kto jeszcze ma wtedy wolne”, zatwierdzenie w oknie potwierdzenia, odrzucenie i anulowanie z obowiązkowym powodem, PDF, powiadomienia dla pracownika.
 - 2026-11-17: Wnioski urlopowe: 14 prób nadużyć (trasy i prawdziwa baza), jedna naprawiona (numer z adresu tylko z cyfr, `addressNumber` w `fields.ts`); sprawdzenie w przeglądarce (lista, szczegóły, zatwierdzenie, odrzucenie, telefon), tytuł szczegółów szeryfowy jak w makiecie; `npm run check` i 32 testy e2e zielone (pełny przebieg).
 - 2026-11-17: Wnioski urlopowe: zbudowane (kroki 0–16: lista z zakładkami i filtrami, szczegóły pod `/admin/leave-requests/:id` z paskiem „Kto jeszcze ma wtedy wolne”, zatwierdzenie w oknie, odrzucenie i anulowanie z powodem, PDF, powiadomienia), przegląd kodu z poprawkami, `npm run check` i 31 testów e2e zielone. Wspólne: `LeaveRequestParts`, `SearchField`, `sendInlinePdf`, `leaveRequestPdfData`, `likePattern`, adresy podstron (`detailPath`).
 - 2026-11-17: Wnioski urlopowe: spec zaakceptowany (zatwierdzenie z oknem, powód odrzucenia i anulowania obowiązkowy, `reject_reason` → `decision_reason`, adres szczegółów `/admin/leave-requests/:id`, bez podziału na części).
