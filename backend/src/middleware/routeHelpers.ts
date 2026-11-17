@@ -20,6 +20,9 @@ export const fail = (status: number, message: string, extra: Omit<ServiceError, 
   error: { ...extra, status, message },
 });
 
+/** Rekord nie istnieje albo jest poza zasięgiem tej osoby (cudzy rekord też daje 404, nie 403). */
+export const notFound = (): { error: ServiceError } => fail(404, SERVER_MESSAGES.notFound);
+
 /**
  * Numer rekordu z adresu: tylko same cyfry bez zera na początku (7, nie 1e3, 0x10, " 7" ani 007), inaczej 404.
  * Nie zamieniaj numeru z adresu przez `Number`: `Number('1e3')` to 1000, a `Number('0x10')` to 16.

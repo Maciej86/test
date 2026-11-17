@@ -30,6 +30,11 @@ describe('seedE2eAccounts', () => {
     vi.mocked(pool.query).mockResolvedValue([{}] as never);
     await removeTemporaryData();
     expect(vi.mocked(pool.query).mock.calls).toEqual([
+      // Wnioski mają RESTRICT do kont i typów, więc znikają pierwsze (także wnioski stałego konta e2e pracownika).
+      [
+        'DELETE FROM leave_requests WHERE user_id IN (SELECT id FROM users WHERE login LIKE ? OR login = ?) OR leave_type_id IN (SELECT id FROM leave_types WHERE name LIKE ?)',
+        ['e2e.tmp.%@test.local', 'e2e.employee@test.local', 'E2E %'],
+      ],
       ['DELETE FROM users WHERE login LIKE ?', ['e2e.tmp.%@test.local']],
       ['DELETE FROM leave_types WHERE name LIKE ?', ['E2E %']],
       // Najpierw konta przestają wskazywać typ (klucz obcy RESTRICT), potem typ znika.
@@ -54,8 +59,4 @@ describe('seedE2eNotifications', () => {
     }
     expect(inserts.filter(([sql]) => sql.includes('NULL FROM'))).toHaveLength(2);
   });
-});
-
-describe('seedE2e: leave requests', () => {
-  it.todo('removes leave requests of temporary accounts and types before deleting them');
 });

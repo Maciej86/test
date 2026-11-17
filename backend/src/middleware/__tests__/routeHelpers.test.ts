@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { Response } from 'express';
-import { fail, idParam, reply } from '../routeHelpers';
+import { fail, idParam, notFound, reply } from '../routeHelpers';
 
 const fakeRes = () => {
   const res = { status: vi.fn(), json: vi.fn() };
@@ -40,5 +40,10 @@ describe('route helpers', () => {
 });
 
 describe('notFound', () => {
-  it.todo('notFound → 404 server.not_found');
+  it('notFound → 404 server.not_found, sent by reply as 404', () => {
+    expect(notFound()).toEqual({ error: { status: 404, message: 'server.not_found' } });
+    const res = fakeRes();
+    reply(res, notFound());
+    expect(res.status).toHaveBeenCalledWith(404);
+  });
 });

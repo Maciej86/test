@@ -44,10 +44,15 @@ const saveToDb = async (account: E2eAccount): Promise<void> => {
 };
 
 /**
- * Porządek przed testami: bez kont, typów urlopów i typów umów z poprzednich uruchomień (pule znikają z kontami,
+ * Porządek przed testami: bez wniosków, kont, typów urlopów i typów umów z poprzednich uruchomień (pule znikają z kontami,
  * CASCADE). Typ umowy ma u pracowników RESTRICT, więc najpierw konta przestają go wskazywać.
  */
 export const removeTemporaryData = async (): Promise<void> => {
+  // Wnioski mają RESTRICT do kont i typów, więc znikają pierwsze; stałe konto e2e pracownika zaczyna bez wniosków.
+  await pool.query(
+    'DELETE FROM leave_requests WHERE user_id IN (SELECT id FROM users WHERE login LIKE ? OR login = ?) OR leave_type_id IN (SELECT id FROM leave_types WHERE name LIKE ?)',
+    [E2E_TEMP_LOGIN_LIKE, E2E_ACCOUNTS.employee, E2E_TEMP_LEAVE_TYPE_LIKE],
+  );
   await pool.query('DELETE FROM users WHERE login LIKE ?', [E2E_TEMP_LOGIN_LIKE]);
   await pool.query('DELETE FROM leave_types WHERE name LIKE ?', [E2E_TEMP_LEAVE_TYPE_LIKE]);
   await pool.query('UPDATE users SET contract_type_id = NULL WHERE contract_type_id IN (SELECT id FROM contract_types WHERE name LIKE ?)', [

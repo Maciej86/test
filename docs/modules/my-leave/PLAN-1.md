@@ -37,15 +37,17 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   (`RequestModal.test.tsx`, `DayStrip.test.tsx`), `e2e/my-leave.spec.ts` (scenariusze z `TESTS-1.md`) → `npm run check`.
   _Uwaga:_ testy Pracowników i Typów urlopów nie dostały `it.todo` (test zasad nie pozwala na nie w zrobionym module); powstają od razu jako prawdziwe w kroku 8.
 
-- [ ] 1. **`notFound()` wspólne:** `export const notFound = (): Result => fail(404, SERVER_MESSAGES.notFound)`
+- [x] 1. **`notFound()` wspólne:** `export const notFound = (): Result => fail(404, SERVER_MESSAGES.notFound)`
   w `routeHelpers.ts`; test w `backend/src/middleware/__tests__/routeHelpers.test.ts` (status 404, klucz) →
   `npm run check`.
+  _Uwaga:_ podmiana trzech kopii w starych modułach zostaje na porządki z `IDEAS.md`, jak w planie.
 
-- [ ] 2. **Migracja `017_leave_requests.sql`** według `SPEC-1.md` („Dane”), potem `npm run migrate`. Test (wzór
+- [x] 2. **Migracja `017_leave_requests.sql`** według `SPEC-1.md` („Dane”), potem `npm run migrate`. Test (wzór
   z `notifications.routes.test.ts`, odczyt pliku SQL): `user_id … ON DELETE RESTRICT`, `leave_type_id … ON DELETE
   RESTRICT`, `decided_by … ON DELETE SET NULL`, `comment VARCHAR(500)`. Dane testowe: `seedE2e.ts` usuwa wnioski kont
   `E2E_TEMP_LOGIN_LIKE`, typów `E2E_TEMP_LEAVE_TYPE_LIKE` i konta e2e pracownika przed usunięciem kont/typów; test
   w `seedE2e.test.ts` (kolejność zapytań: `DELETE FROM leave_requests …` przed `DELETE FROM users …`) → `npm run check`.
+  _Uwaga:_ test migracji w osobnym pliku `my-leave.migration.test.ts`; stałe `LEAVE_REQUEST_COMMENT_MAX` i `LEAVE_REQUEST_STATUSES` powstały już tu (test migracji je porównuje). `npm run migrate` czeka na uruchomienie Dockera (baza nie działała).
 
 - [ ] 3. **Wspólne zasady w `shared`:**
   - `shared/src/constants/myLeave.ts`: `LEAVE_REQUEST_COMMENT_MAX = 500`, `LEAVE_REQUEST_STATUSES` (5 statusów),
