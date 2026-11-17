@@ -38,7 +38,7 @@ ze specu: ta sama tabela).
 
 ## Kroki
 
-- [ ] 0. **Szkielet testów** (`it.todo`, po jednym na wymaganie ze specu): `shared/src/schemas/__tests__/leaveRequests.test.ts`,
+- [x] 0. **Szkielet testów** (`it.todo`, po jednym na wymaganie ze specu): `shared/src/schemas/__tests__/leaveRequests.test.ts`,
   `backend/src/modules/leave-requests/__tests__/` (`leave-requests.queries.test.ts`, `leave-requests.service.test.ts`,
   `leave-requests.routes.test.ts`), `frontend/src/modules/leave-requests/__tests__/` (`LeaveRequestsPage.test.tsx`,
   `leave-requests.api.test.tsx`), `…/components/__tests__/` (`DetailsDrawer.test.tsx`, `TeamStrip.test.tsx`,
