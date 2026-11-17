@@ -7,7 +7,7 @@ type Params = Record<string, unknown>;
  * Parametry listy (strona, szukanie, kolejność, filtry) w adresie strony: `?page=2&search=kowal`. Czyta je ten sam
  * schemat, który sprawdza zapytanie na serwerze, więc odświeżenie i wysłany link pokazują ten sam widok.
  * Zły parametr (np. stara zakładka z `?sort=foo`) zamienia się na domyślny, reszta zostaje. Zmiana filtra wraca na
- * stronę 1; w adresie zostaje tylko to, co różni się od `defaults`.
+ * stronę 1 (gdy schemat ma `page`); w adresie zostaje tylko to, co różni się od `defaults`.
  *
  *   const [params, setParams] = useListParams(employeesListQuerySchema, { page: 1, search: '', sort: 'name', dir: 'asc' });
  */
@@ -28,7 +28,8 @@ export const useListParams = <S extends z.ZodType<Params>>(
   }
 
   const update = (next: Partial<z.output<S>>) => {
-    const merged: Params = { ...params, page: 1, ...next };
+    // Lista ze stronami wraca na stronę 1; lista bez stron (np. wybór roku) nie dostaje `page` w adresie.
+    const merged: Params = { ...params, ...('page' in params ? { page: 1 } : {}), ...next };
     const entries = Object.entries(merged).filter(([key, value]) => value !== undefined && (defaults as Params)[key] !== value);
     setSearchParams(new URLSearchParams(entries.map(([key, value]) => [key, String(value)])));
   };

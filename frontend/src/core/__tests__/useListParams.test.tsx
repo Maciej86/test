@@ -52,3 +52,22 @@ describe('useListParams', () => {
     expect(url()).toBe('?page=2&search=kowal');
   });
 });
+
+describe('useListParams without pages', () => {
+  const yearSchema = z.object({ year: z.coerce.number().int().min(2000).max(2100).optional() });
+
+  it('a schema without page does not get page=1 in the address; bad value → undefined', () => {
+    let search = '';
+    let result!: ReturnType<typeof useListParams<typeof yearSchema>>;
+    const Hook = () => {
+      search = useLocation().search;
+      result = useListParams(yearSchema, {});
+      return null;
+    };
+    const router = createMemoryRouter([{ path: '*', element: <Hook /> }], { initialEntries: ['/?year=abc'] });
+    render(<RouterProvider router={router} />);
+    expect(result[0]).toEqual({});
+    act(() => result[1]({ year: 2025 }));
+    expect(search).toBe('?year=2025');
+  });
+});

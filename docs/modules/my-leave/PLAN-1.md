@@ -124,12 +124,13 @@ ze swoją kopią (makieta niczego nie importuje z `frontend/`).
   `server.*` i `validation.*` w `my-leave.json`, `employees.server.pending_requests` w `employees.json`.
   `routeProtection.test.ts` zielony → `npm run check`.
 
-- [ ] 10. **Ekran `MyLeavePage`** (`frontend/src/modules/my-leave/`): `my-leave.api.ts` (`useMyLeaveOverview`,
+- [x] 10. **Ekran `MyLeavePage`** (`frontend/src/modules/my-leave/`): `my-leave.api.ts` (`useMyLeaveOverview`,
   `useMyRequests(year)`, `useCreateRequest`, `useWithdrawRequest`; po zapisie `invalidateQueries(['my-leave'])`),
   wpis w `frontend/src/core/routes/pages.ts`, komponenty `PoolCard`, `LimitsCard`, `RequestsTable` (tabela + karty),
   rok przez `useListParams(myLeaveRequestsQuerySchema, …)`, `DataState` z pustym rokiem. Testy ekranu: liczby puli
   i legendy, boks limitów znika bez typów z limitem, kolejność i statusy, „Wycofaj” tylko przy czekającym, pusty rok,
   `?year=abc` → rok otwarty → `npm run check`.
+  _Uwaga:_ `useListParams` nie dopisuje już `page=1` do adresu listy bez stron (test w `useListParams.test.tsx`). Rok listy: bez `?year` serwer bierze rok otwarty, więc lista nie czeka na pulę. Komponenty: `PoolCards.tsx` (pula i limity), `RequestsTable.tsx` (tabela, karty, `splitText`).
 
 - [ ] 11. **Okno „Złóż wniosek”** (`RequestModal`, `DayStrip`): `useForm` + `zodResolver(leaveRequestSchema)`,
   `DateField` z `minDate` = dziś, „Do” dopasowuje się do „Od”, ramka z `checkLeaveRequest` (te same teksty co

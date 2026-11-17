@@ -28,6 +28,7 @@
   "split_annual": "{{count}} z puli {{year}}",
   "split_none": "nie odejmuje z puli",
   "split_returned": "nie liczą się do puli",
+  "quoted": "„{{text}}”",
   "status": {
     "pending": "Czeka na decyzję",
     "approved": "Zatwierdzony",
