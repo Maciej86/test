@@ -17,7 +17,9 @@ odrzucenie i anulowanie oddają dni. Pracownik dostaje powiadomienie o każdej d
   „Anuluj urlop”) **(polecam)**
 - b) Zawsze z oknem „Zatwierdzić wniosek?”
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-17):** 1b. Przy zatwierdzeniu okno „Zatwierdzić wniosek?” (z listy i ze szczegółów): pracownik,
+typ, termin i dni robocze, kto jeszcze ma wtedy urlop, przy minionym terminie żółta ramka; przyciski „Wróć”
+i „Zatwierdź”.
 
 ## 2. Pasek „Kto jeszcze ma wtedy wolne” (powiązanie z innymi wnioskami)
 

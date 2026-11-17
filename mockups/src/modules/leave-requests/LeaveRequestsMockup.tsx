@@ -10,10 +10,10 @@ import { ListPagination } from '../../common/ListPagination';
 import { notify } from '../../common/notify';
 import { PageHeader } from '../../common/PageHeader';
 import { Question, Questions } from '../../common/Question';
-import { CancelModal, DetailsDrawer, RejectModal, STATUS_COLOR, Term, isLate, splitText } from './LeaveRequestModals';
+import { ApproveModal, CancelModal, DetailsDrawer, RejectModal, STATUS_COLOR, Term, isLate, splitText } from './LeaveRequestModals';
 import { LEAVE_TYPES, POOLS, REQUESTS, YEARS, poolLeft, type MockRequest } from './data';
 
-const STATES = ['list', 'details', 'details_late', 'details_approved', 'reject', 'reject_error', 'cancel', 'cancel_started', 'already_decided', 'empty'] as const;
+const STATES = ['list', 'approve', 'details', 'details_late', 'details_approved', 'reject', 'reject_error', 'cancel', 'cancel_started', 'already_decided', 'empty'] as const;
 type State = (typeof STATES)[number];
 
 const STATUS_FILTERS = ['pending', 'approved', 'rejected', 'cancelled', 'withdrawn', 'all'] as const;
@@ -32,18 +32,19 @@ const sortRows = (rows: MockRequest[], status: StatusFilter) =>
   );
 
 interface RowActions {
+  onApprove: (r: MockRequest) => void;
   onDetails: (r: MockRequest) => void;
   onReject: (r: MockRequest) => void;
   onCancel: (r: MockRequest) => void;
 }
 
-const Actions = ({ r, onDetails, onReject, onCancel }: RowActions & { r: MockRequest }) => {
+const Actions = ({ r, onApprove, onDetails, onReject, onCancel }: RowActions & { r: MockRequest }) => {
   const { t } = useTranslation('leave-requests');
   const stop = (fn: () => void) => (e: MouseEvent) => { e.stopPropagation(); fn(); };
   if (r.status === 'pending') {
     return (
       <Group gap={4} justify="flex-end" wrap="nowrap">
-        <Button size="xs" color="green" leftSection={<ButtonIcon action="confirm" size={14} />} onClick={stop(() => notify.success(t('approved_done', { name: r.employee })))}>
+        <Button size="xs" color="green" leftSection={<ButtonIcon action="confirm" size={14} />} onClick={stop(() => onApprove(r))}>
           {t('approve')}
         </Button>
         <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="cancel" size={14} />} onClick={stop(() => onReject(r))}>{t('reject')}</Button>
@@ -169,12 +170,15 @@ export const LeaveRequestsMockup = () => {
   const [details, setDetails] = useState<MockRequest | null>(null);
   const [reject, setReject] = useState<{ r: MockRequest; error: boolean } | null>(null);
   const [cancel, setCancel] = useState<MockRequest | null>(null);
+  const [approve, setApprove] = useState<MockRequest | null>(null);
 
   const changeState = (s: State) => {
     setState(s);
     setDetails(null);
     setReject(null);
     setCancel(null);
+    setApprove(null);
+    if (s === 'approve') setApprove(byId(24));
     if (s === 'details') setDetails(byId(24));
     if (s === 'details_late') setDetails(byId(19));
     if (s === 'details_approved') setDetails(byId(22));
@@ -203,22 +207,11 @@ export const LeaveRequestsMockup = () => {
     value: s,
     label: s === 'pending' ? t('filter_pending', { count: state === 'empty' ? 0 : pendingCount }) : t(`filter.${s}`),
   }));
-  const actions: RowActions = { onDetails: setDetails, onReject: (r) => setReject({ r, error: false }), onCancel: setCancel };
+  const actions: RowActions = { onApprove: setApprove, onDetails: setDetails, onReject: (r) => setReject({ r, error: false }), onCancel: setCancel };
 
   return (
     <Stack>
       <Questions>
-        <Question
-          number={1}
-          about={t('q.about_list')}
-          options={[
-            { id: 'a', text: t('q.q1a') },
-            { id: 'b', text: t('q.q1b') },
-          ]}
-          recommended="a"
-        >
-          {t('q.q1')}
-        </Question>
         <Question
           number={2}
           about={t('q.about_details')}
@@ -363,9 +356,11 @@ export const LeaveRequestsMockup = () => {
       <DetailsDrawer
         request={details}
         onClose={() => setDetails(null)}
+        onApprove={setApprove}
         onReject={(r) => setReject({ r, error: false })}
         onCancel={setCancel}
       />
+      {approve && <ApproveModal key={approve.id} request={approve} onClose={() => { setApprove(null); setDetails(null); }} />}
       {reject && <RejectModal key={`${reject.r.id}-${reject.error}`} request={reject.r} showError={reject.error} onClose={() => setReject(null)} />}
       {cancel && <CancelModal key={cancel.id} request={cancel} onClose={() => setCancel(null)} />}
     </Stack>

@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.36
 
-**Następny krok:** Moduł Wnioski urlopowe: odpowiedzi na 9 pytań w makiecie (`docs/modules/leave-requests/QUESTIONS.md`).
+**Następny krok:** Moduł Wnioski urlopowe: odpowiedzi na pytania 2–9 w makiecie (`docs/modules/leave-requests/QUESTIONS.md`).
 
 ## Start aplikacji
 
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-17: Wnioski urlopowe: odpowiedź 1b, zatwierdzenie z oknem potwierdzenia „Zatwierdzić wniosek?”.
 - 2026-11-17: Wnioski urlopowe: makieta listy (zakładki statusów, wyszukiwarka, filtr typu i roku, kolumna „Zostało w puli”, karty na telefonie), szczegółów z prawej (pasek „Kto jeszcze ma wtedy wolne”, pula, decyzja), okien odrzucenia i anulowania z powodem; 9 pytań.
 - 2026-11-17: Poprawka (z `IDEAS.md`, potwierdzona: „działa”): dokończone porządki „wspólne zamiast kopii”: `notFound` i nowe `isDuplicateEntry` (`backend/src/db/errors.ts`) w serwerze, `currentYear` w `shared`, okno „Przywrócić konto?” na `ConfirmModal`, w makietach wspólne `ConfirmModal`, `PageHeader`, `EmptyState`, `ListPagination`.
 - 2026-11-17: Moduł Moje urlopy zrobiony (część 2 potwierdzona przez użytkownika: „działa”): pula i limity, składanie i wycofywanie wniosków z blokadami, powiadomienia i e-mail, PDF zatwierdzonego wniosku w nowej karcie (wspólne `backend/src/pdf/` dla modułu 9), `npm run my-leave:approve-test`.

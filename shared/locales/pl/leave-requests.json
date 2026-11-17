@@ -31,6 +31,9 @@
     "cancelled": "Anulowany"
   },
   "approve": "Zatwierdź",
+  "approve_title": "Zatwierdzić wniosek?",
+  "approve_text": "Pracownik dostanie powiadomienie o zatwierdzeniu. Gdyby to była pomyłka, urlop można później anulować.",
+  "approve_others": "W tym czasie urlop ma też: {{names}}.",
   "reject": "Odrzuć",
   "pdf": "PDF",
   "pdf_mockup": "W aplikacji otworzy się PDF wniosku w nowej karcie (ten sam dokument co w „Moich urlopach”).",
@@ -99,6 +102,7 @@
   "mockup_state": "Pokaż stan:",
   "mockup_states": {
     "list": "Lista",
+    "approve": "Zatwierdzenie",
     "details": "Szczegóły",
     "details_late": "Termin minął",
     "details_approved": "Zatwierdzony",
@@ -115,9 +119,6 @@
     "about_reject": "Odrzucenie",
     "about_cancel": "Anulowanie urlopu",
     "about_fields": "Okna odrzucenia i anulowania",
-    "q1": "Jak zatwierdzać wniosek?",
-    "q1a": "Od razu przyciskiem „Zatwierdź” na liście albo w szczegółach, bez dodatkowego pytania (pomyłkę naprawia „Anuluj urlop”)",
-    "q1b": "Zawsze z oknem „Zatwierdzić wniosek?”",
     "q2": "Co pokazać w pasku „Kto jeszcze ma wtedy wolne”?",
     "q2a": "Urlopy zatwierdzone i wnioski czekające innych osób",
     "q2b": "Tylko urlopy zatwierdzone",

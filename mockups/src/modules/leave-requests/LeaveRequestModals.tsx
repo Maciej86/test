@@ -79,6 +79,7 @@ const PoolBox = ({ r }: { r: MockRequest }) => {
 interface DetailsProps {
   request: MockRequest | null;
   onClose: () => void;
+  onApprove: (r: MockRequest) => void;
   onReject: (r: MockRequest) => void;
   onCancel: (r: MockRequest) => void;
 }
@@ -87,7 +88,7 @@ interface DetailsProps {
  * Szczegóły wniosku z prawej strony (na telefonie na cały ekran). Otwiera je kliknięcie wiersza, link z e-maila
  * i z powiadomienia (adres `/admin/leave-requests/24`). Tu administrator decyduje.
  */
-export const DetailsDrawer = ({ request: r, onClose, onReject, onCancel }: DetailsProps) => {
+export const DetailsDrawer = ({ request: r, onClose, onApprove, onReject, onCancel }: DetailsProps) => {
   const { t } = useTranslation('leave-requests');
   const others = r ? overlapping(r) : [];
   return (
@@ -136,7 +137,7 @@ export const DetailsDrawer = ({ request: r, onClose, onReject, onCancel }: Detai
               <Divider />
               <Group justify="flex-end">
                 <Button variant="default" color="red" leftSection={<ButtonIcon action="cancel" />} onClick={() => onReject(r)}>{t('reject')}</Button>
-                <Button color="green" leftSection={<ButtonIcon action="confirm" />} onClick={() => { notify.success(t('approved_done', { name: r.employee })); onClose(); }}>
+                <Button color="green" leftSection={<ButtonIcon action="confirm" />} onClick={() => onApprove(r)}>
                   {t('approve')}
                 </Button>
               </Group>
@@ -216,6 +217,29 @@ export const CancelModal = ({ request: r, onClose }: { request: MockRequest; onC
         {r.deducts ? t('cancel_pool', { count: r.days, name: r.employee, left: poolLeft(pool) + r.days }) : t('cancel_no_pool')}
       </Text>
       <ReasonField label={t('cancel_reason')} hint={t('cancel_hint')} value={reason.value} error={reason.error} onChange={reason.setValue} />
+    </ConfirmModal>
+  );
+};
+
+/** Potwierdzenie zatwierdzenia (odpowiedź 1b): co zatwierdzam i co się stanie. */
+export const ApproveModal = ({ request: r, onClose }: { request: MockRequest; onClose: () => void }) => {
+  const { t } = useTranslation('leave-requests');
+  const others = overlapping(r).filter((o) => o.status === 'approved');
+  return (
+    <ConfirmModal
+      title={t('approve_title')}
+      confirmLabel={t('approve')}
+      confirmAction="confirm"
+      cancelLabel={t('back')}
+      onConfirm={() => { notify.success(t('approved_done', { name: r.employee })); onClose(); }}
+      onClose={onClose}
+    >
+      <Text>{r.employee}: {r.type}, <Term r={r} /> ({t('days', { count: r.days })}).</Text>
+      {isLate(r) && <Alert color="yellow" variant="light" icon={<Clock size={18} />}>{t('late_hint')}</Alert>}
+      {others.length > 0 && (
+        <Text size="sm">{t('approve_others', { names: [...new Set(others.map((o) => o.employee))].join(', ') })}</Text>
+      )}
+      <Text size="sm" c="dimmed">{t('approve_text')}</Text>
     </ConfirmModal>
   );
 };
