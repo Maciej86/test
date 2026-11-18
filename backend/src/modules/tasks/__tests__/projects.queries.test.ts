@@ -21,14 +21,14 @@ const spyDb = (...results: unknown[]) => {
 
 describe('projects queries', () => {
   it('listProjects: membership condition in SQL for the viewer, counts without archived tasks', async () => {
-    const { db, calls } = spyDb([{ id: 9, name: 'Marketing', position: 1, created_at: '2026-11-02 10:00:00', open_count: 3, done_count: 1 }]);
+    const { db, calls } = spyDb([{ id: 9, name: 'Marketing', position: 1, created_at: '2026-11-02 10:00:00', open_count: 3, done_count: 1, archived_count: 2 }]);
     const rows = await q.listProjects(db, { id: 5, name: 'Jan Kowalski', role: 'employee' });
     const [sql, params] = calls[0]!;
     expect(sql).toMatch(/\? = 'admin' OR EXISTS \(SELECT 1 FROM project_members/);
     expect(sql).toMatch(/archived_at IS NULL/);
     expect(sql).toMatch(/ORDER BY p\.position/);
     expect(params).toEqual(['employee', 5]);
-    expect(rows).toEqual([{ id: 9, name: 'Marketing', position: 1, createdAt: '2026-11-02 10:00:00', openCount: 3, doneCount: 1 }]);
+    expect(rows).toEqual([{ id: 9, name: 'Marketing', position: 1, createdAt: '2026-11-02 10:00:00', openCount: 3, doneCount: 1, archivedCount: 2 }]);
   });
 
   it('listMembers: open tasks per member without done and archived tasks; empty list asks nothing', async () => {

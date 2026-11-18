@@ -7,7 +7,7 @@ import { NavMenu } from '../../../common/NavMenu';
 import { useAppNavigation } from '../useAppNavigation';
 import { renderWithProviders } from '../../../test/render';
 
-const project = (id: number, name: string): ProjectItem => ({ id, name, position: id, members: [], openCount: 0, doneCount: 0, createdAt: '2026-11-02' });
+const project = (id: number, name: string): ProjectItem => ({ id, name, position: id, members: [], openCount: 0, doneCount: 0, archivedCount: 0, createdAt: '2026-11-02' });
 
 const Menu = () => {
   const { user } = useAuth();

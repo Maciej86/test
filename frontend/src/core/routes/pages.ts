@@ -8,6 +8,7 @@ import { ContractTypesPage } from '../../modules/contract-types/ContractTypesPag
 import { NotificationsPage } from '../../modules/notifications/NotificationsPage';
 import { MyLeavePage } from '../../modules/my-leave/MyLeavePage';
 import { LeaveRequestsPage } from '../../modules/leave-requests/LeaveRequestsPage';
+import { ProjectsPage } from '../../modules/tasks/ProjectsPage';
 import { TaskBoardPage } from '../../modules/tasks/TaskBoardPage';
 import { TasksHomePage } from '../../modules/tasks/TasksHomePage';
 
@@ -22,6 +23,7 @@ export const PAGES: Pages = {
   'my-leave': MyLeavePage,
   'leave-requests': LeaveRequestsPage,
   // Bez pozycji w menu: adres w buildAppRoutes (TASKS_PATH; tablicę i listę projektów dopisuje moduł Zadania).
+  'task-projects': ProjectsPage,
   'tasks-home': TasksHomePage,
   'task-board': TaskBoardPage,
   // Bez pozycji w menu: adres w buildAppRoutes (NOTIFICATIONS_PATH).

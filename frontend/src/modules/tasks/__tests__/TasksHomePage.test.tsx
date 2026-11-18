@@ -5,7 +5,7 @@ import { AuthProvider } from '../../../core/auth/AuthProvider';
 import { renderRoutes } from '../../../test/render';
 import { TasksHomePage } from '../TasksHomePage';
 
-const project = (id: number): ProjectItem => ({ id, name: `P${id}`, position: id, members: [], openCount: 0, doneCount: 0, createdAt: '2026-11-02' });
+const project = (id: number): ProjectItem => ({ id, name: `P${id}`, position: id, members: [], openCount: 0, doneCount: 0, archivedCount: 0, createdAt: '2026-11-02' });
 
 const show = (user: SessionUser, projects: ProjectItem[]) => {
   vi.spyOn(api, 'get').mockImplementation(async (url: string) => (url === '/auth/me' ? { data: { user } } : { data: { items: projects } }));

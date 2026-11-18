@@ -170,7 +170,7 @@ w archiwum traktowane jak nieistniejące (404).
 
 | Metoda i adres | Kto | Dane wejściowe (schemat) | Odpowiedź | Błędy |
 |---|---|---|---|---|
-| `GET /api/tasks/projects` | admin, employee | — | projekty widoczne dla osoby: `id`, `name`, `position`, `members` (`id`, `name`, `archived`, `openTasks` = liczba jego otwartych zadań w projekcie), `openCount`, `doneCount`, `createdAt` | — |
+| `GET /api/tasks/projects` | admin, employee | — | projekty widoczne dla osoby: `id`, `name`, `position`, `members` (`id`, `name`, `archived`, `openTasks` = liczba jego otwartych zadań w projekcie), `openCount`, `doneCount`, `archivedCount` (zadania w archiwum, do okna usuwania), `createdAt` | — |
 | `GET /api/tasks/projects/candidates` | admin | — | aktywni pracownicy (`id`, `name`) do okna projektu | 403 pracownik |
 | `POST /api/tasks/projects` | admin | `projectSchema` (`name`, `memberIds`) | `{ id }`, 201 | 400 pola; 409 `tasks.project_name_taken` (pole `name`) |
 | `PUT /api/tasks/projects/:id` | admin | `projectSchema` | `{ ok }` | 400; 404; 409 nazwa |

@@ -89,6 +89,8 @@ export interface ProjectItem {
   members: ProjectMember[];
   openCount: number;
   doneCount: number;
+  /** Zadania projektu w archiwum (też znikną przy usunięciu projektu). */
+  archivedCount: number;
   createdAt: string;
 }
 

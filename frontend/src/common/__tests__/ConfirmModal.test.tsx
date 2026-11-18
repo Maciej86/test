@@ -52,4 +52,9 @@ describe('ConfirmModal', () => {
     setup({ loading: true });
     expect(screen.getByRole('button', { name: 'Ukryj' })).toHaveAttribute('data-loading', 'true');
   });
+
+  it('confirmDisabled blocks the confirm button until the condition is met (e.g. typed project name)', () => {
+    setup({ confirmDisabled: true });
+    expect(screen.getByRole('button', { name: 'Ukryj' })).toBeDisabled();
+  });
 });

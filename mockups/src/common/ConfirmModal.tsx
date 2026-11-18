@@ -21,6 +21,7 @@ export const ConfirmModal = ({
   danger = false,
   confirmColor,
   loading = false,
+  confirmDisabled = false,
   onConfirm,
   onClose,
   children,
@@ -34,6 +35,8 @@ export const ConfirmModal = ({
   /** Kolor przycisku akcji, np. `green` przy zatwierdzeniu; ma pierwszeństwo przed `danger`. */
   confirmColor?: MantineColor;
   loading?: boolean;
+  /** Przycisk akcji wyłączony, np. dopóki nie wpisano nazwy projektu do usunięcia. */
+  confirmDisabled?: boolean;
   onConfirm: () => void;
   onClose: () => void;
   children: ReactNode;
@@ -45,7 +48,7 @@ export const ConfirmModal = ({
         {children}
         <Group justify="flex-end">
           <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{cancelLabel ?? t('cancel')}</Button>
-          <Button color={confirmColor ?? (danger ? 'red' : undefined)} leftSection={<ButtonIcon action={confirmAction} />} loading={loading} onClick={onConfirm}>
+          <Button color={confirmColor ?? (danger ? 'red' : undefined)} leftSection={<ButtonIcon action={confirmAction} />} loading={loading} disabled={confirmDisabled} onClick={onConfirm}>
             {confirmLabel}
           </Button>
         </Group>

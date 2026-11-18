@@ -226,7 +226,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   w formularzu; kalendarz terminu w nowym zadaniu nie pozwala wybrać dnia przed dziś (serwer i tak sprawdza);
   wspólna logika formularza w `components/useTaskForm.ts`; w `test/setup.ts` zastępnik `document.fonts`.
 
-- [ ] **16. Lista projektów (front).** Pliki `ProjectsPage.tsx`, `components/ProjectsTable.tsx`,
+- [x] **16. Lista projektów (front).** Pliki `ProjectsPage.tsx`, `components/ProjectsTable.tsx`,
   `components/ProjectModal.tsx`, `components/DeleteProjectModal.tsx`. Testy: tabela z kolumnami ze specu i karty na
   telefonie, strzałki (`OrderArrows`) wołają `useMoveProject`, pusta lista z „Dodaj projekt”; okno: powtórzona
   nazwa → błąd pod polem; usunięcie z członków osoby z otwartymi zadaniami → żółta ramka z liczbą (z `openTasks`
@@ -234,6 +234,9 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   okno; okno usunięcia: przycisk wyłączony, dopóki nazwa się nie zgadza, po usunięciu z
   tablicy tego projektu przejście na listę projektów; pracownik na `/admin/tasks/projects` → „Brak dostępu”
   → `npm run check`.
+
+  **Uwaga:** `ConfirmModal` (front i makiety) dostał `confirmDisabled`, okno usuwania projektu korzysta z niego;
+  `ProjectItem.archivedCount` (liczba w oknie usuwania obejmuje archiwum, jak w specu).
 
 - [ ] **17. Makieta, dokumenty, wygląd.** Makieta tablicy przeciąga przez `@dnd-kit` jak aplikacja (te same
   `boardDrop`-owe zasady, bez API); `SPEC-GENERAL.md`: wiersze Mapy dostępu z tabeli API `SPEC-1.md`; `DESIGN.md`:

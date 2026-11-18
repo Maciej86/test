@@ -32,9 +32,11 @@ const setPhone = (phone: boolean) => {
   })) as unknown as typeof window.matchMedia;
 };
 
-const show = (data: BoardResponse | 'missing', path = '/admin/tasks/9') => {
+const show = (data: BoardResponse | 'missing', path = '/admin/tasks/9', user: SessionUser = jan) => {
   vi.spyOn(api, 'get').mockImplementation(async (url: string) => {
-    if (url === '/auth/me') return { data: { user: jan } };
+    if (url === '/auth/me') return { data: { user } };
+    if (url === '/tasks/projects') return { data: { items: [{ id: 9, name: 'Marketing', position: 1, members: [], openCount: 4, doneCount: 1, archivedCount: 0, createdAt: '2026-11-02' }] } };
+    if (url === '/tasks/projects/candidates') return { data: [] };
     if (data === 'missing') throw Object.assign(new Error('404'), { isAxiosError: true, response: { status: 404, data: { error: { message: 'server.not_found' } } } });
     return { data };
   });
@@ -149,5 +151,15 @@ describe('TaskBoardPage', () => {
     expect(await screen.findByText('Usunąć zadanie?')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Usuń' }));
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/tasks/4/archive'));
+  });
+
+  it('only the admin sees Edytuj projekt, which opens the project window', async () => {
+    const { unmount } = show(board());
+    await screen.findByText('Ulotki na targi');
+    expect(screen.queryByRole('button', { name: 'Edytuj projekt' })).not.toBeInTheDocument();
+    unmount();
+    show(board(), '/admin/tasks/9', { id: 1, name: 'Anna Nowak', role: 'admin', mustChangePassword: false });
+    fireEvent.click(await screen.findByRole('button', { name: 'Edytuj projekt' }));
+    expect(await screen.findByText('Projekt: Marketing')).toBeInTheDocument();
   });
 });

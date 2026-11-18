@@ -7,11 +7,12 @@ import type { Viewer } from '../../middleware/routeHelpers';
 export const listProjects = async (
   db: Db,
   viewer: Viewer,
-): Promise<{ id: number; name: string; position: number; createdAt: string; openCount: number; doneCount: number }[]> => {
+): Promise<{ id: number; name: string; position: number; createdAt: string; openCount: number; doneCount: number; archivedCount: number }[]> => {
   const [rows] = await db.query<RowDataPacket[]>(
     `SELECT p.id, p.name, p.position, p.created_at,
        (SELECT COUNT(*) FROM tasks t WHERE t.project_id = p.id AND t.archived_at IS NULL AND t.column_key <> 'done') AS open_count,
-       (SELECT COUNT(*) FROM tasks t WHERE t.project_id = p.id AND t.archived_at IS NULL AND t.column_key = 'done') AS done_count
+       (SELECT COUNT(*) FROM tasks t WHERE t.project_id = p.id AND t.archived_at IS NULL AND t.column_key = 'done') AS done_count,
+       (SELECT COUNT(*) FROM tasks t WHERE t.project_id = p.id AND t.archived_at IS NOT NULL) AS archived_count
      FROM projects p
      WHERE ? = 'admin' OR EXISTS (SELECT 1 FROM project_members pm WHERE pm.project_id = p.id AND pm.user_id = ?)
      ORDER BY p.position`,
@@ -24,6 +25,7 @@ export const listProjects = async (
     createdAt: r.created_at as string,
     openCount: Number(r.open_count),
     doneCount: Number(r.done_count),
+    archivedCount: Number(r.archived_count),
   }));
 };
 

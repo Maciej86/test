@@ -49,14 +49,14 @@ afterEach(() => vi.clearAllMocks());
 
 describe('projects: list and candidates', () => {
   it('project list filtered by the viewer, with members and their open tasks', async () => {
-    vi.mocked(q.listProjects).mockResolvedValue([{ id: 9, name: 'Marketing', position: 1, createdAt: '2026-11-02', openCount: 3, doneCount: 1 }]);
+    vi.mocked(q.listProjects).mockResolvedValue([{ id: 9, name: 'Marketing', position: 1, createdAt: '2026-11-02', openCount: 3, doneCount: 1, archivedCount: 0 }]);
     vi.mocked(q.listMembers).mockResolvedValue([{ projectId: 9, id: 5, name: 'Jan Kowalski', archived: false, openTasks: 2 }]);
     const jan = { id: 5, name: 'Jan Kowalski', role: 'employee' as const };
     const result = await s.listProjects(jan);
     expect(q.listProjects).toHaveBeenCalledWith(expect.anything(), jan);
     expect(q.listMembers).toHaveBeenCalledWith(expect.anything(), [9]);
     expect(result.items).toEqual([
-      { id: 9, name: 'Marketing', position: 1, createdAt: '2026-11-02', openCount: 3, doneCount: 1, members: [{ id: 5, name: 'Jan Kowalski', archived: false, openTasks: 2 }] },
+      { id: 9, name: 'Marketing', position: 1, createdAt: '2026-11-02', openCount: 3, doneCount: 1, archivedCount: 0, members: [{ id: 5, name: 'Jan Kowalski', archived: false, openTasks: 2 }] },
     ]);
   });
 

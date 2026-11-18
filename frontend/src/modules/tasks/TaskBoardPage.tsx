@@ -15,13 +15,14 @@ import { useAuth } from '../../core/auth/AuthProvider';
 import { notify } from '../../core/notify';
 import { useListParams } from '../../core/useListParams';
 import { ArchiveTaskModal } from './components/ArchiveTaskModal';
+import { ProjectModal } from './components/ProjectModal';
 import { BoardColumn } from './components/BoardColumn';
 import { BoardHeader } from './components/BoardHeader';
 import { dragTarget, placementOf } from './components/boardDrop';
 import { TaskDrawer } from './components/TaskDrawer';
 import { TaskFormModal } from './components/TaskFormModal';
 import { columnTasks, moveInBoard } from './boardMove';
-import { useBoard, useMoveTask } from './tasks.api';
+import { useBoard, useMoveTask, useProjects } from './tasks.api';
 import { dueState } from './taskDue';
 
 const PROJECT_ID = /^[1-9]\d{0,9}$/;
@@ -49,6 +50,9 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
   const [dragTasks, setDragTasks] = useState<BoardTask[] | null>(null);
   const [creating, setCreating] = useState(false);
   const [archiving, setArchiving] = useState<BoardTask | null>(null);
+  const [editingProject, setEditingProject] = useState(false);
+  const isAdmin = user?.role === 'admin';
+  const project = useProjects(isAdmin).data?.items.find((p) => p.id === projectId);
   const openTask = view.task === undefined ? null : (data.tasks.find((task) => task.id === view.task) ?? null);
   const missingTask = view.task !== undefined && openTask === null;
   // Zadanie z adresu (link z powiadomienia) nie jest na tablicy: usunięte, w archiwum albo z innego projektu.
@@ -123,6 +127,11 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
         openCount={open.length}
         overdue={open.filter((task) => dueState(task) === 'overdue').length}
         people={data.people}
+        extraActions={
+          isAdmin && project ? (
+            <Button variant="default" leftSection={<ButtonIcon action="edit" />} onClick={() => setEditingProject(true)}>{t('project_edit')}</Button>
+          ) : undefined
+        }
         onAdd={() => setCreating(true)}
       />
       <Group gap="md" align="center">
@@ -174,6 +183,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
         />
       )}
       {archiving && <ArchiveTaskModal task={archiving} onClose={() => setArchiving(null)} />}
+      {editingProject && project && <ProjectModal project={project} onClose={() => setEditingProject(false)} />}
     </Stack>
   );
 };
