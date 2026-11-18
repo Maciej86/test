@@ -96,7 +96,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   - `mockups/src/modules/tasks/navigation.tsx`: projekty dokładane **przed** stałą pozycją z konfiguracji (z `text`
     zamiast kluczy `mockup_projects`), ekran `task-projects` w `TASK_SCREENS` → `npm run check`.
 
-- [ ] **6. Powiązanie z urlopami.** Test w `leave-requests.queries.test.ts`: `listApprovedLeaves(db, [5, 6],
+- [x] **6. Powiązanie z urlopami.** Test w `leave-requests.queries.test.ts`: `listApprovedLeaves(db, [5, 6],
   '2026-11-18', '2026-12-02')` pyta tylko o status `approved` i nakładanie się dat, zwraca `{ userId, dateFrom,
   dateTo }[]` bez rodzaju i powodu; pusta lista osób → `[]` bez zapytania. Kod w `leave-requests.queries.ts`
   → `npm run check`.

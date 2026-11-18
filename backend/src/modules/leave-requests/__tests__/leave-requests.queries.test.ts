@@ -131,4 +131,21 @@ describe('leave requests queries', () => {
     expect(params).toEqual(['cancelled', 1, 'Anna Nowak', 'Przesunięty.', 21, 'approved']);
     expect(await q.setDecision(spyDb({ affectedRows: 0 }).db, 21, { from: 'pending', to: 'approved', actor: { id: 1, name: 'Anna' }, reason: null })).toBe(0);
   });
+
+  // Zadania pokazują przy przypisanej osobie tylko daty zatwierdzonego urlopu (bez rodzaju i powodu).
+  it('listApprovedLeaves returns only dates of approved leaves overlapping the range', async () => {
+    const { db, calls } = spyDb([{ user_id: 5, date_from: '2026-11-23', date_to: '2026-11-27' }]);
+    expect(await q.listApprovedLeaves(db, [5, 6], '2026-11-18', '2026-12-02')).toEqual([{ userId: 5, dateFrom: '2026-11-23', dateTo: '2026-11-27' }]);
+    const [sql, params] = calls[0]!;
+    expect(sql).toMatch(/status = \?/);
+    expect(sql).toMatch(/date_from <= \? AND date_to >= \?/);
+    expect(sql).not.toMatch(/leave_type|reason|comment/);
+    expect(params).toEqual([[5, 6], 'approved', '2026-12-02', '2026-11-18']);
+  });
+
+  it('listApprovedLeaves with no people asks nothing', async () => {
+    const { db, calls } = spyDb([]);
+    expect(await q.listApprovedLeaves(db, [], '2026-11-18', '2026-12-02')).toEqual([]);
+    expect(calls).toHaveLength(0);
+  });
 });

@@ -160,6 +160,25 @@ export const listOverlapping = async (
   return rows.map((o) => ({ employeeName: o.employee_name, dateFrom: o.date_from, dateTo: o.date_to, status: o.status }));
 };
 
+/**
+ * Zatwierdzone urlopy wybranych osób, które mają choć jeden wspólny dzień z zakresem `from`–`to`. Dla modułu Zadania
+ * (żółta kropka przy przypisanej osobie): tylko daty, bez rodzaju urlopu, powodu i komentarza.
+ */
+export const listApprovedLeaves = async (
+  db: Db,
+  userIds: number[],
+  from: string,
+  to: string,
+): Promise<{ userId: number; dateFrom: string; dateTo: string }[]> => {
+  if (userIds.length === 0) return [];
+  const [rows] = await db.query<RowDataPacket[]>(
+    `SELECT user_id, date_from, date_to FROM leave_requests
+     WHERE user_id IN (?) AND status = ? AND date_from <= ? AND date_to >= ? ORDER BY date_from`,
+    [userIds, 'approved', to, from],
+  );
+  return rows.map((r) => ({ userId: r.user_id as number, dateFrom: r.date_from as string, dateTo: r.date_to as string }));
+};
+
 /** Pula otwarta (najstarszy niezamknięty rok) każdej z osób; osoby bez puli nie ma w mapie. */
 export const findOpenPools = async (db: Db, userIds: number[]): Promise<Map<number, PoolRow>> => {
   if (userIds.length === 0) return new Map();
