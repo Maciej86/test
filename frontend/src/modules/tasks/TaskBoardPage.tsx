@@ -164,7 +164,8 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
             </>
           )}
           {/* Karta pod kursorem: zawsze w swoim rozmiarze; w kolumnie zostaje jej przygaszony zarys. */}
-          <DragOverlay>
+          {/* Bez animacji powrotu: po puszczeniu karta już stoi na nowym miejscu, kopia znika od razu. */}
+          <DragOverlay dropAnimation={null}>
             {activeTask && (
               <div data-drag-overlay style={{ cursor: 'grabbing' }}>
                 <TaskCard task={activeTask} people={people} meId={meId} onOpen={() => undefined} onMove={() => undefined} onArchive={() => undefined} />

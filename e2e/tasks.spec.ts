@@ -209,6 +209,9 @@ test('przeciągana karta pod kursorem ma rozmiar karty, a w kolumnie zostaje jej
   expect(Math.abs(box.width - from.width)).toBeLessThan(3);
   expect(Math.abs(box.height - from.height)).toBeLessThan(3);
   await page.mouse.up();
+  // Zgłoszenie 2026-11-19: po puszczeniu kopia leciała do starej kolumny. Teraz znika od razu, karta stoi na nowym miejscu.
+  await expect(ghost).toHaveCount(0, { timeout: 100 });
+  await expect(page.getByRole('region', { name: 'W opracowaniu' }).getByText('Niska karta')).toBeVisible();
   await expect.poll(async () => (await board(page, project.id)).tasks.find((t) => t.title === 'Niska karta')?.column).toBe('draft');
   await page.request.delete(`/api/tasks/projects/${project.id}`, { data: { confirmName: name } });
 });
