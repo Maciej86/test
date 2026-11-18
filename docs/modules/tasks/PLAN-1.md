@@ -245,9 +245,12 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   **Uwaga:** makieta przeciąga dalej natywnie (myszką, bez `@dnd-kit`): wygląd i zachowanie są te same, a przepisanie
   makiety na bibliotekę niczego nie pokazałoby użytkownikowi; okno usuwania projektu w makiecie na `ConfirmModal`.
 
-- [ ] **18. E2e ze scenariuszy `TESTS-1.md`.** `e2e/tasks.spec.ts`: administrator zakłada projekt z dwoma pracownikami → pracownik A dodaje zadanie i przypisuje
+- [x] **18. E2e ze scenariuszy `TESTS-1.md`.** `e2e/tasks.spec.ts`: administrator zakłada projekt z dwoma pracownikami → pracownik A dodaje zadanie i przypisuje
   B → B widzi powiadomienie i link otwiera podgląd → B przenosi kartę do „Zrealizowane” → A widzi zmianę bez
   odświeżania (≤ 7 s) → administrator usuwa B z projektu (B znika z otwartego zadania) → usuwa projekt po wpisaniu
   nazwy. `npm run test:e2e` zielony.
+
+  **Uwaga:** test e2e Wniosków urlopowych czeka teraz, aż wyszukiwanie trafi do adresu (po poprawce „tabela nie
+  skacze” lista zostaje na ekranie w trakcie wyszukiwania). Wszystkie testy e2e: 33 zielone.
 
 - [ ] **19. Przegląd kodu** całej części (lista kontrolna z `CONVENTIONS.md`), poprawki z testami → `npm run check`.

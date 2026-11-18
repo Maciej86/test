@@ -31,6 +31,8 @@ test('administrator zatwierdza w oknie, odrzuca z powodem i anuluje urlop; praco
   await page.goto('/admin/leave-requests');
   await expect(page.getByRole('heading', { name: 'Wnioski urlopowe' })).toBeVisible();
   await page.getByPlaceholder('Szukaj pracownika').fill('Ola Decyzja');
+  // Tabela zostaje na ekranie w trakcie wyszukiwania (bez skakania), więc czekamy, aż wyszukiwanie trafi do adresu.
+  await expect(page).toHaveURL(/search=Ola/);
   const rowA = page.getByRole('row', { name: /Wniosek A z testu/ });
   await expect(rowA).toContainText('Czeka na decyzję');
   await rowA.getByText('Ola Decyzja').click();
