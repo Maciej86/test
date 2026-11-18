@@ -155,7 +155,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
     wołania usługi; pracownik nie przypisze się do cudzego projektu przez `PUT` cudzego zadania → 404 →
     `npm run check`.
 
-- [ ] **10. Zmiana roli w Pracownikach.** Test w `employees.service.test.ts` (albo trasach): zmiana roli
+- [x] **10. Zmiana roli w Pracownikach.** Test w `employees.service.test.ts` (albo trasach): zmiana roli
   `admin` → `employee` w tej samej transakcji woła `addMemberWhereAssigned(conn, id, actor)`; inne zmiany (bez zmiany
   roli, `employee` → `admin`) jej nie wołają. Kod w `employees.service.ts` (import z
   `../tasks/projects.service`, jedyne miejsce, gdzie moduł woła funkcję innego modułu, zgodnie z „Powiązaniami”)

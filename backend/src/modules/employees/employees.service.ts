@@ -19,6 +19,7 @@ import { isDuplicateEntry } from '../../db/errors';
 import { fail, notFound, type Actor, type Result, type ServiceError } from '../../middleware/routeHelpers';
 import { findContractType, listSelectableContractTypes } from '../contract-types/contract-types.queries';
 import { countPendingRequests, sumPoolUsage } from '../my-leave/my-leave.queries';
+import { addMemberWhereAssigned } from '../tasks/projects.service';
 import * as q from './employees.queries';
 
 
@@ -208,6 +209,9 @@ export const updateEmployee = async (id: number, input: EmployeeData, actor: Act
         await q.updateUser(conn, id, accountInput(input));
         await logActivity(conn, { ...log, action: 'update', entityType: 'users', changes: accountChanges });
       }
+      // Administrator, który staje się pracownikiem, nie traci dostępu do projektów ze swoimi otwartymi zadaniami
+      // (moduł Zadania, ustalenie z 2026-11-18).
+      if (before.role === 'admin' && input.role === 'employee') await addMemberWhereAssigned(conn, id, actor);
 
       if (input.role === 'employee' && input.annualDays !== undefined) {
         const year = await getOpenYear(conn);

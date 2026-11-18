@@ -29,6 +29,7 @@ vi.mock('../employees.queries', () => ({
 }));
 vi.mock('../../contract-types/contract-types.queries', () => ({ findContractType: vi.fn(), listSelectableContractTypes: vi.fn() }));
 vi.mock('../../my-leave/my-leave.queries', () => ({ sumPoolUsage: vi.fn(), countPendingRequests: vi.fn() }));
+vi.mock('../../tasks/projects.service', async (orig) => ({ ...(await orig<object>()), addMemberWhereAssigned: vi.fn(async () => []) }));
 process.env.JWT_SECRET = 'test-secret-test-secret-test-secret';
 
 const users = await import('../../../auth/users.queries');
