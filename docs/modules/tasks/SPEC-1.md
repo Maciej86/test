@@ -73,6 +73,17 @@ Kliknięcie karty albo „⋮ → Edytuj” (odpowiedź 1a). Tytuł szuflady „
 zamyka. Osoba, której już nie można przypisać (archiwum albo spoza projektu), zostaje na liście przypisanych, ale
 nie da się jej dodać ponownie. Miejsce na komentarze dochodzi w części 2.
 
+### Znacznik „Zakończone” (zmiana 2026-11-19, prośba użytkownika)
+
+- W menu „⋮” karty i w podglądzie: „Oznacz jako zakończone”, a przy zakończonym „Cofnij zakończenie”. Mogą to zrobić
+  wszyscy, którzy widzą projekt.
+- Zakończona karta zostaje w swojej kolumnie (np. zadanie zrobione, które czeka jeszcze na sprawdzenie). Cała karta
+  jest wyszarzona i ma plakietkę „Zakończone”. Przeciąganie i edycja działają dalej; przeniesienie do innej kolumny nie
+  zmienia znacznika. **[decyzja AI]**
+- Serwer zapisuje `tasks.finished_at` (kto i kiedy: historia zmian `tasks` / `status`, `finished` przed → po).
+- Trasa `POST /api/tasks/:taskId/finish` z `{ finished: boolean }` (widzi projekt zadania, zadanie spoza archiwum,
+  inaczej 404); po zapisie dymek „Oznaczono jako zakończone.” albo „Cofnięto zakończenie.”
+
 ### Okno „Usunąć zadanie?”
 
 `ConfirmModal`: „Zadanie „…” zniknie z tablicy i trafi do archiwum. Administrator może je stamtąd przywrócić.”,
@@ -128,7 +139,7 @@ Migracje (jedna zmiana struktury na plik, kolejne numery od 019):
 |---|---|
 | `projects` | `id`, `name VARCHAR(60)` unikalna, `position INT UNSIGNED`, `created_at`, `updated_at` |
 | `project_members` | `project_id`, `user_id`, klucz główny (`project_id`, `user_id`), `created_at` |
-| `tasks` | `id`, `project_id`, `title VARCHAR(150)`, `description TEXT NULL`, `due_date DATE NULL`, `column_key ENUM('draft','in_progress','done')`, `position INT UNSIGNED`, `completed_at DATETIME NULL`, `created_by INT UNSIGNED NULL`, `created_by_name VARCHAR(…)`, `archived_at DATETIME NULL`, `archived_by INT UNSIGNED NULL`, `created_at`, `updated_at`; indeks (`project_id`, `archived_at`, `column_key`, `position`) |
+| `tasks` (+ `finished_at DATETIME NULL`, migracja 023) | `id`, `project_id`, `title VARCHAR(150)`, `description TEXT NULL`, `due_date DATE NULL`, `column_key ENUM('draft','in_progress','done')`, `position INT UNSIGNED`, `completed_at DATETIME NULL`, `created_by INT UNSIGNED NULL`, `created_by_name VARCHAR(…)`, `archived_at DATETIME NULL`, `archived_by INT UNSIGNED NULL`, `created_at`, `updated_at`; indeks (`project_id`, `archived_at`, `column_key`, `position`) |
 | `task_assignees` | `task_id`, `user_id`, klucz główny (`task_id`, `user_id`) |
 
 | Rodzic | Dziecko (kolumna) | Przy usunięciu rodzica | Dlaczego |

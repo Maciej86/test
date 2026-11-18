@@ -28,6 +28,8 @@ Liczba komentarzy jest widoczna na karcie.
   (540 px).
 - **Odświeżanie tablicy co 5 sekund**, gdy karta przeglądarki jest otwarta (zamiast 30 s), i od razu po powrocie do
   niej. Dzwonek zostaje przy 60 sekundach.
+- **Znacznik „Zakończone” (2026-11-19):** opcja w menu karty i w podglądzie; karta zostaje w swojej kolumnie,
+  wyszarzona, z plakietką „Zakończone”; budowane w części 1.
 - Moduł robi się duży: po pytaniach zaproponuję podział na części (część 1: projekty i tablice, część 2: komentarze).
 
 ## 1. Kliknięcie karty
