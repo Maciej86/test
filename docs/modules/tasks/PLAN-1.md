@@ -170,7 +170,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   **Uwaga:** stała, teksty i ikona weszły w kroku 7 (czerwony był wtedy test tekstów w `shared`); tu test ekranu
   powiadomień i spec Powiadomień.
 
-- [ ] **12. Hooki frontu `tasks.api.ts`.** Test `tasks.api.test.tsx` (wzór: `leave-requests.api.test.tsx`):
+- [x] **12. Hooki frontu `tasks.api.ts`.** Test `tasks.api.test.tsx` (wzór: `leave-requests.api.test.tsx`):
   `useProjects()` → `GET /tasks/projects`; `useProjectCandidates(enabled)`; `useSaveProject()` (POST bez `id`, PUT z
   `id`), `useMoveProject()`, `useDeleteProject()` odświeżają klucz `['tasks']`; `useBoard(projectId, oldDone)` →
   `GET /tasks/projects/<id>/board` z `refetchInterval: TASK_BOARD_REFRESH_MS`, `refetchIntervalInBackground: false`,
