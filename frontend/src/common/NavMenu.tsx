@@ -17,9 +17,10 @@ export const NavMenu = ({ items, user }: Props) => {
   const render = (list: NavItem[]) =>
     list.map((item) =>
       item.children ? (
-        // Grupa (np. „Ustawienia”) nie ma własnej strony: tylko rozwija swoje pozycje.
+        // Grupa (np. „Ustawienia”) nie ma własnej strony: tylko rozwija swoje pozycje. Klucz zmienia się, gdy bieżąca
+        // pozycja trafi do grupy później (projekty z serwera), więc grupa rozwija się wtedy sama.
         <NavLink
-          key={item.key}
+          key={`${item.key}-${item.children.some((c) => c.key === activeKey) ? 'open' : 'closed'}`}
           component="button"
           type="button"
           label={item.text ?? translateKey(t, item.label)}

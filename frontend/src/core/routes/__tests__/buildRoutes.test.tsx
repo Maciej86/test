@@ -102,7 +102,27 @@ describe('login guard', () => {
     dashboard: () => <p>Pulpit testowy</p>,
     tasks: () => <p>Zadania testowe</p>,
     notifications: () => <p>Powiadomienia testowe</p>,
+    'task-board': () => <p>Tablica testowa</p>,
+    'tasks-home': () => <p>Zadania: przekierowanie</p>,
+    'task-projects': () => <p>Projekty testowe</p>,
   };
+
+  it('task board, the bare Zadania address and the project list have their own pages (tasks module)', async () => {
+    const { unmount } = renderRoutes(buildAppRoutes(areas, pages, user), '/admin/tasks/9');
+    expect(await screen.findByText('Tablica testowa')).toBeInTheDocument();
+    unmount();
+    const home = renderRoutes(buildAppRoutes(areas, pages, user), '/admin/tasks');
+    expect(await screen.findByText('Zadania: przekierowanie')).toBeInTheDocument();
+    home.unmount();
+    renderRoutes(buildAppRoutes(areas, pages, admin), '/admin/tasks/projects');
+    expect(await screen.findByText('Projekty testowe')).toBeInTheDocument();
+  });
+
+  it('a logged-out person on a task board sees the login screen with the return address', async () => {
+    const { router } = renderRoutes(buildAppRoutes(areas, pages, null), '/admin/tasks/9?task=40');
+    expect(await screen.findByText('Ekran logowania')).toBeInTheDocument();
+    expect(router.state.location.search).toBe('?next=%2Fadmin%2Ftasks%2F9%3Ftask%3D40');
+  });
 
   it('the notifications page (outside the menu) opens in the panel for both roles', async () => {
     renderRoutes(buildAppRoutes(areas, pages, user), '/admin/notifications');

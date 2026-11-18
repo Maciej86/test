@@ -13,7 +13,7 @@ import { MissingScreen } from '../../common/MissingScreen';
 import { PublicLayout } from '../../common/PublicLayout';
 import { buildRoutes, type Pages } from './buildRoutes';
 import { PASSWORD_CHANGE_PATH } from '../../config/constants';
-import { NOTIFICATIONS_PATH } from '@app/shared';
+import { NOTIFICATIONS_PATH, TASK_BOARD_PATH, TASKS_PATH } from '@app/shared';
 import type { ReactElement } from 'react';
 
 /**
@@ -62,9 +62,13 @@ export const buildAppRoutes = (areas: Areas, pages: Pages, user: SessionUser | n
     routes.push({ element: guarded(<AccountLayout />, user), children: buildRoutes(ACCOUNT_NAVIGATION, pages, user) });
   }
   if (areas.admin) {
-    // Strony panelu bez pozycji w menu, dla każdej zalogowanej roli: „Powiadomienia” (z dzwonka).
-    const Notifications = pages.notifications;
-    const unlisted = [{ path: NOTIFICATIONS_PATH, element: Notifications ? <Notifications /> : <MissingScreen /> }];
+    // Strony panelu bez pozycji w menu, dla każdej zalogowanej roli: „Powiadomienia” (z dzwonka) i tablice Zadań.
+    // Zadania: tablica projektu (projekty dokłada do menu useAppNavigation) i sam adres „Zadania” (przekierowanie).
+    const pageAt = (path: string, key: string) => {
+      const Page = pages[key];
+      return { path, element: Page ? <Page /> : <MissingScreen /> };
+    };
+    const unlisted = [pageAt(NOTIFICATIONS_PATH, 'notifications'), pageAt(TASK_BOARD_PATH, 'task-board'), pageAt(TASKS_PATH, 'tasks-home')];
     routes.push({ element: guarded(<AppLayout />, user), children: [...buildRoutes(NAVIGATION, pages, user), ...unlisted] });
     // Każdy inny adres w panelu (np. /admin/leave-requests/128 z e-maila): niezalogowany też trafia na logowanie.
     if (!user) routes.push({ path: '/admin/*', element: <RedirectToLogin /> });

@@ -178,7 +178,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   `useMoveTask(projectId)` zmienia od razu dane tablicy w pamięci (`setQueryData`), przy błędzie przywraca
   poprzednie i odświeża → `npm run check`.
 
-- [ ] **13. Menu i trasy we froncie.**
+- [x] **13. Menu i trasy we froncie.**
   - `frontend/src/core/routes/useAppNavigation.ts`: `useAppNavigation(): NavItem[]` dokłada do grupy `tasks`
     pozycje z `useProjectNavItems()` (z modułu Zadania: `{ key: 'task-project-<id>', path: taskBoardPath(id), text:
     name, icon: 'folder', roles: ['admin', 'employee'] }`) przed „Projektami”; `AppLayout` używa go zamiast
@@ -188,6 +188,9 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
     (`pages['tasks-home']`: przekierowanie na pierwszy projekt, bez projektów na Pulpit, administratora na listę
     projektów); `PAGES`: `task-projects`, `task-board`, `tasks-home`. Test w `buildAppRoutes.test.tsx`; numer
     projektu nie z cyfr → „nie znaleziono” → `npm run check`.
+
+  **Uwaga:** `NavMenu` (i menu makiety) rozwija grupę, gdy bieżąca pozycja dojdzie do niej później (projekty
+  przychodzą z serwera po pierwszym wyświetleniu menu); `TasksHomePage` dla `tasks-home`.
 
 - [ ] **14. Tablica projektu (front).** Pliki `frontend/src/modules/tasks/TaskBoardPage.tsx`,
   `components/BoardColumn.tsx`, `components/TaskCard.tsx`, `components/PersonAvatar.tsx`, `components/BoardHeader.tsx`
