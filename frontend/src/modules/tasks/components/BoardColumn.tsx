@@ -35,16 +35,18 @@ const SortableCard = ({ task, ...actions }: CardActions & { task: BoardTask }) =
  * Kolumna tablicy (wzorzec „Kolumny tablicy” z DESIGN.md): nagłówek z liczbą kart (przy filtrze „pasujące /
  * wszystkie”), karty do przeciągania, a w „Zrealizowanych” przycisk starszych kart.
  */
-export const BoardColumn = ({ column, tasks, total, filtered, showTitle = true, oldDone, ...actions }: CardActions & {
+export const BoardColumn = ({ column, tasks, total, filtered, showTitle = true, highlighted = false, oldDone, ...actions }: CardActions & {
   column: TaskColumn;
   tasks: BoardTask[];
   total: number;
   filtered: boolean;
   showTitle?: boolean;
+  /** Tu trafi przeciągana karta (przerywana ramka). */
+  highlighted?: boolean;
   oldDone?: { count: number; shown: boolean; onToggle: () => void };
 }) => {
   const { t } = useTranslation('tasks');
-  const { setNodeRef, isOver } = useDroppable({ id: columnDropId(column) });
+  const { setNodeRef } = useDroppable({ id: columnDropId(column) });
   const title = t(`column.${column}`);
   return (
     <Paper
@@ -55,7 +57,7 @@ export const BoardColumn = ({ column, tasks, total, filtered, showTitle = true, 
       withBorder
       bg="var(--app-panel-background)"
       mih={160}
-      style={{ outline: isOver ? '2px dashed var(--mantine-color-navy-4)' : undefined, outlineOffset: -2 }}
+      style={{ outline: highlighted ? '2px dashed var(--mantine-color-navy-4)' : undefined, outlineOffset: -2 }}
     >
       {showTitle && (
         <Group justify="space-between" mb="sm" wrap="nowrap">

@@ -1,7 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Alert, Anchor, Button, Group, Paper, SegmentedControl, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { DndContext, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type DragOverEvent } from '@dnd-kit/core';
+import {
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  pointerWithin,
+  rectIntersection,
+  useSensor,
+  useSensors,
+  type CollisionDetection,
+  type DragEndEvent,
+  type DragOverEvent,
+} from '@dnd-kit/core';
 import { SquareKanban, WifiOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
@@ -18,7 +29,7 @@ import { ArchiveTaskModal } from './components/ArchiveTaskModal';
 import { ProjectModal } from './components/ProjectModal';
 import { BoardColumn } from './components/BoardColumn';
 import { BoardHeader } from './components/BoardHeader';
-import { dragOverTarget, dropTarget, placementOf } from './components/boardDrop';
+import { dragOverTarget, dropTarget, overColumn, placementOf, preferCards } from './components/boardDrop';
 import { TaskDrawer } from './components/TaskDrawer';
 import { TaskFormModal } from './components/TaskFormModal';
 import { columnTasks, moveInBoard } from './boardMove';
@@ -29,6 +40,12 @@ const PROJECT_ID = /^[1-9]\d{0,9}$/;
 /** Na węższym ekranie (telefon, mały tablet) widać jedną kolumnę naraz. */
 const PHONE_QUERY = '(max-width: 62em)';
 const DEFAULT_PHONE_COLUMN: TaskColumn = 'in_progress';
+
+/** Cel przeciągania: to, co jest pod kursorem (karta przed kolumną); poza kolumnami najbliższe po powierzchni. */
+const collisionDetection: CollisionDetection = (args) => {
+  const under = pointerWithin(args);
+  return under.length > 0 ? preferCards(under) : rectIntersection(args);
+};
 
 const RefreshFailed = () => {
   const { t } = useTranslation('tasks');
@@ -53,6 +70,8 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
   const [phoneColumn, setPhoneColumn] = useState<TaskColumn>(DEFAULT_PHONE_COLUMN);
   // W trakcie przeciągania tablica nie przyjmuje odświeżeń z serwera (karta nie ucieka spod palca).
   const [dragTasks, setDragTasks] = useState<BoardTask[] | null>(null);
+  // Kolumna, do której trafi przeciągana karta (podświetlona ramka).
+  const [targetColumn, setTargetColumn] = useState<TaskColumn | null>(null);
   const [creating, setCreating] = useState(false);
   const [archiving, setArchiving] = useState<BoardTask | null>(null);
   const [editingProject, setEditingProject] = useState(false);
@@ -86,6 +105,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
     move.mutate({ taskId: task.id, column, beforeTaskId }, { onError: (error) => notify.error(apiErrorMessage(error, t)) });
 
   const onDragOver = ({ active, over }: DragOverEvent) => {
+    setTargetColumn(over && dragTasks ? overColumn(dragTasks, over.id) : null);
     if (!over) return;
     // Na najświeższym stanie: kilka zdarzeń w jednej klatce nie pracuje na nieaktualnej kopii.
     setDragTasks((current) => {
@@ -103,6 +123,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
       if (before.column !== after.column || before.beforeTaskId !== after.beforeTaskId) sendMove(task, after.column, after.beforeTaskId);
     }
     setDragTasks(null);
+    setTargetColumn(null);
   };
 
   const actions = {
@@ -122,6 +143,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
         total={all.length}
         filtered={filtered}
         showTitle={showTitle}
+        highlighted={targetColumn === key}
         oldDone={key === 'done' ? { count: data.oldDoneCount, shown: oldDone, onToggle: onOldDone } : undefined}
         {...actions}
       />
@@ -158,7 +180,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
           />
         </Paper>
       ) : (
-        <DndContext sensors={sensors} onDragStart={() => setDragTasks(data.tasks)} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={() => setDragTasks(null)}>
+        <DndContext sensors={sensors} onDragStart={() => setDragTasks(data.tasks)} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={() => { setDragTasks(null); setTargetColumn(null); }} collisionDetection={collisionDetection}>
           {phone ? (
             <Stack gap="sm">
               <SegmentedControl

@@ -150,6 +150,38 @@ test('przeciągnięcie karty na nagłówek innej kolumny: bez błędu, karta tra
   await page.request.delete(`/api/tasks/projects/${project.id}`, { data: { confirmName: name } });
 });
 
+// Zgłoszenie 2026-11-18: karta nad kartą w innej kolumnie (szerokie okno) nie zmieniała ramki ani miejsca, bo cel
+// wybierała większa część karty, a nie kursor.
+test('przeciąganie nad kartę w innej kolumnie: ramka tej kolumny się podświetla, karta trafia przed tę kartę', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.setViewportSize({ width: 2100, height: 1100 });
+  const suffix = String(Date.now()).slice(-6);
+  await logIn(page, ADMIN, password());
+  await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+  const name = `E2E Ramka ${suffix}`;
+  const project = (await (await page.request.post('/api/tasks/projects', { data: { name, memberIds: [] } })).json()) as { id: number };
+  const add = (title: string, column: string) =>
+    page.request.post(`/api/tasks/projects/${project.id}/tasks`, { data: { title, description: '', dueDate: '', column, assigneeIds: [] } });
+  await add('Karta w opracowaniu', 'draft');
+  await add('Karta z toku', 'in_progress');
+  await page.goto(`/admin/tasks/${project.id}`);
+  const moving = page.locator('.mantine-Card-root', { hasText: 'Karta z toku' });
+  const target = page.locator('.mantine-Card-root', { hasText: 'Karta w opracowaniu' });
+  const from = (await moving.boundingBox())!;
+  const to = (await target.boundingBox())!;
+  // Chwyt przy lewej krawędzi karty: większa część karty zostaje nad „W toku”, a kursor jest nad kartą w „W opracowaniu”.
+  await page.mouse.move(from.x + 30, from.y + 15);
+  await page.mouse.down();
+  await page.mouse.move(from.x + 40, from.y + 30, { steps: 5 });
+  await page.mouse.move(to.x + to.width - 60, to.y + 15, { steps: 25 });
+  const draft = page.getByRole('region', { name: 'W opracowaniu' });
+  await expect(draft).toHaveCSS('outline-style', 'dashed');
+  await expect(draft.getByText('Karta z toku')).toBeVisible();
+  await page.mouse.up();
+  await expect.poll(async () => (await board(page, project.id)).tasks.find((t) => t.title === 'Karta z toku')?.column).toBe('draft');
+  await page.request.delete(`/api/tasks/projects/${project.id}`, { data: { confirmName: name } });
+});
+
 // Próby nadużyć (docs/modules/tasks/TESTS-1.md, „Próby nadużyć”) na prawdziwej bazie: pracownik spoza projektu,
 // podrobione pola, zakazane przeniesienia, kilka zapisów naraz, usuwanie i złe dane.
 test.describe('abuse', () => {

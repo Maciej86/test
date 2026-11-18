@@ -1,5 +1,5 @@
 import type { BoardTask } from '@app/shared';
-import { columnDropId, dragOverTarget, dropTarget, placementOf } from '../components/boardDrop';
+import { columnDropId, dragOverTarget, dropTarget, overColumn, placementOf, preferCards } from '../components/boardDrop';
 import { moveInBoard } from '../boardMove';
 
 const task = (id: number, column: BoardTask['column'], position: number): BoardTask => ({
@@ -54,5 +54,20 @@ describe('boardDrop: on drop (order inside the column)', () => {
   it('placementOf reads the column and the next card', () => {
     expect(placementOf(tasks, 2)).toEqual({ column: 'draft', beforeTaskId: 3 });
     expect(placementOf(tasks, 4)).toEqual({ column: 'in_progress', beforeTaskId: null });
+  });
+});
+
+// Zgłoszenie 2026-11-18: karta wisiała już nad kartą w innej kolumnie, a ramka i miejsce się nie zmieniały, bo cel
+// wybierało to, nad czym była większa część szerokiej karty. Teraz cel jest pod kursorem, karta przed kolumną.
+describe('boardDrop: target under the pointer', () => {
+  it('preferCards puts cards before columns, keeping their order', () => {
+    const c = (id: number | string) => ({ id, data: undefined });
+    expect(preferCards([c(columnDropId('draft')), c(1), c(columnDropId('done')), c(2)]).map((x) => x.id)).toEqual([1, 2, columnDropId('draft'), columnDropId('done')]);
+  });
+
+  it('overColumn: the column of the card or the column itself, unknown → null', () => {
+    expect(overColumn(tasks, 4)).toBe('in_progress');
+    expect(overColumn(tasks, columnDropId('done'))).toBe('done');
+    expect(overColumn(tasks, 99)).toBeNull();
   });
 });

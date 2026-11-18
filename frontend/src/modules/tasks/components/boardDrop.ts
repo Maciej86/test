@@ -1,3 +1,4 @@
+import type { Collision } from '@dnd-kit/core';
 import type { BoardTask, TaskColumn, TaskMoveInput } from '@app/shared';
 import { columnTasks } from '../boardMove';
 
@@ -6,7 +7,8 @@ const COLUMN_PREFIX = 'column:';
 /** Identyfikator kolumny jako miejsca upuszczenia (karty mają numery zadań). */
 export const columnDropId = (column: TaskColumn): string => `${COLUMN_PREFIX}${column}`;
 
-const overColumn = (tasks: BoardTask[], overId: number | string): TaskColumn | null => {
+/** Kolumna, do której celuje kursor: kolumna karty pod nim albo sama kolumna. */
+export const overColumn = (tasks: BoardTask[], overId: number | string): TaskColumn | null => {
   if (typeof overId === 'string') return overId.startsWith(COLUMN_PREFIX) ? (overId.slice(COLUMN_PREFIX.length) as TaskColumn) : null;
   return tasks.find((t) => t.id === overId)?.column ?? null;
 };
@@ -43,3 +45,9 @@ export const placementOf = (tasks: BoardTask[], taskId: number): TaskMoveInput =
   const list = columnTasks(tasks, task.column);
   return { column: task.column, beforeTaskId: list[list.findIndex((t) => t.id === taskId) + 1]?.id ?? null };
 };
+
+/** Karty (numery) przed kolumnami: pod kursorem jest zwykle i karta, i jej kolumna, a celem ma być karta. */
+export const preferCards = <T extends Pick<Collision, 'id'>>(collisions: T[]): T[] => [
+  ...collisions.filter((c) => typeof c.id === 'number'),
+  ...collisions.filter((c) => typeof c.id !== 'number'),
+];
