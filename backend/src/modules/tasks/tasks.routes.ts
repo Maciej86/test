@@ -1,20 +1,25 @@
 import { Router } from 'express';
 import {
   boardQuerySchema,
+  newTaskSchema,
   orderMoveSchema,
   projectDeleteSchema,
   projectSchema,
+  taskMoveSchema,
+  taskSchema,
   type BoardQuery,
   type OrderMoveInput,
   type ProjectData,
   type ProjectDeleteInput,
+  type TaskData,
+  type TaskMoveInput,
 } from '@app/shared';
 import { requireRole } from '../../middleware/requireRole';
 import { actorOf, idParam, reply, viewerOf } from '../../middleware/routeHelpers';
 import { validateBody } from '../../middleware/validateBody';
 import { validateQuery } from '../../middleware/validateQuery';
 import { createProject, deleteProject, listCandidates, listProjects, moveProject, updateProject } from './projects.service';
-import { getBoard } from './tasks.service';
+import { archiveTask, createTask, getBoard, moveTask, updateTask } from './tasks.service';
 
 /**
  * Moduł Zadania: podpięty w app.ts przez mountModule (role grupy „Zadania”: admin, employee). Projekty zmienia tylko
@@ -53,4 +58,24 @@ tasksRoutes.delete('/projects/:id', adminOnly, validateBody(projectDeleteSchema)
 tasksRoutes.get('/projects/:id/board', validateQuery(boardQuerySchema), async (req, res) => {
   const id = idParam(res, req.params.id);
   if (id !== null) reply(res, await getBoard(id, viewerOf(req.user), (req.query as unknown as BoardQuery).oldDone));
+});
+
+tasksRoutes.post('/projects/:id/tasks', validateBody(newTaskSchema), async (req, res) => {
+  const id = idParam(res, req.params.id);
+  if (id !== null) reply(res, await createTask(id, req.body as TaskData, viewerOf(req.user)), 201);
+});
+
+tasksRoutes.put('/:taskId', validateBody(taskSchema), async (req, res) => {
+  const id = idParam(res, req.params.taskId);
+  if (id !== null) reply(res, await updateTask(id, req.body as TaskData, viewerOf(req.user)));
+});
+
+tasksRoutes.post('/:taskId/move', validateBody(taskMoveSchema), async (req, res) => {
+  const id = idParam(res, req.params.taskId);
+  if (id !== null) reply(res, await moveTask(id, req.body as TaskMoveInput, viewerOf(req.user)));
+});
+
+tasksRoutes.post('/:taskId/archive', async (req, res) => { // rule-ok: bez danych wejściowych, tylko numer z adresu
+  const id = idParam(res, req.params.taskId);
+  if (id !== null) reply(res, await archiveTask(id, viewerOf(req.user)));
 });

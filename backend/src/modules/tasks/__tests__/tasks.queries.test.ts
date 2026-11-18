@@ -52,4 +52,33 @@ describe('board queries', () => {
     expect(await q.assigneesOf(empty.db, [])).toEqual(new Map());
     expect(empty.calls).toHaveLength(0);
   });
+
+  it('findTask: only not archived tasks of a project the viewer sees, optional row lock', async () => {
+    const { db, calls } = spyDb([]);
+    expect(await q.findTask(db, 7, { id: 5, name: 'Jan Kowalski', role: 'employee' }, { lock: true })).toBeNull();
+    const [sql, params] = calls[0]!;
+    expect(sql).toMatch(/t\.id = \? AND t\.archived_at IS NULL AND \(\? = 'admin' OR EXISTS \(SELECT 1 FROM project_members/);
+    expect(sql).toMatch(/FOR UPDATE$/);
+    expect(params).toEqual([7, 'employee', 5]);
+  });
+
+  it('columnTaskIds locks the column (not archived) in position order', async () => {
+    const { db, calls } = spyDb([{ id: 11 }, { id: 12 }]);
+    expect(await q.columnTaskIds(db, 9, 'done')).toEqual([11, 12]);
+    expect(calls[0]![0]).toMatch(/project_id = \? AND column_key = \? AND archived_at IS NULL ORDER BY position, id FOR UPDATE/);
+    expect(calls[0]![1]).toEqual([9, 'done']);
+  });
+
+  it('setPositions numbers 1..n; setAssignees replaces the list', async () => {
+    const { db, calls } = spyDb({});
+    await q.setPositions(db, [7, 11]);
+    expect(calls.map((c) => c[1])).toEqual([[1, 7], [2, 11]]);
+    const a = spyDb({});
+    await q.setAssignees(a.db, 7, [5, 6]);
+    expect(a.calls[0]![0]).toMatch(/DELETE FROM task_assignees WHERE task_id = \?/);
+    expect(a.calls[1]![1]).toEqual([[[7, 5], [7, 6]]]);
+    const none = spyDb({});
+    await q.setAssignees(none.db, 7, []);
+    expect(none.calls).toHaveLength(1);
+  });
 });

@@ -133,7 +133,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   liczba w `oldDoneCount`, a z `?oldDone=1` są w `tasks`; `leaves` tylko dla zadań spoza `done` z terminem ≥ dziś
   (bez terminu: dziś + 14 dni), z `listApprovedLeaves`; `?oldDone=2` → 400 → `npm run check`.
 
-- [ ] **9. Zadania: dodanie, zmiana, przeniesienie, archiwum.** Pliki `tasks.queries.ts`, `tasks.service.ts`.
+- [x] **9. Zadania: dodanie, zmiana, przeniesienie, archiwum.** Pliki `tasks.queries.ts`, `tasks.service.ts`.
   Testy w `tasks.routes.test.ts` i `tasks.service.test.ts`:
   - `POST /tasks/projects/:id/tasks`: 201; termin wczoraj → 400 `tasks.due_in_past` (pole `dueDate`); osoba spoza
     projektu, z archiwum albo pracownik niebędący członkiem → 400 `tasks.assignee_not_allowed` (pole

@@ -1,4 +1,4 @@
-import type { RowDataPacket } from 'mysql2';
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { BoardPerson, Role, TaskColumn } from '@app/shared';
 import type { Db } from '../../db/pool';
 import type { Viewer } from '../../middleware/routeHelpers';
@@ -91,4 +91,58 @@ export const assigneesOf = async (db: Db, taskIds: number[]): Promise<Map<number
   const [rows] = await db.query<RowDataPacket[]>('SELECT task_id, user_id FROM task_assignees WHERE task_id IN (?) ORDER BY task_id, user_id', [taskIds]);
   for (const r of rows) map.set(r.task_id as number, [...(map.get(r.task_id as number) ?? []), r.user_id as number]);
   return map;
+};
+
+/** Zadanie (bez archiwum) z projektu, który osoba widzi; `lock` blokuje wiersz do końca transakcji. */
+export const findTask = async (db: Db, id: number, viewer: Viewer, opts: { lock?: boolean } = {}): Promise<TaskRow | null> => {
+  const sql = `SELECT ${TASK_COLUMNS_SQL} FROM tasks t
+     WHERE t.id = ? AND t.archived_at IS NULL AND (? = 'admin' OR EXISTS (SELECT 1 FROM project_members pm WHERE pm.project_id = t.project_id AND pm.user_id = ?))`;
+  const [rows] = await db.query<RowDataPacket[]>(opts.lock ? `${sql} FOR UPDATE` : sql, [id, viewer.role, viewer.id]); // rule-ok: wstawiona tylko stała lista kolumn i stałe FOR UPDATE z tego pliku, dane idą przez ?
+  return rows[0] ? toTask(rows[0]) : null;
+};
+
+/** Zadania kolumny (bez archiwum) w kolejności, zablokowane: dwa przeciągnięcia naraz czekają na siebie. */
+export const columnTaskIds = async (db: Db, projectId: number, column: TaskColumn): Promise<number[]> => {
+  const [rows] = await db.query<RowDataPacket[]>(
+    'SELECT id FROM tasks WHERE project_id = ? AND column_key = ? AND archived_at IS NULL ORDER BY position, id FOR UPDATE',
+    [projectId, column],
+  );
+  return rows.map((r) => r.id as number);
+};
+
+/** Pozycje 1..n w podanej kolejności (bez dziur i powtórzeń). */
+export const setPositions = async (db: Db, ids: number[]): Promise<void> => {
+  for (const [index, id] of ids.entries()) await db.query('UPDATE tasks SET position = ? WHERE id = ?', [index + 1, id]);
+};
+
+export const insertTask = async (
+  db: Db,
+  t: { projectId: number; title: string; description: string | null; dueDate: string | null; column: TaskColumn; completedAt: Date | null; createdBy: number; createdByName: string },
+): Promise<number> => {
+  const [result] = await db.query<ResultSetHeader>(
+    `INSERT INTO tasks (project_id, title, description, due_date, column_key, position, completed_at, created_by, created_by_name)
+     VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?)`,
+    [t.projectId, t.title, t.description, t.dueDate, t.column, t.completedAt, t.createdBy, t.createdByName],
+  );
+  return result.insertId;
+};
+
+export const updateTask = async (db: Db, id: number, t: { title: string; description: string | null; dueDate: string | null }): Promise<void> => {
+  await db.query('UPDATE tasks SET title = ?, description = ?, due_date = ? WHERE id = ?', [t.title, t.description, t.dueDate, id]);
+};
+
+/** Nowa kolumna i data realizacji (liczy usługa: wejście do „Zrealizowane” = teraz, wyjście = brak). */
+export const setColumn = async (db: Db, id: number, column: TaskColumn, completedAt: Date | null): Promise<void> => {
+  await db.query('UPDATE tasks SET column_key = ?, completed_at = ? WHERE id = ?', [column, completedAt, id]);
+};
+
+export const setAssignees = async (db: Db, taskId: number, userIds: number[]): Promise<void> => {
+  await db.query('DELETE FROM task_assignees WHERE task_id = ?', [taskId]);
+  if (userIds.length === 0) return;
+  await db.query('INSERT INTO task_assignees (task_id, user_id) VALUES ?', [userIds.map((id) => [taskId, id])]);
+};
+
+/** „Usuń” na tablicy: do archiwum (przywraca administrator w module Archiwum). */
+export const archiveTask = async (db: Db, id: number, byUserId: number): Promise<void> => {
+  await db.query('UPDATE tasks SET archived_at = NOW(), archived_by = ? WHERE id = ?', [byUserId, id]);
 };

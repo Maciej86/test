@@ -12,10 +12,20 @@ vi.mock('../tasks.queries', () => ({
   boardTasks: vi.fn(),
   countOldDone: vi.fn(),
   assigneesOf: vi.fn(),
+  findTask: vi.fn(),
+  columnTaskIds: vi.fn(),
+  setPositions: vi.fn(),
+  insertTask: vi.fn(),
+  updateTask: vi.fn(),
+  setColumn: vi.fn(),
+  setAssignees: vi.fn(),
+  archiveTask: vi.fn(),
 }));
 
 const q = await import('../tasks.queries');
 const { listApprovedLeaves } = await import('../../leave-requests/leave-requests.queries');
+const { notifyUsers } = await import('../../notifications/notifications.service');
+const { logActivity } = await import('../../../db/activityLog');
 const s = await import('../tasks.service');
 
 const jan = { id: 5, name: 'Jan Kowalski', role: 'employee' as const };
@@ -93,10 +103,147 @@ describe('board', () => {
     expect(byId.get(10)!.leaves).toEqual([]);
   });
 
-  it.todo('new task goes to the top of its column');
-  it.todo('author comes from the actor, not the request');
-  it.todo('task_assigned only for newly assigned people other than the author');
-  it.todo('column change via edit puts the card on top and sets or clears completed_at');
-  it.todo('move renumbers the column without gaps under a lock');
-  it.todo('history entries for create, update, status and archive');
+});
+
+const people = [
+  { id: 1, name: 'Anna Nowak', role: 'admin' as const, archived: false, assignable: true },
+  { id: 5, name: 'Jan Kowalski', role: 'employee' as const, archived: false, assignable: true },
+  { id: 6, name: 'Piotr Zieliński', role: 'employee' as const, archived: false, assignable: true },
+  { id: 8, name: 'Ewa Mazur', role: 'employee' as const, archived: true, assignable: false },
+];
+const input = { title: 'Zamówić ulotki', description: null, dueDate: '2026-11-25', column: 'draft' as const, assigneeIds: [5, 6] };
+
+describe('task writes', () => {
+  beforeEach(() => {
+    vi.mocked(q.boardPeople).mockResolvedValue(people);
+    vi.mocked(q.insertTask).mockResolvedValue(40);
+    vi.mocked(q.columnTaskIds).mockResolvedValue([11, 12]);
+    vi.mocked(q.findTask).mockResolvedValue(row({ id: 7, column: 'draft' }));
+    vi.mocked(q.assigneesOf).mockResolvedValue(new Map([[7, [5]]]));
+  });
+
+  it('new task goes to the top of its column, author from the actor, assignees saved', async () => {
+    expect(await s.createTask(9, input, jan)).toEqual({ id: 40 });
+    expect(q.findVisibleProject).toHaveBeenCalledWith(conn, 9, jan);
+    expect(q.columnTaskIds).toHaveBeenCalledWith(conn, 9, 'draft');
+    expect(q.insertTask).toHaveBeenCalledWith(conn, {
+      projectId: 9, title: 'Zamówić ulotki', description: null, dueDate: '2026-11-25', column: 'draft', completedAt: null, createdBy: 5, createdByName: 'Jan Kowalski',
+    });
+    expect(q.setPositions).toHaveBeenCalledWith(conn, [40, 11, 12]);
+    expect(q.setAssignees).toHaveBeenCalledWith(conn, 40, [5, 6]);
+  });
+
+  it('new task straight into done gets completed_at now', async () => {
+    await s.createTask(9, { ...input, column: 'done' }, jan);
+    expect(q.insertTask).toHaveBeenCalledWith(conn, expect.objectContaining({ column: 'done', completedAt: new Date('2026-11-18T08:00:00Z') }));
+  });
+
+  it('task_assigned for the assignees (the author is skipped by notifyUsers), link opens the task; history create', async () => {
+    await s.createTask(9, input, jan);
+    expect(notifyUsers).toHaveBeenCalledWith(conn, {
+      type: 'task_assigned', userIds: [5, 6], params: { task: 'Zamówić ulotki', dueDate: '2026-11-25' }, link: '/admin/tasks/9?task=40', actor: { id: 5, name: 'Jan Kowalski' },
+    });
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'create', entityType: 'tasks', entityId: 40, userId: 5 }));
+  });
+
+  it('no due date → no dueDate parameter in the notification', async () => {
+    await s.createTask(9, { ...input, dueDate: null }, jan);
+    expect(notifyUsers).toHaveBeenCalledWith(conn, expect.objectContaining({ params: { task: 'Zamówić ulotki' } }));
+  });
+
+  it('project not visible → 404; assignee outside the project or archived → 400 on assigneeIds', async () => {
+    vi.mocked(q.findVisibleProject).mockResolvedValueOnce(null);
+    expect(await s.createTask(9, input, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
+    for (const ids of [[99], [8]]) {
+      expect(await s.createTask(9, { ...input, assigneeIds: ids }, jan)).toEqual({
+        error: expect.objectContaining({ status: 400, fields: { assigneeIds: 'tasks.assignee_not_allowed' } }),
+      });
+    }
+    expect(q.insertTask).not.toHaveBeenCalled();
+  });
+
+  it('edit: task_assigned only for newly assigned people; an archived person already assigned may stay', async () => {
+    vi.mocked(q.assigneesOf).mockResolvedValue(new Map([[7, [5, 8]]]));
+    expect(await s.updateTask(7, { ...input, assigneeIds: [5, 8, 6] }, jan)).toEqual({ ok: true });
+    expect(q.findTask).toHaveBeenCalledWith(conn, 7, jan, { lock: true });
+    expect(q.updateTask).toHaveBeenCalledWith(conn, 7, { title: 'Zamówić ulotki', description: null, dueDate: '2026-11-25' });
+    expect(q.setAssignees).toHaveBeenCalledWith(conn, 7, [5, 8, 6]);
+    expect(notifyUsers).toHaveBeenCalledWith(conn, expect.objectContaining({ type: 'task_assigned', userIds: [6], link: '/admin/tasks/9?task=7' }));
+    expect(q.setColumn).not.toHaveBeenCalled();
+  });
+
+  it('edit: task not found, archived or in a project the viewer cannot see → 404', async () => {
+    vi.mocked(q.findTask).mockResolvedValue(null);
+    expect(await s.updateTask(7, input, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
+    expect(q.updateTask).not.toHaveBeenCalled();
+  });
+
+  it('column change via edit puts the card on top and sets or clears completed_at', async () => {
+    vi.mocked(q.columnTaskIds).mockImplementation(async (_db, _p, column) => (column === 'done' ? [21, 22] : [7, 11]));
+    await s.updateTask(7, { ...input, column: 'done' }, jan);
+    expect(q.setColumn).toHaveBeenCalledWith(conn, 7, 'done', new Date('2026-11-18T08:00:00Z'));
+    expect(q.setPositions).toHaveBeenCalledWith(conn, [7, 21, 22]);
+    expect(q.setPositions).toHaveBeenCalledWith(conn, [11]);
+    vi.clearAllMocks();
+    vi.mocked(q.findTask).mockResolvedValue(row({ id: 7, column: 'done', completedAt: '2026-11-17T10:00:00.000Z' }));
+    vi.mocked(q.assigneesOf).mockResolvedValue(new Map([[7, [5]]]));
+    vi.mocked(q.boardPeople).mockResolvedValue(people);
+    vi.mocked(q.columnTaskIds).mockResolvedValue([]);
+    await s.updateTask(7, { ...input, column: 'in_progress' }, jan);
+    expect(q.setColumn).toHaveBeenCalledWith(conn, 7, 'in_progress', null);
+  });
+
+  it('move inside a column: before another card, positions 1..n without gaps', async () => {
+    vi.mocked(q.findTask).mockResolvedValue(row({ id: 7, column: 'in_progress' }));
+    vi.mocked(q.columnTaskIds).mockResolvedValue([11, 7, 12, 13]);
+    expect(await s.moveTask(7, { column: 'in_progress', beforeTaskId: 11 }, jan)).toEqual({ ok: true });
+    expect(q.setPositions).toHaveBeenCalledWith(conn, [7, 11, 12, 13]);
+    expect(q.setColumn).not.toHaveBeenCalled();
+    expect(logActivity).not.toHaveBeenCalled();
+  });
+
+  it('move to another column at the end: completed_at set, old column renumbered, history status', async () => {
+    vi.mocked(q.findTask).mockResolvedValue(row({ id: 7, column: 'in_progress' }));
+    vi.mocked(q.columnTaskIds).mockImplementation(async (_db, _p, column) => (column === 'done' ? [21] : [11, 7, 12]));
+    await s.moveTask(7, { column: 'done', beforeTaskId: null }, jan);
+    expect(q.setColumn).toHaveBeenCalledWith(conn, 7, 'done', new Date('2026-11-18T08:00:00Z'));
+    expect(q.setPositions).toHaveBeenCalledWith(conn, [21, 7]);
+    expect(q.setPositions).toHaveBeenCalledWith(conn, [11, 12]);
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({
+      action: 'status', entityType: 'tasks', entityId: 7, changes: { column_key: { before: 'in_progress', after: 'done' } },
+    }));
+  });
+
+  it('move inside done keeps completed_at', async () => {
+    vi.mocked(q.findTask).mockResolvedValue(row({ id: 7, column: 'done', completedAt: '2026-11-01T10:00:00.000Z' }));
+    vi.mocked(q.columnTaskIds).mockResolvedValue([21, 7]);
+    await s.moveTask(7, { column: 'done', beforeTaskId: 21 }, jan);
+    expect(q.setColumn).not.toHaveBeenCalled();
+  });
+
+  it('move: beforeTaskId not in the target column (other project, other column, archived) → 400', async () => {
+    vi.mocked(q.findTask).mockResolvedValue(row({ id: 7, column: 'in_progress' }));
+    vi.mocked(q.columnTaskIds).mockResolvedValue([11, 7]);
+    expect(await s.moveTask(7, { column: 'in_progress', beforeTaskId: 99 }, jan)).toEqual({
+      error: expect.objectContaining({ status: 400, message: 'tasks.before_task_invalid' }),
+    });
+    expect(await s.moveTask(7, { column: 'in_progress', beforeTaskId: 7 }, jan)).toEqual({ error: expect.objectContaining({ status: 400 }) });
+    expect(q.setPositions).not.toHaveBeenCalled();
+  });
+
+  it('archive: by the actor, history archive; missing → 404', async () => {
+    expect(await s.archiveTask(7, jan)).toEqual({ ok: true });
+    expect(q.archiveTask).toHaveBeenCalledWith(conn, 7, 5);
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'archive', entityType: 'tasks', entityId: 7 }));
+    vi.mocked(q.findTask).mockResolvedValue(null);
+    expect(await s.archiveTask(7, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
+  });
+
+  it('history: edit writes changed fields and assignees before → after', async () => {
+    await s.updateTask(7, { ...input, title: 'Nowy tytuł', assigneeIds: [6] }, jan);
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({
+      action: 'update', entityType: 'tasks', entityId: 7,
+      changes: expect.objectContaining({ title: { before: 'Oferta dla hurtowni', after: 'Nowy tytuł' }, assignee_ids: { before: [5], after: [6] } }),
+    }));
+  });
 });
