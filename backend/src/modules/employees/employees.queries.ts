@@ -209,10 +209,11 @@ export const closePool = async (db: Db, id: number): Promise<void> => {
   await db.query('UPDATE leave_pools SET closed_at = NOW() WHERE id = ?', [id]);
 };
 
-/** Osoby spoza archiwum (np. do przypisania zadania). */
-export const listActiveUsers = async (db: Db): Promise<{ id: number; name: string }[]> => {
+/** Osoby spoza archiwum, opcjonalnie tylko z jedną rolą (np. pracownicy do projektu w module Zadania). */
+export const listActiveUsers = async (db: Db, role?: Role): Promise<{ id: number; name: string }[]> => {
   const [rows] = await db.query<RowDataPacket[]>(
-    'SELECT id, name FROM users WHERE archived_at IS NULL ORDER BY last_name, first_name',
+    'SELECT id, name FROM users WHERE archived_at IS NULL AND (? IS NULL OR role = ?) ORDER BY last_name, first_name',
+    [role ?? null, role ?? null],
   );
   return rows.map((r) => ({ id: r.id as number, name: r.name as string }));
 };

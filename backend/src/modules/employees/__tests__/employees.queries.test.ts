@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn() } }));
-const { findOpenPoolsForYear, insertUser, listEmployees, setTemporaryPassword, updateUser } = await import('../employees.queries');
+const { findOpenPoolsForYear, insertUser, listActiveUsers, listEmployees, setTemporaryPassword, updateUser } = await import('../employees.queries');
 
 const fakeDb = (rows: unknown[][]) => {
   const query = vi.fn();
@@ -70,5 +70,17 @@ describe('employees queries', () => {
     const db = { query: vi.fn().mockResolvedValue([[]]) };
     await findOpenPoolsForYear(db, 2026);
     expect(db.query.mock.calls[0]![0]).toMatch(/FOR UPDATE OF p$/);
+  });
+
+  // Kandydaci na członków projektu (moduł Zadania): tylko pracownicy spoza archiwum.
+  it('listActiveUsers can be limited to one role', async () => {
+    const all = { query: vi.fn().mockResolvedValue([[{ id: 2, name: 'Jan Kowalski' }]]) };
+    await listActiveUsers(all);
+    expect(all.query.mock.calls[0]![1]).toEqual([null, null]);
+    const employees = { query: vi.fn().mockResolvedValue([[{ id: 2, name: 'Jan Kowalski' }]]) };
+    expect(await listActiveUsers(employees, 'employee')).toEqual([{ id: 2, name: 'Jan Kowalski' }]);
+    const [sql, params] = employees.query.mock.calls[0]!;
+    expect(sql).toMatch(/archived_at IS NULL AND \(\? IS NULL OR role = \?\)/);
+    expect(params).toEqual(['employee', 'employee']);
   });
 });

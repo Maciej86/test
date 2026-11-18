@@ -1,5 +1,5 @@
 import type { Response } from 'express';
-import { SERVER_MESSAGES } from '@app/shared';
+import { SERVER_MESSAGES, type Role } from '@app/shared';
 import { sendError } from './errors';
 
 /**
@@ -27,6 +27,13 @@ export interface Actor {
 }
 
 export const actorOf = (user: Express.Request['user']): Actor => ({ id: user!.id, name: user!.name });
+
+/** Osoba z rolą: gdy dostęp do rekordu zależy od roli (np. administrator widzi wszystkie projekty). */
+export interface Viewer extends Actor {
+  role: Role;
+}
+
+export const viewerOf = (user: Express.Request['user']): Viewer => ({ id: user!.id, name: user!.name, role: user!.role });
 
 /** Rekord nie istnieje albo jest poza zasięgiem tej osoby (cudzy rekord też daje 404, nie 403). */
 export const notFound = (): { error: ServiceError } => fail(404, SERVER_MESSAGES.notFound);

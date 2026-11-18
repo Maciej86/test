@@ -38,6 +38,10 @@
       "title": "Nowe zadanie dla Ciebie",
       "detail": "„{{task}}”, termin: {{dueDate}}",
       "detail_no_due": "„{{task}}”"
+    },
+    "project_added": {
+      "title": "Dodano Cię do projektu",
+      "detail": "„{{project}}”"
     }
   },
   "mockup_state": "Pokaż stan:",

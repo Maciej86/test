@@ -101,7 +101,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   dateTo }[]` bez rodzaju i powodu; pusta lista osób → `[]` bez zapytania. Kod w `leave-requests.queries.ts`
   → `npm run check`.
 
-- [ ] **7. Projekty: zapytania, usługa, trasy.** Pliki `backend/src/modules/tasks/projects.queries.ts`,
+- [x] **7. Projekty: zapytania, usługa, trasy.** Pliki `backend/src/modules/tasks/projects.queries.ts`,
   `projects.service.ts`, `tasks.routes.ts` (jeden router modułu, `mountModule(api, 'tasks', tasksRoutes)` w `app.ts`).
   Testy w `projects.routes.test.ts` (wzór: `leave-types.routes.test.ts`, usługa podmieniona) i
   `tasks.service.test.ts` (zapytania podmienione):
@@ -120,6 +120,11 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   - Funkcja dla Pracowników: `addMemberWhereAssigned(conn: PoolConnection, userId: number, actor: Actor):
     Promise<number[]>` dopisuje osobę do projektów, w których ma przypisane zadanie spoza `done` i spoza archiwum,
     zwraca numery projektów, wpis historii `projects`/`update` dla każdego → `npm run check`.
+
+  **Uwaga:** testy usługi i zapytań projektów są w osobnych plikach `projects.service.test.ts` i
+  `projects.queries.test.ts`; rodzaj powiadomienia `project_added` (stała, teksty, ikona w dzwonku) wszedł już w tym
+  kroku, bo usługa go potrzebuje (z kroku 11 zostaje spec Powiadomień); `Viewer`/`viewerOf` dopisane do
+  `routeHelpers.ts`; `listActiveUsers(db, role?)` w Pracownikach.
 
 - [ ] **8. Tablica projektu.** `GET /tasks/projects/:id/board` w `board.routes.test.ts` i `tasks.service.test.ts`:
   pracownik spoza projektu → 404 (bez zdradzania, że projekt jest); admin bez członkostwa → 200; `people` =
