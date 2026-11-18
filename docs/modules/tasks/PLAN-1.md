@@ -59,7 +59,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
     (d: OrderDirection) => void` (test makiety poprawiony). Podmiana w `LeaveTypesTable` i `ContractTypesTable` → `npm run check`. **Uwaga:** `move_up`/`move_down` zostają też w
     `leave-types.json` i `contract-types.json`, bo używają ich makiety zamkniętych modułów (ich się nie zmienia).
 
-- [ ] **2. Biblioteka `@dnd-kit`.** `npm install -w @app/frontend -w @app/mockups @dnd-kit/core @dnd-kit/sortable
+- [x] **2. Biblioteka `@dnd-kit`.** `npm install -w @app/frontend -w @app/mockups @dnd-kit/core @dnd-kit/sortable
   @dnd-kit/utilities` (wersje sprzed co najmniej 2 tygodni), wpis jest już w „Bibliotekach” `SPEC-GENERAL.md`;
   `npm audit --omit=dev` bez „high”/„critical` → `npm run check`.
 
