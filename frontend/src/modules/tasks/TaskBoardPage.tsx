@@ -77,7 +77,15 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
   const open = data.tasks.filter((task) => task.column !== 'done');
 
   const sendMove = (task: BoardTask, column: TaskColumn, beforeTaskId: number | null) =>
-    move.mutate({ taskId: task.id, column, beforeTaskId }, { onError: (error) => notify.error(apiErrorMessage(error, t)) });
+    move.mutate(
+      { taskId: task.id, column, beforeTaskId },
+      {
+        onError: (error) => {
+          drag.reset();
+          notify.error(apiErrorMessage(error, t));
+        },
+      },
+    );
   const drag = useBoardDrag(data.tasks, sendMove);
   const { tasks, targetColumn, activeTask } = drag;
 

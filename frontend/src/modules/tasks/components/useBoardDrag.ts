@@ -31,6 +31,10 @@ export const useBoardDrag = (tasks: BoardTask[], onMove: (task: BoardTask, colum
   // Kolumna, do której trafi przeciągana karta (podświetlona ramka).
   const [targetColumn, setTargetColumn] = useState<TaskColumn | null>(null);
   const [activeId, setActiveId] = useState<number | null>(null);
+  // Ułożenie po upuszczeniu, ważne dla tych danych tablicy (`base`), na których przeciąganie się zaczęło. Nowe dane
+  // (zmiana od razu na ekranie po wysłaniu albo odpowiedź serwera) je zastępują, więc karta nie wraca na chwilę na
+  // stare miejsce, a „duch” leci od razu do nowej kolumny.
+  const [settled, setSettled] = useState<{ base: BoardTask[]; tasks: BoardTask[] } | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
@@ -42,6 +46,7 @@ export const useBoardDrag = (tasks: BoardTask[], onMove: (task: BoardTask, colum
     setActiveId(null);
   };
   const onDragStart = ({ active }: DragStartEvent) => {
+    setSettled(null);
     setDragTasks(tasks);
     setActiveId(Number(active.id));
   };
@@ -61,16 +66,21 @@ export const useBoardDrag = (tasks: BoardTask[], onMove: (task: BoardTask, colum
     if (dragTasks && task) {
       const before = placementOf(tasks, id);
       const after = over ? dropTarget(dragTasks, id, over.id) : placementOf(dragTasks, id);
-      if (before.column !== after.column || before.beforeTaskId !== after.beforeTaskId) onMove(task, after.column, after.beforeTaskId);
+      if (before.column !== after.column || before.beforeTaskId !== after.beforeTaskId) {
+        setSettled({ base: tasks, tasks: moveInBoard(dragTasks, id, after) });
+        onMove(task, after.column, after.beforeTaskId);
+      }
     }
     stop();
   };
 
   return {
     /** Karty do pokazania: kopia w trakcie przeciągania, inaczej z serwera. */
-    tasks: dragTasks ?? tasks,
+    tasks: dragTasks ?? (settled && settled.base === tasks ? settled.tasks : tasks),
     targetColumn,
     activeTask: activeId === null ? null : (tasks.find((task) => task.id === activeId) ?? null),
+    /** Serwer odrzucił przeniesienie: wraca ułożenie z danych tablicy. */
+    reset: () => setSettled(null),
     context: { sensors, collisionDetection, onDragStart, onDragOver, onDragEnd, onDragCancel: stop },
   };
 };
