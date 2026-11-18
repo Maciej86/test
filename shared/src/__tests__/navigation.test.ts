@@ -246,3 +246,11 @@ describe('safeNextPath', () => {
     for (const path of bad) expect(safeNextPath(path)).toBeNull();
   });
 });
+
+describe('tasks navigation', () => {
+  it('Zadania is a group: both roles reach the module, only the admin sees Projekty', () => {
+    const tasks = NAVIGATION.find((i) => i.key === 'tasks')!;
+    expect(tasks.children?.map((c) => [c.key, c.path, c.roles])).toEqual([['task-projects', '/admin/tasks/projects', ['admin']]]);
+    expect(rolesFor('tasks', NAVIGATION)?.sort()).toEqual(['admin', 'employee']);
+  });
+});

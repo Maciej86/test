@@ -121,8 +121,8 @@ describe('login guard', () => {
     expect(router.state.location.pathname).toBe('/login');
   });
 
-  it('a person with a temporary password on /admin/tasks sees the change password screen', async () => {
-    const { router } = renderRoutes(buildAppRoutes(areas, pages, { ...user, mustChangePassword: true }), '/admin/tasks');
+  it('a person with a temporary password on /admin/employees sees the change password screen', async () => {
+    const { router } = renderRoutes(buildAppRoutes(areas, pages, { ...user, mustChangePassword: true }), '/admin/employees');
     expect(await screen.findByText('Ekran hasła')).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/change-password');
   });

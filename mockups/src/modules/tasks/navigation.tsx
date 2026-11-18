@@ -6,8 +6,8 @@ import { TasksMockup } from './TasksMockup';
 import { PROJECTS } from './data';
 
 /**
- * Makieta menu „Zadania” z projektami: „Zadania” staje się grupą, pod nią projekty (pracownik widzi tylko swoje)
- * i „Projekty” dla administratora. W aplikacji projekty przyjdą z bazy; tu są zmyślone z data.ts.
+ * Makieta menu „Zadania”: przed stałą pozycją „Projekty” z navigation.config.ts dokłada projekty (pracownik widzi
+ * tylko swoje). W aplikacji robi to useAppNavigation z projektami z serwera; tu są zmyślone z data.ts.
  */
 export const withTaskProjects = (items: NavItem[]): NavItem[] =>
   items.map((item) =>
@@ -17,19 +17,20 @@ export const withTaskProjects = (items: NavItem[]): NavItem[] =>
           ...item,
           children: [
             ...PROJECTS.map((p): NavItem => ({
-              key: `tasks-project-${p.id}`,
+              key: `task-project-${p.id}`,
               path: `/admin/tasks/${p.id}`,
-              label: `tasks.mockup_projects.${p.id}`,
+              label: item.label,
+              text: p.name,
               icon: 'folder',
               roles: p.members.includes(MOCK_USER_NAMES.employee ?? '') ? ['admin', 'employee'] : ['admin'],
             })),
-            { key: 'tasks-projects', path: '/admin/tasks/projects', label: 'tasks.projects_title', icon: 'folder-cog', roles: ['admin'] },
+            ...(item.children ?? []),
           ],
         },
   );
 
-/** Ekrany pozycji z `withTaskProjects` (klucz = NavItem.key). */
+/** Ekrany pozycji z `withTaskProjects` i grupy „Zadania” (klucz = NavItem.key). */
 export const TASK_SCREENS: Record<string, ComponentType> = {
-  ...Object.fromEntries(PROJECTS.map((p) => [`tasks-project-${p.id}`, () => <TasksMockup key={p.id} projectId={p.id} />])),
-  'tasks-projects': ProjectsMockup,
+  ...Object.fromEntries(PROJECTS.map((p) => [`task-project-${p.id}`, () => <TasksMockup key={p.id} projectId={p.id} />])),
+  'task-projects': ProjectsMockup,
 };

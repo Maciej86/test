@@ -16,6 +16,8 @@ export interface NavItem {
   /** Nazwa ikony z Lucide (https://lucide.dev/icons/), np. 'house', 'calendar-days'. Mapa: common/icons.tsx. */
   icon: string;
   roles: Role[];
+  /** Gotowa etykieta zamiast klucza `label` (np. nazwa projektu z serwera). */
+  text?: string;
   children?: NavItem[];
   /** Strona ma też adres szczegółów `<path>/:id` (np. `/admin/leave-requests/24` z e-maila); ta sama strona i role. */
   detailPath?: boolean;

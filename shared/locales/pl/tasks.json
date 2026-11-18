@@ -133,11 +133,6 @@
   "col_members": "Członkowie",
   "col_tasks": "Zadania",
   "col_created": "Utworzony",
-  "mockup_projects": {
-    "1": "Marketing",
-    "2": "Produkcja",
-    "3": "Montaż"
-  },
   "mockup_project_states": {
     "list": "lista",
     "new": "nowy projekt",

@@ -78,3 +78,20 @@ describe('NavMenu group', () => {
     expect(screen.getByText('Typy urlopów').closest('a')).toHaveAttribute('data-active', 'true');
   });
 });
+
+describe('NavMenu ready-made labels', () => {
+  it('shows `text` as the label instead of a translation key (projects from the server)', () => {
+    const nav: NavItem[] = [
+      {
+        key: 'tasks', path: '/admin/tasks', label: 'common.nav.tasks', icon: 'square-kanban', roles: ['admin'],
+        children: [{ key: 'task-project-3', path: '/admin/tasks/3', label: 'common.nav.tasks', text: 'Montaż', icon: 'folder', roles: ['admin'] }],
+      },
+    ];
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/admin/tasks/3']}>
+        <NavMenu items={nav} user={{ id: 1, name: 'Anna', role: 'admin', mustChangePassword: false }} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText('Montaż')).toBeInTheDocument();
+  });
+});

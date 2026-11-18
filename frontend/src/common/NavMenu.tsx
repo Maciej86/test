@@ -22,7 +22,7 @@ export const NavMenu = ({ items, user }: Props) => {
           key={item.key}
           component="button"
           type="button"
-          label={translateKey(t, item.label)}
+          label={item.text ?? translateKey(t, item.label)}
           leftSection={<NavIcon name={item.icon} />}
           defaultOpened={item.children.some((c) => c.key === activeKey)}
         >
@@ -34,7 +34,7 @@ export const NavMenu = ({ items, user }: Props) => {
           component={RouterLink}
           to={item.path}
           end
-          label={translateKey(t, item.label)}
+          label={item.text ?? translateKey(t, item.label)}
           leftSection={<NavIcon name={item.icon} />}
           active={item.key === activeKey}
         />

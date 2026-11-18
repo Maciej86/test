@@ -87,7 +87,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
     osób; 50 i 51 członków; powtórzony numer → błąd), termin wczoraj / dziś przy `newTaskSchema` z zegarem
     ustawionym na 2026-11-18 00:30 czasu polskiego (= 2026-11-17 23:30 UTC; „dziś” to 18.11) → `npm run check`.
 
-- [ ] **5. Menu z projektami (shared, front, makieta).**
+- [x] **5. Menu z projektami (shared, front, makieta).**
   - `NavItem` dostaje `text?: string` (gotowa etykieta zamiast klucza); `NavMenu` i `mockups/src/Shell.tsx`
     pokazują `item.text ?? translateKey(t, item.label)` (test w `NavMenu.test.tsx`).
   - `NAVIGATION`: `tasks` staje się grupą `children: [{ key: 'task-projects', path: '/admin/tasks/projects', label:

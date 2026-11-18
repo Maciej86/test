@@ -72,7 +72,7 @@ const MenuLinks = ({ items, role }: { items: NavItem[]; role: Role }) => {
           key={item.key}
           component="button"
           type="button"
-          label={translateKey(t, item.label)}
+          label={item.text ?? translateKey(t, item.label)}
           leftSection={<NavIcon name={item.icon} />}
           defaultOpened={item.children.some((c) => c.key === activeKey)}
         >
@@ -84,7 +84,7 @@ const MenuLinks = ({ items, role }: { items: NavItem[]; role: Role }) => {
           component={RouterLink}
           to={item.path}
           end
-          label={translateKey(t, item.label)}
+          label={item.text ?? translateKey(t, item.label)}
           leftSection={<NavIcon name={item.icon} />}
           active={item.key === activeKey}
         />
