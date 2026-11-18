@@ -1,9 +1,20 @@
 import { Router } from 'express';
-import { orderMoveSchema, projectDeleteSchema, projectSchema, type OrderMoveInput, type ProjectData, type ProjectDeleteInput } from '@app/shared';
+import {
+  boardQuerySchema,
+  orderMoveSchema,
+  projectDeleteSchema,
+  projectSchema,
+  type BoardQuery,
+  type OrderMoveInput,
+  type ProjectData,
+  type ProjectDeleteInput,
+} from '@app/shared';
 import { requireRole } from '../../middleware/requireRole';
 import { actorOf, idParam, reply, viewerOf } from '../../middleware/routeHelpers';
 import { validateBody } from '../../middleware/validateBody';
+import { validateQuery } from '../../middleware/validateQuery';
 import { createProject, deleteProject, listCandidates, listProjects, moveProject, updateProject } from './projects.service';
+import { getBoard } from './tasks.service';
 
 /**
  * Moduł Zadania: podpięty w app.ts przez mountModule (role grupy „Zadania”: admin, employee). Projekty zmienia tylko
@@ -37,4 +48,9 @@ tasksRoutes.post('/projects/:id/move', adminOnly, validateBody(orderMoveSchema),
 tasksRoutes.delete('/projects/:id', adminOnly, validateBody(projectDeleteSchema), async (req, res) => {
   const id = idParam(res, req.params.id);
   if (id !== null) reply(res, await deleteProject(id, (req.body as ProjectDeleteInput).confirmName, actorOf(req.user)));
+});
+
+tasksRoutes.get('/projects/:id/board', validateQuery(boardQuerySchema), async (req, res) => {
+  const id = idParam(res, req.params.id);
+  if (id !== null) reply(res, await getBoard(id, viewerOf(req.user), (req.query as unknown as BoardQuery).oldDone));
 });

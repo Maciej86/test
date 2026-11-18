@@ -126,7 +126,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   kroku, bo usługa go potrzebuje (z kroku 11 zostaje spec Powiadomień); `Viewer`/`viewerOf` dopisane do
   `routeHelpers.ts`; `listActiveUsers(db, role?)` w Pracownikach.
 
-- [ ] **8. Tablica projektu.** `GET /tasks/projects/:id/board` w `board.routes.test.ts` i `tasks.service.test.ts`:
+- [x] **8. Tablica projektu.** `GET /tasks/projects/:id/board` w `board.routes.test.ts` i `tasks.service.test.ts`:
   pracownik spoza projektu → 404 (bez zdradzania, że projekt jest); admin bez członkostwa → 200; `people` =
   aktywni administratorzy i członkowie (z `assignable`) plus osoby z archiwum przypisane do zadań; `tasks` bez
   archiwum, w kolejności `column_key`, `position`; zrealizowane z `completed_at` starszym niż 30 dni pominięte, ich
