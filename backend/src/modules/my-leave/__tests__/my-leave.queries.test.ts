@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { Db } from '../../../db/pool';
 
 vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn() } }));
 const q = await import('../my-leave.queries');
 const { findOpenPoolOfUser } = await import('../../employees/employees.queries');
-type Db = import('../my-leave.queries').Db;
 
 type Call = [string, unknown[] | undefined];
 const spyDb = (result: unknown = []) => {

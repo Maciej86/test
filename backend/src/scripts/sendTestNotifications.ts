@@ -2,7 +2,8 @@ import { pathToFileURL } from 'node:url';
 import { createI18n, type NotificationType } from '@app/shared';
 import { pool } from '../db/pool';
 import { withTransaction } from '../db/transaction';
-import { activeIdsByRole, type Db } from '../modules/notifications/notifications.queries';
+import type { Db } from '../db/pool';
+import { activeIdsByRole } from '../modules/notifications/notifications.queries';
 import { notifyUsers } from '../modules/notifications/notifications.service';
 
 // `npm run notifications:test`: przykładowe powiadomienia każdego rodzaju dla aktywnych kont (dane jak w makiecie

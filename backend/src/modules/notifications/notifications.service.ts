@@ -8,7 +8,7 @@ import {
   type NotificationType,
 } from '@app/shared';
 import { PAGE_SIZE } from '../../config/constants';
-import { pool } from '../../db/pool';
+import { pool, type Db } from '../../db/pool';
 import { notFound, type Result } from '../../middleware/routeHelpers';
 import {
   activeIdsByRole,
@@ -19,7 +19,6 @@ import {
   listForUser,
   markAllRead,
   markRead,
-  type Db,
 } from './notifications.queries';
 
 /** Co i dla kogo zapisać. `actor` = `req.user` modułu, który tworzy powiadomienie (sam go nie dostaje). */

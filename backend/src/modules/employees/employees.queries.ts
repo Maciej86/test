@@ -1,10 +1,7 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { EmployeeSort, Role } from '@app/shared';
-import { pool } from '../../db/pool';
+import { pool, type Db } from '../../db/pool';
 import { likePattern } from '../../db/like';
-
-/** Pula połączeń albo połączenie transakcji: oba mają `query`. */
-export type Db = Pick<typeof pool, 'query'>;
 
 export interface EmployeeRow extends RowDataPacket {
   id: number;

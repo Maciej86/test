@@ -90,7 +90,10 @@ Nowa pozycja nawigacji: wpis w `NAVIGATION` (panel, ścieżka od `/admin`), `ACC
   w `src/test/`. Pilnuje tego test zasad.
 
 **Wspólne zamiast kopii.** Kod potrzebny w drugim miejscu nie powstaje drugi raz: przenosisz go do wspólnego
-miejsca, z testem, i podmieniasz w pierwszym module. Nie kopiujesz i nie importujesz z folderu innego modułu.
+miejsca, z testem, i w tym samym kroku podmieniasz **wszystkie** kopie w projekcie (każdy moduł, który robi to samo).
+Nie pytasz o to użytkownika i nie odkładasz podmiany (ani do `docs/IDEAS.md`, ani do `docs/FIXES.md`): nie zmienia ona
+działania aplikacji, a stara kopia zostaje wzorem dla następnych modułów. Do `FIXES.md` trafiają tylko porządki
+zgłoszone przez użytkownika, gdy inny moduł jest `w toku` (`changes.md`). Nie kopiujesz i nie importujesz z folderu innego modułu.
 
 | Co | Dokąd |
 |---|---|
@@ -98,6 +101,10 @@ miejsca, z testem, i podmieniasz w pierwszym module. Nie kopiujesz i nie importu
 | hook albo funkcja frontu bez wyglądu (parametry listy w adresie, mutacja odświeżająca listę) | `frontend/src/core/` |
 | pomocnik backendu (rozpoznanie powtórzonej nazwy, „nie znaleziono”) | `backend/src/db/` albo `backend/src/middleware/` |
 | logika potrzebna na froncie i w backendzie (daty, liczby, bieżący rok) | `shared/src/` |
+
+Komponent z wyglądem wydzielasz **od razu w obu miejscach**: `frontend/src/common/` i `mockups/src/common/` (ten sam
+kod, w makiecie bez wywołań API). Makiety modułów, które nie są jeszcze zrobione, przepinasz na wspólny klocek;
+makiet modułów zrobionych nie ruszasz.
 
 Szukasz po tym, **co kod robi**, a nie identycznego kodu: dwa okna z pytaniem i dwoma przyciskami, dwie listy
 z filtrami w adresie, dwa nagłówki ekranu to ten sam klocek, nawet gdy różnią się tekstem, kolorem przycisku,
@@ -327,6 +334,8 @@ więc backend sprawdza wszystko sam, nawet jeśli formularz już to sprawdził:
 - Kilka zapisów, które muszą się udać razem (także każdy zapis z historią zmian): `withTransaction(async (conn) => { … })`
   z `backend/src/db/transaction.ts`. Sama zatwierdza, cofa przy błędzie i oddaje połączenie; nie wołasz
   `pool.getConnection()` ręcznie.
+- Funkcje w `<module>.queries.ts` przyjmują `db: Db` (typ z `backend/src/db/pool.ts`), żeby to samo zapytanie
+  działało poza transakcją (`pool`) i w niej (`conn`). Nie definiuj własnego `Db` w module.
 
 ## Powiązania między modułami
 
@@ -381,13 +390,15 @@ Dwa przypadki, dwie drogi:
   pdfmake.addFonts(Roboto);
   pdfmake.setUrlAccessPolicy(() => false); // dokument nigdy nie pobiera nic z internetu
   pdfmake.setLocalAccessPolicy((path: string) => path.startsWith(fontsDir)); // ani plików z serwera
-  export const renderPdf = (doc: object): Promise<Buffer> =>
-    pdfmake.createPdf({ defaultStyle: { font: 'Roboto' }, ...doc }).getBuffer();
+  export const renderPdf = (doc: { defaultStyle?: object } & Record<string, unknown>): Promise<Buffer> =>
+    pdfmake.createPdf({ ...doc, defaultStyle: { font: 'Roboto', ...doc.defaultStyle } }).getBuffer();
   ```
   Treść dokumentu buduje funkcja modułu (np. `orders.pdf.ts`) z danych z bazy: teksty z i18n, daty przez
   `formatDate`, kwoty przez `formatMoney`, liczby przez `formatNumber`. Trasa `GET /api/<moduł>/:id/pdf` z tymi samymi
-  uprawnieniami co rekord, odpowiedź `Content-Type: application/pdf` i `Content-Disposition: attachment`. Obrazki
-  (np. logo) tylko z plików aplikacji, dołączone jako dane, nigdy z adresu podanego przez użytkownika.
+  uprawnieniami co rekord; nazwa pliku przez `res.attachment('zamowienie-<numer>.pdf')` (ustawia `Content-Type:
+  application/pdf` i `Content-Disposition: attachment`, polskie znaki koduje sam), bez nazw wpisanych przez
+  użytkownika. Obrazki (np. logo) tylko z plików aplikacji, dołączone jako dane, nigdy z adresu podanego przez
+  użytkownika.
   Testy: odpowiedź zaczyna się od `%PDF`, bez logowania 401, cudzy rekord 404.
 
 ## Na żywo (WebSocket)
@@ -535,7 +546,8 @@ niżej i listy z plików dziedzinowych modułu.
 
 ## Lista kontrolna przeglądu kodu
 
-Używaj jej, gdy nie ma `superpowers:requesting-code-review`:
+Przechodzisz ją przy każdym przeglądzie modułu: z `superpowers:requesting-code-review` recenzent dostaje ją
+w poleceniu, bez superpowers przechodzisz ją sam.
 
 - [ ] moduł podpięty przez `mountModule`; trasy publiczne tylko te z „Mapy dostępu”, z limitem i `validateBody`
 - [ ] każda trasa jest w „Mapie dostępu”, a testy sprawdzają 401 bez logowania i 403 dla złej roli
@@ -553,7 +565,9 @@ Używaj jej, gdy nie ma `superpowers:requesting-code-review`:
 - [ ] dane na froncie przez hooki `<module>.api.ts` i `DataState`; brak `useEffect` z pobieraniem i `fetch`
 - [ ] żaden fragment modułu nie robi tego samego co coś w innym module, `common/`, `core/` albo `shared/` (także
   „prawie tak samo”; recenzent porównuje z resztą projektu, nie tylko z tym modułem); wspólne klocki bez parametrów
-  na siłę
+  na siłę. Szukasz po wyglądzie i zachowaniu, nie po nazwach plików: np. każdy `<Modal>` z parą Anuluj/akcja to
+  jeden wspólny klocek okna potwierdzenia (np. `ConfirmModal` w `common/`; gdy go jeszcze nie ma, wydziel go), także
+  gdy siedzi wewnątrz innego okna
 - [ ] funkcje strzałkowe, bez `function`
 - [ ] numer z adresu przez `idParam`, odpowiedź usługi przez `reply`
 - [ ] listy: `validateQuery(listQuerySchema(...))`, sortowanie tylko po kolumnach z listy, stan w adresie

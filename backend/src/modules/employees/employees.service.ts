@@ -13,7 +13,7 @@ import {
 import { hashPassword } from '../../auth/password';
 import { PAGE_SIZE } from '../../config/constants';
 import { diffChanges, logActivity } from '../../db/activityLog';
-import { pool } from '../../db/pool';
+import { pool, type Db } from '../../db/pool';
 import { withTransaction } from '../../db/transaction';
 import { isDuplicateEntry } from '../../db/errors';
 import { fail, notFound, type Actor, type Result, type ServiceError } from '../../middleware/routeHelpers';
@@ -25,7 +25,7 @@ import * as q from './employees.queries';
 /** Bieżący rok kalendarzowy w strefie aplikacji. */
 
 /** Rok otwarty: najmniejszy rok z niezamkniętą pulą; bez pul bieżący rok. */
-export const getOpenYear = async (db: q.Db = pool): Promise<number> => {
+export const getOpenYear = async (db: Db = pool): Promise<number> => {
   return (await q.minOpenYear(db)) ?? currentYear();
 };
 
@@ -39,7 +39,7 @@ export interface PoolUsageDays {
 const NO_USAGE: PoolUsageDays = { usedDays: 0, pendingDays: 0, usedCarried: 0 };
 
 /** Wykorzystane (zatwierdzone) i czekające dni z puli, z wniosków modułu Moje urlopy (zapisany podział). */
-export const getPoolUsage = async (userIds: number[], year: number, db: q.Db = pool, opts: { lock?: boolean } = {}): Promise<Map<number, PoolUsageDays>> => {
+export const getPoolUsage = async (userIds: number[], year: number, db: Db = pool, opts: { lock?: boolean } = {}): Promise<Map<number, PoolUsageDays>> => {
   const usage = await sumPoolUsage(db, userIds, year, opts);
   return new Map(
     userIds.map((id) => {
@@ -80,7 +80,7 @@ export const listEmployeesPage = async (query: EmployeesListQuery, me: Actor): P
 };
 
 /** Login i e-mail są niepowtarzalne razem z archiwum; konto w archiwum → podpowiedź przywrócenia. */
-const findConflict = async (db: q.Db, login: string, email: string | null, exceptId: number | null): Promise<{ error: ServiceError } | null> => {
+const findConflict = async (db: Db, login: string, email: string | null, exceptId: number | null): Promise<{ error: ServiceError } | null> => {
   const others = await q.findAccountsWithLoginOrEmail(db, login, email, exceptId);
   for (const field of ['login', 'email'] as const) {
     const other = others.find((o) => (field === 'login' ? o.login === login : email !== null && o.email === email));
@@ -107,7 +107,7 @@ const duplicateError = (error: unknown): { error: ServiceError } | null => {
  * Typ umowy do zapisu: widoczny albo ten, który osoba już ma (ukryty zostaje u niej). Zwraca nazwę do historii.
  * Nieistniejący i cudzy ukryty → 400 pod polem.
  */
-const checkContractType = async (db: q.Db, typeId: number | null, currentTypeId: number | null): Promise<{ name: string | null } | { error: ServiceError }> => {
+const checkContractType = async (db: Db, typeId: number | null, currentTypeId: number | null): Promise<{ name: string | null } | { error: ServiceError }> => {
   if (typeId === null) return { name: null };
   const type = await findContractType(db, typeId, { forShare: true });
   if (!type || (type.hidden && type.id !== currentTypeId)) {
@@ -117,7 +117,7 @@ const checkContractType = async (db: q.Db, typeId: number | null, currentTypeId:
 };
 
 /** Nazwa obecnego typu osoby (do historii); brak → null. */
-const contractTypeName = async (db: q.Db, typeId: number | null): Promise<string | null> =>
+const contractTypeName = async (db: Db, typeId: number | null): Promise<string | null> =>
   typeId === null ? null : ((await findContractType(db, typeId))?.name ?? null);
 
 /** Pola konta do historii zmian (nazwy kolumn w bazie); typ umowy jako nazwa, żeby wpis był czytelny po zmianie nazwy. */
@@ -184,7 +184,7 @@ export const createEmployee = async (input: EmployeeCreateData, actor: Actor): P
 
 
 /** Konto spoza archiwum albo null. */
-const findActiveEmployee = async (db: q.Db, id: number) => {
+const findActiveEmployee = async (db: Db, id: number) => {
   const user = await q.findUser(db, id);
   return user && !user.archived_at ? user : null;
 };
@@ -269,7 +269,7 @@ export const restoreEmployee = async (id: number, actor: Actor): Promise<Result>
   });
 };
 
-const leftDaysByUser = async (pools: q.YearPoolRow[], year: number, db: q.Db = pool, opts: { lock?: boolean } = {}): Promise<Map<number, number>> => {
+const leftDaysByUser = async (pools: q.YearPoolRow[], year: number, db: Db = pool, opts: { lock?: boolean } = {}): Promise<Map<number, number>> => {
   const usage = await getPoolUsage(pools.map((p) => p.user_id), year, db, opts);
   return new Map(pools.map((p) => [p.user_id, toPool(year, p.annual_days, p.carried_days, usage.get(p.user_id) ?? NO_USAGE).leftDays]));
 };

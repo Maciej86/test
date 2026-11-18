@@ -1,9 +1,6 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { ContractTypeData, ContractTypeItem, SelectableContractType } from '@app/shared';
-import { pool } from '../../db/pool';
-
-/** Pula połączeń albo połączenie transakcji: oba mają `query`. */
-export type Db = Pick<typeof pool, 'query'>;
+import { pool, type Db } from '../../db/pool';
 
 interface ContractTypeRow extends RowDataPacket {
   id: number;

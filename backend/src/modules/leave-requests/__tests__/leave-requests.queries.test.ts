@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { Db } from '../../../db/pool';
 
 vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn() } }));
 const q = await import('../leave-requests.queries');
-type Db = import('../leave-requests.queries').Db;
 type ListFilters = import('../leave-requests.queries').ListFilters;
 
 type Call = [string, unknown[] | undefined];

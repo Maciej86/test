@@ -10,7 +10,7 @@ import {
 } from '@app/shared';
 import { PAGE_SIZE } from '../../config/constants';
 import { diffChanges, logActivity } from '../../db/activityLog';
-import { pool } from '../../db/pool';
+import { pool, type Db } from '../../db/pool';
 import { withTransaction } from '../../db/transaction';
 import { fail, notFound, type Actor, type Result, type ServiceError } from '../../middleware/routeHelpers';
 import type { PoolRow } from '../employees/employees.queries';
@@ -95,7 +95,7 @@ const alreadyDecided = (r: q.RequestItem): { error: ServiceError } =>
  * Decyzja w transakcji: blokada wiersza wniosku, sprawdzenie statusu, zmiana z warunkiem statusu, historia zmian
  * i powiadomienie pracownika. Drugi administrator (albo wycofanie) w tej samej chwili dostaje 409 `already_decided`.
  */
-const decide = (id: number, actor: Actor, d: Decision, extraCheck?: (conn: q.Db, r: q.RequestItem) => Promise<{ error: ServiceError } | null>): Promise<Result> =>
+const decide = (id: number, actor: Actor, d: Decision, extraCheck?: (conn: Db, r: q.RequestItem) => Promise<{ error: ServiceError } | null>): Promise<Result> =>
   withTransaction(async (conn) => {
     const r = await q.findRequest(conn, id, { lock: true });
     if (!r) return notFound();

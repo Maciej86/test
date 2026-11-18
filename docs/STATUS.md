@@ -1,6 +1,6 @@
 # Stan projektu: test
 
-**Wersja stepkit:** 0.1.36
+**Wersja stepkit:** 0.1.40
 
 **Następny krok:** Moduł Zadania: makieta (`/stepkit:dalej`).
 
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-18: Aktualizacja stepkit do 0.1.40: wspólny typ `Db` w `backend/src/db/pool.ts` zamiast kopii w modułach, nowy plik `docs/FIXES.md` na odłożone poprawki (na razie pusty: w `IDEAS.md` nie było otwartych poprawek), aktualne zasady w `docs/CONVENTIONS.md` i `docs/conventions/`.
 - 2026-11-17: Moduł Wnioski urlopowe zrobiony (potwierdzony przez użytkownika: „działa”): lista z zakładkami i filtrami, szczegóły pod `/admin/leave-requests/:id` (link z e-maila i dzwonka) z paskiem „Kto jeszcze ma wtedy wolne”, zatwierdzenie w oknie potwierdzenia, odrzucenie i anulowanie z obowiązkowym powodem, PDF, powiadomienia dla pracownika.
 - 2026-11-17: Wnioski urlopowe: 14 prób nadużyć (trasy i prawdziwa baza), jedna naprawiona (numer z adresu tylko z cyfr, `addressNumber` w `fields.ts`); sprawdzenie w przeglądarce (lista, szczegóły, zatwierdzenie, odrzucenie, telefon), tytuł szczegółów szeryfowy jak w makiecie; `npm run check` i 32 testy e2e zielone (pełny przebieg).
 - 2026-11-17: Wnioski urlopowe: zbudowane (kroki 0–16: lista z zakładkami i filtrami, szczegóły pod `/admin/leave-requests/:id` z paskiem „Kto jeszcze ma wtedy wolne”, zatwierdzenie w oknie, odrzucenie i anulowanie z powodem, PDF, powiadomienia), przegląd kodu z poprawkami, `npm run check` i 31 testów e2e zielone. Wspólne: `LeaveRequestParts`, `SearchField`, `sendInlinePdf`, `leaveRequestPdfData`, `likePattern`, adresy podstron (`detailPath`).

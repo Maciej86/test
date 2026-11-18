@@ -1,11 +1,9 @@
 import type { RowDataPacket } from 'mysql2';
 import type { LeaveRequestStatus } from '@app/shared';
-import type { pool } from '../db/pool';
+import type { Db } from '../db/pool';
 import type { LeaveRequestPdfData } from './leaveRequestPdf';
 
 // Wniosek do PDF dla obu tras: „Moje urlopy” (tylko własny, z `userId`) i „Wnioski urlopowe” (administrator, dowolny).
-
-type Db = Pick<typeof pool, 'query'>;
 
 export interface PdfRequestRow extends RowDataPacket {
   id: number;

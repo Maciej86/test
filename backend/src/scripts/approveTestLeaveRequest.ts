@@ -3,7 +3,7 @@ import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { createI18n, type LeaveRequestStatus } from '@app/shared';
 import { pool } from '../db/pool';
 import { withTransaction } from '../db/transaction';
-import type { Db } from '../modules/my-leave/my-leave.queries';
+import type { Db } from '../db/pool';
 
 // `npm run my-leave:approve-test [-- login]`: zatwierdza najnowszy wniosek czekający na decyzję (albo najnowszy wniosek
 // osoby o tym loginie) jako pierwszy aktywny administrator, żeby sprawdzić PDF, zanim zatwierdzanie zbuduje moduł

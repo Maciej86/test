@@ -1,9 +1,6 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { LeaveTypeData, LeaveTypeItem, SelectableLeaveType } from '@app/shared';
-import { pool } from '../../db/pool';
-
-/** Pula połączeń albo połączenie transakcji: oba mają `query`. */
-export type Db = Pick<typeof pool, 'query'>;
+import { pool, type Db } from '../../db/pool';
 
 export interface LeaveTypeRow extends RowDataPacket {
   id: number;

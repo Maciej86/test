@@ -4,7 +4,7 @@ import {
   type ContractTypeDirection,
   type ContractTypesListResponse,
 } from '@app/shared';
-import { pool } from '../../db/pool';
+import { pool, type Db } from '../../db/pool';
 import { withTransaction } from '../../db/transaction';
 import { isDuplicateEntry } from '../../db/errors';
 import { fail, notFound, type Result, type ServiceError } from '../../middleware/routeHelpers';
@@ -13,7 +13,7 @@ import * as q from './contract-types.queries';
 const nameTaken = () => fail(409, M.nameTaken, { fields: { name: M.nameTaken } });
 
 /** Nazwa zajęta: przez widoczny typ zwykły błąd, przez ukryty podpowiedź „Przywróć go”. */
-const nameConflict = async (db: q.Db, name: string, exceptId: number | null): Promise<{ error: ServiceError } | null> => {
+const nameConflict = async (db: Db, name: string, exceptId: number | null): Promise<{ error: ServiceError } | null> => {
   const other = await q.findByName(db, name, exceptId);
   if (!other) return null;
   if (!other.hidden) return nameTaken();

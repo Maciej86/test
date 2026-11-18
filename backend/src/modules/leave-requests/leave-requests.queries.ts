@@ -2,11 +2,9 @@ import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { LeaveRequestFilter, LeaveRequestStatus } from '@app/shared';
 import { PAGE_SIZE } from '../../config/constants';
 import { likePattern } from '../../db/like';
-import type { pool } from '../../db/pool';
+import type { Db } from '../../db/pool';
 import type { Actor } from '../../middleware/routeHelpers';
 import type { PoolRow } from '../employees/employees.queries';
-
-export type Db = Pick<typeof pool, 'query'>;
 
 const PENDING: LeaveRequestStatus = 'pending';
 const ACTIVE: LeaveRequestStatus[] = ['pending', 'approved'];
