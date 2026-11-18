@@ -1,14 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { LeaveRequestDetails, LeaveRequestsListQuery, LeaveRequestsListResponse } from '@app/shared';
 import { api } from '../../core/api/client';
 
 const KEY = ['leave-requests'] as const;
 
-/** Strona listy z filtrami z adresu. */
+/**
+ * Strona listy z filtrami z adresu. Przy zmianie zakładki, filtra albo strony zostaje poprzednia lista, dopóki nie
+ * przyjdzie nowa (inaczej znika podsumowanie nad tabelą i ekran skacze).
+ */
 export const useLeaveRequests = (query: LeaveRequestsListQuery) => {
   return useQuery({
     queryKey: [...KEY, 'list', query],
     queryFn: () => api.get<LeaveRequestsListResponse>('/leave-requests', { params: query }).then((r) => r.data),
+    placeholderData: keepPreviousData,
   });
 };
 

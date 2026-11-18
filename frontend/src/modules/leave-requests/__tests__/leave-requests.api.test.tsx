@@ -33,6 +33,23 @@ describe('leave requests api', () => {
     expect(get).not.toHaveBeenCalled();
   });
 
+  // Przełączenie zakładki nie może na chwilę opróżnić ekranu: znikałby wiersz „1 wniosek czeka…” i tabela skakała.
+  it('useLeaveRequests keeps the previous list while the next tab is loading', async () => {
+    const first = { items: [], total: 0, page: 1, pageSize: 25, pendingCount: 1, oldestPendingAt: '2026-11-17' };
+    vi.spyOn(api, 'get')
+      .mockResolvedValueOnce({ data: first })
+      .mockReturnValueOnce(new Promise(() => undefined));
+    const { wrapper } = setup();
+    const { result, rerender } = renderHook(({ status }) => useLeaveRequests({ status, page: 1, search: '' }), {
+      wrapper,
+      initialProps: { status: 'pending' as 'pending' | 'approved' },
+    });
+    await waitFor(() => expect(result.current.data).toEqual(first));
+    rerender({ status: 'approved' });
+    await waitFor(() => expect(result.current.isPlaceholderData).toBe(true));
+    expect(result.current.data).toEqual(first);
+  });
+
   it('decisions post to their addresses with the reason', async () => {
     const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { ok: true } });
     const { wrapper } = setup();

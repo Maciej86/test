@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { LeaveRequestInput, MyLeaveOverview, MyLeaveRequest, MyLeaveRequestsResponse } from '@app/shared';
 import { api } from '../../core/api/client';
 
@@ -12,11 +12,12 @@ export const useMyLeaveOverview = () => {
   });
 };
 
-/** Wnioski z roku; bez roku serwer bierze rok otwarty. */
+/** Wnioski z roku; bez roku serwer bierze rok otwarty. Przy zmianie roku zostaje poprzednia lista, dopóki nie przyjdzie nowa. */
 export const useMyRequests = (year: number | undefined) => {
   return useQuery({
     queryKey: [...KEY, 'requests', year ?? null],
     queryFn: () => api.get<MyLeaveRequestsResponse>('/my-leave/requests', { params: year === undefined ? {} : { year } }).then((r) => r.data),
+    placeholderData: keepPreviousData,
   });
 };
 
