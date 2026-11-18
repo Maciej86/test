@@ -114,3 +114,130 @@ test('projekt, przypisanie, powiadomienie, przeniesienie widoczne u innych, usun
   await expect(page.getByRole('row', { name: new RegExp(projectName) })).toHaveCount(0);
   expect((await page.request.get(`/api/tasks/projects/${projectId}/board`)).status()).toBe(404);
 });
+
+// Próby nadużyć (docs/modules/tasks/TESTS-1.md, „Próby nadużyć”) na prawdziwej bazie: pracownik spoza projektu,
+// podrobione pola, zakazane przeniesienia, kilka zapisów naraz, usuwanie i złe dane.
+test.describe('abuse', () => {
+  const setup = async (page: Page, browser: import('@playwright/test').Browser) => {
+    const suffix = String(Date.now()).slice(-6);
+    await logIn(page, ADMIN, password());
+    await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+    const member = await employee(page, browser, 'Ala', `Członek${suffix}`);
+    const outsider = await employee(page, browser, 'Olek', `Obcy${suffix}`);
+    const candidates = (await (await page.request.get('/api/tasks/projects/candidates')).json()) as { id: number; name: string }[];
+    const memberId = candidates.find((c) => c.name === `Ala Członek${suffix}`)!.id;
+    const outsiderId = candidates.find((c) => c.name === `Olek Obcy${suffix}`)!.id;
+    const project = (await (await page.request.post('/api/tasks/projects', { data: { name: `E2E Nadużycia ${suffix}`, memberIds: [memberId] } })).json()) as { id: number };
+    const other = (await (await page.request.post('/api/tasks/projects', { data: { name: `E2E Inny ${suffix}`, memberIds: [outsiderId] } })).json()) as { id: number };
+    const newTask = async (as: Page, projectId: number, title: string, extra: object = {}) => {
+      const res = await as.request.post(`/api/tasks/projects/${projectId}/tasks`, { data: { title, description: '', dueDate: '', column: 'draft', assigneeIds: [], ...extra } });
+      expect(res.status()).toBe(201);
+      return ((await res.json()) as { id: number }).id;
+    };
+    const cleanup = async () => {
+      for (const p of [project.id, other.id]) {
+        const name = p === project.id ? `E2E Nadużycia ${suffix}` : `E2E Inny ${suffix}`;
+        await page.request.delete(`/api/tasks/projects/${p}`, { data: { confirmName: name } });
+      }
+    };
+    return { member: member.page, outsider: outsider.page, memberId, outsiderId, projectId: project.id, otherId: other.id, newTask, cleanup };
+  };
+
+  test('pracownik spoza projektu: nie widzi go na liście i dostaje 404 na tablicy i każdym zapisie; wyższa rola → 403', async ({ page, browser }) => {
+    test.setTimeout(90_000);
+    const s = await setup(page, browser);
+    const taskId = await s.newTask(s.member, s.projectId, 'Tajne zadanie');
+    const list = (await (await s.outsider.request.get('/api/tasks/projects')).json()) as { items: { id: number }[] };
+    expect(list.items.map((p) => p.id)).not.toContain(s.projectId);
+    expect((await s.outsider.request.get(`/api/tasks/projects/${s.projectId}/board`)).status()).toBe(404);
+    const task = { title: 'Przejęte', description: '', dueDate: '', column: 'done', assigneeIds: [s.outsiderId] };
+    expect((await s.outsider.request.post(`/api/tasks/projects/${s.projectId}/tasks`, { data: task })).status()).toBe(404);
+    expect((await s.outsider.request.put(`/api/tasks/${taskId}`, { data: task })).status()).toBe(404);
+    expect((await s.outsider.request.post(`/api/tasks/${taskId}/move`, { data: { column: 'done', beforeTaskId: null } })).status()).toBe(404);
+    expect((await s.outsider.request.post(`/api/tasks/${taskId}/archive`)).status()).toBe(404);
+    const after = await board(page, s.projectId);
+    expect(after.tasks.find((t) => t.id === taskId)).toMatchObject({ title: 'Tajne zadanie', column: 'draft', assigneeIds: [] });
+    // Wyższa rola: projekty zmienia tylko administrator, także gdy pracownik wpisze adres ręcznie.
+    expect((await s.member.request.post('/api/tasks/projects', { data: { name: 'Mój projekt', memberIds: [] } })).status()).toBe(403);
+    expect((await s.member.request.get('/api/tasks/projects/candidates')).status()).toBe(403);
+    expect((await s.member.request.delete(`/api/tasks/projects/${s.projectId}`, { data: { confirmName: 'x' } })).status()).toBe(403);
+    await s.member.goto('/admin/tasks/projects');
+    await expect(s.member.getByText('Nie masz dostępu do tej części aplikacji.')).toBeVisible();
+    await s.outsider.goto(`/admin/tasks/${s.projectId}`);
+    await expect(s.outsider.getByText('Nie masz dostępu do tego projektu albo projekt został usunięty.')).toBeVisible();
+    await s.cleanup();
+  });
+
+  test('podrobione pola i zakazane przeniesienia: autor, pozycja i data z serwera; karta z innego projektu → 400', async ({ page, browser }) => {
+    test.setTimeout(90_000);
+    const s = await setup(page, browser);
+    const taskId = await s.newTask(s.member, s.projectId, 'Podrobione pola', { createdBy: 1, createdByName: 'Prezes', position: 99, completedAt: '2020-01-01', projectId: s.otherId });
+    const created = (await board(page, s.projectId)).tasks.find((t) => t.id === taskId) as unknown as { createdByName: string; position: number; completedAt: string | null };
+    expect(created.createdByName).toMatch(/^Ala Członek/);
+    expect(created.position).toBe(1);
+    expect(created.completedAt).toBeNull();
+    const foreign = await s.newTask(s.outsider, s.otherId, 'Karta z innego projektu');
+    expect((await s.member.request.post(`/api/tasks/${taskId}/move`, { data: { column: 'draft', beforeTaskId: foreign } })).status()).toBe(400);
+    // Przypisanie osoby spoza projektu i termin w przeszłości → 400 przy polu.
+    const outsiderAssigned = await s.member.request.post(`/api/tasks/projects/${s.projectId}/tasks`, { data: { title: 'Dla obcego', description: '', dueDate: '', column: 'draft', assigneeIds: [s.outsiderId] } });
+    expect(outsiderAssigned.status()).toBe(400);
+    expect(((await outsiderAssigned.json()) as { error: { fields: Record<string, string> } }).error.fields).toEqual({ assigneeIds: 'tasks.assignee_not_allowed' });
+    const past = await s.member.request.post(`/api/tasks/projects/${s.projectId}/tasks`, { data: { title: 'Wczoraj', description: '', dueDate: '2020-01-01', column: 'draft', assigneeIds: [] } });
+    expect(past.status()).toBe(400);
+    // Zadanie w archiwum: dalsze zmiany → 404.
+    expect((await s.member.request.post(`/api/tasks/${taskId}/archive`)).status()).toBe(200);
+    expect((await s.member.request.put(`/api/tasks/${taskId}`, { data: { title: 'Po archiwum', description: '', dueDate: '', column: 'draft', assigneeIds: [] } })).status()).toBe(404);
+    expect((await s.member.request.post(`/api/tasks/${taskId}/archive`)).status()).toBe(404);
+    await s.cleanup();
+  });
+
+  test('kilka przeciągnięć naraz w tej samej kolumnie → wszystkie bez błędu serwera, pozycje 1..n bez powtórzeń', async ({ page, browser }) => {
+    test.setTimeout(90_000);
+    const s = await setup(page, browser);
+    const ids: number[] = [];
+    for (const n of [1, 2, 3, 4, 5]) ids.push(await s.newTask(s.member, s.projectId, `Karta ${n}`));
+    const moves = await Promise.all([
+      s.member.request.post(`/api/tasks/${ids[0]}/move`, { data: { column: 'draft', beforeTaskId: null } }),
+      page.request.post(`/api/tasks/${ids[1]}/move`, { data: { column: 'draft', beforeTaskId: null } }),
+      s.member.request.post(`/api/tasks/${ids[2]}/move`, { data: { column: 'in_progress', beforeTaskId: null } }),
+      page.request.post(`/api/tasks/${ids[3]}/move`, { data: { column: 'in_progress', beforeTaskId: null } }),
+      s.member.request.post(`/api/tasks/${ids[4]}/move`, { data: { column: 'draft', beforeTaskId: ids[0] } }),
+      page.request.post(`/api/tasks/${ids[0]}/move`, { data: { column: 'done', beforeTaskId: null } }),
+    ]);
+    expect(moves.map((r) => r.status()).filter((code) => code >= 500)).toEqual([]);
+    const after = await board(page, s.projectId);
+    for (const column of ['draft', 'in_progress', 'done']) {
+      const positions = (after.tasks as unknown as { column: string; position: number }[]).filter((t) => t.column === column).map((t) => t.position).sort((a, b) => a - b);
+      expect(positions).toEqual(positions.map((_, i) => i + 1));
+    }
+    expect(after.tasks).toHaveLength(5);
+    // Dwa dodania naraz do pustej kolumny: oba zapisane, pozycje 1 i 2.
+    const both = await Promise.all([
+      s.member.request.post(`/api/tasks/projects/${s.projectId}/tasks`, { data: { title: 'Naraz A', description: '', dueDate: '', column: 'done', assigneeIds: [] } }),
+      page.request.post(`/api/tasks/projects/${s.projectId}/tasks`, { data: { title: 'Naraz B', description: '', dueDate: '', column: 'done', assigneeIds: [] } }),
+    ]);
+    expect(both.map((r) => r.status())).toEqual([201, 201]);
+    await s.cleanup();
+  });
+
+  test('złe dane: skrypt w tytule widać jako tekst, za długi tytuł → 400; usunięcie osoby z projektu zostawia zadanie', async ({ page, browser }) => {
+    test.setTimeout(90_000);
+    const s = await setup(page, browser);
+    const xss = '<script>alert(1)</script>';
+    const taskId = await s.newTask(s.member, s.projectId, xss, { assigneeIds: [s.memberId] });
+    let dialogs = 0;
+    s.member.on('dialog', () => { dialogs += 1; });
+    await s.member.goto(`/admin/tasks/${s.projectId}`);
+    await expect(s.member.getByText(xss)).toBeVisible();
+    expect(dialogs).toBe(0);
+    const long = await s.member.request.post(`/api/tasks/projects/${s.projectId}/tasks`, { data: { title: 'x'.repeat(151), description: '', dueDate: '', column: 'draft', assigneeIds: [] } });
+    expect(long.status()).toBe(400);
+    // Usunięcie osoby z projektu: zadanie zostaje, bez niej; osoba traci dostęp do tablicy.
+    expect((await page.request.put(`/api/tasks/projects/${s.projectId}`, { data: { name: `E2E Nadużycia ${String(s.projectId)}x`, memberIds: [] } })).status()).toBe(200);
+    const after = await board(page, s.projectId);
+    expect(after.tasks.find((t) => t.id === taskId)!.assigneeIds).toEqual([]);
+    expect((await s.member.request.get(`/api/tasks/projects/${s.projectId}/board`)).status()).toBe(404);
+    await page.request.delete(`/api/tasks/projects/${s.projectId}`, { data: { confirmName: `E2E Nadużycia ${String(s.projectId)}x` } });
+    await s.cleanup();
+  });
+});

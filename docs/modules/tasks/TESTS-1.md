@@ -46,4 +46,19 @@ prywatnym), żeby widzieć obie osoby naraz.
 
 ## Próby nadużyć
 
-(uzupełniane na etapie testy według `abuse.md`)
+Sprawdzone 2026-11-18 na prawdziwej bazie (`e2e/tasks.spec.ts`, blok `abuse`) i w testach tras (`describe('abuse')`):
+
+- Pracownik spoza projektu: nie widzi go na liście projektów; tablica, dodanie zadania, zmiana, przeniesienie
+  i usunięcie cudzego zadania → 404, zadanie bez zmian: przeszła (odparta)
+- Pracownik wpisuje adres listy projektów i woła trasy administratora (dodanie, kandydaci, usunięcie) → brak dostępu,
+  403: przeszła
+- Podrobione pola przy dodaniu (autor, pozycja, data realizacji, inny projekt) → wartości z sesji i z serwera:
+  przeszła
+- Karta „przed” kartą z innego projektu → 400; przypisanie osoby spoza projektu → 400 przy polu; termin
+  w przeszłości → 400; zmiany zadania w archiwum → 404: przeszła
+- Sześć przeciągnięć naraz w tych samych kolumnach (dwie osoby) → bez błędu serwera, pozycje 1..n bez powtórzeń;
+  dwa dodania naraz do pustej kolumny → oba zapisane: naprawiona (przegląd kodu: zakleszczenie blokad, teraz
+  najpierw blokada projektu)
+- Zmyślone numery w adresie (`0`, `1e3`, `0x10`, `007`, `21;DROP`) → 404 bez wywołania usługi: przeszła
+- `<script>alert(1)</script>` w tytule → na tablicy zwykły tekst, bez okienka; tytuł 151 znaków → 400: przeszła
+- Usunięcie osoby z projektu → jej otwarte zadanie zostaje bez niej, a ona traci dostęp do tablicy (404): przeszła
