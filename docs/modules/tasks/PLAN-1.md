@@ -63,7 +63,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   @dnd-kit/utilities` (wersje sprzed co najmniej 2 tygodni), wpis jest już w „Bibliotekach” `SPEC-GENERAL.md`;
   `npm audit --omit=dev` bez „high”/„critical` → `npm run check`.
 
-- [ ] **3. Migracje.** Test `tasks.migration.test.ts` (wzór: `my-leave.migration.test.ts`): każdy plik ma swoje
+- [x] **3. Migracje.** Test `tasks.migration.test.ts` (wzór: `my-leave.migration.test.ts`): każdy plik ma swoje
   `FOREIGN KEY … ON DELETE` z tabeli relacji `SPEC-1.md`, `projects.name` jest `UNIQUE`, `tasks.column_key` to
   `ENUM('draft','in_progress','done')`, indeks (`project_id`, `archived_at`, `column_key`, `position`).
   Pliki: `019_projects.sql`, `020_project_members.sql`, `021_tasks.sql`, `022_task_assignees.sql` →
