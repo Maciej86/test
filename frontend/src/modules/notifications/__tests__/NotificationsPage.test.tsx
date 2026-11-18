@@ -52,6 +52,12 @@ describe('NotificationsPage', () => {
     expect(api.get).toHaveBeenCalledWith('/notifications', { params: { page: 1, unread: '0' } });
   });
 
+  it('project_added: title and the project name (module Zadania)', async () => {
+    show(page({ total: 1, unread: 1, items: [item({ id: 4, type: 'project_added', params: { project: 'Marketing' }, link: '/admin/tasks/9' })] }));
+    expect(await screen.findByText('Dodano Cię do projektu')).toBeInTheDocument();
+    expect(screen.getByText('„Marketing”')).toBeInTheDocument();
+  });
+
   it('?unread=1 sends unread 1; the switch changes the address', async () => {
     const { router } = show(page({ unread: 2 }), '/admin/notifications?unread=1');
     await waitFor(() => expect(api.get).toHaveBeenCalledWith('/notifications', { params: { page: 1, unread: '1' } }));

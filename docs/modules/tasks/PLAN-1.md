@@ -161,11 +161,14 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   `../tasks/projects.service`, jedyne miejsce, gdzie moduł woła funkcję innego modułu, zgodnie z „Powiązaniami”)
   → `npm run check`.
 
-- [ ] **11. Powiadomienia.** Test w `shared` (`notifications.test.ts` już sprawdza teksty każdego rodzaju):
+- [x] **11. Powiadomienia.** Test w `shared` (`notifications.test.ts` już sprawdza teksty każdego rodzaju):
   `NOTIFICATION_TYPES` + `project_added`; `notifications.json` `types.project_added.title` („Dodano Cię do
   projektu”) i `detail` („„{{project}}””); ikona rodzaju w dzwonku (`folder`, kolor `navy`) z testem
   `NotificationItem`. W `docs/modules/notifications/SPEC.md` link `task_assigned` →
   `/admin/tasks/<projectId>?task=<id>` i wiersz `project_added` → `npm run check`.
+
+  **Uwaga:** stała, teksty i ikona weszły w kroku 7 (czerwony był wtedy test tekstów w `shared`); tu test ekranu
+  powiadomień i spec Powiadomień.
 
 - [ ] **12. Hooki frontu `tasks.api.ts`.** Test `tasks.api.test.tsx` (wzór: `leave-requests.api.test.tsx`):
   `useProjects()` → `GET /tasks/projects`; `useProjectCandidates(enabled)`; `useSaveProject()` (POST bez `id`, PUT z

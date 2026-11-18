@@ -61,7 +61,8 @@ Stałe w `shared/src/constants/notifications.ts`: `NOTIFICATION_TYPES`. Treść 
 | `leave_approved` | pracownik wniosku | Urlop zatwierdzony | {typ}, {od} – {do} | `leaveType`, `dateFrom`, `dateTo` | `/admin/my-leave` |
 | `leave_rejected` | pracownik wniosku | Urlop odrzucony | {typ}, {od} – {do}. Powód: {powód} | jw. + `reason` | jw. |
 | `leave_cancelled` | pracownik wniosku | Urlop anulowany | {typ}, {od} – {do}. Dni wróciły do puli. | jw. | jw. |
-| `task_assigned` | nowo przypisana osoba | Nowe zadanie dla Ciebie | „{tytuł}”, termin: {termin} (bez terminu: sam tytuł) | `task`, `dueDate` (może nie być) | `/admin/tasks` |
+| `task_assigned` | nowo przypisana osoba | Nowe zadanie dla Ciebie | „{tytuł}”, termin: {termin} (bez terminu: sam tytuł) | `task`, `dueDate` (może nie być) | `/admin/tasks/<projectId>?task=<id>` (zmiana 2026-11-18, moduł Zadania) |
+| `project_added` | pracownik nowo dodany do projektu | Dodano Cię do projektu | „{projekt}” | `project` | `/admin/tasks/<projectId>` (moduł Zadania, 2026-11-18) |
 
 Daty w parametrach zapisane jako `RRRR-MM-DD`, na ekranie przez `formatDate`.
 
