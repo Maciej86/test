@@ -91,5 +91,7 @@
     "yesterday_at": "wczoraj, {{time}}"
   },
   "date_placeholder": "DD.MM.RRRR",
-  "cancel": "Anuluj"
+  "cancel": "Anuluj",
+  "move_up": "Przesuń wyżej",
+  "move_down": "Przesuń niżej"
 }

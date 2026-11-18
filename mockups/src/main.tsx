@@ -10,14 +10,16 @@ import '@app/shared/theme.css';
 import './appearance/variants.css';
 import { ThemeVariantProvider } from './appearance/ThemeVariants';
 import { THEME_VARIANTS } from './appearance/variants';
+import { NAVIGATION } from '@app/shared';
 import { MockupApp } from './App';
+import { withTaskProjects } from './modules/tasks/navigation';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <I18nextProvider i18n={createI18n()}>
       <ThemeVariantProvider variants={THEME_VARIANTS}>
         <Notifications />
-        <MockupApp />
+        <MockupApp navigation={withTaskProjects(NAVIGATION)} />
       </ThemeVariantProvider>
     </I18nextProvider>
   </StrictMode>,

@@ -1,5 +1,5 @@
 import { useRef, useState, type DragEvent } from 'react';
-import { Badge, Button, Group, Paper, SegmentedControl, SimpleGrid, Stack, Switch, Text, TextInput, Title } from '@mantine/core';
+import { Avatar, Badge, Button, Group, Paper, SegmentedControl, SimpleGrid, Stack, Switch, Text, TextInput, Title, Tooltip } from '@mantine/core';
 import { Search, SquareKanban } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { MOCK_USER_NAMES } from '../../common/mockUsers';
@@ -10,13 +10,12 @@ import { PageHeader } from '../../common/PageHeader';
 import { Question, Questions } from '../../common/Question';
 import { useMockupRole } from '../../common/mockupRole';
 import { TaskCard } from './TaskCard';
-import { ArchiveTaskModal, TaskDrawer } from './TaskModals';
-import { COLUMNS, TASKS, TODAY, dueState, isOldDone, type Column, type MockTask } from './data';
+import { ProjectModal } from './ProjectModals';
+import { ArchiveTaskModal, TaskCreateModal, TaskDrawer } from './TaskModals';
+import { ADMINS, ARCHIVED_PEOPLE, COLUMNS, TASKS, TODAY, dueState, isOldDone, leaveBeforeDue, projectById, type Column, type MockTask } from './data';
 
 const STATES = ['board', 'new', 'edit', 'edit_leave', 'errors', 'archive', 'old_done', 'only_mine', 'empty'] as const;
 type State = (typeof STATES)[number];
-
-const byId = (id: number) => TASKS.find((task) => task.id === id)!;
 
 /** Przenosi zadanie `id` do kolumny `column`, przed zadanie `beforeId` (null = na koniec kolumny). */
 const moveTask = (tasks: MockTask[], id: number, column: Column, beforeId: number | null): MockTask[] => {
@@ -41,18 +40,18 @@ const TasksQuestions = () => (
       number={1}
       about="Karta zadania"
       options={[
-        { id: 'a', text: 'Kliknięcie karty od razu otwiera formularz z prawej: zmieniasz i klikasz „Zapisz”' },
-        { id: 'b', text: 'Najpierw podgląd zadania, a zmiany dopiero po kliknięciu „Edytuj”' },
+        { id: 'a', text: 'Kliknięcie karty otwiera podgląd z prawej, w którym od razu można zmieniać pola i klikać „Zapisz”; pod spodem komentarze' },
+        { id: 'b', text: 'Najpierw sam podgląd, zmiany dopiero po kliknięciu „Edytuj”' },
       ]}
       recommended="a"
     >
-      Co ma się dziać po kliknięciu karty?
+      Co ma się dziać po kliknięciu karty? (Dodawanie jest teraz w oknie na środku, jak prosiłeś.)
     </Question>
     <Question
       number={2}
       about="Przycisk „Dodaj zadanie”"
       options={[
-        { id: 'a', text: 'Jeden przycisk u góry; nowe zadanie trafia na górę kolumny „W opracowaniu”, a w formularzu można wybrać inną kolumnę' },
+        { id: 'a', text: 'Jeden przycisk u góry; nowe zadanie trafia na górę „W opracowaniu” (w oknie można wybrać inną kolumnę)' },
         { id: 'b', text: 'Dodatkowo mały przycisk „+” pod każdą kolumną' },
       ]}
       recommended="a"
@@ -63,8 +62,8 @@ const TasksQuestions = () => (
       number={3}
       about="Żółta kropka przy osobie (powiązanie z urlopami)"
       options={[
-        { id: 'a', text: 'Kropka, gdy osoba ma zatwierdzony urlop między dziś a terminem zadania (bez terminu: w najbliższych 14 dniach); po najechaniu same daty, bez rodzaju urlopu. W formularzu żółta ramka z ostrzeżeniem' },
-        { id: 'b', text: 'Tak samo, ale także dla wniosków, które jeszcze czekają na decyzję' },
+        { id: 'a', text: 'Kropka, gdy osoba ma zatwierdzony urlop między dziś a terminem zadania (bez terminu: w najbliższych 14 dniach); po najechaniu same daty, bez rodzaju urlopu; w formularzu żółta ramka' },
+        { id: 'b', text: 'Tak samo, ale także dla wniosków czekających na decyzję' },
         { id: 'c', text: 'Bez informacji o urlopach na tablicy' },
       ]}
       recommended="a"
@@ -76,7 +75,7 @@ const TasksQuestions = () => (
       about="Przełącznik „Tylko moje zadania”"
       options={[
         { id: 'a', text: 'Zadania, do których jestem przypisany (moje karty mają też niebieski pasek po lewej)' },
-        { id: 'b', text: 'Zadania, do których jestem przypisany, i te, które sam dodałem' },
+        { id: 'b', text: 'Przypisane do mnie i te, które sam dodałem' },
       ]}
       recommended="a"
     >
@@ -84,9 +83,9 @@ const TasksQuestions = () => (
     </Question>
     <Question
       number={5}
-      about="Powiadomienia"
+      about="Powiadomienia o zadaniach"
       options={[
-        { id: 'a', text: 'Tylko gdy ktoś inny przypisze mnie do zadania (tak jak w planie aplikacji)' },
+        { id: 'a', text: 'Gdy ktoś inny przypisze mnie do zadania albo skomentuje zadanie, do którego jestem przypisany' },
         { id: 'b', text: 'Dodatkowo, gdy ktoś inny przeniesie moje zadanie do „Zrealizowane” albo je usunie' },
       ]}
       recommended="a"
@@ -97,23 +96,12 @@ const TasksQuestions = () => (
       number={6}
       about="Tablica na telefonie"
       options={[
-        { id: 'a', text: 'Jedna kolumna naraz, przełączana u góry; kolejność zmienia się przeciągnięciem, a do innej kolumny przenosi się z menu „⋮ → Przenieś do”' },
+        { id: 'a', text: 'Jedna kolumna naraz, przełączana u góry; kolejność przeciągnięciem, do innej kolumny przez „⋮ → Przenieś do”' },
         { id: 'b', text: 'Wszystkie trzy kolumny jedna pod drugą' },
       ]}
       recommended="a"
     >
       Jak tablica ma wyglądać na telefonie? (Zmniejsz okno przeglądarki, żeby zobaczyć wariant a.)
-    </Question>
-    <Question
-      number={7}
-      about="Wspólna tablica"
-      options={[
-        { id: 'a', text: 'Odświeża się sama co 30 sekund i po powrocie do karty przeglądarki' },
-        { id: 'b', text: 'Tylko po odświeżeniu strony' },
-      ]}
-      recommended="a"
-    >
-      Kilka osób pracuje na tablicy naraz. Kiedy widzisz zmiany innych?
     </Question>
     <Question
       number={8}
@@ -126,43 +114,73 @@ const TasksQuestions = () => (
     >
       Do przeciągania kart (także na telefonie) potrzebny jest dodatek spoza ustalonej listy. Zgadzasz się?
     </Question>
-    <Question number={9} about="Formularz zadania (zasady pól)">
+    <Question number={9} about="Formularz zadania i komentarz (zasady pól)">
       Tytuł: wymagany, 3–150 znaków. Opis: nieobowiązkowy, do 2000 znaków. Termin: nieobowiązkowy, data DD.MM.RRRR
-      (np. 25.11.2026); przy dodawaniu nie wcześniejszy niż dziś, przy zmianie istniejącego zadania dowolny. Przypisane
-      osoby: nieobowiązkowe, 0–10 osób, tylko konta, które nie są w archiwum. Kolumna: jedna z trzech, domyślnie
-      „W opracowaniu”. Odpowiedz „ok” albo popraw wybrane pola.
+      (np. 25.11.2026); przy dodawaniu nie wcześniejszy niż dziś, przy zmianie dowolny. Przypisane osoby: 0–10, tylko
+      członkowie projektu i administratorzy, bez kont w archiwum. Kolumna: domyślnie „W opracowaniu”. Komentarz: 1–2000
+      znaków. Odpowiedz „ok” albo popraw wybrane pola.
+    </Question>
+    <Question
+      number={10}
+      about="Menu „Zadania”"
+      options={[
+        { id: 'a', text: 'Każdy projekt osobno; „moje zadania ze wszystkich projektów” pokaże Pulpit' },
+        { id: 'b', text: 'Dodatkowo pozycja „Moje zadania” na górze podmenu: moje zadania ze wszystkich projektów na jednej tablicy' },
+      ]}
+      recommended="a"
+    >
+      Czy potrzebny jest widok zadań ze wszystkich projektów naraz?
+    </Question>
+    <Question
+      number={11}
+      about="Komentarze (w podglądzie zadania „Edycja”)"
+      options={[
+        { id: 'a', text: 'Autor może poprawić i usunąć swój komentarz (poprawiony ma dopisek „edytowany”); administrator może usunąć każdy' },
+        { id: 'b', text: 'Komentarzy nie da się zmieniać ani usuwać' },
+      ]}
+      recommended="a"
+    >
+      Kto może zmieniać i usuwać komentarze?
     </Question>
   </Questions>
 );
 
-export const TasksMockup = () => {
+export const TasksMockup = ({ projectId }: { projectId: number }) => {
   const { t } = useTranslation('tasks');
   const role = useMockupRole();
   const me = MOCK_USER_NAMES[role] ?? '';
+  const isAdmin = role === 'admin';
+  const project = projectById(projectId);
+  const projectTasks = TASKS.filter((task) => task.projectId === projectId);
   const [state, setState] = useState<State>('board');
-  const [tasks, setTasks] = useState<MockTask[]>(TASKS);
+  const [tasks, setTasks] = useState<MockTask[]>(projectTasks);
   const [onlyMine, setOnlyMine] = useState(false);
   const [showOld, setShowOld] = useState(false);
   const [search, setSearch] = useState('');
   const [phoneColumn, setPhoneColumn] = useState<Column>('in_progress');
-  const [drawer, setDrawer] = useState<{ task: MockTask | null; errors: boolean } | null>(null);
+  const [create, setCreate] = useState<{ errors: boolean } | null>(null);
+  const [details, setDetails] = useState<MockTask | null>(null);
   const [archive, setArchive] = useState<MockTask | null>(null);
+  const [editProject, setEditProject] = useState(false);
   const [dropColumn, setDropColumn] = useState<Column | null>(null);
   const dragged = useRef<number | null>(null);
 
   const changeState = (s: State) => {
     setState(s);
-    setDrawer(null);
+    setCreate(null);
+    setDetails(null);
     setArchive(null);
     setOnlyMine(s === 'only_mine');
     setShowOld(s === 'old_done');
     setSearch('');
-    setTasks(s === 'empty' ? [] : TASKS);
-    if (s === 'new') setDrawer({ task: null, errors: false });
-    if (s === 'edit') setDrawer({ task: byId(5), errors: false });
-    if (s === 'edit_leave') setDrawer({ task: byId(7), errors: false });
-    if (s === 'errors') setDrawer({ task: null, errors: true });
-    if (s === 'archive') setArchive(byId(4));
+    setTasks(s === 'empty' ? [] : projectTasks);
+    const withComments = projectTasks.find((task) => (task.comments?.length ?? 0) > 1) ?? projectTasks[0];
+    const withLeave = projectTasks.find((task) => task.people.some((p) => leaveBeforeDue(task, p))) ?? withComments;
+    if (s === 'new') setCreate({ errors: false });
+    if (s === 'errors') setCreate({ errors: true });
+    if (s === 'edit' && withComments) setDetails(withComments);
+    if (s === 'edit_leave' && withLeave) setDetails(withLeave);
+    if (s === 'archive' && projectTasks[0]) setArchive(projectTasks[0]);
     if (s === 'old_done') setPhoneColumn('done');
   };
 
@@ -245,7 +263,7 @@ export const TasksMockup = () => {
               key={task.id}
               task={task}
               mine={task.people.includes(me)}
-              onOpen={() => setDrawer({ task, errors: false })}
+              onOpen={() => setDetails(task)}
               onMove={(c) => move(task, c)}
               onArchive={() => setArchive(task)}
               onDragStart={(e) => { dragged.current = task.id; e.dataTransfer.effectAllowed = 'move'; }}
@@ -268,6 +286,8 @@ export const TasksMockup = () => {
     );
   };
 
+  const members = [...ADMINS, ...project.members];
+
   return (
     <Stack onDragEnd={endDrag}>
       <TasksQuestions />
@@ -286,16 +306,29 @@ export const TasksMockup = () => {
       </Paper>
 
       <PageHeader
-        title={t('title')}
+        title={project.name}
         subtitle={
           tasks.length === 0
             ? t('summary_empty')
             : [t('summary', { count: open.length }), overdue > 0 ? t('summary_overdue', { count: overdue }) : null].filter(Boolean).join(', ')
         }
         actions={
-          <Button leftSection={<ButtonIcon action="add" />} onClick={() => setDrawer({ task: null, errors: false })}>
-            {t('new_task')}
-          </Button>
+          <>
+            <Tooltip label={t('project_people', { names: members.join(', ') })} multiline w={280}>
+              <Avatar.Group spacing={6}>
+                {members.slice(0, 4).map((p) => (
+                  <Avatar key={p} size="sm" radius="xl" color={ARCHIVED_PEOPLE.includes(p) ? 'gray' : 'navy'} variant="light">
+                    {p.split(' ').map((x) => x[0]).join('')}
+                  </Avatar>
+                ))}
+                {members.length > 4 && <Avatar size="sm" radius="xl" color="gray">+{members.length - 4}</Avatar>}
+              </Avatar.Group>
+            </Tooltip>
+            {isAdmin && (
+              <Button variant="default" leftSection={<ButtonIcon action="edit" />} onClick={() => setEditProject(true)}>{t('project_edit')}</Button>
+            )}
+            <Button leftSection={<ButtonIcon action="add" />} onClick={() => setCreate({ errors: false })}>{t('new_task')}</Button>
+          </>
         }
       />
 
@@ -316,8 +349,8 @@ export const TasksMockup = () => {
           <EmptyState
             icon={SquareKanban}
             title={t('board_empty_title')}
-            text={t('board_empty')}
-            action={<Button leftSection={<ButtonIcon action="add" />} onClick={() => setDrawer({ task: null, errors: false })}>{t('new_task')}</Button>}
+            text={t('board_empty', { project: project.name })}
+            action={<Button leftSection={<ButtonIcon action="add" />} onClick={() => setCreate({ errors: false })}>{t('new_task')}</Button>}
           />
         </Paper>
       ) : (
@@ -344,16 +377,20 @@ export const TasksMockup = () => {
         </>
       )}
 
-      {drawer && (
+      {create && <TaskCreateModal key={String(create.errors)} project={project} showErrors={create.errors} onClose={() => setCreate(null)} />}
+      {details && (
         <TaskDrawer
-          key={`${drawer.task?.id ?? 'new'}-${drawer.errors}`}
-          task={drawer.task}
-          showErrors={drawer.errors}
-          onClose={() => setDrawer(null)}
-          onArchive={(task) => { setDrawer(null); setArchive(task); }}
+          key={details.id}
+          project={project}
+          task={details}
+          me={me}
+          isAdmin={isAdmin}
+          onClose={() => setDetails(null)}
+          onArchive={(task) => { setDetails(null); setArchive(task); }}
         />
       )}
       {archive && <ArchiveTaskModal task={archive} onClose={() => setArchive(null)} />}
+      {editProject && <ProjectModal project={project} onClose={() => setEditProject(false)} />}
     </Stack>
   );
 };

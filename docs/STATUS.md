@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.40
 
-**Następny krok:** Moduł Zadania: odpowiedzi na 9 pytań do makiety (http://localhost:5181/admin/tasks), potem spec (`/stepkit:dalej`).
+**Następny krok:** Moduł Zadania: odpowiedzi na 15 otwartych pytań do makiety (http://localhost:5181, menu „Zadania”), potem podział na części i spec (`/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-18: Zadania: zmiana zakresu na prośbę użytkownika: projekty jako podmenu „Zadań” (tworzy administrator, pracownik widzi tylko swoje), komentarze z powiadomieniem, dodawanie w oknie, podgląd z prawej 540 px, odświeżanie co 5 s (odpowiedź 7); makieta przerobiona, 15 otwartych pytań; wspólne `OrderArrows` w makietach.
 - 2026-11-18: Zadania: makieta tablicy (trzy kolumny z przeciąganiem, na telefonie jedna kolumna naraz, „Tylko moje zadania”, wyszukiwarka, chowanie zrealizowanych po 30 dniach), formularz w szufladzie z prawej (dodaj i edytuj, ostrzeżenie o urlopie osoby przed terminem), usunięcie do archiwum; 9 pytań.
 - 2026-11-18: Aktualizacja stepkit do 0.1.40: wspólny typ `Db` w `backend/src/db/pool.ts` zamiast kopii w modułach, nowy plik `docs/FIXES.md` na odłożone poprawki (na razie pusty: w `IDEAS.md` nie było otwartych poprawek), aktualne zasady w `docs/CONVENTIONS.md` i `docs/conventions/`.
 - 2026-11-17: Moduł Wnioski urlopowe zrobiony (potwierdzony przez użytkownika: „działa”): lista z zakładkami i filtrami, szczegóły pod `/admin/leave-requests/:id` (link z e-maila i dzwonka) z paskiem „Kto jeszcze ma wtedy wolne”, zatwierdzenie w oknie potwierdzenia, odrzucenie i anulowanie z obowiązkowym powodem, PDF, powiadomienia dla pracownika.

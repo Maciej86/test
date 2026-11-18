@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import { DashboardMockup } from './modules/dashboard/DashboardMockup';
-import { TasksMockup } from './modules/tasks/TasksMockup';
+import { TASK_SCREENS } from './modules/tasks/navigation';
 import { ActivityLogMockup } from './modules/activity-log/ActivityLogMockup';
 import { ArchiveMockup } from './modules/archive/ArchiveMockup';
 import { MyAccountMockup } from './modules/my-account/MyAccountMockup';
@@ -19,7 +19,8 @@ export const SCREENS: Record<string, ComponentType> = {
   'my-leave': () => <Done labelKey="common.nav.my_leave" />,
   // Moduł Wnioski urlopowe zrobiony; makieta zostaje w modules/leave-requests/LeaveRequestsMockup.tsx.
   'leave-requests': () => <Done labelKey="common.nav.leave_requests" />,
-  'tasks': TasksMockup,
+  // Zadania: grupa z projektami (modules/tasks/navigation.tsx).
+  ...TASK_SCREENS,
   // Moduł Pracownicy zrobiony; makieta zostaje w modules/employees/EmployeesMockup.tsx.
   'employees': () => <Done labelKey="common.nav.employees" />,
   // Moduł Typy urlopów zrobiony; makieta zostaje w modules/leave-types/LeaveTypesMockup.tsx.

@@ -23,6 +23,7 @@ zmniejszy się o właściwą liczbę dni roboczych (najpierw z zaległego urlopu
 | Typ urlopu | np. wypoczynkowy, na żądanie; ma ustawienie „odejmuje dni z puli” i opcjonalny roczny limit |
 | Dni robocze | dni od–do bez sobót, niedziel i świąt (`getPolishHolidays` z `shared/src/holidays.ts`) |
 | Kolumna zadania | W opracowaniu, W toku, Zrealizowane |
+| Projekt | np. Marketing, Produkcja, Montaż; własna tablica zadań; tworzy go administrator i wybiera pracowników, którzy go widzą (zmiana 2026-11-18) |
 
 ## 3. Części aplikacji
 
@@ -42,7 +43,8 @@ odwiedzających i bez części „konto”. `/` przekierowuje na `/login` albo n
 | Wydruk / PDF wniosku zatwierdzonego | ✓ | ✓ (własny) |
 | Typy urlopów (dodaj, edytuj, ukryj) | ✓ | — |
 | Pracownicy: dodaj, edytuj, ustaw hasło, pule dni, „Zamknij rok”, do archiwum | ✓ | — |
-| Tablica zadań: widzi wszystkie, dodaje, edytuje, przeciąga, przypisuje, usuwa (do archiwum) | ✓ | ✓ |
+| Projekty: dodaj, edytuj, członkowie, kolejność, do archiwum | ✓ | — |
+| Tablice zadań projektów: dodaje, edytuje, przeciąga, przypisuje, komentuje, usuwa (do archiwum) | ✓ (wszystkie projekty) | ✓ (tylko projekty, do których należy) |
 | Historia zmian | ✓ | — |
 | Archiwum: przywróć, usuń na stałe | ✓ | — |
 | Powiadomienia w aplikacji (dzwonek, własne) | ✓ | ✓ |
@@ -59,7 +61,9 @@ Panel (`NAVIGATION` w `shared/src/navigation.config.ts`):
 | Pulpit | dashboard | `/admin` | admin, employee |
 | Moje urlopy | my-leave | `/admin/my-leave` | employee |
 | Wnioski urlopowe | leave-requests | `/admin/leave-requests` | admin |
-| Zadania | tasks | `/admin/tasks` | admin, employee |
+| Zadania (rozwijane, bez własnej strony; zmiana 2026-11-18) | tasks | — | admin, employee |
+| ↳ każdy projekt (pozycje z bazy, w kolejności z listy projektów) | tasks | `/admin/tasks/:projectId` | admin; employee tylko członek projektu |
+| ↳ Projekty | tasks | `/admin/tasks/projects` | admin |
 | Pracownicy | employees | `/admin/employees` | admin |
 | Historia zmian | activity-log | `/admin/activity-log` | admin |
 | Archiwum | archive | `/admin/archive` | admin |
@@ -87,7 +91,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `GET /api/my-leave/requests/:id/pdf` | employee | tylko własny (cudzy → 404) i tylko zatwierdzony (inaczej 409); PDF `inline`, `no-store` |
 | `/admin/leave-requests`, `/admin/leave-requests/:id`, `/api/leave-requests` | admin | adres `/:id` otwiera szczegóły wniosku (link z e-maila i z dzwonka) |
 | `GET /api/leave-requests`, `GET /api/leave-requests/:id`, `POST /api/leave-requests/:id/approve`, `/:id/reject`, `/:id/cancel`, `GET /api/leave-requests/:id/pdf` | admin | `mountModule(api, 'leave-requests', …)`; kto decyduje = `req.user`; nieistniejący → 404; decyzja na rozpatrzonym → 409 `already_decided`; anulowanie w zamkniętym roku → 409 `year_closed`; PDF tylko zatwierdzonego (inaczej 409) |
-| `/admin/tasks`, `/api/tasks` | admin, employee | wspólna tablica, każdy edytuje wszystko |
+| `/admin/tasks/:projectId`, `/admin/tasks/projects`, `/api/tasks` | admin, employee | tablica projektu tylko dla członków projektu i administratorów (cudzy projekt → 404); lista projektów i zmiany projektów tylko administrator; adresy API ustali spec modułu |
 | `/admin/employees`, `/api/employees` | admin | także pule i „Zamknij rok” |
 | `GET/POST /api/employees`, `PUT /api/employees/:id`, `POST /api/employees/:id/password`, `/:id/archive`, `/:id/restore`, `GET/POST /api/employees/close-year`, `GET /api/employees/contract-types` | admin | `mountModule(api, 'employees', …)`; własnej roli i własnego konta do archiwum nie (409) |
 | `/admin/leave-types`, `/api/leave-types` | admin | lista typów do formularza wniosku: osobna trasa w `my-leave` |
@@ -111,7 +115,10 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `leave_types` | `name` (unikalna), `deducts_pool` BOOLEAN, `yearly_limit` INT NULL, `hidden_at` NULL |
 | `leave_pools` | `user_id`, `year`, `annual_days`, `carried_days`, `closed_at` NULL; unikalne (`user_id`, `year`) |
 | `leave_requests` | `user_id`, `leave_type_id`, `date_from`, `date_to`, `working_days`, `days_from_carried`, `days_from_annual`, `pool_year`, `comment` NULL, `status`, `reject_reason` NULL, `decided_by` NULL, `decided_by_name` NULL, `decided_at` NULL |
-| `tasks` | `title`, `description` NULL, `due_date` NULL, `column_key` (`draft`/`in_progress`/`done`), `position`, `completed_at` NULL, `created_by` NULL, `created_by_name`, `archived_at`, `archived_by` |
+| `projects` | `name` (unikalna), `position`, `archived_at`, `archived_by` (zmiana 2026-11-18) |
+| `project_members` | `project_id`, `user_id`; klucz główny (`project_id`, `user_id`) |
+| `tasks` | `project_id`, `title`, `description` NULL, `due_date` NULL, `column_key` (`draft`/`in_progress`/`done`), `position`, `completed_at` NULL, `created_by` NULL, `created_by_name`, `archived_at`, `archived_by` |
+| `task_comments` | `task_id`, `user_id` NULL, `user_name`, `text`, `edited_at` NULL, `created_at` |
 | `task_assignees` | `task_id`, `user_id`; klucz główny (`task_id`, `user_id`) |
 | `notifications` | `user_id`, `type`, `params` JSON, `link` NULL, `read_at` NULL |
 
@@ -131,6 +138,11 @@ Wartości liczone wyłącznie przez serwer: `working_days`, podział na `days_fr
 | `users` | `tasks.created_by` | SET NULL + `created_by_name` | autorstwo |
 | `users` | `tasks.archived_by` | SET NULL | autorstwo archiwizacji |
 | `tasks` | `task_assignees.task_id` | CASCADE | przypisanie bez zadania nie ma sensu |
+| `projects` | `tasks.project_id` | do ustalenia w specu Zadań (pytanie 13) | |
+| `projects` | `project_members.project_id` | CASCADE | członkostwo bez projektu nie ma sensu |
+| `users` | `project_members.user_id` | CASCADE | usunięta na stałe osoba znika z projektów |
+| `tasks` | `task_comments.task_id` | CASCADE | komentarz bez zadania nie ma sensu |
+| `users` | `task_comments.user_id` | SET NULL + `user_name` | komentarz zostaje po usunięciu osoby |
 | `users` | `task_assignees.user_id` | CASCADE | usunięta na stałe osoba znika z przypisań |
 | `users` | `notifications.user_id` | CASCADE | powiadomienia należą do osoby |
 
@@ -186,7 +198,8 @@ wymagają.
   PDF i wydruk (my-leave, leave-requests), wylogowanie po bezczynności (login).
 - E-maile tylko na `users.email`, nigdy na `login`. Jedyny e-mail: nowy wniosek → administratorzy z adresem.
 - Powiadomienia w aplikacji: administrator o nowym i wycofanym wniosku; pracownik o zatwierdzeniu, odrzuceniu,
-  anulowaniu swojego urlopu i o przypisaniu do zadania.
+  anulowaniu swojego urlopu i o przypisaniu do zadania; przypisane osoby o nowym komentarzu do zadania (zmiana
+  2026-11-18).
 - Brak plików i zestawień na start (pomysły w `docs/IDEAS.md`).
 
 ### Biblioteki
@@ -199,6 +212,7 @@ wymagają.
 
 ## 9. Ostatnie decyzje (archiwum)
 
+- 2026-11-18: Zadania: projekty (Marketing, Produkcja, Montaż…) jako podmenu „Zadań”, każde zadanie w projekcie, pracownik widzi tylko swoje projekty; komentarze z powiadomieniem dla przypisanych; dodawanie zadania w oknie, podgląd z prawej 540 px; tablica odświeża się co 5 s.
 - 2026-11-16: Porządki „wspólne zamiast kopii”: `ConfirmModal`, `PageHeader`, `EmptyState`, `ListPagination` (`frontend/src/common/`) i `useListParams` (`frontend/src/core/`) w Pracownikach, Typach urlopów, Typach umów i Powiadomieniach; okno potwierdzenia przy błędzie zostaje otwarte.
 - 2026-11-16: Aktualizacja stepkit 0.1.34 → 0.1.36: wspólne pole daty i grupy w menu bez własnej strony były już w projekcie; nowa zasada „Wspólne zamiast kopii” (przed planem sprawdzam, czy coś podobnego już jest, i przenoszę do wspólnego miejsca).
 - 2026-11-16: Moduł Typy umów zrobiony (potwierdzony przez użytkownika): słownik typów umów w „Ustawieniach” (kolejność strzałkami, dodawanie, zmiana nazwy, ukrywanie i przywracanie, 4 typy na start), pole „Rodzaj umowy” u pracownika z typów (`users.contract_type_id`), pracownik zachowuje ukryty typ.

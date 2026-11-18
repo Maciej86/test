@@ -1,6 +1,6 @@
 import type { DragEvent } from 'react';
 import { ActionIcon, Avatar, Card, Group, Indicator, Menu, Stack, Text, Tooltip } from '@mantine/core';
-import { CalendarDays, CheckCheck, EllipsisVertical, GripVertical, MoveRight } from 'lucide-react';
+import { CalendarDays, CheckCheck, EllipsisVertical, GripVertical, MessageSquare, MoveRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
@@ -48,6 +48,7 @@ export const TaskCard = ({ task, mine, onOpen, onMove, onArchive, onDragStart, o
   const done = task.column === 'done';
   const shown = task.people.slice(0, MAX_AVATARS);
   const hidden = task.people.length - shown.length;
+  const comments = task.comments?.length ?? 0;
 
   return (
     <Card
@@ -93,19 +94,29 @@ export const TaskCard = ({ task, mine, onOpen, onMove, onArchive, onDragStart, o
           {task.description && !done && <Text size="xs" c="dimmed" lineClamp={2}>{task.description}</Text>}
 
           <Group justify="space-between" wrap="nowrap" gap="xs">
-            {done && task.completedAt ? (
-              <Group gap={4} c="dimmed" wrap="nowrap">
-                <CheckCheck size={14} />
-                <Text size="xs" c="inherit">{t('completed_on', { date: formatDate(task.completedAt) })}</Text>
-              </Group>
-            ) : task.due && due ? (
-              <Tooltip label={t(due === 'overdue' ? 'due_overdue' : due === 'soon' ? 'due_soon' : 'due', { date: formatDate(task.due) })}>
-                <Group gap={4} c={DUE_COLOR[due]} wrap="nowrap">
-                  <CalendarDays size={14} />
-                  <Text size="xs" c="inherit" fw={due === 'normal' ? 400 : 600}>{formatDate(task.due)}</Text>
+            <Group gap="sm" wrap="nowrap">
+              {done && task.completedAt ? (
+                <Group gap={4} c="dimmed" wrap="nowrap">
+                  <CheckCheck size={14} />
+                  <Text size="xs" c="inherit">{t('completed_on', { date: formatDate(task.completedAt) })}</Text>
                 </Group>
-              </Tooltip>
-            ) : <span />}
+              ) : task.due && due ? (
+                <Tooltip label={t(due === 'overdue' ? 'due_overdue' : due === 'soon' ? 'due_soon' : 'due', { date: formatDate(task.due) })}>
+                  <Group gap={4} c={DUE_COLOR[due]} wrap="nowrap">
+                    <CalendarDays size={14} />
+                    <Text size="xs" c="inherit" fw={due === 'normal' ? 400 : 600}>{formatDate(task.due)}</Text>
+                  </Group>
+                </Tooltip>
+              ) : null}
+              {comments > 0 && (
+                <Tooltip label={t('comments_count', { count: comments })}>
+                  <Group gap={4} c="dimmed" wrap="nowrap">
+                    <MessageSquare size={14} />
+                    <Text size="xs" c="inherit">{comments}</Text>
+                  </Group>
+                </Tooltip>
+              )}
+            </Group>
 
             {task.people.length === 0 ? (
               <Text size="xs" c="dimmed">{t('nobody')}</Text>
