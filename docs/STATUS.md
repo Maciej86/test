@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.40
 
-**Następny krok:** Moduł Zadania: makieta (`/stepkit:dalej`).
+**Następny krok:** Moduł Zadania: odpowiedzi na 9 pytań do makiety (http://localhost:5181/admin/tasks), potem spec (`/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -28,7 +28,7 @@
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | zrobiony | zamknięcie | my-leave |
-| 10 | Zadania | tasks | czeka | makieta | employees, notifications |
+| 10 | Zadania | tasks | w toku | pytania | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
 | 13 | Moje konto | my-account | czeka | makieta | login |
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-18: Zadania: makieta tablicy (trzy kolumny z przeciąganiem, na telefonie jedna kolumna naraz, „Tylko moje zadania”, wyszukiwarka, chowanie zrealizowanych po 30 dniach), formularz w szufladzie z prawej (dodaj i edytuj, ostrzeżenie o urlopie osoby przed terminem), usunięcie do archiwum; 9 pytań.
 - 2026-11-18: Aktualizacja stepkit do 0.1.40: wspólny typ `Db` w `backend/src/db/pool.ts` zamiast kopii w modułach, nowy plik `docs/FIXES.md` na odłożone poprawki (na razie pusty: w `IDEAS.md` nie było otwartych poprawek), aktualne zasady w `docs/CONVENTIONS.md` i `docs/conventions/`.
 - 2026-11-17: Moduł Wnioski urlopowe zrobiony (potwierdzony przez użytkownika: „działa”): lista z zakładkami i filtrami, szczegóły pod `/admin/leave-requests/:id` (link z e-maila i dzwonka) z paskiem „Kto jeszcze ma wtedy wolne”, zatwierdzenie w oknie potwierdzenia, odrzucenie i anulowanie z obowiązkowym powodem, PDF, powiadomienia dla pracownika.
 - 2026-11-17: Wnioski urlopowe: 14 prób nadużyć (trasy i prawdziwa baza), jedna naprawiona (numer z adresu tylko z cyfr, `addressNumber` w `fields.ts`); sprawdzenie w przeglądarce (lista, szczegóły, zatwierdzenie, odrzucenie, telefon), tytuł szczegółów szeryfowy jak w makiecie; `npm run check` i 32 testy e2e zielone (pełny przebieg).
