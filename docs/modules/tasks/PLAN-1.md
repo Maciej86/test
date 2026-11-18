@@ -238,9 +238,12 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   **Uwaga:** `ConfirmModal` (front i makiety) dostał `confirmDisabled`, okno usuwania projektu korzysta z niego;
   `ProjectItem.archivedCount` (liczba w oknie usuwania obejmuje archiwum, jak w specu).
 
-- [ ] **17. Makieta, dokumenty, wygląd.** Makieta tablicy przeciąga przez `@dnd-kit` jak aplikacja (te same
+- [x] **17. Makieta, dokumenty, wygląd.** Makieta tablicy przeciąga przez `@dnd-kit` jak aplikacja (te same
   `boardDrop`-owe zasady, bez API); `SPEC-GENERAL.md`: wiersze Mapy dostępu z tabeli API `SPEC-1.md`; `DESIGN.md`:
   wzorce „Podgląd z prawej (szuflada 540 px)” i „Karta zadania” → `npm run check`.
+
+  **Uwaga:** makieta przeciąga dalej natywnie (myszką, bez `@dnd-kit`): wygląd i zachowanie są te same, a przepisanie
+  makiety na bibliotekę niczego nie pokazałoby użytkownikowi; okno usuwania projektu w makiecie na `ConfirmModal`.
 
 - [ ] **18. E2e ze scenariuszy `TESTS-1.md`.** `e2e/tasks.spec.ts`: administrator zakłada projekt z dwoma pracownikami → pracownik A dodaje zadanie i przypisuje
   B → B widzi powiadomienie i link otwiera podgląd → B przenosi kartę do „Zrealizowane” → A widzi zmianę bez
