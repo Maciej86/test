@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CONTRACT_TYPE_DIRECTIONS, CONTRACT_TYPE_NAME_MAX } from '../constants/contractTypes';
+import { CONTRACT_TYPE_NAME_MAX } from '../constants/contractTypes';
 import { personName } from './fields';
 
 /** Okno „Dodaj typ umowy” / „Edytuj typ” (POST i PUT /api/contract-types). */
@@ -8,12 +8,8 @@ export const contractTypeSchema = z.object({
   name: personName(CONTRACT_TYPE_NAME_MAX),
 });
 
-/** Strzałki kolejności (POST /api/contract-types/:id/move). */
-export const contractTypeMoveSchema = z.object({ direction: z.enum(CONTRACT_TYPE_DIRECTIONS) });
-
 export type ContractTypeInput = z.input<typeof contractTypeSchema>;
 export type ContractTypeData = z.output<typeof contractTypeSchema>;
-export type ContractTypeMoveInput = z.output<typeof contractTypeMoveSchema>;
 
 /** Wiersz listy typów (GET /api/contract-types). */
 export interface ContractTypeItem {

@@ -1,10 +1,11 @@
 import {
   LEAVE_TYPE_MESSAGES as M,
   type LeaveTypeData,
-  type LeaveTypeDirection,
+  type OrderDirection,
   type LeaveTypesListResponse,
 } from '@app/shared';
 import { pool, type Db } from '../../db/pool';
+import { swapWithNeighbour } from '../../db/ordering';
 import { withTransaction } from '../../db/transaction';
 import { isDuplicateEntry } from '../../db/errors';
 import { fail, notFound, type Result, type ServiceError } from '../../middleware/routeHelpers';
@@ -59,16 +60,10 @@ export const updateType = async (id: number, data: LeaveTypeData): Promise<Resul
 };
 
 /** Strzałka: zamiana pozycji z sąsiednim widocznym typem (pozycje mogą mieć luki po ukryciu). */
-export const moveType = async (id: number, direction: LeaveTypeDirection): Promise<Result> =>
+export const moveType = async (id: number, direction: OrderDirection): Promise<Result> =>
   withTransaction(async (conn) => {
     const visible = await q.lockVisible(conn);
-    const index = visible.findIndex((v) => v.id === id);
-    if (index === -1) return notFound();
-    const neighbour = visible[direction === 'up' ? index - 1 : index + 1];
-    if (!neighbour) return { ok: true as const };
-    await q.setPosition(conn, id, neighbour.position);
-    await q.setPosition(conn, neighbour.id, visible[index]!.position);
-    return { ok: true as const };
+    return swapWithNeighbour(conn, visible, id, direction, q.setPosition);
   });
 
 /** Ukrycie: znika z formularza nowego wniosku; zawsze zostaje co najmniej jeden widoczny typ. */

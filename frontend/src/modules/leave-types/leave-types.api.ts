@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { LeaveTypeDirection, LeaveTypeInput, LeaveTypesListResponse } from '@app/shared';
+import type { OrderDirection, LeaveTypeInput, LeaveTypesListResponse } from '@app/shared';
 import { api } from '../../core/api/client';
 
 const KEY = ['leave-types'] as const;
@@ -29,7 +29,7 @@ export const useUpdateLeaveType = () => {
 };
 
 export const useMoveLeaveType = () => {
-  return useLeaveTypesMutation(({ id, direction }: { id: number; direction: LeaveTypeDirection }) =>
+  return useLeaveTypesMutation(({ id, direction }: { id: number; direction: OrderDirection }) =>
     api.post(`/leave-types/${id}/move`, { direction }),
   );
 };

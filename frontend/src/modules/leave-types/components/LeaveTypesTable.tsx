@@ -1,14 +1,14 @@
-import { ActionIcon, Badge, Button, Card, Group, Stack, Table, Text, Tooltip } from '@mantine/core';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Badge, Button, Card, Group, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { TABLE_MIN_WIDTH, type LeaveTypeDirection, type LeaveTypeItem } from '@app/shared';
+import { TABLE_MIN_WIDTH, type OrderDirection, type LeaveTypeItem } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
+import { OrderArrows } from '../../../common/OrderArrows';
 
 export interface RowActions {
   onEdit: (lt: LeaveTypeItem) => void;
   onHide: (lt: LeaveTypeItem) => void;
   onUnhide: (lt: LeaveTypeItem) => void;
-  onMove: (lt: LeaveTypeItem, direction: LeaveTypeDirection) => void;
+  onMove: (lt: LeaveTypeItem, direction: OrderDirection) => void;
   /** Typ, którego przywracanie właśnie trwa (przycisk się kręci i nie da się kliknąć drugi raz). */
   unhidingId: number | null;
 }
@@ -40,28 +40,6 @@ const NameCell = ({ lt }: { lt: LeaveTypeItem }) => {
 const LimitText = ({ limit }: { limit: number | null }) => {
   const { t } = useTranslation('leave-types');
   return limit === null ? <Text span inherit c="dimmed">{t('no_limit')}</Text> : <>{t('limit_days', { count: limit })}</>;
-};
-
-/** Strzałki kolejności: ta sama kolejność jest w formularzu wniosku pracownika. */
-const OrderArrows = ({ lt, index, count, onMove }: { lt: LeaveTypeItem; index: number; count: number; onMove: RowActions['onMove'] }) => {
-  const { t } = useTranslation('leave-types');
-  return (
-    <Group gap={2} wrap="nowrap">
-      <ActionIcon variant="subtle" color="gray" size="sm" aria-label={t('move_up')} disabled={index === 0} onClick={() => onMove(lt, 'up')}>
-        <ChevronUp size={16} />
-      </ActionIcon>
-      <ActionIcon
-        variant="subtle"
-        color="gray"
-        size="sm"
-        aria-label={t('move_down')}
-        disabled={index === count - 1}
-        onClick={() => onMove(lt, 'down')}
-      >
-        <ChevronDown size={16} />
-      </ActionIcon>
-    </Group>
-  );
 };
 
 const Actions = ({ lt, visibleCount, unhidingId, onEdit, onHide, onUnhide }: Omit<RowActions, 'onMove'> & { lt: LeaveTypeItem; visibleCount: number }) => {
@@ -118,7 +96,7 @@ export const LeaveTypesTable = ({ rows, visibleCount, onMove, ...actions }: List
         <Table.Tbody>
           {rows.map((lt, i) => (
             <Table.Tr key={lt.id}>
-              <Table.Td>{!lt.hidden && <OrderArrows lt={lt} index={i} count={visibleCount} onMove={onMove} />}</Table.Td>
+              <Table.Td>{!lt.hidden && <OrderArrows index={i} count={visibleCount} onMove={(direction) => onMove(lt, direction)} />}</Table.Td>
               <Table.Td><NameCell lt={lt} /></Table.Td>
               <Table.Td><DeductsBadge deducts={lt.deductsPool} /></Table.Td>
               <Table.Td c={lt.hidden ? 'dimmed' : undefined}><LimitText limit={lt.yearlyLimit} /></Table.Td>
@@ -149,7 +127,7 @@ export const LeaveTypeCards = ({ rows, visibleCount, onMove, ...actions }: ListP
             </Text>
             <Text size="sm" c="dimmed">{t('requests_count', { count: lt.requestsCount })}</Text>
             <Group justify="space-between" wrap="nowrap">
-              {lt.hidden ? <span /> : <OrderArrows lt={lt} index={i} count={visibleCount} onMove={onMove} />}
+              {lt.hidden ? <span /> : <OrderArrows index={i} count={visibleCount} onMove={(direction) => onMove(lt, direction)} />}
               <Actions lt={lt} visibleCount={visibleCount} {...actions} />
             </Group>
           </Stack>

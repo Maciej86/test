@@ -105,7 +105,7 @@ export const ProjectsMockup = () => {
                   const c = counts(p);
                   return (
                     <Table.Tr key={p.id}>
-                      <Table.Td><OrderArrows index={i} count={rows.length} /></Table.Td>
+                      <Table.Td><OrderArrows index={i} count={rows.length} onMove={() => undefined} /></Table.Td>
                       <Table.Td><Anchor component={Link} to={`/admin/tasks/${p.id}`} fw={600}>{p.name}</Anchor></Table.Td>
                       <Table.Td><Members p={p} /></Table.Td>
                       <Table.Td>
@@ -129,7 +129,7 @@ export const ProjectsMockup = () => {
                   <Stack gap="xs">
                     <Group justify="space-between" wrap="nowrap">
                       <Anchor component={Link} to={`/admin/tasks/${p.id}`} fw={600}>{p.name}</Anchor>
-                      <OrderArrows index={i} count={rows.length} />
+                      <OrderArrows index={i} count={rows.length} onMove={() => undefined} />
                     </Group>
                     <Members p={p} />
                     <Text size="sm" c="dimmed">{t('project_open', { count: c.open })}, {t('project_done', { count: c.done })}</Text>

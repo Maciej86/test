@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { leaveTypeMoveSchema, leaveTypeSchema } from '../leaveTypes';
+import { leaveTypeSchema } from '../leaveTypes';
 
 const base = { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: '' };
 const issue = (r: { error?: { issues: { message: string; path: PropertyKey[] }[] } }, field: string) =>
@@ -38,10 +38,3 @@ describe('leaveTypeSchema', () => {
   });
 });
 
-describe('leaveTypeMoveSchema', () => {
-  it('direction up/down ok, left → error', () => {
-    expect(leaveTypeMoveSchema.safeParse({ direction: 'up' }).success).toBe(true);
-    expect(leaveTypeMoveSchema.safeParse({ direction: 'down' }).success).toBe(true);
-    expect(leaveTypeMoveSchema.safeParse({ direction: 'left' }).success).toBe(false);
-  });
-});

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { ContractTypeDirection, ContractTypeInput, ContractTypesListResponse } from '@app/shared';
+import type { OrderDirection, ContractTypeInput, ContractTypesListResponse } from '@app/shared';
 import { api } from '../../core/api/client';
 
 const KEY = ['contract-types'] as const;
@@ -34,7 +34,7 @@ export const useUpdateContractType = () => {
 };
 
 export const useMoveContractType = () => {
-  return useContractTypesMutation(({ id, direction }: { id: number; direction: ContractTypeDirection }) =>
+  return useContractTypesMutation(({ id, direction }: { id: number; direction: OrderDirection }) =>
     api.post(`/contract-types/${id}/move`, { direction }),
   );
 };

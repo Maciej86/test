@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { leaveTypeMoveSchema, leaveTypeSchema, type LeaveTypeData, type LeaveTypeMoveInput } from '@app/shared';
+import { leaveTypeSchema, orderMoveSchema, type LeaveTypeData, type OrderMoveInput } from '@app/shared';
 import { idParam, reply } from '../../middleware/routeHelpers';
 import { validateBody } from '../../middleware/validateBody';
 import { createType, hideType, listTypes, moveType, unhideType, updateType } from './leave-types.service';
@@ -20,9 +20,9 @@ leaveTypesRoutes.put('/:id', validateBody(leaveTypeSchema), async (req, res) => 
   if (id !== null) reply(res, await updateType(id, req.body as LeaveTypeData));
 });
 
-leaveTypesRoutes.post('/:id/move', validateBody(leaveTypeMoveSchema), async (req, res) => {
+leaveTypesRoutes.post('/:id/move', validateBody(orderMoveSchema), async (req, res) => {
   const id = idParam(res, req.params.id);
-  if (id !== null) reply(res, await moveType(id, (req.body as LeaveTypeMoveInput).direction));
+  if (id !== null) reply(res, await moveType(id, (req.body as OrderMoveInput).direction));
 });
 
 leaveTypesRoutes.post('/:id/hide', async (req, res) => { // rule-ok: bez danych wejściowych, tylko numer z adresu

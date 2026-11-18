@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { contractTypeMoveSchema, contractTypeSchema } from '../contractTypes';
+import { contractTypeSchema } from '../contractTypes';
 
 const issue = (r: { error?: { issues: { message: string; path: PropertyKey[] }[] } }, field: string) =>
   r.error?.issues.find((i) => i.path.join('.') === field)?.message;
@@ -23,10 +23,3 @@ describe('contractTypeSchema', () => {
   });
 });
 
-describe('contractTypeMoveSchema', () => {
-  it('direction up and down → ok; left → error', () => {
-    expect(contractTypeMoveSchema.parse({ direction: 'up' }).direction).toBe('up');
-    expect(contractTypeMoveSchema.parse({ direction: 'down' }).direction).toBe('down');
-    expect(contractTypeMoveSchema.safeParse({ direction: 'left' }).success).toBe(false);
-  });
-});

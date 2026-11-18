@@ -44,7 +44,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   `ProjectsPage`, `TaskBoardPage`, `TaskCard`, `TaskFormModal`, `TaskDrawer`), `e2e/tasks.spec.ts`. Lista `it.todo`
   = wiersze tabel API i pól ze `SPEC-1.md` plus scenariusze `TESTS-1.md` → `npm run check`.
 
-- [ ] **1. Wydzielenie kolejności strzałkami.**
+- [x] **1. Wydzielenie kolejności strzałkami.**
   - Test `ordering.test.ts` (shared): `orderMoveSchema` przyjmuje `up`/`down`, odrzuca `left` (klucz
     `validation.required`/enum). Kod: `ORDER_DIRECTIONS = ['up', 'down'] as const`, `OrderDirection`,
     `orderMoveSchema`, `OrderMoveInput`; usunięcie `LEAVE_TYPE_DIRECTIONS`, `CONTRACT_TYPE_DIRECTIONS`,
@@ -56,8 +56,8 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
     w obu modułach woła go po `lockVisible`. Istniejące testy tras Typów urlopów i umów dalej zielone.
   - Test `OrderArrows.test.tsx` (front): pierwsza pozycja ma wyłączone „Przesuń wyżej”, ostatnia „Przesuń niżej”,
     kliknięcie woła `onMove('down')`. Kod `frontend/src/common/OrderArrows.tsx`; makietowy dostaje `onMove?:
-    (d: OrderDirection) => void` (test makiety poprawiony). Podmiana w `LeaveTypesTable` i `ContractTypesTable`;
-    `move_up`/`move_down` usunięte z `leave-types.json` i `contract-types.json` → `npm run check`.
+    (d: OrderDirection) => void` (test makiety poprawiony). Podmiana w `LeaveTypesTable` i `ContractTypesTable` → `npm run check`. **Uwaga:** `move_up`/`move_down` zostają też w
+    `leave-types.json` i `contract-types.json`, bo używają ich makiety zamkniętych modułów (ich się nie zmienia).
 
 - [ ] **2. Biblioteka `@dnd-kit`.** `npm install -w @app/frontend -w @app/mockups @dnd-kit/core @dnd-kit/sortable
   @dnd-kit/utilities` (wersje sprzed co najmniej 2 tygodni), wpis jest już w „Bibliotekach” `SPEC-GENERAL.md`;

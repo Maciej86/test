@@ -6,9 +6,6 @@ export const LEAVE_TYPE_NAME_MAX = 40;
 export const LEAVE_TYPE_LIMIT_MIN = 1;
 export const LEAVE_TYPE_LIMIT_MAX = 365;
 
-/** Kierunek strzałek kolejności. */
-export const LEAVE_TYPE_DIRECTIONS = ['up', 'down'] as const;
-export type LeaveTypeDirection = (typeof LEAVE_TYPE_DIRECTIONS)[number];
 
 /** Klucze błędów serwera modułu (teksty w shared/locales/pl/leave-types.json, sekcja server). */
 export const LEAVE_TYPE_MESSAGES = {

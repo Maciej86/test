@@ -1,14 +1,14 @@
-import { ActionIcon, Badge, Button, Card, Group, Stack, Table, Text } from '@mantine/core';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Badge, Button, Card, Group, Stack, Table, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { TABLE_MIN_WIDTH, type ContractTypeDirection, type ContractTypeItem } from '@app/shared';
+import { TABLE_MIN_WIDTH, type OrderDirection, type ContractTypeItem } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
+import { OrderArrows } from '../../../common/OrderArrows';
 
 export interface RowActions {
   onEdit: (ct: ContractTypeItem) => void;
   onHide: (ct: ContractTypeItem) => void;
   onUnhide: (ct: ContractTypeItem) => void;
-  onMove: (ct: ContractTypeItem, direction: ContractTypeDirection) => void;
+  onMove: (ct: ContractTypeItem, direction: OrderDirection) => void;
   /** Typ, którego przywracanie właśnie trwa (przycisk się kręci i nie da się kliknąć drugi raz). */
   unhidingId: number | null;
 }
@@ -36,28 +36,6 @@ const NameCell = ({ ct }: { ct: ContractTypeItem }) => {
 const EmployeesText = ({ count }: { count: number }) => {
   const { t } = useTranslation('contract-types');
   return count === 0 ? <Text span inherit c="dimmed">{t('no_employees')}</Text> : <>{t('employees_count', { count })}</>;
-};
-
-/** Strzałki kolejności: ta sama kolejność jest w oknie pracownika. */
-const OrderArrows = ({ ct, index, count, onMove }: { ct: ContractTypeItem; index: number; count: number; onMove: RowActions['onMove'] }) => {
-  const { t } = useTranslation('contract-types');
-  return (
-    <Group gap={2} wrap="nowrap">
-      <ActionIcon variant="subtle" color="gray" size="sm" aria-label={t('move_up')} disabled={index === 0} onClick={() => onMove(ct, 'up')}>
-        <ChevronUp size={16} />
-      </ActionIcon>
-      <ActionIcon
-        variant="subtle"
-        color="gray"
-        size="sm"
-        aria-label={t('move_down')}
-        disabled={index === count - 1}
-        onClick={() => onMove(ct, 'down')}
-      >
-        <ChevronDown size={16} />
-      </ActionIcon>
-    </Group>
-  );
 };
 
 /** Akcje wiersza; ukryć można każdy widoczny typ, także ostatni (rodzaj umowy jest nieobowiązkowy). */
@@ -101,7 +79,7 @@ export const ContractTypesTable = ({ rows, visibleCount, onMove, ...actions }: L
         <Table.Tbody>
           {rows.map((ct, i) => (
             <Table.Tr key={ct.id}>
-              <Table.Td>{!ct.hidden && <OrderArrows ct={ct} index={i} count={visibleCount} onMove={onMove} />}</Table.Td>
+              <Table.Td>{!ct.hidden && <OrderArrows index={i} count={visibleCount} onMove={(direction) => onMove(ct, direction)} />}</Table.Td>
               <Table.Td><NameCell ct={ct} /></Table.Td>
               <Table.Td c="dimmed"><EmployeesText count={ct.employeesCount} /></Table.Td>
               <Table.Td><Actions ct={ct} {...actions} /></Table.Td>
@@ -124,7 +102,7 @@ export const ContractTypeCards = ({ rows, visibleCount, onMove, ...actions }: Li
             <NameCell ct={ct} />
             <Text size="sm" c="dimmed">{t('col_employees')}: <EmployeesText count={ct.employeesCount} /></Text>
             <Group justify="space-between" wrap="nowrap">
-              {ct.hidden ? <span /> : <OrderArrows ct={ct} index={i} count={visibleCount} onMove={onMove} />}
+              {ct.hidden ? <span /> : <OrderArrows index={i} count={visibleCount} onMove={(direction) => onMove(ct, direction)} />}
               <Actions ct={ct} {...actions} />
             </Group>
           </Stack>

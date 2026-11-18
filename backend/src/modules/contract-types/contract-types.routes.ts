@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { contractTypeMoveSchema, contractTypeSchema, type ContractTypeData, type ContractTypeMoveInput } from '@app/shared';
+import { contractTypeSchema, orderMoveSchema, type ContractTypeData, type OrderMoveInput } from '@app/shared';
 import { idParam, reply } from '../../middleware/routeHelpers';
 import { validateBody } from '../../middleware/validateBody';
 import { createType, hideType, listTypes, moveType, unhideType, updateType } from './contract-types.service';
@@ -20,9 +20,9 @@ contractTypesRoutes.put('/:id', validateBody(contractTypeSchema), async (req, re
   if (id !== null) reply(res, await updateType(id, req.body as ContractTypeData));
 });
 
-contractTypesRoutes.post('/:id/move', validateBody(contractTypeMoveSchema), async (req, res) => {
+contractTypesRoutes.post('/:id/move', validateBody(orderMoveSchema), async (req, res) => {
   const id = idParam(res, req.params.id);
-  if (id !== null) reply(res, await moveType(id, (req.body as ContractTypeMoveInput).direction));
+  if (id !== null) reply(res, await moveType(id, (req.body as OrderMoveInput).direction));
 });
 
 contractTypesRoutes.post('/:id/hide', async (req, res) => { // rule-ok: bez danych wejściowych, tylko numer z adresu
