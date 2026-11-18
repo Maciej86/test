@@ -35,7 +35,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
 
 ---
 
-- [ ] **0. Szkielet testów.** Pliki z `it.todo` dla każdego wymagania:
+- [x] **0. Szkielet testów.** Pliki z `it.todo` dla każdego wymagania:
   `shared/src/schemas/__tests__/tasks.test.ts`, `shared/src/schemas/__tests__/ordering.test.ts`,
   `backend/src/db/__tests__/ordering.test.ts`, `backend/src/modules/tasks/__tests__/tasks.migration.test.ts`,
   `…/tasks/__tests__/projects.routes.test.ts`, `…/tasks/__tests__/board.routes.test.ts`,
