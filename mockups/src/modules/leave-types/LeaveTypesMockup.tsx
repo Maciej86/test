@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Badge, Button, Card, Group, Paper, SegmentedControl, Stack, Switch, Table, Text } from '@mantine/core';
+import { ActionIcon, Badge, Button, Card, Group, Paper, SegmentedControl, Stack, Switch, Table, Text } from '@mantine/core';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
-import { OrderArrows } from '../../common/OrderArrows';
 import { PageHeader } from '../../common/PageHeader';
 import { notify } from '../../common/notify';
 import { HideModal, LeaveTypeModal } from './LeaveTypeModals';
@@ -38,6 +38,21 @@ const NameCell = ({ lt }: { lt: MockLeaveType }) => {
 const LimitText = ({ limit }: { limit: number | null }) => {
   const { t } = useTranslation('leave-types');
   return limit === null ? <Text span inherit c="dimmed">{t('no_limit')}</Text> : <>{t('limit_days', { count: limit })}</>;
+};
+
+/** Strzałki kolejności: ta sama kolejność jest w formularzu wniosku pracownika. */
+const OrderArrows = ({ index, count }: { index: number; count: number }) => {
+  const { t } = useTranslation('leave-types');
+  return (
+    <Group gap={2} wrap="nowrap">
+      <ActionIcon variant="subtle" color="gray" size="sm" aria-label={t('move_up')} disabled={index === 0}>
+        <ChevronUp size={16} />
+      </ActionIcon>
+      <ActionIcon variant="subtle" color="gray" size="sm" aria-label={t('move_down')} disabled={index === count - 1}>
+        <ChevronDown size={16} />
+      </ActionIcon>
+    </Group>
+  );
 };
 
 const Actions = ({ lt, onEdit, onHide }: RowActions & { lt: MockLeaveType }) => {

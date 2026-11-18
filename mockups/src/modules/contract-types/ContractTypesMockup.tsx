@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Badge, Button, Card, Group, Paper, SegmentedControl, Select, Stack, Switch, Table, Text } from '@mantine/core';
+import { ActionIcon, Badge, Button, Card, Group, Paper, SegmentedControl, Select, Stack, Switch, Table, Text } from '@mantine/core';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
-import { OrderArrows } from '../../common/OrderArrows';
 import { PageHeader } from '../../common/PageHeader';
 import { notify } from '../../common/notify';
 import { ContractTypeModal, HideModal } from './ContractTypeModals';
@@ -33,6 +33,21 @@ const NameCell = ({ ct }: { ct: MockContractType }) => {
 const EmployeesText = ({ count }: { count: number }) => {
   const { t } = useTranslation('contract-types');
   return count === 0 ? <Text span inherit c="dimmed">{t('no_employees')}</Text> : <>{t('employees_count', { count })}</>;
+};
+
+/** Strzałki kolejności: ta sama kolejność jest na liście „Rodzaj umowy” w oknie pracownika. */
+const OrderArrows = ({ index, count }: { index: number; count: number }) => {
+  const { t } = useTranslation('contract-types');
+  return (
+    <Group gap={2} wrap="nowrap">
+      <ActionIcon variant="subtle" color="gray" size="sm" aria-label={t('move_up')} disabled={index === 0}>
+        <ChevronUp size={16} />
+      </ActionIcon>
+      <ActionIcon variant="subtle" color="gray" size="sm" aria-label={t('move_down')} disabled={index === count - 1}>
+        <ChevronDown size={16} />
+      </ActionIcon>
+    </Group>
+  );
 };
 
 const Actions = ({ ct, onEdit, onHide }: RowActions & { ct: MockContractType }) => {

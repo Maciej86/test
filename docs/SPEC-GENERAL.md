@@ -43,7 +43,7 @@ odwiedzających i bez części „konto”. `/` przekierowuje na `/login` albo n
 | Wydruk / PDF wniosku zatwierdzonego | ✓ | ✓ (własny) |
 | Typy urlopów (dodaj, edytuj, ukryj) | ✓ | — |
 | Pracownicy: dodaj, edytuj, ustaw hasło, pule dni, „Zamknij rok”, do archiwum | ✓ | — |
-| Projekty: dodaj, edytuj, członkowie, kolejność, do archiwum | ✓ | — |
+| Projekty: dodaj, edytuj, członkowie, kolejność, usuń na stałe (z zadaniami) | ✓ | — |
 | Tablice zadań projektów: dodaje, edytuje, przeciąga, przypisuje, komentuje, usuwa (do archiwum) | ✓ (wszystkie projekty) | ✓ (tylko projekty, do których należy) |
 | Historia zmian | ✓ | — |
 | Archiwum: przywróć, usuń na stałe | ✓ | — |

@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.40
 
-**Następny krok:** Moduł Zadania: akceptacja podziału na części (1. projekty i tablice, 2. komentarze), potem spec ogólny modułu i spec części 1 (`/stepkit:dalej`).
+**Następny krok:** Moduł Zadania, część 1/2 (projekty i tablice): akceptacja `SPEC.md` i `SPEC-1.md`, potem plan (`/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -28,7 +28,7 @@
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | zrobiony | zamknięcie | my-leave |
-| 10 | Zadania | tasks | w toku | spec (podział na części) | employees, notifications |
+| 10 | Zadania | tasks | w toku | spec, część 1/2 | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
 | 13 | Moje konto | my-account | czeka | makieta | login |
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-18: Zadania: podział na 2 części zaakceptowany (1. projekty i tablice, 2. komentarze); napisane `SPEC.md` i `SPEC-1.md`; zmiana roli administrator → pracownik dopisuje go do projektów z jego otwartymi zadaniami.
 - 2026-11-18: Zadania: odpowiedzi na wszystkie pytania makiety (`@dnd-kit` zatwierdzony, projekt usuwa się na stałe z zadaniami po wpisaniu nazwy, osoba usunięta z projektu znika tylko z otwartych zadań, reszta jak w rekomendacjach); panele pytań usunięte z makiety.
 - 2026-11-18: Poprawka (zgłoszenie użytkownika): tabela Wniosków urlopowych i Moich urlopów nie skacze przy zmianie zakładki i roku (`keepPreviousData`).
 - 2026-11-18: Zadania: zmiana zakresu na prośbę użytkownika: projekty jako podmenu „Zadań” (tworzy administrator, pracownik widzi tylko swoje), komentarze z powiadomieniem, dodawanie w oknie, podgląd z prawej 540 px, odświeżanie co 5 s (odpowiedź 7); makieta przerobiona, 15 otwartych pytań; wspólne `OrderArrows` w makietach.
