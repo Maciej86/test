@@ -58,4 +58,22 @@ describe('TaskDrawer', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Usuń' }));
     expect(onArchive).toHaveBeenCalledWith(task);
   });
+
+  it('saving sends only the fields the person changed; the rest comes from the latest board (no lost update)', async () => {
+    const put = vi.spyOn(api, 'put').mockResolvedValue({ data: { ok: true } });
+    const Refreshing = () => {
+      const [current, setCurrent] = useState(task);
+      return (
+        <>
+          <button type="button" onClick={() => setCurrent({ ...task, column: 'done', assigneeIds: [5] })}>ktoś przeniósł</button>
+          <TaskDrawer projectId={9} board={{ ...board, tasks: [current] }} task={current} onClose={vi.fn()} onArchive={vi.fn()} />
+        </>
+      );
+    };
+    renderWithProviders(<Refreshing />);
+    fireEvent.change(await screen.findByRole('textbox', { name: /Tytuł/ }), { target: { value: 'Poprawiony tytuł' } });
+    fireEvent.click(screen.getByText('ktoś przeniósł'));
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
+    await waitFor(() => expect(put).toHaveBeenCalledWith('/tasks/7', expect.objectContaining({ title: 'Poprawiony tytuł', column: 'done', assigneeIds: [5] })));
+  });
 });

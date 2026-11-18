@@ -35,6 +35,8 @@ describe('projects queries', () => {
     const { db, calls } = spyDb([{ project_id: 9, user_id: 5, name: 'Jan Kowalski', archived_at: null, open_tasks: 2 }]);
     expect(await q.listMembers(db, [9])).toEqual([{ projectId: 9, id: 5, name: 'Jan Kowalski', archived: false, openTasks: 2 }]);
     expect(calls[0]![0]).toMatch(/column_key <> 'done'/);
+    // Administratorzy widzą wszystko i nie są pokazywani jako członkowie (np. po awansie pracownika).
+    expect(calls[0]![0]).toMatch(/u\.role = 'employee'/);
     expect(calls[0]![0]).toMatch(/t\.archived_at IS NULL/);
     const empty = spyDb([]);
     expect(await q.listMembers(empty.db, [])).toEqual([]);

@@ -253,4 +253,15 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   **Uwaga:** test e2e Wniosków urlopowych czeka teraz, aż wyszukiwanie trafi do adresu (po poprawce „tabela nie
   skacze” lista zostaje na ekranie w trakcie wyszukiwania). Wszystkie testy e2e: 33 zielone.
 
-- [ ] **19. Przegląd kodu** całej części (lista kontrolna z `CONVENTIONS.md`), poprawki z testami → `npm run check`.
+- [x] **19. Przegląd kodu** całej części (lista kontrolna z `CONVENTIONS.md`), poprawki z testami → `npm run check`.
+  **Wynik przeglądu (2026-11-18):** bez krytycznych. Poprawione z testami: (1) każdy zapis zadania blokuje najpierw
+  projekt (`lockProject`), więc dwa przeciągnięcia naraz czekają zamiast się zakleszczyć (to samo chroni dodanie
+  zadania przed usuwanym projektem); (2) nieudane odświeżenie w tle zostawia tablicę i otwarty podgląd, z żółtym
+  komunikatem; (3) zapis z podglądu wysyła tylko zmienione pola, resztę bierze z najświeższej tablicy (nie cofa
+  cudzego przeniesienia); drobne: administratorzy nie są pokazywani jako członkowie, `onDragOver` na najświeższym
+  stanie, `@dnd-kit` usunięty z makiet. (4) Próby nadużyć na prawdziwej bazie: etap testy.
+  **Odłożone drobiazgi:** menu nie znika od razu po usunięciu projektu (najpóźniej przy powrocie do karty); dwa szybkie
+  przeciągnięcia z rzędu mogą na chwilę mignąć; po archiwizacji luka w pozycjach (znika przy następnym przeniesieniu);
+  progi telefonu (`62em`, `48em`) wpisane w plikach; podobna szuflada w Wnioskach urlopowych (`DetailsDrawer`) do
+  wydzielenia; link z powiadomienia do zadania zrealizowanego ponad 30 dni temu pokazuje „Nie znaleziono zadania”;
+  grupa w menu zwija się, gdy bieżąca strona wychodzi z grupy.

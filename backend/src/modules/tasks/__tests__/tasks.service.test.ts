@@ -20,6 +20,7 @@ vi.mock('../tasks.queries', () => ({
   setColumn: vi.fn(),
   setAssignees: vi.fn(),
   archiveTask: vi.fn(),
+  lockProject: vi.fn(),
 }));
 
 const q = await import('../tasks.queries');
@@ -131,6 +132,35 @@ describe('task writes', () => {
     vi.mocked(q.columnTaskIds).mockResolvedValue([11, 12]);
     vi.mocked(q.findTask).mockResolvedValue(row({ id: 7, column: 'draft' }));
     vi.mocked(q.assigneesOf).mockResolvedValue(new Map([[7, [5]]]));
+    vi.mocked(q.lockProject).mockResolvedValue(true);
+  });
+
+  // Jedna kolejność blokad (projekt, potem zadanie i kolumny): dwa przeciągnięcia naraz czekają, zamiast się zakleszczyć.
+  it('every task write locks the project first, then the task and the columns', async () => {
+    const order = () => [
+      vi.mocked(q.lockProject).mock.invocationCallOrder[0]!,
+      vi.mocked(q.columnTaskIds).mock.invocationCallOrder[0]!,
+    ];
+    vi.mocked(q.columnTaskIds).mockResolvedValue([7, 11]);
+    await s.moveTask(7, { column: 'draft', beforeTaskId: 11 }, jan);
+    expect(q.lockProject).toHaveBeenCalledWith(conn, 9);
+    const lockedTask = vi.mocked(q.findTask).mock.calls.findIndex((c) => (c[3] as { lock?: boolean } | undefined)?.lock === true);
+    expect(vi.mocked(q.findTask).mock.invocationCallOrder[lockedTask]!).toBeGreaterThan(vi.mocked(q.lockProject).mock.invocationCallOrder[0]!);
+    const [lock, column] = order();
+    expect(lock).toBeLessThan(column);
+    for (const write of [() => s.updateTask(7, input, jan), () => s.archiveTask(7, jan), () => s.createTask(9, input, jan)]) {
+      vi.mocked(q.lockProject).mockClear();
+      await write();
+      expect(q.lockProject).toHaveBeenCalledWith(conn, 9);
+    }
+  });
+
+  it('project deleted in the meantime → 404, nothing written', async () => {
+    vi.mocked(q.lockProject).mockResolvedValue(false);
+    expect(await s.createTask(9, input, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
+    expect(await s.moveTask(7, { column: 'done', beforeTaskId: null }, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
+    expect(q.insertTask).not.toHaveBeenCalled();
+    expect(q.setPositions).not.toHaveBeenCalled();
   });
 
   it('new task goes to the top of its column, author from the actor, assignees saved', async () => {

@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.40
 
-**Następny krok:** Moduł Zadania, część 1/2: implementacja, krok 19 z `PLAN-1.md` (`/stepkit:dalej`).
+**Następny krok:** Moduł Zadania, część 1/2: testy (próby nadużyć na prawdziwej bazie, sprawdzenie w przeglądarce, potem użytkownik przechodzi `TESTS-1.md`) (`/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -28,7 +28,7 @@
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | zrobiony | zamknięcie | my-leave |
-| 10 | Zadania | tasks | w toku | implementacja, część 1/2 (krok 19/20) | employees, notifications |
+| 10 | Zadania | tasks | w toku | testy, część 1/2 | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
 | 13 | Moje konto | my-account | czeka | makieta | login |
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-18: Zadania, część 1: zbudowana (kroki 0–19), przegląd kodu z poprawkami (blokada projektu przy zapisach, tablica zostaje przy nieudanym odświeżeniu, zapis tylko zmienionych pól); `npm run check` i 33 testy e2e zielone.
 - 2026-11-18: Zadania: spec części 1 zaakceptowany; napisane `PLAN-1.md` (20 kroków) i `TESTS-1.md`.
 - 2026-11-18: Zadania: podział na 2 części zaakceptowany (1. projekty i tablice, 2. komentarze); napisane `SPEC.md` i `SPEC-1.md`; zmiana roli administrator → pracownik dopisuje go do projektów z jego otwartymi zadaniami.
 - 2026-11-18: Zadania: odpowiedzi na wszystkie pytania makiety (`@dnd-kit` zatwierdzony, projekt usuwa się na stałe z zadaniami po wpisaniu nazwy, osoba usunięta z projektu znika tylko z otwartych zadań, reszta jak w rekomendacjach); panele pytań usunięte z makiety.

@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import type { BoardResponse, BoardTask, SessionUser } from '@app/shared';
 import { api } from '../../../core/api/client';
 import { AuthProvider } from '../../../core/auth/AuthProvider';
@@ -161,5 +161,21 @@ describe('TaskBoardPage', () => {
     show(board(), '/admin/tasks/9', { id: 1, name: 'Anna Nowak', role: 'admin', mustChangePassword: false });
     fireEvent.click(await screen.findByRole('button', { name: 'Edytuj projekt' }));
     expect(await screen.findByText('Projekt: Marketing')).toBeInTheDocument();
+  });
+
+  it('a failed background refresh keeps the board and the open drawer with typed values', async () => {
+    let fail = false;
+    vi.spyOn(api, 'get').mockImplementation(async (url: string) => {
+      if (url === '/auth/me') return { data: { user: jan } };
+      if (fail) throw Object.assign(new Error('503'), { isAxiosError: true, response: { status: 503, data: { error: { message: 'server.unavailable' } } } });
+      return { data: board() };
+    });
+    renderRoutes([{ path: '/admin/tasks/:projectId', element: <AuthProvider><TaskBoardPage /></AuthProvider> }], '/admin/tasks/9?task=3');
+    const title = await screen.findByRole('textbox', { name: /Tytuł/ });
+    fireEvent.change(title, { target: { value: 'Wpisane przed awarią' } });
+    fail = true;
+    await act(async () => { await vi.advanceTimersByTimeAsync(20_000); });
+    expect(await screen.findByText('Nie udało się odświeżyć tablicy. Spróbuję ponownie za chwilę.')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /Tytuł/ })).toHaveValue('Wpisane przed awarią');
   });
 });

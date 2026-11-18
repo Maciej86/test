@@ -146,3 +146,13 @@ export const setAssignees = async (db: Db, taskId: number, userIds: number[]): P
 export const archiveTask = async (db: Db, id: number, byUserId: number): Promise<void> => {
   await db.query('UPDATE tasks SET archived_at = NOW(), archived_by = ? WHERE id = ?', [byUserId, id]);
 };
+
+/**
+ * Blokada projektu na czas zapisu zadania. Każdy zapis zadań (dodanie, zmiana, przeniesienie, archiwum) i usunięcie
+ * projektu blokuje najpierw projekt, więc dwa zapisy w tym samym projekcie czekają na siebie zamiast się zakleszczyć.
+ * Projekt usunięty w międzyczasie: false.
+ */
+export const lockProject = async (db: Db, projectId: number): Promise<boolean> => {
+  const [rows] = await db.query<RowDataPacket[]>('SELECT id FROM projects WHERE id = ? FOR UPDATE', [projectId]);
+  return rows.length > 0;
+};

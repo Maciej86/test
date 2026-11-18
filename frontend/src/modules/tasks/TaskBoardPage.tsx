@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Anchor, Button, Group, Paper, SegmentedControl, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
+import { Alert, Anchor, Button, Group, Paper, SegmentedControl, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { DndContext, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type DragOverEvent } from '@dnd-kit/core';
-import { SquareKanban } from 'lucide-react';
+import { SquareKanban, WifiOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 import { TASK_COLUMNS, boardViewSchema, type BoardResponse, type BoardTask, type TaskColumn } from '@app/shared';
@@ -29,6 +29,11 @@ const PROJECT_ID = /^[1-9]\d{0,9}$/;
 /** Na węższym ekranie (telefon, mały tablet) widać jedną kolumnę naraz. */
 const PHONE_QUERY = '(max-width: 62em)';
 const DEFAULT_PHONE_COLUMN: TaskColumn = 'in_progress';
+
+const RefreshFailed = () => {
+  const { t } = useTranslation('tasks');
+  return <Alert variant="light" color="yellow" icon={<WifiOff size={18} />}>{t('refresh_failed')}</Alert>;
+};
 
 const NoAccess = () => {
   const { t } = useTranslation('tasks');
@@ -81,9 +86,13 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
     move.mutate({ taskId: task.id, column, beforeTaskId }, { onError: (error) => notify.error(apiErrorMessage(error, t)) });
 
   const onDragOver = ({ active, over }: DragOverEvent) => {
-    if (!over || !dragTasks) return;
-    const target = dragTarget(dragTasks, Number(active.id), over.id);
-    if (target) setDragTasks(moveInBoard(dragTasks, Number(active.id), target));
+    if (!over) return;
+    // Na najświeższym stanie: kilka zdarzeń w jednej klatce nie pracuje na nieaktualnej kopii.
+    setDragTasks((current) => {
+      if (!current) return current;
+      const target = dragTarget(current, Number(active.id), over.id);
+      return target ? moveInBoard(current, Number(active.id), target) : current;
+    });
   };
   const onDragEnd = ({ active }: DragEndEvent) => {
     const id = Number(active.id);
@@ -202,9 +211,15 @@ const BoardLoader = ({ projectId }: { projectId: number }) => {
   const [oldDone, setOldDone] = useState(false);
   const board = useBoard(projectId, oldDone);
   if (apiErrorKey(board.error) === 'server.not_found') return <NoAccess />;
-  return (
-    <DataState query={board}>
-      {board.data && <Board projectId={projectId} data={board.data} oldDone={oldDone} onOldDone={() => setOldDone((v) => !v)} />}
-    </DataState>
-  );
+  // Tablica już jest, a odświeżenie w tle się nie udało (np. chwilowy brak sieci): zostaje to, co widać, razem
+  // z otwartym podglądem i wpisanymi wartościami; następne odświeżenie spróbuje znowu.
+  if (board.data) {
+    return (
+      <Stack>
+        {board.isError && <RefreshFailed />}
+        <Board projectId={projectId} data={board.data} oldDone={oldDone} onOldDone={() => setOldDone((v) => !v)} />
+      </Stack>
+    );
+  }
+  return <DataState query={board}>{null}</DataState>;
 };

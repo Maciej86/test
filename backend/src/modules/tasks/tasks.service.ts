@@ -96,11 +96,21 @@ const notifyAssigned = (conn: PoolConnection, projectId: number, taskId: number,
         actor: { id: viewer.id, name: viewer.name },
       });
 
+/**
+ * Zadanie do zapisu: najpierw blokada projektu (jedna kolejność blokad dla wszystkich zapisów), potem zadanie
+ * przeczytane od nowa pod blokadą. Niewidoczne, w archiwum albo projekt usunięty w międzyczasie: null.
+ */
+const lockTaskForWrite = async (conn: PoolConnection, taskId: number, viewer: Viewer): Promise<q.TaskRow | null> => {
+  const seen = await q.findTask(conn, taskId, viewer);
+  if (!seen || !(await q.lockProject(conn, seen.projectId))) return null;
+  return q.findTask(conn, taskId, viewer, { lock: true });
+};
+
 /** Nowe zadanie na górze wybranej kolumny; przypisani dostają powiadomienie. */
 export const createTask = async (projectId: number, data: TaskData, viewer: Viewer): Promise<Result<{ id: number }>> =>
   withTransaction(async (conn) => {
     const project = await q.findVisibleProject(conn, projectId, viewer);
-    if (!project) return notFound();
+    if (!project || !(await q.lockProject(conn, projectId))) return notFound();
     if (!(await assigneesAllowed(conn, projectId, data.assigneeIds, []))) return assigneeNotAllowed();
     const columnIds = await q.columnTaskIds(conn, projectId, data.column);
     const id = await q.insertTask(conn, {
@@ -137,7 +147,7 @@ const changeColumn = async (conn: PoolConnection, task: q.TaskRow, column: TaskC
 /** Zmiana zadania z podglądu; zmiana kolumny stawia kartę na górze nowej kolumny. */
 export const updateTask = async (taskId: number, data: TaskData, viewer: Viewer): Promise<Result> =>
   withTransaction(async (conn) => {
-    const task = await q.findTask(conn, taskId, viewer, { lock: true });
+    const task = await lockTaskForWrite(conn, taskId, viewer);
     if (!task) return notFound();
     const before = (await q.assigneesOf(conn, [taskId])).get(taskId) ?? [];
     if (!(await assigneesAllowed(conn, task.projectId, data.assigneeIds, before))) return assigneeNotAllowed();
@@ -162,7 +172,7 @@ export const updateTask = async (taskId: number, data: TaskData, viewer: Viewer)
 /** Przeciągnięcie karty: przed wskazaną kartę tej samej kolumny docelowej albo na jej koniec. */
 export const moveTask = async (taskId: number, move: TaskMoveInput, viewer: Viewer): Promise<Result> =>
   withTransaction(async (conn) => {
-    const task = await q.findTask(conn, taskId, viewer, { lock: true });
+    const task = await lockTaskForWrite(conn, taskId, viewer);
     if (!task) return notFound();
     const target = (await q.columnTaskIds(conn, task.projectId, move.column)).filter((id) => id !== taskId);
     const index = move.beforeTaskId === null ? target.length : target.indexOf(move.beforeTaskId);
@@ -187,7 +197,7 @@ export const moveTask = async (taskId: number, move: TaskMoveInput, viewer: View
 /** „Usuń” na tablicy: zadanie trafia do archiwum. */
 export const archiveTask = async (taskId: number, viewer: Viewer): Promise<Result> =>
   withTransaction(async (conn) => {
-    const task = await q.findTask(conn, taskId, viewer, { lock: true });
+    const task = await lockTaskForWrite(conn, taskId, viewer);
     if (!task) return notFound();
     await q.archiveTask(conn, taskId, viewer.id);
     await logActivity(conn, { userId: viewer.id, userName: viewer.name, action: 'archive', entityType: ENTITY, entityId: taskId, changes: {} });

@@ -40,7 +40,7 @@ export const listMembers = async (
        (SELECT COUNT(*) FROM task_assignees ta JOIN tasks t ON t.id = ta.task_id
         WHERE ta.user_id = u.id AND t.project_id = pm.project_id AND t.column_key <> 'done' AND t.archived_at IS NULL) AS open_tasks
      FROM project_members pm JOIN users u ON u.id = pm.user_id
-     WHERE pm.project_id IN (?) ORDER BY u.last_name, u.first_name`,
+     WHERE pm.project_id IN (?) AND u.role = 'employee' ORDER BY u.last_name, u.first_name`,
     [projectIds],
   );
   return rows.map((r) => ({

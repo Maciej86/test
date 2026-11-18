@@ -33,7 +33,17 @@ export const useTaskForm = (projectId: number, task: BoardTask | null, onDone: (
     validate: zod4Resolver(task ? taskSchema : newTaskSchema),
   });
   const submit = form.onSubmit((values) => {
-    const input = { ...values, assigneeIds: values.assigneeIds.map(Number), ...(task ? { id: task.id } : {}) };
+    // Pola, których osoba nie ruszała, biorą najświeższy stan z tablicy: zapis nie cofa przeniesienia karty ani
+    // przypisania, które w międzyczasie zrobił ktoś inny.
+    const fresh = <K extends keyof TaskFormValues>(key: K, latest: TaskFormValues[K]) => (task && !form.isDirty(key) ? latest : values[key]);
+    const input = {
+      title: fresh('title', task?.title ?? ''),
+      description: fresh('description', task?.description ?? ''),
+      dueDate: fresh('dueDate', task?.dueDate ?? null),
+      column: fresh('column', task?.column ?? 'draft'),
+      assigneeIds: fresh('assigneeIds', (task?.assigneeIds ?? []).map(String)).map(Number),
+      ...(task ? { id: task.id } : {}),
+    };
     save.mutate(input, {
       onSuccess: () => {
         notify.success(task ? t('saved') : t('added'));
