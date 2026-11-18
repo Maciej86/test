@@ -3,7 +3,6 @@ import { Alert, Button, Group, Modal, MultiSelect, Stack, Text, TextInput } from
 import { UserMinus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ButtonIcon } from '../../common/ButtonIcon';
-import { ConfirmModal } from '../../common/ConfirmModal';
 import { notify } from '../../common/notify';
 import { EMPLOYEES, TASKS, openTasksOf, type MockProject } from './data';
 
@@ -70,19 +69,33 @@ export const ProjectModal = ({ project, showError = false, removeMember, onClose
   );
 };
 
-export const ArchiveProjectModal = ({ project, onClose }: { project: MockProject; onClose: () => void }) => {
+/** Usunięcie na stałe: razem z zadaniami i komentarzami, więc trzeba wpisać nazwę projektu. */
+export const DeleteProjectModal = ({ project, onClose }: { project: MockProject; onClose: () => void }) => {
   const { t } = useTranslation('tasks');
+  const [typed, setTyped] = useState('');
   const count = TASKS.filter((task) => task.projectId === project.id).length;
   return (
-    <ConfirmModal
-      title={t('project_archive_title')}
-      confirmLabel={t('project_archive')}
-      confirmAction="archive"
-      danger
-      onConfirm={() => { notify.success(t('project_archived')); onClose(); }}
-      onClose={onClose}
-    >
-      <Text>{t('project_archive_text', { name: project.name, count })}</Text>
-    </ConfirmModal>
+    <Modal opened onClose={onClose} title={t('project_delete_title')}>
+      <Stack>
+        <Text>{t('project_delete_text', { name: project.name, count })}</Text>
+        <TextInput
+          label={t('project_delete_confirm_label', { name: project.name })}
+          value={typed}
+          onChange={(e) => setTyped(e.currentTarget.value)}
+          data-autofocus
+        />
+        <Group justify="flex-end">
+          <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
+          <Button
+            color="red"
+            leftSection={<ButtonIcon action="delete" />}
+            disabled={typed.trim() !== project.name}
+            onClick={() => { notify.success(t('project_deleted')); onClose(); }}
+          >
+            {t('project_delete')}
+          </Button>
+        </Group>
+      </Stack>
+    </Modal>
   );
 };

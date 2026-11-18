@@ -35,14 +35,14 @@ Liczba komentarzy jest widoczna na karcie.
 - a) Podgląd z prawej, w którym od razu można zmieniać pola i klikać „Zapisz”; pod spodem komentarze **(polecam)**
 - b) Najpierw sam podgląd, zmiany dopiero po „Edytuj”
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 1a.
 
 ## 2. Dodawanie zadań
 
 - a) Jeden przycisk u góry; nowe zadanie trafia na górę „W opracowaniu”, w oknie można wybrać inną kolumnę **(polecam)**
 - b) Dodatkowo mały przycisk „+” pod każdą kolumną
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 2a.
 
 ## 3. Urlop przypisanej osoby (powiązanie z urlopami)
 
@@ -51,28 +51,28 @@ Liczba komentarzy jest widoczna na karcie.
 - b) Tak samo, ale także dla wniosków czekających na decyzję
 - c) Bez informacji o urlopach na tablicy
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 3a.
 
 ## 4. „Tylko moje zadania”
 
 - a) Zadania, do których jestem przypisany (moje karty mają też niebieski pasek po lewej) **(polecam)**
 - b) Przypisane do mnie i te, które sam dodałem
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 4a.
 
 ## 5. Powiadomienia o zadaniach
 
 - a) Gdy ktoś inny przypisze mnie do zadania albo skomentuje zadanie, do którego jestem przypisany **(polecam)**
 - b) Dodatkowo, gdy ktoś inny przeniesie moje zadanie do „Zrealizowane” albo je usunie
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 5a.
 
 ## 6. Tablica na telefonie
 
 - a) Jedna kolumna naraz, przełączana u góry; kolejność przeciągnięciem, do innej kolumny przez „⋮ → Przenieś do” **(polecam)**
 - b) Wszystkie trzy kolumny jedna pod drugą
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 6a.
 
 ## 7. Zmiany innych osób na wspólnej tablicy
 
@@ -87,7 +87,7 @@ Liczba komentarzy jest widoczna na karcie.
 - a) Zgoda na `@dnd-kit` (darmowy, popularny, działa też palcem na telefonie) **(polecam)**
 - b) Bez dodatku: przenoszenie tylko z menu karty
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 8a: zgoda na `@dnd-kit`.
 
 ## 9. Zasady pól (zadanie i komentarz)
 
@@ -100,14 +100,14 @@ Liczba komentarzy jest widoczna na karcie.
 | Kolumna | tak | W opracowaniu / W toku / Zrealizowane, domyślnie „W opracowaniu” | |
 | Komentarz | tak | 1–2000 znaków | |
 
-**Odpowiedź:** („ok” albo poprawki)
+**Odpowiedź (2026-11-18):** ok.
 
 ## 10. Widok zadań ze wszystkich projektów
 
 - a) Każdy projekt osobno; „moje zadania ze wszystkich projektów” pokaże Pulpit **(polecam)**
 - b) Dodatkowo pozycja „Moje zadania” na górze podmenu: moje zadania ze wszystkich projektów na jednej tablicy
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 10a.
 
 ## 11. Zmiana i usuwanie komentarzy
 
@@ -115,21 +115,21 @@ Liczba komentarzy jest widoczna na karcie.
   każdy **(polecam)**
 - b) Komentarzy nie da się zmieniać ani usuwać
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 11a.
 
 ## 12. Kolejność projektów w menu
 
 - a) Strzałkami na liście projektów, tak jak typy urlopów **(polecam)**
 - b) Zawsze alfabetycznie
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 12a.
 
 ## 13. Projekt, który nie jest już potrzebny
 
 - a) „Do archiwum”: znika z menu razem z zadaniami; w Archiwum można go przywrócić albo usunąć na stałe **(polecam)**
 - b) Usunąć można tylko projekt bez zadań
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** „Usuń projekt” usuwa **na stałe**, bez archiwum, razem z zadaniami i komentarzami; w oknie widać liczbę zadań, które znikną, i trzeba wpisać nazwę projektu.
 
 ## 14. Usunięcie osoby z projektu
 
@@ -137,14 +137,14 @@ Liczba komentarzy jest widoczna na karcie.
   najpierw ostrzega, z ilu zadań zniknie **(polecam)**
 - b) Nie da się usunąć osoby, która ma otwarte zadania w projekcie
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 14a: zadanie zostaje, osoba znika z przypisań tylko w otwartych zadaniach („W opracowaniu”, „W toku”); w zrealizowanych zostaje. Osoba przestaje widzieć projekt.
 
 ## 15. Powiadomienie o dodaniu do projektu
 
 - a) Pracownik dostaje powiadomienie w dzwonku, gdy dodasz go do projektu **(polecam)**
 - b) Bez powiadomienia, projekt po prostu pojawia się w menu
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-18):** 15a.
 
 ## 16. Zasady pól (projekt)
 
@@ -153,4 +153,4 @@ Liczba komentarzy jest widoczna na karcie.
 | Nazwa | tak | 2–60 znaków, nie może się powtarzać (także z projektami w archiwum) | Marketing |
 | Członkowie | nie | 0–50 osób, tylko pracownicy spoza archiwum (administratorzy widzą wszystko i bez tego) | |
 
-**Odpowiedź:** („ok” albo poprawki)
+**Odpowiedź (2026-11-18):** ok.

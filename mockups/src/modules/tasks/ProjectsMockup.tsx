@@ -9,11 +9,10 @@ import { DateText } from '../../common/DateText';
 import { EmptyState } from '../../common/EmptyState';
 import { OrderArrows } from '../../common/OrderArrows';
 import { PageHeader } from '../../common/PageHeader';
-import { Question, Questions } from '../../common/Question';
-import { ArchiveProjectModal, ProjectModal } from './ProjectModals';
+import { DeleteProjectModal, ProjectModal } from './ProjectModals';
 import { ARCHIVED_PEOPLE, PROJECTS, TASKS, type MockProject } from './data';
 
-const STATES = ['list', 'new', 'duplicate', 'remove_member', 'archive', 'empty'] as const;
+const STATES = ['list', 'new', 'duplicate', 'remove_member', 'delete', 'empty'] as const;
 type State = (typeof STATES)[number];
 
 const initials = (name: string) => name.split(' ').map((p) => p[0]).join('');
@@ -40,74 +39,20 @@ const Members = ({ p }: { p: MockProject }) => {
   );
 };
 
-const ProjectsQuestions = () => (
-  <Questions>
-    <Question
-      number={12}
-      about="Kolejność projektów"
-      options={[
-        { id: 'a', text: 'Strzałkami w tej tabeli, tak jak typy urlopów; ta sama kolejność w menu „Zadania”' },
-        { id: 'b', text: 'Zawsze alfabetycznie' },
-      ]}
-      recommended="a"
-    >
-      W jakiej kolejności projekty mają być w menu?
-    </Question>
-    <Question
-      number={13}
-      about="Przycisk „Do archiwum”"
-      options={[
-        { id: 'a', text: 'Projekt znika z menu razem ze swoimi zadaniami i trafia do Archiwum; stamtąd można go przywrócić albo usunąć na stałe' },
-        { id: 'b', text: 'Usunąć można tylko projekt bez zadań' },
-      ]}
-      recommended="a"
-    >
-      Co się dzieje z projektem, który już nie jest potrzebny?
-    </Question>
-    <Question
-      number={14}
-      about="Usunięcie osoby z projektu (stan „usuwam osobę z zadaniami”)"
-      options={[
-        { id: 'a', text: 'Osoba przestaje widzieć projekt i znika z przypisań w jego otwartych zadaniach (w zrealizowanych zostaje); okno najpierw ostrzega' },
-        { id: 'b', text: 'Nie da się usunąć osoby, która ma otwarte zadania w projekcie' },
-      ]}
-      recommended="a"
-    >
-      Co z zadaniami osoby, którą usuwasz z projektu?
-    </Question>
-    <Question
-      number={15}
-      about="Powiadomienia o projektach"
-      options={[
-        { id: 'a', text: 'Pracownik dostaje powiadomienie w dzwonku, gdy dodasz go do projektu' },
-        { id: 'b', text: 'Bez powiadomienia, projekt po prostu pojawia się w menu' },
-      ]}
-      recommended="a"
-    >
-      Czy pracownik ma dostać powiadomienie o dodaniu do projektu?
-    </Question>
-    <Question number={16} about="Okno projektu (zasady pól)">
-      Nazwa: wymagana, 2–60 znaków, nie może się powtarzać (także z projektami w archiwum). Członkowie: 0–50 osób, tylko
-      pracownicy spoza archiwum. Administratorzy widzą wszystkie projekty, więc nie trzeba ich dodawać. Odpowiedz „ok”
-      albo popraw wybrane pola.
-    </Question>
-  </Questions>
-);
-
 export const ProjectsMockup = () => {
   const { t } = useTranslation('tasks');
   const [state, setState] = useState<State>('list');
   const [modal, setModal] = useState<{ project: MockProject | null; error?: boolean; remove?: string } | null>(null);
-  const [archive, setArchive] = useState<MockProject | null>(null);
+  const [toDelete, setToDelete] = useState<MockProject | null>(null);
 
   const changeState = (s: State) => {
     setState(s);
     setModal(null);
-    setArchive(null);
+    setToDelete(null);
     if (s === 'new') setModal({ project: null });
     if (s === 'duplicate') setModal({ project: null, error: true });
     if (s === 'remove_member') setModal({ project: PROJECTS[1]!, remove: 'Jan Kowalski' });
-    if (s === 'archive') setArchive(PROJECTS[2]!);
+    if (s === 'delete') setToDelete(PROJECTS[2]!);
   };
 
   const rows = state === 'empty' ? [] : PROJECTS;
@@ -116,14 +61,12 @@ export const ProjectsMockup = () => {
   const actions = (p: MockProject) => (
     <Group gap={4} justify="flex-end" wrap="nowrap">
       <Button size="xs" variant="subtle" leftSection={<ButtonIcon action="edit" size={14} />} onClick={() => setModal({ project: p })}>{t('edit')}</Button>
-      <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="archive" size={14} />} onClick={() => setArchive(p)}>{t('project_archive')}</Button>
+      <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="delete" size={14} />} onClick={() => setToDelete(p)}>{t('delete')}</Button>
     </Group>
   );
 
   return (
     <Stack>
-      <ProjectsQuestions />
-
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">
           <Text size="sm" fw={600}>{t('mockup_state')}</Text>
@@ -200,7 +143,7 @@ export const ProjectsMockup = () => {
       )}
 
       {modal && <ProjectModal key={`${modal.project?.id ?? 'new'}-${modal.error}-${modal.remove}`} project={modal.project} showError={modal.error} removeMember={modal.remove} onClose={() => setModal(null)} />}
-      {archive && <ArchiveProjectModal project={archive} onClose={() => setArchive(null)} />}
+      {toDelete && <DeleteProjectModal project={toDelete} onClose={() => setToDelete(null)} />}
     </Stack>
   );
 };

@@ -115,7 +115,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `leave_types` | `name` (unikalna), `deducts_pool` BOOLEAN, `yearly_limit` INT NULL, `hidden_at` NULL |
 | `leave_pools` | `user_id`, `year`, `annual_days`, `carried_days`, `closed_at` NULL; unikalne (`user_id`, `year`) |
 | `leave_requests` | `user_id`, `leave_type_id`, `date_from`, `date_to`, `working_days`, `days_from_carried`, `days_from_annual`, `pool_year`, `comment` NULL, `status`, `reject_reason` NULL, `decided_by` NULL, `decided_by_name` NULL, `decided_at` NULL |
-| `projects` | `name` (unikalna), `position`, `archived_at`, `archived_by` (zmiana 2026-11-18) |
+| `projects` | `name` (unikalna), `position` (zmiana 2026-11-18; bez archiwum: projekt usuwa się na stałe) |
 | `project_members` | `project_id`, `user_id`; klucz główny (`project_id`, `user_id`) |
 | `tasks` | `project_id`, `title`, `description` NULL, `due_date` NULL, `column_key` (`draft`/`in_progress`/`done`), `position`, `completed_at` NULL, `created_by` NULL, `created_by_name`, `archived_at`, `archived_by` |
 | `task_comments` | `task_id`, `user_id` NULL, `user_name`, `text`, `edited_at` NULL, `created_at` |
@@ -138,7 +138,7 @@ Wartości liczone wyłącznie przez serwer: `working_days`, podział na `days_fr
 | `users` | `tasks.created_by` | SET NULL + `created_by_name` | autorstwo |
 | `users` | `tasks.archived_by` | SET NULL | autorstwo archiwizacji |
 | `tasks` | `task_assignees.task_id` | CASCADE | przypisanie bez zadania nie ma sensu |
-| `projects` | `tasks.project_id` | do ustalenia w specu Zadań (pytanie 13) | |
+| `projects` | `tasks.project_id` | CASCADE | „Usuń projekt” usuwa na stałe razem z zadaniami (odpowiedź 13, potwierdzenie wpisaniem nazwy) |
 | `projects` | `project_members.project_id` | CASCADE | członkostwo bez projektu nie ma sensu |
 | `users` | `project_members.user_id` | CASCADE | usunięta na stałe osoba znika z projektów |
 | `tasks` | `task_comments.task_id` | CASCADE | komentarz bez zadania nie ma sensu |
@@ -152,7 +152,8 @@ Wartości liczone wyłącznie przez serwer: `working_days`, podział na `days_fr
   pule i historia zostają. Zarchiwizowanej osoby nie da się przypisać do nowego zadania; przy starych widać dopisek
   „zarchiwizowany”. Login i e-mail obejmują archiwum: zamiast drugiego konta z tym samym loginem aplikacja proponuje
   przywrócenie.
-- **Zadania** (`tasks`): „Usuń” na tablicy przenosi do archiwum.
+- **Zadania** (`tasks`): „Usuń” na tablicy przenosi do archiwum. **Projekty** (`projects`) nie mają archiwum: „Usuń”
+  usuwa projekt na stałe razem z zadaniami (także tymi w archiwum) i komentarzami, po wpisaniu nazwy projektu.
 - Przywraca i usuwa na stałe **tylko administrator**, tylko rekord z archiwum (inaczej 409 `server.archive_first`).
 - **Wniosków urlopowych się nie usuwa** (statusy: wycofany, odrzucony, anulowany). Typy urlopów się ukrywa
   (`hidden_at`), nie archiwizuje.
@@ -208,10 +209,11 @@ wymagają.
 |---|---|---|---|
 | `nodemailer` | e-mail | email | lista zatwierdzona |
 | `pdfmake` | PDF wniosku urlopowego | my-leave | lista zatwierdzona |
-| przeciąganie kart (np. `@dnd-kit`) | tablica zadań, także na telefonie | tasks | spoza listy: zapytać w module Zadania |
+| `@dnd-kit` | przeciąganie kart na tablicy zadań, także palcem na telefonie | tasks | zgoda użytkownika 2026-11-18 (odpowiedź 8) |
 
 ## 9. Ostatnie decyzje (archiwum)
 
+- 2026-11-18: Zadania: odpowiedzi na pytania makiety: `@dnd-kit` zatwierdzony; projekt usuwa się na stałe z zadaniami; osoba usunięta z projektu znika z otwartych zadań; reszta jak w rekomendacjach.
 - 2026-11-18: Zadania: projekty (Marketing, Produkcja, Montaż…) jako podmenu „Zadań”, każde zadanie w projekcie, pracownik widzi tylko swoje projekty; komentarze z powiadomieniem dla przypisanych; dodawanie zadania w oknie, podgląd z prawej 540 px; tablica odświeża się co 5 s.
 - 2026-11-16: Porządki „wspólne zamiast kopii”: `ConfirmModal`, `PageHeader`, `EmptyState`, `ListPagination` (`frontend/src/common/`) i `useListParams` (`frontend/src/core/`) w Pracownikach, Typach urlopów, Typach umów i Powiadomieniach; okno potwierdzenia przy błędzie zostaje otwarte.
 - 2026-11-16: Aktualizacja stepkit 0.1.34 → 0.1.36: wspólne pole daty i grupy w menu bez własnej strony były już w projekcie; nowa zasada „Wspólne zamiast kopii” (przed planem sprawdzam, czy coś podobnego już jest, i przenoszę do wspólnego miejsca).

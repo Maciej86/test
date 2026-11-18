@@ -7,7 +7,6 @@ import { ButtonIcon } from '../../common/ButtonIcon';
 import { EmptyState } from '../../common/EmptyState';
 import { notify } from '../../common/notify';
 import { PageHeader } from '../../common/PageHeader';
-import { Question, Questions } from '../../common/Question';
 import { useMockupRole } from '../../common/mockupRole';
 import { TaskCard } from './TaskCard';
 import { ProjectModal } from './ProjectModals';
@@ -33,117 +32,6 @@ const moveTask = (tasks: MockTask[], id: number, column: Column, beforeId: numbe
   }
   return rest;
 };
-
-const TasksQuestions = () => (
-  <Questions>
-    <Question
-      number={1}
-      about="Karta zadania"
-      options={[
-        { id: 'a', text: 'Kliknięcie karty otwiera podgląd z prawej, w którym od razu można zmieniać pola i klikać „Zapisz”; pod spodem komentarze' },
-        { id: 'b', text: 'Najpierw sam podgląd, zmiany dopiero po kliknięciu „Edytuj”' },
-      ]}
-      recommended="a"
-    >
-      Co ma się dziać po kliknięciu karty? (Dodawanie jest teraz w oknie na środku, jak prosiłeś.)
-    </Question>
-    <Question
-      number={2}
-      about="Przycisk „Dodaj zadanie”"
-      options={[
-        { id: 'a', text: 'Jeden przycisk u góry; nowe zadanie trafia na górę „W opracowaniu” (w oknie można wybrać inną kolumnę)' },
-        { id: 'b', text: 'Dodatkowo mały przycisk „+” pod każdą kolumną' },
-      ]}
-      recommended="a"
-    >
-      Gdzie dodaje się zadania?
-    </Question>
-    <Question
-      number={3}
-      about="Żółta kropka przy osobie (powiązanie z urlopami)"
-      options={[
-        { id: 'a', text: 'Kropka, gdy osoba ma zatwierdzony urlop między dziś a terminem zadania (bez terminu: w najbliższych 14 dniach); po najechaniu same daty, bez rodzaju urlopu; w formularzu żółta ramka' },
-        { id: 'b', text: 'Tak samo, ale także dla wniosków czekających na decyzję' },
-        { id: 'c', text: 'Bez informacji o urlopach na tablicy' },
-      ]}
-      recommended="a"
-    >
-      Czy tablica ma pokazywać, że przypisana osoba będzie na urlopie przed terminem?
-    </Question>
-    <Question
-      number={4}
-      about="Przełącznik „Tylko moje zadania”"
-      options={[
-        { id: 'a', text: 'Zadania, do których jestem przypisany (moje karty mają też niebieski pasek po lewej)' },
-        { id: 'b', text: 'Przypisane do mnie i te, które sam dodałem' },
-      ]}
-      recommended="a"
-    >
-      Które zadania są „moje”?
-    </Question>
-    <Question
-      number={5}
-      about="Powiadomienia o zadaniach"
-      options={[
-        { id: 'a', text: 'Gdy ktoś inny przypisze mnie do zadania albo skomentuje zadanie, do którego jestem przypisany' },
-        { id: 'b', text: 'Dodatkowo, gdy ktoś inny przeniesie moje zadanie do „Zrealizowane” albo je usunie' },
-      ]}
-      recommended="a"
-    >
-      Kiedy osoba dostaje powiadomienie w dzwonku?
-    </Question>
-    <Question
-      number={6}
-      about="Tablica na telefonie"
-      options={[
-        { id: 'a', text: 'Jedna kolumna naraz, przełączana u góry; kolejność przeciągnięciem, do innej kolumny przez „⋮ → Przenieś do”' },
-        { id: 'b', text: 'Wszystkie trzy kolumny jedna pod drugą' },
-      ]}
-      recommended="a"
-    >
-      Jak tablica ma wyglądać na telefonie? (Zmniejsz okno przeglądarki, żeby zobaczyć wariant a.)
-    </Question>
-    <Question
-      number={8}
-      about="Przeciąganie kart"
-      options={[
-        { id: 'a', text: 'Zgoda na dodatek „@dnd-kit” (darmowy, popularny, działa też palcem na telefonie)' },
-        { id: 'b', text: 'Bez dodatku: przenoszenie tylko z menu karty' },
-      ]}
-      recommended="a"
-    >
-      Do przeciągania kart (także na telefonie) potrzebny jest dodatek spoza ustalonej listy. Zgadzasz się?
-    </Question>
-    <Question number={9} about="Formularz zadania i komentarz (zasady pól)">
-      Tytuł: wymagany, 3–150 znaków. Opis: nieobowiązkowy, do 2000 znaków. Termin: nieobowiązkowy, data DD.MM.RRRR
-      (np. 25.11.2026); przy dodawaniu nie wcześniejszy niż dziś, przy zmianie dowolny. Przypisane osoby: 0–10, tylko
-      członkowie projektu i administratorzy, bez kont w archiwum. Kolumna: domyślnie „W opracowaniu”. Komentarz: 1–2000
-      znaków. Odpowiedz „ok” albo popraw wybrane pola.
-    </Question>
-    <Question
-      number={10}
-      about="Menu „Zadania”"
-      options={[
-        { id: 'a', text: 'Każdy projekt osobno; „moje zadania ze wszystkich projektów” pokaże Pulpit' },
-        { id: 'b', text: 'Dodatkowo pozycja „Moje zadania” na górze podmenu: moje zadania ze wszystkich projektów na jednej tablicy' },
-      ]}
-      recommended="a"
-    >
-      Czy potrzebny jest widok zadań ze wszystkich projektów naraz?
-    </Question>
-    <Question
-      number={11}
-      about="Komentarze (w podglądzie zadania „Edycja”)"
-      options={[
-        { id: 'a', text: 'Autor może poprawić i usunąć swój komentarz (poprawiony ma dopisek „edytowany”); administrator może usunąć każdy' },
-        { id: 'b', text: 'Komentarzy nie da się zmieniać ani usuwać' },
-      ]}
-      recommended="a"
-    >
-      Kto może zmieniać i usuwać komentarze?
-    </Question>
-  </Questions>
-);
 
 export const TasksMockup = ({ projectId }: { projectId: number }) => {
   const { t } = useTranslation('tasks');
@@ -290,8 +178,6 @@ export const TasksMockup = ({ projectId }: { projectId: number }) => {
 
   return (
     <Stack onDragEnd={endDrag}>
-      <TasksQuestions />
-
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">
           <Text size="sm" fw={600}>{t('mockup_state')}</Text>
