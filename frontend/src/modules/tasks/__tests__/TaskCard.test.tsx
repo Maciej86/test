@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import type { BoardPerson, BoardTask } from '@app/shared';
 import { TaskCard } from '../components/TaskCard';
 import { renderWithProviders } from '../../../test/render';
@@ -8,11 +8,11 @@ const people = new Map(
   [person(1, 'Anna Nowak'), person(5, 'Jan Kowalski'), person(6, 'Piotr Zieliński'), person(7, 'Tomasz Wójcik'), person(8, 'Ewa Mazur', { archived: true, assignable: false })].map((p) => [p.id, p]),
 );
 const task = (o: Partial<BoardTask> = {}): BoardTask => ({
-  id: 7, title: 'Oferta dla hurtowni', description: 'Cennik na 2027.', dueDate: null, column: 'in_progress', position: 1, completedAt: null,
+  id: 7, title: 'Oferta dla hurtowni', description: 'Cennik na 2027.', dueDate: null, column: 'in_progress', position: 1, completedAt: null, finishedAt: null,
   createdByName: 'Anna Nowak', createdAt: '2026-11-05T10:00:00.000Z', assigneeIds: [], leaves: [], ...o,
 });
 const show = (t: BoardTask, meId = 5) =>
-  renderWithProviders(<TaskCard task={t} people={people} meId={meId} onOpen={vi.fn()} onMove={vi.fn()} onArchive={vi.fn()} />);
+  renderWithProviders(<TaskCard task={t} people={people} meId={meId} onOpen={vi.fn()} onMove={vi.fn()} onFinish={vi.fn()} onArchive={vi.fn()} />);
 
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -33,7 +33,7 @@ describe('TaskCard', () => {
   });
 
   it('done card shows completion date, no description', () => {
-    show(task({ column: 'done', completedAt: '2026-11-14T15:10:00.000Z', dueDate: '2026-11-10' }));
+    show(task({ column: 'done', completedAt: '2026-11-14T15:10:00.000Z', finishedAt: null, dueDate: '2026-11-10' }));
     expect(screen.getByText('Zrealizowane 14.11.2026')).toBeInTheDocument();
     expect(screen.queryByText('Cennik na 2027.')).not.toBeInTheDocument();
     expect(screen.queryByText('10.11.2026')).not.toBeInTheDocument();
@@ -59,5 +59,15 @@ describe('TaskCard', () => {
     unmount();
     const other = show(task({ assigneeIds: [6] }));
     expect(other.container.querySelector('[data-mine="true"]')).toBeNull();
+  });
+
+  it('finished card: badge, greyed out, menu offers to undo', async () => {
+    const onFinish = vi.fn();
+    renderWithProviders(<TaskCard task={task({ finishedAt: '2026-11-18T09:00:00.000Z' })} people={people} meId={5} onOpen={vi.fn()} onMove={vi.fn()} onFinish={onFinish} onArchive={vi.fn()} />);
+    expect(screen.getByText('Zakończone')).toBeInTheDocument();
+    expect(screen.getByText('Oferta dla hurtowni').closest('.mantine-Card-root')).toHaveAttribute('data-finished', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'Więcej działań' }));
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Cofnij zakończenie' }));
+    expect(onFinish).toHaveBeenCalled();
   });
 });

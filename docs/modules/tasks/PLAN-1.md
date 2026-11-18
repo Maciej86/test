@@ -266,11 +266,13 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   wydzielenia; link z powiadomienia do zadania zrealizowanego ponad 30 dni temu pokazuje „Nie znaleziono zadania”;
   grupa w menu zwija się, gdy bieżąca strona wychodzi z grupy.
 
-- [ ] **20. Znacznik „Zakończone” (zmiana 2026-11-19).** Makieta: karta wyszarzona z plakietką, opcja w menu.
+- [x] **20. Znacznik „Zakończone” (zmiana 2026-11-19).** Makieta: karta wyszarzona z plakietką, opcja w menu.
   Migracja `023_tasks_finished.sql` (`finished_at DATETIME NULL`) + test; `taskFinishSchema` (`finished: boolean`);
   `setFinished(db, id, at)`; usługa `finishTask(taskId, finished, viewer)` przez `lockTaskForWrite`, historia
   `tasks`/`status` (`finished`), 404 dla cudzego i archiwum; trasa `POST /tasks/:taskId/finish` z testami (401,
   zmyślone numery → 404, pracownik spoza projektu → 404 na prawdziwej bazie); `BoardTask.finishedAt`; hook
   `useFinishTask`; karta: plakietka „Zakończone”, cała karta przygaszona, pozycja menu; podgląd: przycisk; testy
   karty, podglądu i e2e → `npm run check`.
-
+  **Uwaga:** nowe akcje w `BUTTON_ICONS` (front i makiety): `finish` (`CircleCheck`), `reopen` (`RotateCcw`), wpis
+  w `DESIGN.md`. Po przeglądzie: poprawki przeciągania na prośbę użytkownika (pętla przy nagłówku kolumny, cel pod
+  kursorem z ramką, kopia karty o stałym rozmiarze bez animacji powrotu, ułożenie po upuszczeniu) z testami e2e.

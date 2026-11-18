@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-19: Zadania: znacznik „Zakończone” (prośba użytkownika): karta zostaje w kolumnie, wyszarzona, z plakietką; poprawki przeciągania zgłoszone przy testach (pętla przy nagłówku, ramka pod kursorem, kopia karty bez rozciągania i bez lotu do starej kolumny).
 - 2026-11-18: Zadania, część 1: zbudowana (kroki 0–19), przegląd kodu z poprawkami (blokada projektu przy zapisach, tablica zostaje przy nieudanym odświeżeniu, zapis tylko zmienionych pól); `npm run check` i 33 testy e2e zielone.
 - 2026-11-18: Zadania: spec części 1 zaakceptowany; napisane `PLAN-1.md` (20 kroków) i `TESTS-1.md`.
 - 2026-11-18: Zadania: podział na 2 części zaakceptowany (1. projekty i tablice, 2. komentarze); napisane `SPEC.md` i `SPEC-1.md`; zmiana roli administrator → pracownik dopisuje go do projektów z jego otwartymi zadaniami.

@@ -203,3 +203,23 @@ export const archiveTask = async (taskId: number, viewer: Viewer): Promise<Resul
     await logActivity(conn, { userId: viewer.id, userName: viewer.name, action: 'archive', entityType: ENTITY, entityId: taskId, changes: {} });
     return { ok: true as const };
   });
+
+/** Znacznik „Zakończone”: karta zostaje w kolumnie, wyszarzona; ponowne oznaczenie zostawia pierwszą datę. */
+export const finishTask = async (taskId: number, finished: boolean, viewer: Viewer): Promise<Result> =>
+  withTransaction(async (conn) => {
+    const task = await lockTaskForWrite(conn, taskId, viewer);
+    if (!task) return notFound();
+    const at = finished ? (task.finishedAt ? new Date(task.finishedAt) : new Date()) : null;
+    await q.setFinished(conn, taskId, at);
+    if (Boolean(task.finishedAt) !== finished) {
+      await logActivity(conn, {
+        userId: viewer.id,
+        userName: viewer.name,
+        action: 'status',
+        entityType: ENTITY,
+        entityId: taskId,
+        changes: { finished: { before: Boolean(task.finishedAt), after: finished } },
+      });
+    }
+    return { ok: true as const };
+  });

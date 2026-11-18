@@ -69,6 +69,8 @@ export interface MockTask {
   createdAt: string;
   /** Kiedy trafiło do „Zrealizowane” (liczy serwer). */
   completedAt?: string;
+  /** Znacznik „Zakończone”: karta zostaje w kolumnie, wyszarzona. */
+  finished?: boolean;
   comments?: MockComment[];
 }
 
@@ -76,7 +78,7 @@ export const TASKS: MockTask[] = [
   // Marketing
   { id: 2, projectId: 1, column: 'draft', title: 'Kupić upominki świąteczne dla klientów', due: '2026-12-10', people: ['Magdalena Lewandowska'], createdBy: 'Anna Nowak', createdAt: '2026-11-12 09:05' },
   { id: 16, projectId: 1, column: 'draft', title: 'Post na Facebooku o promocji grudniowej', description: 'Zdjęcia nowych regałów, rabat 10% do 20.12.', people: ['Katarzyna Wiśniewska'], createdBy: 'Katarzyna Wiśniewska', createdAt: '2026-11-17 15:20' },
-  { id: 6, projectId: 1, column: 'in_progress', title: 'Rozliczyć targi w Poznaniu', due: '2026-11-19', people: ['Katarzyna Wiśniewska'], createdBy: 'Anna Nowak', createdAt: '2026-11-03 08:15' },
+  { id: 6, projectId: 1, column: 'in_progress', title: 'Rozliczyć targi w Poznaniu', finished: true, due: '2026-11-19', people: ['Katarzyna Wiśniewska'], createdBy: 'Anna Nowak', createdAt: '2026-11-03 08:15' },
   {
     id: 7, projectId: 1, column: 'in_progress', title: 'Przygotować ofertę dla hurtowni w Lesznie', description: 'Cennik na 2027, warunki dostaw i rabat przy zamówieniach powyżej 20 000 zł.', due: '2026-11-25', people: ['Magdalena Lewandowska', 'Jan Kowalski'], createdBy: 'Anna Nowak', createdAt: '2026-11-05 10:00',
     comments: [

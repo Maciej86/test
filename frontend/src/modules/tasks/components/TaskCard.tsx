@@ -1,5 +1,5 @@
 import type { CSSProperties, HTMLAttributes, Ref } from 'react';
-import { ActionIcon, Avatar, Card, Group, Menu, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Avatar, Badge, Card, Group, Menu, Stack, Text, Tooltip } from '@mantine/core';
 import { CalendarDays, CheckCheck, EllipsisVertical, GripVertical, MoveRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TASK_COLUMNS, formatDate, type BoardPerson, type BoardTask, type TaskColumn } from '@app/shared';
@@ -22,19 +22,22 @@ export interface CardDrag {
  * Karta na tablicy: tytuł, opis, termin (po czasie czerwony, dziś i jutro żółty) albo data realizacji, przypisane
  * osoby, pasek po lewej przy moim zadaniu i menu „⋮” (Edytuj, Przenieś do, Usuń). Wzór: makieta `TaskCard.tsx`.
  */
-export const TaskCard = ({ task, people, meId, drag, onOpen, onMove, onArchive }: {
+export const TaskCard = ({ task, people, meId, drag, onOpen, onMove, onFinish, onArchive }: {
   task: BoardTask;
   people: Map<number, BoardPerson>;
   meId: number;
   drag?: CardDrag;
   onOpen: () => void;
   onMove: (column: TaskColumn) => void;
+  /** Oznacz jako zakończone albo cofnij zakończenie. */
+  onFinish: () => void;
   onArchive: () => void;
 }) => {
   const { t } = useTranslation('tasks');
   const due = dueState(task);
   const done = task.column === 'done';
   const mine = task.assigneeIds.includes(meId);
+  const finished = task.finishedAt !== null;
   const assigned = task.assigneeIds.map((id) => people.get(id)).filter((p): p is BoardPerson => p !== undefined);
   const shown = assigned.slice(0, MAX_AVATARS);
   const hidden = assigned.slice(MAX_AVATARS);
@@ -47,7 +50,8 @@ export const TaskCard = ({ task, people, meId, drag, onOpen, onMove, onArchive }
       padding="sm"
       onClick={onOpen}
       data-mine={mine}
-      style={{ cursor: drag ? 'grab' : 'pointer', borderLeft: mine ? '3px solid var(--mantine-color-navy-4)' : undefined, ...drag?.style }}
+      data-finished={finished}
+      style={{ cursor: drag ? 'grab' : 'pointer', borderLeft: mine ? '3px solid var(--mantine-color-navy-4)' : undefined, opacity: finished ? 0.55 : undefined, filter: finished ? 'grayscale(1)' : undefined, ...drag?.style }}
     >
       <Group gap={6} wrap="nowrap" align="flex-start">
         <Text c="dimmed" mt={2} visibleFrom="md" aria-hidden>
@@ -69,11 +73,15 @@ export const TaskCard = ({ task, people, meId, drag, onOpen, onMove, onArchive }
                   <Menu.Item key={c} leftSection={<MoveRight size={14} />} onClick={() => onMove(c)}>{t(`column.${c}`)}</Menu.Item>
                 ))}
                 <Menu.Divider />
+                <Menu.Item leftSection={<ButtonIcon action={finished ? 'reopen' : 'finish'} size={14} />} onClick={onFinish}>
+                  {finished ? t('unfinish') : t('finish')}
+                </Menu.Item>
                 <Menu.Item color="red" leftSection={<ButtonIcon action="delete" size={14} />} onClick={onArchive}>{t('delete')}</Menu.Item>
               </Menu.Dropdown>
             </Menu>
           </Group>
 
+          {finished && <Badge size="sm" variant="light" color="gray" tt="none" w="fit-content">{t('finished_badge')}</Badge>}
           {task.description && !done && <Text size="xs" c="dimmed" lineClamp={2}>{task.description}</Text>}
 
           <Group justify="space-between" wrap="nowrap" gap="xs">

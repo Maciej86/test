@@ -45,6 +45,10 @@ export const taskMoveSchema = z.object({
   beforeTaskId: addressNumber.nullable(),
 });
 
+/** Znacznik „Zakończone” (POST /api/tasks/:id/finish). */
+export const taskFinishSchema = z.object({ finished: z.boolean({ error: 'validation.required' }) });
+export type TaskFinishInput = z.output<typeof taskFinishSchema>;
+
 /** Parametry tablicy: `oldDone=1` dokłada zrealizowane starsze niż 30 dni. */
 export const boardQuerySchema = z.object({
   oldDone: z
@@ -128,6 +132,8 @@ export interface BoardTask {
   column: TaskColumn;
   position: number;
   completedAt: string | null;
+  /** Znacznik „Zakończone”: karta zostaje w kolumnie, wyszarzona. */
+  finishedAt: string | null;
   createdByName: string;
   createdAt: string;
   assigneeIds: number[];

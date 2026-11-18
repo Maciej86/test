@@ -6,7 +6,7 @@ import { renderWithProviders } from '../../../test/render';
 import { TaskDrawer } from '../components/TaskDrawer';
 
 const task: BoardTask = {
-  id: 7, title: 'Oferta dla hurtowni', description: null, dueDate: '2026-11-10', column: 'in_progress', position: 1, completedAt: null,
+  id: 7, title: 'Oferta dla hurtowni', description: null, dueDate: '2026-11-10', column: 'in_progress', position: 1, completedAt: null, finishedAt: null,
   createdByName: 'Anna Nowak', createdAt: '2026-11-05T09:00:00.000Z', assigneeIds: [5, 8], leaves: [],
 };
 const board: BoardResponse = {
@@ -75,5 +75,12 @@ describe('TaskDrawer', () => {
     fireEvent.click(screen.getByText('ktoś przeniósł'));
     fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
     await waitFor(() => expect(put).toHaveBeenCalledWith('/tasks/7', expect.objectContaining({ title: 'Poprawiony tytuł', column: 'done', assigneeIds: [5] })));
+  });
+
+  it('the drawer has Oznacz jako zakończone', async () => {
+    const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { ok: true } });
+    renderWithProviders(<TaskDrawer projectId={9} board={board} task={task} onClose={vi.fn()} onArchive={vi.fn()} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Oznacz jako zakończone' }));
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/tasks/7/finish', { finished: true }));
   });
 });

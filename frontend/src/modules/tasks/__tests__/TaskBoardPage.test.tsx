@@ -8,7 +8,7 @@ import { TaskBoardPage } from '../TaskBoardPage';
 
 const jan: SessionUser = { id: 5, name: 'Jan Kowalski', role: 'employee', mustChangePassword: false };
 const task = (id: number, column: BoardTask['column'], o: Partial<BoardTask> = {}): BoardTask => ({
-  id, title: `Zadanie ${id}`, description: null, dueDate: null, column, position: id, completedAt: column === 'done' ? '2026-11-17T10:00:00.000Z' : null,
+  id, title: `Zadanie ${id}`, description: null, dueDate: null, column, position: id, completedAt: column === 'done' ? '2026-11-17T10:00:00.000Z' : null, finishedAt: null,
   createdByName: 'Anna Nowak', createdAt: '2026-11-05T10:00:00.000Z', assigneeIds: [], leaves: [], ...o,
 });
 const board = (o: Partial<BoardResponse> = {}): BoardResponse => ({
@@ -177,5 +177,13 @@ describe('TaskBoardPage', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(20_000); });
     expect(await screen.findByText('Nie udało się odświeżyć tablicy. Spróbuję ponownie za chwilę.')).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Tytuł/ })).toHaveValue('Wpisane przed awarią');
+  });
+
+  it('Oznacz jako zakończone from the card menu sends the flag', async () => {
+    show(board());
+    const card = (await screen.findByText('Zadanie 4')).closest('.mantine-Card-root') as HTMLElement;
+    fireEvent.click(within(card).getByRole('button', { name: 'Więcej działań' }));
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Oznacz jako zakończone' }));
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/tasks/4/finish', { finished: true }));
   });
 });

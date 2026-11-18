@@ -5,6 +5,7 @@ import {
   orderMoveSchema,
   projectDeleteSchema,
   projectSchema,
+  taskFinishSchema,
   taskMoveSchema,
   taskSchema,
   type BoardQuery,
@@ -12,6 +13,7 @@ import {
   type ProjectData,
   type ProjectDeleteInput,
   type TaskData,
+  type TaskFinishInput,
   type TaskMoveInput,
 } from '@app/shared';
 import { requireRole } from '../../middleware/requireRole';
@@ -19,7 +21,7 @@ import { actorOf, idParam, reply, viewerOf } from '../../middleware/routeHelpers
 import { validateBody } from '../../middleware/validateBody';
 import { validateQuery } from '../../middleware/validateQuery';
 import { createProject, deleteProject, listCandidates, listProjects, moveProject, updateProject } from './projects.service';
-import { archiveTask, createTask, getBoard, moveTask, updateTask } from './tasks.service';
+import { archiveTask, createTask, finishTask, getBoard, moveTask, updateTask } from './tasks.service';
 
 /**
  * Moduł Zadania: podpięty w app.ts przez mountModule (role grupy „Zadania”: admin, employee). Projekty zmienia tylko
@@ -78,4 +80,9 @@ tasksRoutes.post('/:taskId/move', validateBody(taskMoveSchema), async (req, res)
 tasksRoutes.post('/:taskId/archive', async (req, res) => { // rule-ok: bez danych wejściowych, tylko numer z adresu
   const id = idParam(res, req.params.taskId);
   if (id !== null) reply(res, await archiveTask(id, viewerOf(req.user)));
+});
+
+tasksRoutes.post('/:taskId/finish', validateBody(taskFinishSchema), async (req, res) => {
+  const id = idParam(res, req.params.taskId);
+  if (id !== null) reply(res, await finishTask(id, (req.body as TaskFinishInput).finished, viewerOf(req.user)));
 });

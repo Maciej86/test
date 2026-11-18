@@ -13,6 +13,7 @@ export interface TaskRow {
   column: TaskColumn;
   position: number;
   completedAt: string | null;
+  finishedAt: string | null;
   createdByName: string;
   createdAt: string;
 }
@@ -26,11 +27,12 @@ const toTask = (r: RowDataPacket): TaskRow => ({
   column: r.column_key as TaskColumn,
   position: r.position as number,
   completedAt: r.completed_at ? new Date(r.completed_at as string).toISOString() : null,
+  finishedAt: r.finished_at ? new Date(r.finished_at as string).toISOString() : null,
   createdByName: r.created_by_name as string,
   createdAt: new Date(r.created_at as string).toISOString(),
 });
 
-const TASK_COLUMNS_SQL = 't.id, t.project_id, t.title, t.description, t.due_date, t.column_key, t.position, t.completed_at, t.created_by_name, t.created_at';
+const TASK_COLUMNS_SQL = 't.id, t.project_id, t.title, t.description, t.due_date, t.column_key, t.position, t.completed_at, t.finished_at, t.created_by_name, t.created_at';
 
 /** Projekt, który osoba widzi: administrator każdy, pracownik tylko swój (warunek w SQL); inaczej null. */
 export const findVisibleProject = async (db: Db, id: number, viewer: Viewer): Promise<{ id: number; name: string } | null> => {
@@ -155,4 +157,9 @@ export const archiveTask = async (db: Db, id: number, byUserId: number): Promise
 export const lockProject = async (db: Db, projectId: number): Promise<boolean> => {
   const [rows] = await db.query<RowDataPacket[]>('SELECT id FROM projects WHERE id = ? FOR UPDATE', [projectId]);
   return rows.length > 0;
+};
+
+/** Znacznik „Zakończone”: data albo brak (cofnięcie). */
+export const setFinished = async (db: Db, id: number, at: Date | null): Promise<void> => {
+  await db.query('UPDATE tasks SET finished_at = ? WHERE id = ?', [at, id]);
 };

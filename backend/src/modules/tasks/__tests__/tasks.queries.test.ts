@@ -89,4 +89,13 @@ describe('board queries', () => {
     const none = spyDb([]);
     expect(await q.lockProject(none.db, 9)).toBe(false);
   });
+
+  it('setFinished sets or clears finished_at', async () => {
+    const at = new Date('2026-11-19T10:00:00Z');
+    const { db, calls } = spyDb({});
+    await q.setFinished(db, 7, at);
+    await q.setFinished(db, 7, null);
+    expect(calls[0]![0]).toBe('UPDATE tasks SET finished_at = ? WHERE id = ?');
+    expect(calls.map((c) => c[1])).toEqual([[at, 7], [null, 7]]);
+  });
 });

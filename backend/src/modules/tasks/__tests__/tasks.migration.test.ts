@@ -40,4 +40,10 @@ describe('tasks migrations', () => {
     expect(members).toMatch(/PRIMARY KEY \(project_id, user_id\)/);
     expect(assignees).toMatch(/PRIMARY KEY \(task_id, user_id\)/);
   });
+
+  it('023 adds the finished marker to tasks, one change only', () => {
+    const finished = read('023_tasks_finished.sql');
+    expect(finished).toMatch(/ALTER TABLE tasks ADD COLUMN finished_at DATETIME NULL/);
+    expect(finished.match(/ALTER TABLE/g)).toHaveLength(1);
+  });
 });

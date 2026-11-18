@@ -158,5 +158,10 @@
   "no_access": "Nie masz dostępu do tego projektu albo projekt został usunięty.",
   "back_to_dashboard": "Wróć na Pulpit",
   "task_not_found": "Nie znaleziono zadania.",
-  "refresh_failed": "Nie udało się odświeżyć tablicy. Spróbuję ponownie za chwilę."
+  "refresh_failed": "Nie udało się odświeżyć tablicy. Spróbuję ponownie za chwilę.",
+  "finish": "Oznacz jako zakończone",
+  "unfinish": "Cofnij zakończenie",
+  "finished_badge": "Zakończone",
+  "finished_done": "Oznaczono jako zakończone.",
+  "unfinished_done": "Cofnięto zakończenie."
 }

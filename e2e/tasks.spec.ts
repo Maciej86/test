@@ -74,6 +74,13 @@ test('projekt, przypisanie, powiadomienie, przeniesienie widoczne u innych, usun
   await expect(jan.getByRole('region', { name: 'Zrealizowane' }).getByText('Zamówić ulotki na targi')).toBeVisible();
   await expect(piotr.getByRole('region', { name: 'Zrealizowane' }).getByText('Zamówić ulotki na targi')).toBeVisible({ timeout: 7_000 });
 
+  // Znacznik „Zakończone”: karta zostaje w kolumnie, wyszarzona, z plakietką.
+  await card.getByRole('button', { name: 'Więcej działań' }).click();
+  await jan.getByRole('menuitem', { name: 'Oznacz jako zakończone' }).click();
+  await expect(jan.getByText('Oznaczono jako zakończone.')).toBeVisible();
+  await expect(card).toHaveAttribute('data-finished', 'true');
+  await expect(card.getByText('Zakończone', { exact: true })).toBeVisible();
+
   // Przeciąganie myszą: nowa karta z „W opracowaniu” do „W toku”.
   const second = await piotr.request.post(`/api/tasks/projects/${projectId}/tasks`, {
     data: { title: 'Rozwiesić plakaty', description: '', dueDate: '', column: 'draft', assigneeIds: [janId] },
@@ -256,6 +263,7 @@ test.describe('abuse', () => {
     expect((await s.outsider.request.put(`/api/tasks/${taskId}`, { data: task })).status()).toBe(404);
     expect((await s.outsider.request.post(`/api/tasks/${taskId}/move`, { data: { column: 'done', beforeTaskId: null } })).status()).toBe(404);
     expect((await s.outsider.request.post(`/api/tasks/${taskId}/archive`)).status()).toBe(404);
+    expect((await s.outsider.request.post(`/api/tasks/${taskId}/finish`, { data: { finished: true } })).status()).toBe(404);
     const after = await board(page, s.projectId);
     expect(after.tasks.find((t) => t.id === taskId)).toMatchObject({ title: 'Tajne zadanie', column: 'draft', assigneeIds: [] });
     // Wyższa rola: projekty zmienia tylko administrator, także gdy pracownik wpisze adres ręcznie.

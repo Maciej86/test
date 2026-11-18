@@ -3,6 +3,7 @@ import {
   ArchiveRestore,
   ArrowLeft,
   CalendarCheck,
+  CircleCheck,
   Check,
   Copy,
   Download,
@@ -16,6 +17,7 @@ import {
   Plus,
   Printer,
   RefreshCw,
+  RotateCcw,
   Save,
   Search,
   Send,
@@ -55,6 +57,8 @@ export const BUTTON_ICONS = {
   close_year: CalendarCheck,
   hide: EyeOff,
   unhide: Undo2,
+  finish: CircleCheck,
+  reopen: RotateCcw,
 } as const satisfies Record<string, LucideIcon>;
 
 export type ButtonAction = keyof typeof BUTTON_ICONS;

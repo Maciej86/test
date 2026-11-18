@@ -25,7 +25,7 @@ const setup = () => {
 };
 
 const task = (id: number, column: BoardTask['column'], position: number): BoardTask => ({
-  id, title: `Zadanie ${id}`, description: null, dueDate: null, column, position, completedAt: null, createdByName: 'Anna Nowak',
+  id, title: `Zadanie ${id}`, description: null, dueDate: null, column, position, completedAt: null, finishedAt: null, createdByName: 'Anna Nowak',
   createdAt: '2026-11-10T10:00:00.000Z', assigneeIds: [], leaves: [],
 });
 const board = (): BoardResponse => ({

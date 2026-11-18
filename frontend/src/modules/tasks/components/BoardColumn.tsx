@@ -12,6 +12,7 @@ interface CardActions {
   meId: number;
   onOpen: (task: BoardTask) => void;
   onMove: (task: BoardTask, column: TaskColumn) => void;
+  onFinish: (task: BoardTask) => void;
   onArchive: (task: BoardTask) => void;
 }
 
@@ -29,6 +30,7 @@ const SortableCard = ({ task, ...actions }: CardActions & { task: BoardTask }) =
       drag={{ ref: setNodeRef, props: { ...attributes, ...listeners }, style: { transform: CSS.Translate.toString(transform), transition, opacity: isDragging ? 0.35 : 1 } }}
       onOpen={() => actions.onOpen(task)}
       onMove={(column) => actions.onMove(task, column)}
+      onFinish={() => actions.onFinish(task)}
       onArchive={() => actions.onArchive(task)}
     />
   );

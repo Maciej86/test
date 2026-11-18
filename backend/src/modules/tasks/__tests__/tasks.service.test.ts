@@ -21,6 +21,7 @@ vi.mock('../tasks.queries', () => ({
   setAssignees: vi.fn(),
   archiveTask: vi.fn(),
   lockProject: vi.fn(),
+  setFinished: vi.fn(),
 }));
 
 const q = await import('../tasks.queries');
@@ -33,7 +34,7 @@ const jan = { id: 5, name: 'Jan Kowalski', role: 'employee' as const };
 const anna = { id: 1, name: 'Anna Nowak', role: 'admin' as const };
 const row = (o: Partial<import('../tasks.queries').TaskRow> = {}): import('../tasks.queries').TaskRow => ({
   id: 7, projectId: 9, title: 'Oferta dla hurtowni', description: null, dueDate: '2026-11-25', column: 'in_progress', position: 1,
-  completedAt: null, createdByName: 'Anna Nowak', createdAt: '2026-11-05T10:00:00.000Z', ...o,
+  completedAt: null, finishedAt: null, createdByName: 'Anna Nowak', createdAt: '2026-11-05T10:00:00.000Z', ...o,
 });
 
 beforeEach(() => {
@@ -286,5 +287,20 @@ describe('task writes', () => {
       action: 'update', entityType: 'tasks', entityId: 7,
       changes: expect.objectContaining({ title: { before: 'Oferta dla hurtowni', after: 'Nowy tytuł' }, assignee_ids: { before: [5], after: [6] } }),
     }));
+  });
+
+  it('finish: marks and unmarks under the project lock, history status finished; missing → 404', async () => {
+    expect(await s.finishTask(7, true, jan)).toEqual({ ok: true });
+    expect(q.lockProject).toHaveBeenCalledWith(conn, 9);
+    expect(q.setFinished).toHaveBeenCalledWith(conn, 7, new Date('2026-11-18T08:00:00Z'));
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'status', entityType: 'tasks', entityId: 7, changes: { finished: { before: false, after: true } } }));
+    vi.mocked(q.findTask).mockResolvedValue(row({ id: 7, finishedAt: '2026-11-18T07:00:00.000Z' }));
+    await s.finishTask(7, false, jan);
+    expect(q.setFinished).toHaveBeenLastCalledWith(conn, 7, null);
+    vi.mocked(q.setFinished).mockClear();
+    await s.finishTask(7, true, jan);
+    expect(q.setFinished).toHaveBeenCalledWith(conn, 7, new Date('2026-11-18T07:00:00.000Z'));
+    vi.mocked(q.findTask).mockResolvedValue(null);
+    expect(await s.finishTask(7, true, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
   });
 });

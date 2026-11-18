@@ -153,6 +153,10 @@ export const TasksMockup = ({ projectId }: { projectId: number }) => {
               mine={task.people.includes(me)}
               onOpen={() => setDetails(task)}
               onMove={(c) => move(task, c)}
+              onFinish={() => {
+                setTasks((all) => all.map((x) => (x.id === task.id ? { ...x, finished: !x.finished } : x)));
+                notify.success(t(task.finished ? 'unfinished_done' : 'finished_done'));
+              }}
               onArchive={() => setArchive(task)}
               onDragStart={(e) => { dragged.current = task.id; e.dataTransfer.effectAllowed = 'move'; }}
               onDragOver={onCardDragOver(task)}

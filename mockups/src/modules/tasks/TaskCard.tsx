@@ -1,5 +1,5 @@
 import type { DragEvent } from 'react';
-import { ActionIcon, Avatar, Card, Group, Indicator, Menu, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Avatar, Badge, Card, Group, Indicator, Menu, Stack, Text, Tooltip } from '@mantine/core';
 import { CalendarDays, CheckCheck, EllipsisVertical, GripVertical, MessageSquare, MoveRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '@app/shared';
@@ -33,12 +33,13 @@ const PersonAvatar = ({ task, name }: { task: MockTask; name: string }) => {
   );
 };
 
-export const TaskCard = ({ task, mine, onOpen, onMove, onArchive, onDragStart, onDragOver }: {
+export const TaskCard = ({ task, mine, onOpen, onMove, onFinish, onArchive, onDragStart, onDragOver }: {
   task: MockTask;
   /** Zadanie przypisane do oglądającego: pasek po lewej. */
   mine: boolean;
   onOpen: () => void;
   onMove: (column: Column) => void;
+  onFinish: () => void;
   onArchive: () => void;
   onDragStart: (e: DragEvent) => void;
   onDragOver: (e: DragEvent) => void;
@@ -61,6 +62,8 @@ export const TaskCard = ({ task, mine, onOpen, onMove, onArchive, onDragStart, o
       style={{
         cursor: 'grab',
         borderLeft: mine ? '3px solid var(--mantine-color-navy-4)' : undefined,
+        opacity: task.finished ? 0.55 : 1,
+        filter: task.finished ? 'grayscale(1)' : undefined,
       }}
       aria-label={mine ? `${task.title}. ${t('assigned_to_you')}` : task.title}
     >
@@ -86,11 +89,15 @@ export const TaskCard = ({ task, mine, onOpen, onMove, onArchive, onDragStart, o
                   <Menu.Item key={c} leftSection={<MoveRight size={14} />} onClick={() => onMove(c)}>{t(`column.${c}`)}</Menu.Item>
                 ))}
                 <Menu.Divider />
+                <Menu.Item leftSection={<ButtonIcon action={task.finished ? 'reopen' : 'finish'} size={14} />} onClick={onFinish}>
+                  {task.finished ? t('unfinish') : t('finish')}
+                </Menu.Item>
                 <Menu.Item color="red" leftSection={<ButtonIcon action="delete" size={14} />} onClick={onArchive}>{t('delete')}</Menu.Item>
               </Menu.Dropdown>
             </Menu>
           </Group>
 
+          {task.finished && <Badge size="sm" variant="light" color="gray" tt="none" w="fit-content">{t('finished_badge')}</Badge>}
           {task.description && !done && <Text size="xs" c="dimmed" lineClamp={2}>{task.description}</Text>}
 
           <Group justify="space-between" wrap="nowrap" gap="xs">

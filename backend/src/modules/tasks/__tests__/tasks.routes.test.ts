@@ -4,7 +4,7 @@ import type { SessionUser } from '@app/shared';
 
 vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn(), getConnection: vi.fn() } }));
 vi.mock('../../../auth/users.queries', () => ({ findActiveUserById: vi.fn() }));
-vi.mock('../tasks.service', () => ({ getBoard: vi.fn(), createTask: vi.fn(), updateTask: vi.fn(), moveTask: vi.fn(), archiveTask: vi.fn() }));
+vi.mock('../tasks.service', () => ({ getBoard: vi.fn(), createTask: vi.fn(), updateTask: vi.fn(), moveTask: vi.fn(), archiveTask: vi.fn(), finishTask: vi.fn() }));
 process.env.JWT_SECRET = 'test-secret-test-secret-test-secret';
 
 const users = await import('../../../auth/users.queries');
@@ -36,6 +36,7 @@ beforeEach(() => {
   vi.mocked(s.updateTask).mockResolvedValue({ ok: true });
   vi.mocked(s.moveTask).mockResolvedValue({ ok: true });
   vi.mocked(s.archiveTask).mockResolvedValue({ ok: true });
+  vi.mocked(s.finishTask).mockResolvedValue({ ok: true });
 });
 
 describe('tasks routes', () => {
@@ -77,6 +78,13 @@ describe('tasks routes', () => {
     expect((await as(jan).post('/tasks/40/move', { column: 'done', beforeTaskId: 999 })).status).toBe(400);
   });
 
+  it('POST finish passes the flag and the viewer; bad body → 400; 401 without login', async () => {
+    expect((await as(jan).post('/tasks/40/finish', { finished: true })).status).toBe(200);
+    expect(s.finishTask).toHaveBeenCalledWith(40, true, viewer);
+    expect((await as(jan).post('/tasks/40/finish', { finished: 'tak' })).status).toBe(400);
+    expect((await as(null).post('/tasks/40/finish', { finished: true })).status).toBe(401);
+  });
+
   it('POST archive then 404 on the second time', async () => {
     expect((await as(jan).post('/tasks/40/archive')).status).toBe(200);
     expect(s.archiveTask).toHaveBeenCalledWith(40, viewer);
@@ -93,8 +101,9 @@ describe('abuse', () => {
       expect((await as(jan).put(`/tasks/${at}`, task)).status).toBe(404);
       expect((await as(jan).post(`/tasks/${at}/move`, { column: 'done', beforeTaskId: null })).status).toBe(404);
       expect((await as(jan).post(`/tasks/${at}/archive`)).status).toBe(404);
+      expect((await as(jan).post(`/tasks/${at}/finish`, { finished: true })).status).toBe(404);
     }
-    for (const fn of [s.createTask, s.updateTask, s.moveTask, s.archiveTask]) expect(fn).not.toHaveBeenCalled();
+    for (const fn of [s.createTask, s.updateTask, s.moveTask, s.archiveTask, s.finishTask]) expect(fn).not.toHaveBeenCalled();
   });
 
   it('author, completion date and position from the body are ignored', async () => {

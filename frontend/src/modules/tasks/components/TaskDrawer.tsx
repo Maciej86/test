@@ -3,6 +3,9 @@ import { useMediaQuery } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime, type BoardResponse, type BoardTask } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
+import { apiErrorMessage } from '../../../core/api/client';
+import { notify } from '../../../core/notify';
+import { useFinishTask } from '../tasks.api';
 import { TaskFields } from './TaskFields';
 import { useTaskForm } from './useTaskForm';
 
@@ -21,6 +24,16 @@ export const TaskDrawer = ({ projectId, board, task, onClose, onArchive }: {
   const { t } = useTranslation('tasks');
   const phone = useMediaQuery(PHONE_QUERY) ?? false;
   const { form, submit, saving } = useTaskForm(projectId, task, onClose);
+  const finish = useFinishTask();
+  const finished = task.finishedAt !== null;
+  const toggleFinished = () =>
+    finish.mutate(
+      { id: task.id, finished: !finished },
+      {
+        onSuccess: () => notify.success(t(finished ? 'unfinished_done' : 'finished_done')),
+        onError: (error) => notify.error(apiErrorMessage(error, t)),
+      },
+    );
   return (
     <Drawer
       opened
@@ -37,7 +50,12 @@ export const TaskDrawer = ({ projectId, board, task, onClose, onArchive }: {
             {task.completedAt && <Text size="xs" c="dimmed">{t('completed_at', { date: formatDateTime(task.completedAt) })}</Text>}
           </Stack>
           <Group justify="space-between">
-            <Button variant="subtle" color="red" leftSection={<ButtonIcon action="delete" />} onClick={() => onArchive(task)}>{t('delete')}</Button>
+            <Group gap="xs">
+              <Button variant="subtle" color="red" leftSection={<ButtonIcon action="delete" />} onClick={() => onArchive(task)}>{t('delete')}</Button>
+              <Button variant="subtle" color="gray" leftSection={<ButtonIcon action={finished ? 'reopen' : 'finish'} />} loading={finish.isPending} onClick={toggleFinished}>
+                {finished ? t('unfinish') : t('finish')}
+              </Button>
+            </Group>
             <Group gap="sm">
               <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
               <Button type="submit" leftSection={<ButtonIcon action="save" />} loading={saving}>{t('save')}</Button>

@@ -77,6 +77,10 @@ export const useSaveTask = (projectId: number) =>
 
 export const useArchiveTask = () => useTasksMutation((id: number) => api.post(`/tasks/${id}/archive`));
 
+/** Znacznik „Zakończone” (karta zostaje w kolumnie, wyszarzona) albo jego cofnięcie. */
+export const useFinishTask = () =>
+  useTasksMutation(({ id, finished }: { id: number; finished: boolean }) => api.post(`/tasks/${id}/finish`, { finished }));
+
 /**
  * Przeciągnięcie karty: tablica zmienia się od razu (bez czekania na serwer); przy błędzie wraca poprzedni stan,
  * a po odpowiedzi dane pobierają się od nowa z serwera.

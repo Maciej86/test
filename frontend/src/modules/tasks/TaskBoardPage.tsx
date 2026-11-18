@@ -23,7 +23,7 @@ import { TaskCard } from './components/TaskCard';
 import { TaskDrawer } from './components/TaskDrawer';
 import { TaskFormModal } from './components/TaskFormModal';
 import { columnTasks } from './boardMove';
-import { useBoard, useMoveTask, useProjects } from './tasks.api';
+import { useBoard, useFinishTask, useMoveTask, useProjects } from './tasks.api';
 import { dueState } from './taskDue';
 
 const PROJECT_ID = /^[1-9]\d{0,9}$/;
@@ -87,6 +87,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
       },
     );
   const drag = useBoardDrag(data.tasks, sendMove);
+  const finish = useFinishTask();
   const { tasks, targetColumn, activeTask } = drag;
 
 
@@ -95,6 +96,14 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
     meId,
     onOpen: (task: BoardTask) => setView({ task: task.id }),
     onMove: (task: BoardTask, column: TaskColumn) => sendMove(task, column, null),
+    onFinish: (task: BoardTask) =>
+      finish.mutate(
+        { id: task.id, finished: task.finishedAt === null },
+        {
+          onSuccess: () => notify.success(t(task.finishedAt === null ? 'finished_done' : 'unfinished_done')),
+          onError: (error) => notify.error(apiErrorMessage(error, t)),
+        },
+      ),
     onArchive: (task: BoardTask) => setArchiving(task),
   };
   const column = (key: TaskColumn, showTitle: boolean) => {
@@ -168,7 +177,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
           <DragOverlay dropAnimation={null}>
             {activeTask && (
               <div data-drag-overlay style={{ cursor: 'grabbing' }}>
-                <TaskCard task={activeTask} people={people} meId={meId} onOpen={() => undefined} onMove={() => undefined} onArchive={() => undefined} />
+                <TaskCard task={activeTask} people={people} meId={meId} onOpen={() => undefined} onMove={() => undefined} onFinish={() => undefined} onArchive={() => undefined} />
               </div>
             )}
           </DragOverlay>
