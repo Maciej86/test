@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import type { BoardResponse, BoardTask, SessionUser } from '@app/shared';
 import { api } from '../../../core/api/client';
 import { AuthProvider } from '../../../core/auth/AuthProvider';
+import { notify } from '../../../core/notify';
 import { renderRoutes } from '../../../test/render';
 import { TaskBoardPage } from '../TaskBoardPage';
 
@@ -21,6 +22,7 @@ const board = (o: Partial<BoardResponse> = {}): BoardResponse => ({
     task(5, 'done'),
   ],
   oldDoneCount: 2,
+  leaves: [{ userId: 5, dateFrom: '2026-11-23', dateTo: '2026-11-27' }],
   ...o,
 });
 
@@ -117,5 +119,35 @@ describe('TaskBoardPage', () => {
     expect(screen.getByRole('radio', { name: 'W toku (2)' })).toBeChecked();
     fireEvent.click(screen.getByRole('radio', { name: 'W opracowaniu (2)' }));
     expect(await screen.findByText('Ulotki na targi')).toBeInTheDocument();
+  });
+
+  it('the task in the address opens the drawer; an unknown one shows a message', async () => {
+    const { unmount } = show(board(), '/admin/tasks/9?task=3');
+    expect(await screen.findByText('Zadanie: Marketing')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /Tytuł/ })).toHaveValue('Zadanie 3');
+    unmount();
+    const error = vi.spyOn(notify, 'error');
+    const { router } = show(board(), '/admin/tasks/9?task=99');
+    await waitFor(() => expect(error).toHaveBeenCalledWith('Nie znaleziono zadania.'));
+    await waitFor(() => expect(router.state.location.search).toBe(''));
+  });
+
+  it('clicking a card opens the drawer through the address; Dodaj zadanie opens the window', async () => {
+    const { router } = show(board());
+    fireEvent.click(await screen.findByText('Zadanie 2'));
+    await waitFor(() => expect(router.state.location.search).toBe('?task=2'));
+    expect(await screen.findByText('Zadanie: Marketing')).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole('button', { name: 'Dodaj zadanie' })[0]!);
+    expect(await screen.findByText('Nowe zadanie: Marketing')).toBeInTheDocument();
+  });
+
+  it('Usuń from the card menu asks first, then archives', async () => {
+    show(board());
+    const card = (await screen.findByText('Zadanie 4')).closest('.mantine-Card-root') as HTMLElement;
+    fireEvent.click(within(card).getByRole('button', { name: 'Więcej działań' }));
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Usuń' }));
+    expect(await screen.findByText('Usunąć zadanie?')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Usuń' }));
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/tasks/4/archive'));
   });
 });

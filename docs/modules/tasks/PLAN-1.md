@@ -214,13 +214,17 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   „Tylko moje” zapisuje się w adresie jako `mine=true`; logika przeciągania w `components/boardDrop.ts`
   (`dragTarget`, `placementOf`) i `boardMove.ts` (`moveInBoard`).
 
-- [ ] **15. Okno nowego zadania, podgląd, usunięcie (front).** Pliki `components/TaskFields.tsx`,
+- [x] **15. Okno nowego zadania, podgląd, usunięcie (front).** Pliki `components/TaskFields.tsx`,
   `components/TaskFormModal.tsx`, `components/TaskDrawer.tsx` (`size={540}`), `components/ArchiveTaskModal.tsx`
   (na `ConfirmModal`). Testy: puste i 2-znakowe pole „Tytuł” → błąd pod polem; termin wczoraj w nowym zadaniu → błąd;
   lista osób = `people` z `assignable`, osoba nieprzypisywalna już przypisana zostaje wyłączona; żółta ramka „Urlop
   przed terminem” z datami; zapis woła `useSaveTask` i pokazuje dymek; błąd 400 z serwera trafia pod pole
   (`fieldError`); podgląd z otwartą edycją nie traci wpisanych wartości po odświeżeniu tablicy; „Usuń” → okno →
   `useArchiveTask` → dymek → `npm run check`.
+
+  **Uwaga:** tablica zwraca też `leaves` (urlopy osób z tablicy na 180 dni, `TASK_FORM_LEAVE_DAYS`) do ramki
+  w formularzu; kalendarz terminu w nowym zadaniu nie pozwala wybrać dnia przed dziś (serwer i tak sprawdza);
+  wspólna logika formularza w `components/useTaskForm.ts`; w `test/setup.ts` zastępnik `document.fonts`.
 
 - [ ] **16. Lista projektów (front).** Pliki `ProjectsPage.tsx`, `components/ProjectsTable.tsx`,
   `components/ProjectModal.tsx`, `components/DeleteProjectModal.tsx`. Testy: tabela z kolumnami ze specu i karty na

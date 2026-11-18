@@ -13,7 +13,7 @@ prywatnym), żeby widzieć obie osoby naraz.
 3. Dodaj drugi projekt o nazwie „marketing” → pod polem „Projekt o tej nazwie już jest.”
 4. Dodaj „Produkcja” (bez członków). Strzałkami przestaw „Produkcja” nad „Marketing” → ta sama kolejność w menu.
 5. Otwórz tablicę „Marketing” → „Tablica jest pusta”. „Dodaj zadanie” → okno na środku ekranu. Wpisz tytuł „Ab” →
-   błąd „co najmniej 3 znaki”. Wpisz „Zamówić ulotki”, termin wczoraj → błąd terminu; termin za tydzień, przypisz
+   błąd „co najmniej 3 znaki”. Wpisz „Zamówić ulotki”; w kalendarzu terminu nie da się wybrać wczorajszego dnia; termin za tydzień, przypisz
    Jana → „Dodaj zadanie” → karta na górze „W opracowaniu”, dymek.
 6. Kliknij kartę → z prawej szerszy podgląd z polami i „Dodane przez: …”. Zmień kolumnę na „W toku”, zapisz → karta
    w „W toku”.

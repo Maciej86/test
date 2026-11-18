@@ -29,7 +29,7 @@ const task = (id: number, column: BoardTask['column'], position: number): BoardT
   createdAt: '2026-11-10T10:00:00.000Z', assigneeIds: [], leaves: [],
 });
 const board = (): BoardResponse => ({
-  project: { id: 9, name: 'Marketing' }, people: [], oldDoneCount: 0,
+  project: { id: 9, name: 'Marketing' }, people: [], oldDoneCount: 0, leaves: [],
   tasks: [task(1, 'draft', 1), task(2, 'draft', 2), task(3, 'in_progress', 1)],
 });
 

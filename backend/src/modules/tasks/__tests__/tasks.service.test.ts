@@ -82,6 +82,17 @@ describe('board', () => {
     expect(all).toMatchObject({ oldDoneCount: 0 });
   });
 
+  it('board leaves: approved leaves of everyone on the board for the next 180 days (task form warning)', async () => {
+    vi.mocked(q.boardPeople).mockResolvedValue([
+      { id: 1, name: 'Anna Nowak', role: 'admin', archived: false, assignable: true },
+      { id: 6, name: 'Piotr Zieliński', role: 'employee', archived: false, assignable: true },
+    ]);
+    vi.mocked(listApprovedLeaves).mockResolvedValue([{ userId: 6, dateFrom: '2026-12-21', dateTo: '2026-12-22' }]);
+    const board = await s.getBoard(9, jan, false);
+    expect(listApprovedLeaves).toHaveBeenCalledWith(expect.anything(), [1, 6], '2026-11-18', '2027-05-17');
+    expect(board).toMatchObject({ leaves: [{ userId: 6, dateFrom: '2026-12-21', dateTo: '2026-12-22' }] });
+  });
+
   it('leaves only for open tasks up to the due date or 14 days', async () => {
     vi.mocked(q.boardTasks).mockResolvedValue([
       row({ id: 7, dueDate: '2026-11-25' }),
@@ -95,7 +106,7 @@ describe('board', () => {
       { userId: 6, dateFrom: '2026-12-28', dateTo: '2026-12-31' },
     ]);
     const board = await s.getBoard(9, jan, false);
-    expect(listApprovedLeaves).toHaveBeenCalledWith(expect.anything(), [5, 6], '2026-11-18', '2026-12-02');
+    expect(listApprovedLeaves).toHaveBeenCalledWith(expect.anything(), [5, 6], '2026-11-18', '2027-05-17');
     const byId = new Map(('tasks' in board ? board.tasks : []).map((t) => [t.id, t]));
     expect(byId.get(7)).toMatchObject({ assigneeIds: [5, 6], leaves: [{ userId: 6, dateFrom: '2026-11-23', dateTo: '2026-11-27' }] });
     expect(byId.get(8)!.leaves).toEqual([{ userId: 6, dateFrom: '2026-11-23', dateTo: '2026-11-27' }]);

@@ -23,3 +23,8 @@ window.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
 
 // jsdom nie ma przewijania do elementu; Mantine woła je przy wyborze opcji z listy (Select).
 Element.prototype.scrollIntoView = () => {};
+
+// Pole tekstowe, które rośnie przy pisaniu (Textarea autosize), nasłuchuje wczytania czcionek; jsdom nie ma document.fonts.
+if (!('fonts' in document)) {
+  Object.defineProperty(document, 'fonts', { value: { addEventListener: () => {}, removeEventListener: () => {}, ready: Promise.resolve() } });
+}

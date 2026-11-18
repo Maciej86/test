@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Anchor, Button, Group, Paper, SegmentedControl, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { DndContext, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type DragOverEvent } from '@dnd-kit/core';
@@ -14,9 +14,12 @@ import { apiErrorKey, apiErrorMessage } from '../../core/api/client';
 import { useAuth } from '../../core/auth/AuthProvider';
 import { notify } from '../../core/notify';
 import { useListParams } from '../../core/useListParams';
+import { ArchiveTaskModal } from './components/ArchiveTaskModal';
 import { BoardColumn } from './components/BoardColumn';
 import { BoardHeader } from './components/BoardHeader';
 import { dragTarget, placementOf } from './components/boardDrop';
+import { TaskDrawer } from './components/TaskDrawer';
+import { TaskFormModal } from './components/TaskFormModal';
 import { columnTasks, moveInBoard } from './boardMove';
 import { useBoard, useMoveTask } from './tasks.api';
 import { dueState } from './taskDue';
@@ -44,6 +47,16 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
   const [phoneColumn, setPhoneColumn] = useState<TaskColumn>(DEFAULT_PHONE_COLUMN);
   // W trakcie przeciągania tablica nie przyjmuje odświeżeń z serwera (karta nie ucieka spod palca).
   const [dragTasks, setDragTasks] = useState<BoardTask[] | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [archiving, setArchiving] = useState<BoardTask | null>(null);
+  const openTask = view.task === undefined ? null : (data.tasks.find((task) => task.id === view.task) ?? null);
+  const missingTask = view.task !== undefined && openTask === null;
+  // Zadanie z adresu (link z powiadomienia) nie jest na tablicy: usunięte, w archiwum albo z innego projektu.
+  useEffect(() => {
+    if (!missingTask) return;
+    notify.error(t('task_not_found'));
+    setView({ task: undefined });
+  }, [missingTask, setView, t]);
   const move = useMoveTask(projectId, oldDone);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -84,7 +97,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
     meId,
     onOpen: (task: BoardTask) => setView({ task: task.id }),
     onMove: (task: BoardTask, column: TaskColumn) => sendMove(task, column, null),
-    onArchive: (_task: BoardTask) => undefined,
+    onArchive: (task: BoardTask) => setArchiving(task),
   };
   const column = (key: TaskColumn, showTitle: boolean) => {
     const all = columnTasks(tasks, key);
@@ -110,7 +123,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
         openCount={open.length}
         overdue={open.filter((task) => dueState(task) === 'overdue').length}
         people={data.people}
-        onAdd={() => undefined}
+        onAdd={() => setCreating(true)}
       />
       <Group gap="md" align="center">
         <SearchField label={t('search')} value={view.search} onChange={(search) => setView({ search })} w={{ base: '100%', sm: 260 }} />
@@ -123,7 +136,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
             icon={SquareKanban}
             title={t('board_empty_title')}
             text={t('board_empty', { project: data.project.name })}
-            action={<Button leftSection={<ButtonIcon action="add" />}>{t('new_task')}</Button>}
+            action={<Button leftSection={<ButtonIcon action="add" />} onClick={() => setCreating(true)}>{t('new_task')}</Button>}
           />
         </Paper>
       ) : (
@@ -148,6 +161,19 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
           )}
         </DndContext>
       )}
+
+      {creating && <TaskFormModal projectId={projectId} board={data} onClose={() => setCreating(false)} />}
+      {openTask && (
+        <TaskDrawer
+          key={openTask.id}
+          projectId={projectId}
+          board={data}
+          task={openTask}
+          onClose={() => setView({ task: undefined })}
+          onArchive={(task) => { setView({ task: undefined }); setArchiving(task); }}
+        />
+      )}
+      {archiving && <ArchiveTaskModal task={archiving} onClose={() => setArchiving(null)} />}
     </Stack>
   );
 };

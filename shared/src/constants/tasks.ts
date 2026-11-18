@@ -21,6 +21,8 @@ export const TASK_BOARD_REFRESH_MS = 5_000;
 export const TASK_HIDE_DONE_AFTER_DAYS = 30;
 /** Zadanie bez terminu: urlopy przypisanych osób w najbliższych tylu dniach. */
 export const TASK_LEAVE_LOOKAHEAD_DAYS = 14;
+/** Formularz zadania ostrzega o urlopach osób z tablicy w najbliższych tylu dniach. */
+export const TASK_FORM_LEAVE_DAYS = 180;
 
 /** Klucze błędów serwera modułu (teksty w tasks.json). */
 export const TASK_MESSAGES = {

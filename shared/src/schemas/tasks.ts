@@ -138,4 +138,6 @@ export interface BoardResponse {
   people: BoardPerson[];
   tasks: BoardTask[];
   oldDoneCount: number;
+  /** Zatwierdzone urlopy osób z tablicy od dziś na 180 dni (ostrzeżenie w formularzu zadania). */
+  leaves: TaskLeave[];
 }

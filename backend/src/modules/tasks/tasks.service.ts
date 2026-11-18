@@ -1,6 +1,7 @@
 import {
   TASK_MESSAGES as M,
   TASK_HIDE_DONE_AFTER_DAYS,
+  TASK_FORM_LEAVE_DAYS,
   TASK_LEAVE_LOOKAHEAD_DAYS,
   dayjs,
   ISO_DATE_FORMAT,
@@ -47,10 +48,12 @@ export const getBoard = async (projectId: number, viewer: Viewer, includeOldDone
 
   const today = todayIsoDate();
   const ranges = rows.map((t) => ({ task: t, until: leaveUntil(t, today), ids: assignees.get(t.id) ?? [] }));
-  const withLeaves = ranges.filter((r) => r.until !== null && r.ids.length > 0);
-  const leaveUserIds = [...new Set(withLeaves.flatMap((r) => r.ids))].sort((a, b) => a - b);
-  const lastDay = withLeaves.reduce((max, r) => (r.until! > max ? r.until! : max), today);
+  // Jedno zapytanie: urlopy osób z tablicy i przypisanych, od dziś do najdalszego terminu (co najmniej 180 dni).
+  const formUntil = dayjs(today).add(TASK_FORM_LEAVE_DAYS, 'day').format(ISO_DATE_FORMAT);
+  const lastDay = ranges.reduce((max, r) => (r.until !== null && r.until > max ? r.until : max), formUntil);
+  const leaveUserIds = [...new Set([...people.map((p) => p.id), ...ranges.flatMap((r) => r.ids)])].sort((a, b) => a - b);
   const leaves: TaskLeave[] = leaveUserIds.length === 0 ? [] : await listApprovedLeaves(pool, leaveUserIds, today, lastDay);
+  const peopleIds = new Set(people.map((p) => p.id));
 
   const tasks: BoardTask[] = ranges.map(({ task, until, ids }) => {
     const { projectId: _projectId, ...rest } = task;
@@ -60,7 +63,7 @@ export const getBoard = async (projectId: number, viewer: Viewer, includeOldDone
       leaves: until === null ? [] : leaves.filter((l) => ids.includes(l.userId) && l.dateFrom <= until && l.dateTo >= today),
     };
   });
-  return { project, people, tasks, oldDoneCount };
+  return { project, people, tasks, oldDoneCount, leaves: leaves.filter((l) => peopleIds.has(l.userId) && l.dateFrom <= formUntil) };
 };
 
 const ENTITY = 'tasks';

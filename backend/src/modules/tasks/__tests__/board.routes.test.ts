@@ -19,7 +19,7 @@ const get = (user: SessionUser | null, url: string) => {
   vi.mocked(users.findActiveUserById).mockResolvedValue(user);
   return request(createApp()).get(`/api${url}`).set('Cookie', user ? `${AUTH_COOKIE_NAME}=${signToken(user, 0)}` : '');
 };
-const board = { project: { id: 9, name: 'Marketing' }, people: [], tasks: [], oldDoneCount: 0 };
+const board = { project: { id: 9, name: 'Marketing' }, people: [], tasks: [], oldDoneCount: 0, leaves: [] };
 
 beforeEach(() => {
   vi.clearAllMocks();
