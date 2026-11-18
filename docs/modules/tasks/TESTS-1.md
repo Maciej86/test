@@ -18,10 +18,14 @@ prywatnym), żeby widzieć obie osoby naraz.
 6. Kliknij kartę → z prawej szerszy podgląd z polami i „Dodane przez: …”. Zmień kolumnę na „W toku”, zapisz → karta
    w „W toku”.
 7. Przeciągnij kartę myszką do „Zrealizowane” → pod tytułem „Zrealizowane <dzisiejsza data>”. Przeciągnij z powrotem.
-8. „⋮ → Usuń” → okno „Usunąć zadanie?” → „Usuń” → karta znika, dymek „Zadanie przeniesione do archiwum.”
-9. Na liście projektów „Edytuj” przy „Marketing”, usuń Jana z członków, gdy ma otwarte zadanie → żółta ramka
+8. Przeciągnij kartę na nagłówek innej kolumny i przytrzymaj → ramka tej kolumny jest przerywana, karta nie skacze;
+   po puszczeniu karta stoi w nowej kolumnie, a jej kopia znika od razu (nie leci do starej kolumny).
+9. „⋮ → Oznacz jako zakończone” → karta zostaje w kolumnie, cała wyszarzona, z plakietką „Zakończone”; „⋮ → Cofnij
+   zakończenie” przywraca zwykły wygląd. To samo przyciskiem w podglądzie z prawej.
+10. „⋮ → Usuń” → okno „Usunąć zadanie?” → „Usuń” → karta znika, dymek „Zadanie przeniesione do archiwum.”
+11. Na liście projektów „Edytuj” przy „Marketing”, usuń Jana z członków, gdy ma otwarte zadanie → żółta ramka
    z liczbą jego zadań; zapisz → w zadaniu Jana już nie ma.
-10. „Usuń” przy „Produkcja” → przycisk „Usuń na stałe” jest wyłączony; wpisz „Produkcja” → włącza się; usuń →
+12. „Usuń” przy „Produkcja” → przycisk „Usuń na stałe” jest wyłączony; wpisz „Produkcja” → włącza się; usuń →
     projekt znika z menu i listy.
 
 ## Jako pracownik

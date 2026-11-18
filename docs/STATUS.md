@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.40
 
-**Następny krok:** Moduł Zadania, część 1/2: testy. Próby nadużyć zrobione; sprawdzenie w przeglądarce czeka na instalację Chrome dla Playwright (`npx playwright install chrome`), potem użytkownik przechodzi `TESTS-1.md` (`/stepkit:dalej`).
+**Następny krok:** Moduł Zadania, część 1/2: użytkownik przechodzi `docs/modules/tasks/TESTS-1.md` i pisze „działa”; potem zamknięcie części 1 i poprawka z `FIXES.md` (`/stepkit:dalej`).
 
 ## Start aplikacji
 
@@ -28,7 +28,7 @@
 | 7 | Typy umów | contract-types | zrobiony | zamknięcie | employees |
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | zrobiony | zamknięcie | my-leave |
-| 10 | Zadania | tasks | w toku | testy, część 1/2 (czeka na Playwright) | employees, notifications |
+| 10 | Zadania | tasks | w toku | testy, część 1/2 (użytkownik przechodzi TESTS-1.md) | employees, notifications |
 | 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
 | 13 | Moje konto | my-account | czeka | makieta | login |
