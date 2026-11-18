@@ -15,7 +15,10 @@ interface CardActions {
   onArchive: (task: BoardTask) => void;
 }
 
-/** Karta, którą da się przeciągać (myszą i palcem). */
+/**
+ * Karta, którą da się przeciągać (myszą i palcem). W trakcie przeciągania zostaje w kolumnie jako przygaszony zarys
+ * miejsca, a pod kursorem jest jej kopia (`DragOverlay`); tylko przesunięcie, bez skalowania do innej kolumny.
+ */
 const SortableCard = ({ task, ...actions }: CardActions & { task: BoardTask }) => {
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({ id: task.id });
   return (
@@ -23,7 +26,7 @@ const SortableCard = ({ task, ...actions }: CardActions & { task: BoardTask }) =
       task={task}
       people={actions.people}
       meId={actions.meId}
-      drag={{ ref: setNodeRef, props: { ...attributes, ...listeners }, style: { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 } }}
+      drag={{ ref: setNodeRef, props: { ...attributes, ...listeners }, style: { transform: CSS.Translate.toString(transform), transition, opacity: isDragging ? 0.35 : 1 } }}
       onOpen={() => actions.onOpen(task)}
       onMove={(column) => actions.onMove(task, column)}
       onArchive={() => actions.onArchive(task)}

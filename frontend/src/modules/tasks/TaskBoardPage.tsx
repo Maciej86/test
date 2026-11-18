@@ -1,18 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Alert, Anchor, Button, Group, Paper, SegmentedControl, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import {
-  DndContext,
-  PointerSensor,
-  TouchSensor,
-  pointerWithin,
-  rectIntersection,
-  useSensor,
-  useSensors,
-  type CollisionDetection,
-  type DragEndEvent,
-  type DragOverEvent,
-} from '@dnd-kit/core';
+import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { SquareKanban, WifiOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
@@ -29,10 +18,11 @@ import { ArchiveTaskModal } from './components/ArchiveTaskModal';
 import { ProjectModal } from './components/ProjectModal';
 import { BoardColumn } from './components/BoardColumn';
 import { BoardHeader } from './components/BoardHeader';
-import { dragOverTarget, dropTarget, overColumn, placementOf, preferCards } from './components/boardDrop';
+import { useBoardDrag } from './components/useBoardDrag';
+import { TaskCard } from './components/TaskCard';
 import { TaskDrawer } from './components/TaskDrawer';
 import { TaskFormModal } from './components/TaskFormModal';
-import { columnTasks, moveInBoard } from './boardMove';
+import { columnTasks } from './boardMove';
 import { useBoard, useMoveTask, useProjects } from './tasks.api';
 import { dueState } from './taskDue';
 
@@ -40,12 +30,6 @@ const PROJECT_ID = /^[1-9]\d{0,9}$/;
 /** Na węższym ekranie (telefon, mały tablet) widać jedną kolumnę naraz. */
 const PHONE_QUERY = '(max-width: 62em)';
 const DEFAULT_PHONE_COLUMN: TaskColumn = 'in_progress';
-
-/** Cel przeciągania: to, co jest pod kursorem (karta przed kolumną); poza kolumnami najbliższe po powierzchni. */
-const collisionDetection: CollisionDetection = (args) => {
-  const under = pointerWithin(args);
-  return under.length > 0 ? preferCards(under) : rectIntersection(args);
-};
 
 const RefreshFailed = () => {
   const { t } = useTranslation('tasks');
@@ -68,10 +52,6 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
   const [view, setView] = useListParams(boardViewSchema, { search: '', mine: false, task: undefined });
   const phone = useMediaQuery(PHONE_QUERY) ?? false;
   const [phoneColumn, setPhoneColumn] = useState<TaskColumn>(DEFAULT_PHONE_COLUMN);
-  // W trakcie przeciągania tablica nie przyjmuje odświeżeń z serwera (karta nie ucieka spod palca).
-  const [dragTasks, setDragTasks] = useState<BoardTask[] | null>(null);
-  // Kolumna, do której trafi przeciągana karta (podświetlona ramka).
-  const [targetColumn, setTargetColumn] = useState<TaskColumn | null>(null);
   const [creating, setCreating] = useState(false);
   const [archiving, setArchiving] = useState<BoardTask | null>(null);
   const [editingProject, setEditingProject] = useState(false);
@@ -86,13 +66,8 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
     setView({ task: undefined });
   }, [missingTask, setView, t]);
   const move = useMoveTask(projectId, oldDone);
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
-  );
 
   const meId = user?.id ?? 0;
-  const tasks = dragTasks ?? data.tasks;
   const people = new Map(data.people.map((p) => [p.id, p]));
   const query = view.search.toLowerCase();
   const filtered = view.mine || query !== '';
@@ -103,28 +78,9 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
 
   const sendMove = (task: BoardTask, column: TaskColumn, beforeTaskId: number | null) =>
     move.mutate({ taskId: task.id, column, beforeTaskId }, { onError: (error) => notify.error(apiErrorMessage(error, t)) });
+  const drag = useBoardDrag(data.tasks, sendMove);
+  const { tasks, targetColumn, activeTask } = drag;
 
-  const onDragOver = ({ active, over }: DragOverEvent) => {
-    setTargetColumn(over && dragTasks ? overColumn(dragTasks, over.id) : null);
-    if (!over) return;
-    // Na najświeższym stanie: kilka zdarzeń w jednej klatce nie pracuje na nieaktualnej kopii.
-    setDragTasks((current) => {
-      if (!current) return current;
-      const target = dragOverTarget(current, Number(active.id), over.id);
-      return target ? moveInBoard(current, Number(active.id), target) : current;
-    });
-  };
-  const onDragEnd = ({ active, over }: DragEndEvent) => {
-    const id = Number(active.id);
-    const task = data.tasks.find((x) => x.id === id);
-    if (dragTasks && task) {
-      const before = placementOf(data.tasks, id);
-      const after = over ? dropTarget(dragTasks, id, over.id) : placementOf(dragTasks, id);
-      if (before.column !== after.column || before.beforeTaskId !== after.beforeTaskId) sendMove(task, after.column, after.beforeTaskId);
-    }
-    setDragTasks(null);
-    setTargetColumn(null);
-  };
 
   const actions = {
     people,
@@ -180,7 +136,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
           />
         </Paper>
       ) : (
-        <DndContext sensors={sensors} onDragStart={() => setDragTasks(data.tasks)} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={() => { setDragTasks(null); setTargetColumn(null); }} collisionDetection={collisionDetection}>
+        <DndContext {...drag.context}>
           {phone ? (
             <Stack gap="sm">
               <SegmentedControl
@@ -199,6 +155,14 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
               <Text size="sm" c="dimmed">{t('drag_hint')}</Text>
             </>
           )}
+          {/* Karta pod kursorem: zawsze w swoim rozmiarze; w kolumnie zostaje jej przygaszony zarys. */}
+          <DragOverlay>
+            {activeTask && (
+              <div data-drag-overlay style={{ cursor: 'grabbing' }}>
+                <TaskCard task={activeTask} people={people} meId={meId} onOpen={() => undefined} onMove={() => undefined} onArchive={() => undefined} />
+              </div>
+            )}
+          </DragOverlay>
         </DndContext>
       )}
 

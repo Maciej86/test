@@ -182,6 +182,37 @@ test('przeciąganie nad kartę w innej kolumnie: ramka tej kolumny się podświe
   await page.request.delete(`/api/tasks/projects/${project.id}`, { data: { confirmName: name } });
 });
 
+// Zgłoszenie 2026-11-18: „duch” przeciąganej karty rozciągał się nad kolumną o innej wysokości.
+test('przeciągana karta pod kursorem ma rozmiar karty, a w kolumnie zostaje jej zarys', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.setViewportSize({ width: 1400, height: 900 });
+  const suffix = String(Date.now()).slice(-6);
+  await logIn(page, ADMIN, password());
+  await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+  const name = `E2E Duch ${suffix}`;
+  const project = (await (await page.request.post('/api/tasks/projects', { data: { name, memberIds: [] } })).json()) as { id: number };
+  const add = (title: string, column: string, description = '') =>
+    page.request.post(`/api/tasks/projects/${project.id}/tasks`, { data: { title, description, dueDate: '', column, assigneeIds: [] } });
+  await add('Wysoka karta', 'draft', 'Długi opis, żeby karta była wyższa. '.repeat(4));
+  await add('Niska karta', 'in_progress');
+  await page.goto(`/admin/tasks/${project.id}`);
+  const moving = page.locator('.mantine-Card-root', { hasText: 'Niska karta' });
+  const from = (await moving.boundingBox())!;
+  const to = (await page.locator('.mantine-Card-root', { hasText: 'Wysoka karta' }).boundingBox())!;
+  await page.mouse.move(from.x + 30, from.y + 15);
+  await page.mouse.down();
+  await page.mouse.move(from.x + 40, from.y + 30, { steps: 5 });
+  await page.mouse.move(to.x + 60, to.y + to.height / 2, { steps: 25 });
+  const ghost = page.locator('[data-drag-overlay] .mantine-Card-root');
+  await expect(ghost).toBeVisible();
+  const box = (await ghost.boundingBox())!;
+  expect(Math.abs(box.width - from.width)).toBeLessThan(3);
+  expect(Math.abs(box.height - from.height)).toBeLessThan(3);
+  await page.mouse.up();
+  await expect.poll(async () => (await board(page, project.id)).tasks.find((t) => t.title === 'Niska karta')?.column).toBe('draft');
+  await page.request.delete(`/api/tasks/projects/${project.id}`, { data: { confirmName: name } });
+});
+
 // Próby nadużyć (docs/modules/tasks/TESTS-1.md, „Próby nadużyć”) na prawdziwej bazie: pracownik spoza projektu,
 // podrobione pola, zakazane przeniesienia, kilka zapisów naraz, usuwanie i złe dane.
 test.describe('abuse', () => {
