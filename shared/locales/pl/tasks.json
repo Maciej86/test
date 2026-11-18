@@ -153,5 +153,11 @@
   "project_delete_text_few": "Projekt „{{name}}” zniknie na stałe razem z {{count}} zadaniami i ich komentarzami. Tego nie da się cofnąć.",
   "project_delete_text_many": "Projekt „{{name}}” zniknie na stałe razem z {{count}} zadaniami i ich komentarzami. Tego nie da się cofnąć.",
   "project_delete_confirm_label": "Żeby potwierdzić, wpisz nazwę projektu: {{name}}",
-  "project_deleted": "Usunięto projekt."
+  "project_deleted": "Usunięto projekt.",
+  "project_name_taken": "Projekt o tej nazwie już jest.",
+  "project_confirm_mismatch": "Wpisana nazwa nie zgadza się z nazwą projektu.",
+  "assignee_not_allowed": "Tej osoby nie można przypisać: nie należy do projektu albo jej konto jest w archiwum.",
+  "member_not_allowed": "Członkiem projektu może być tylko pracownik, którego konto nie jest w archiwum.",
+  "due_in_past": "Termin nie może być wcześniejszy niż dziś.",
+  "before_task_invalid": "Nie można postawić karty w tym miejscu. Odśwież tablicę i spróbuj ponownie."
 }

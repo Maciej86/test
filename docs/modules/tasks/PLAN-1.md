@@ -69,7 +69,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   Pliki: `019_projects.sql`, `020_project_members.sql`, `021_tasks.sql`, `022_task_assignees.sql` →
   `npm run migrate`, `npm run check`.
 
-- [ ] **4. Wspólne stałe i schematy.**
+- [x] **4. Wspólne stałe i schematy.**
   - `shared/src/constants/tasks.ts`: `TASK_COLUMNS`, `TaskColumn`, `TASK_TITLE_MIN = 3`, `TASK_TITLE_MAX = 150`,
     `TASK_DESCRIPTION_MAX = 2000`, `TASK_ASSIGNEES_MAX = 10`, `PROJECT_NAME_MIN = 2`, `PROJECT_NAME_MAX = 60`,
     `PROJECT_MEMBERS_MAX = 50`, `TASK_BOARD_REFRESH_MS = 5000`, `TASK_HIDE_DONE_AFTER_DAYS = 30`,

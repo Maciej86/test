@@ -10,3 +10,4 @@ export * from './contractTypes';
 export * from './notifications';
 export * from './myLeave';
 export * from './leaveRequests';
+export * from './tasks';

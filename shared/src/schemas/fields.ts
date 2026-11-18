@@ -26,6 +26,8 @@ export const FIELD_MESSAGES = {
   passwordRules: 'validation.password_rules',
   wholeNumber: 'validation.whole_number',
   date: 'validation.date',
+  tooMany: 'validation.too_many',
+  duplicates: 'validation.duplicates',
 } as const;
 
 const M = FIELD_MESSAGES;
@@ -131,13 +133,16 @@ export const wholeNumber = (min: number, max: number) =>
       .max(max, M.max),
   );
 
-/** Imię albo nazwisko: obcięte spacje, od 2 do max znaków; puste → wymagane. */
-export const personName = (max: number) =>
+/** Tekst od min do max znaków po obcięciu spacji (np. tytuł zadania 3–150); puste → wymagane. */
+export const textRange = (min: number, max: number) =>
   textInput()
     .trim()
     .min(1, { error: M.required, abort: true })
-    .min(NAME_PART_MIN, M.tooShort)
+    .min(min, M.tooShort)
     .max(max, M.tooLong);
+
+/** Imię albo nazwisko: obcięte spacje, od 2 do max znaków; puste → wymagane. */
+export const personName = (max: number) => textRange(NAME_PART_MIN, max);
 
 /** Pole nieobowiązkowe: puste pole formularza (`''`, same spacje, brak) zapisuje się jako NULL. */
 export const optionalField = <T extends z.ZodType>(schema: T) => {
@@ -183,3 +188,10 @@ export const newPassword = textInput()
  * więc `0x10`, `1e3` czy `007` nie stają się innym numerem. Ekran podaje też liczbę (wybór w polu).
  */
 export const addressNumber = z.union([z.number().int().positive(), z.string().regex(/^[1-9]\d{0,9}$/).transform(Number)]);
+
+/** Lista numerów (np. przypisane osoby): liczby albo teksty cyfr, najwyżej `max`, bez powtórzeń. */
+export const idList = (max: number) =>
+  z
+    .array(addressNumber)
+    .max(max, M.tooMany)
+    .refine((ids) => new Set(ids).size === ids.length, M.duplicates);
