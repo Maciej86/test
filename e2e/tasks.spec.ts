@@ -115,6 +115,41 @@ test('projekt, przypisanie, powiadomienie, przeniesienie widoczne u innych, usun
   expect((await page.request.get(`/api/tasks/projects/${projectId}/board`)).status()).toBe(404);
 });
 
+// Błąd zgłoszony 2026-11-18: przeciągnięcie karty z „W opracowaniu” na nagłówek „W toku” (z kartą w środku)
+// kończyło się „Maximum update depth exceeded”, bo karta skakała na zmianę na koniec kolumny i przed kartę.
+test('przeciągnięcie karty na nagłówek innej kolumny: bez błędu, karta trafia do tej kolumny', async ({ page }) => {
+  test.setTimeout(90_000);
+  // Szerokie okno jak u użytkownika: karty są niskie, a przeciągana karta zahacza jednocześnie o nagłówek i kartę w kolumnie.
+  await page.setViewportSize({ width: 2100, height: 1100 });
+  const suffix = String(Date.now()).slice(-6);
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  await logIn(page, ADMIN, password());
+  await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+  const name = `E2E Nagłówek ${suffix}`;
+  const project = (await (await page.request.post('/api/tasks/projects', { data: { name, memberIds: [] } })).json()) as { id: number };
+  const add = (title: string, column: string) =>
+    page.request.post(`/api/tasks/projects/${project.id}/tasks`, { data: { title, description: '', dueDate: '', column, assigneeIds: [] } });
+  await add('Karta do przeniesienia', 'draft');
+  await add('Karta już w toku', 'in_progress');
+  await page.goto(`/admin/tasks/${project.id}`);
+  const card = page.locator('.mantine-Card-root', { hasText: 'Karta do przeniesienia' });
+  const header = page.getByRole('region', { name: 'W toku' }).getByRole('heading', { name: 'W toku' });
+  const from = (await card.boundingBox())!;
+  const to = (await header.boundingBox())!;
+  await page.mouse.move(from.x + from.width / 2, from.y + 10);
+  await page.mouse.down();
+  await page.mouse.move(from.x + from.width / 2 + 10, from.y + 25, { steps: 5 });
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 20 });
+  for (let i = 0; i < 20; i++) await page.mouse.move(to.x + to.width / 2 + (i % 2), to.y + to.height / 2);
+  await page.mouse.up();
+  await expect(page.getByRole('region', { name: 'W toku' }).getByText('Karta do przeniesienia')).toBeVisible();
+  await expect(page.getByText('Unexpected Application Error')).toHaveCount(0);
+  expect(errors.filter((e) => e.includes('Maximum update depth'))).toEqual([]);
+  await page.request.delete(`/api/tasks/projects/${project.id}`, { data: { confirmName: name } });
+});
+
 // Próby nadużyć (docs/modules/tasks/TESTS-1.md, „Próby nadużyć”) na prawdziwej bazie: pracownik spoza projektu,
 // podrobione pola, zakazane przeniesienia, kilka zapisów naraz, usuwanie i złe dane.
 test.describe('abuse', () => {

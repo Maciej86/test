@@ -18,7 +18,7 @@ import { ArchiveTaskModal } from './components/ArchiveTaskModal';
 import { ProjectModal } from './components/ProjectModal';
 import { BoardColumn } from './components/BoardColumn';
 import { BoardHeader } from './components/BoardHeader';
-import { dragTarget, placementOf } from './components/boardDrop';
+import { dragOverTarget, dropTarget, placementOf } from './components/boardDrop';
 import { TaskDrawer } from './components/TaskDrawer';
 import { TaskFormModal } from './components/TaskFormModal';
 import { columnTasks, moveInBoard } from './boardMove';
@@ -90,16 +90,16 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
     // Na najświeższym stanie: kilka zdarzeń w jednej klatce nie pracuje na nieaktualnej kopii.
     setDragTasks((current) => {
       if (!current) return current;
-      const target = dragTarget(current, Number(active.id), over.id);
+      const target = dragOverTarget(current, Number(active.id), over.id);
       return target ? moveInBoard(current, Number(active.id), target) : current;
     });
   };
-  const onDragEnd = ({ active }: DragEndEvent) => {
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
     const id = Number(active.id);
     const task = data.tasks.find((x) => x.id === id);
     if (dragTasks && task) {
       const before = placementOf(data.tasks, id);
-      const after = placementOf(dragTasks, id);
+      const after = over ? dropTarget(dragTasks, id, over.id) : placementOf(dragTasks, id);
       if (before.column !== after.column || before.beforeTaskId !== after.beforeTaskId) sendMove(task, after.column, after.beforeTaskId);
     }
     setDragTasks(null);
