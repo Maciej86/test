@@ -30,7 +30,7 @@ Układ jak w makiecie (stan „tablica”):
   najechaniu lista nazwisk), przycisk „Edytuj projekt” (tylko administrator, otwiera okno projektu) i „Dodaj
   zadanie”.
 - **Pasek:** wyszukiwarka (tytuł i opis, bez wielkości liter) i przełącznik „Tylko moje zadania” (przypisane do
-  mnie, odpowiedź 4a). Oba w adresie (`?search=…&mine=1`), więc odświeżenie strony je zachowuje. Filtrowanie robi
+  mnie, odpowiedź 4a). Oba w adresie (`?search=…&mine=true`), więc odświeżenie strony je zachowuje. Filtrowanie robi
   ekran na danych tablicy (tablica nie ma stron). **[decyzja AI]**
 - **Trzy kolumny** (`Paper withBorder`, wzorzec „Kolumny tablicy” z `DESIGN.md`): nagłówek z nazwą i liczbą kart
   (przy filtrze „pasujące / wszystkie”), karty w kolejności z serwera. Pusta kolumna: „Przeciągnij tu kartę.”, przy

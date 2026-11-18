@@ -53,6 +53,18 @@ export const boardQuerySchema = z.object({
     .transform((v) => v === '1'),
 });
 
+/** Widok tablicy w adresie: wyszukiwarka, „Tylko moje zadania” i otwarte zadanie (`?task=` z powiadomienia). */
+export const boardViewSchema = z.object({
+  search: z.string().trim().max(TASK_TITLE_MAX).default(''),
+  // W adresie `mine=true` (tak zapisuje useListParams); `mine=1` z ręcznie wpisanego adresu też działa.
+  mine: z
+    .enum(['0', '1', 'false', 'true'])
+    .optional()
+    .transform((v) => v === '1' || v === 'true'),
+  task: addressNumber.optional(),
+});
+export type BoardView = z.output<typeof boardViewSchema>;
+
 export type ProjectInput = z.input<typeof projectSchema>;
 export type ProjectData = z.output<typeof projectSchema>;
 export type ProjectDeleteInput = z.output<typeof projectDeleteSchema>;

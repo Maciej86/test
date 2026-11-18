@@ -154,5 +154,7 @@
   "assignee_not_allowed": "Tej osoby nie można przypisać: nie należy do projektu albo jej konto jest w archiwum.",
   "member_not_allowed": "Członkiem projektu może być tylko pracownik, którego konto nie jest w archiwum.",
   "due_in_past": "Termin nie może być wcześniejszy niż dziś.",
-  "before_task_invalid": "Nie można postawić karty w tym miejscu. Odśwież tablicę i spróbuj ponownie."
+  "before_task_invalid": "Nie można postawić karty w tym miejscu. Odśwież tablicę i spróbuj ponownie.",
+  "no_access": "Nie masz dostępu do tego projektu albo projekt został usunięty.",
+  "back_to_dashboard": "Wróć na Pulpit"
 }

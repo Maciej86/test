@@ -192,7 +192,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   **Uwaga:** `NavMenu` (i menu makiety) rozwija grupę, gdy bieżąca pozycja dojdzie do niej później (projekty
   przychodzą z serwera po pierwszym wyświetleniu menu); `TasksHomePage` dla `tasks-home`.
 
-- [ ] **14. Tablica projektu (front).** Pliki `frontend/src/modules/tasks/TaskBoardPage.tsx`,
+- [x] **14. Tablica projektu (front).** Pliki `frontend/src/modules/tasks/TaskBoardPage.tsx`,
   `components/BoardColumn.tsx`, `components/TaskCard.tsx`, `components/PersonAvatar.tsx`, `components/BoardHeader.tsx`
   (każdy plik poniżej ok. 250 linii). Układ z makiety (`TasksMockup.tsx`, `TaskCard.tsx`). Testy
   (`renderWithProviders`, `api` podmienione):
@@ -201,7 +201,7 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
   - nagłówek z liczbą otwartych i po terminie; karta: termin czerwony po czasie, żółty dziś i jutro, „Zrealizowane
     DD.MM.RRRR”, „+N” przy 4 osobach, szare kółko osoby z archiwum, kropka urlopu z podpowiedzią dat, pasek przy
     moim zadaniu;
-  - wyszukiwarka i „Tylko moje” w adresie (`?search=…&mine=1`), liczniki „pasujące / wszystkie”, „Brak pasujących
+  - wyszukiwarka i „Tylko moje” w adresie (`?search=…&mine=true`), liczniki „pasujące / wszystkie”, „Brak pasujących
     zadań.”; „Pokaż starsze zrealizowane (N)” pobiera z `oldDone=1`;
   - „⋮ → Przenieś do” woła `useMoveTask` z `beforeTaskId: null`; przeciąganie przez `@dnd-kit` (test logiki
     `dropTarget(...)` w osobnej funkcji `components/boardDrop.ts`: z miejsca upuszczenia wylicza `column` i
@@ -209,6 +209,10 @@ podgląd zadania 540 px; teksty tylko z `tasks.json`; kolory z motywu; funkcje s
     upuszczeniu);
   - na telefonie (`useMediaQuery` podmienione) przełącznik kolumn z liczbami, domyślnie „W toku”;
   - `?task=<id>` otwiera podgląd; nieznany numer → dymek „Nie znaleziono zadania.” → `npm run check`.
+
+  **Uwaga:** otwieranie podglądu z `?task=` i dymek o nieznanym zadaniu sprawdza krok 15 (tam powstaje podgląd);
+  „Tylko moje” zapisuje się w adresie jako `mine=true`; logika przeciągania w `components/boardDrop.ts`
+  (`dragTarget`, `placementOf`) i `boardMove.ts` (`moveInBoard`).
 
 - [ ] **15. Okno nowego zadania, podgląd, usunięcie (front).** Pliki `components/TaskFields.tsx`,
   `components/TaskFormModal.tsx`, `components/TaskDrawer.tsx` (`size={540}`), `components/ArchiveTaskModal.tsx`

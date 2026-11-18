@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { boardQuerySchema, newTaskSchema, projectDeleteSchema, projectSchema, taskMoveSchema, taskSchema } from '../tasks';
+import { boardQuerySchema, boardViewSchema, newTaskSchema, projectDeleteSchema, projectSchema, taskMoveSchema, taskSchema } from '../tasks';
 import { textRange } from '../fields';
 import { TASK_COLUMNS } from '../../constants/tasks';
 
@@ -89,5 +89,13 @@ describe('tasks schemas', () => {
     expect(boardQuerySchema.parse({}).oldDone).toBe(false);
     expect(boardQuerySchema.parse({ oldDone: '1' }).oldDone).toBe(true);
     expect(boardQuerySchema.safeParse({ oldDone: '2' }).success).toBe(false);
+  });
+
+  it('boardViewSchema: search, only mine and the task from the address', () => {
+    expect(boardViewSchema.parse({})).toEqual({ search: '', mine: false, task: undefined });
+    expect(boardViewSchema.parse({ search: ' ulotki ', mine: '1', task: '40' })).toEqual({ search: 'ulotki', mine: true, task: 40 });
+    expect(boardViewSchema.safeParse({ task: '1e3' }).success).toBe(false);
+    expect(boardViewSchema.parse({ mine: 'true' }).mine).toBe(true);
+    expect(boardViewSchema.safeParse({ mine: 'yes' }).success).toBe(false);
   });
 });
