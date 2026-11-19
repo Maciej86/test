@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.44
 
-**Następny krok:** Moduł Historia zmian, makieta (`/stepkit:dalej`).
+**Następny krok:** Moduł Historia zmian, pytania: użytkownik odpowiada na 9 pytań makiety (`docs/modules/activity-log/QUESTIONS.md`).
 
 ## Start aplikacji
 
@@ -29,7 +29,7 @@
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | zrobiony | zamknięcie | my-leave |
 | 10 | Zadania | tasks | zrobiony | zamknięcie | employees, notifications |
-| 11 | Historia zmian | activity-log | czeka | makieta | employees, my-leave, leave-requests, tasks |
+| 11 | Historia zmian | activity-log | w toku | pytania | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
 | 13 | Moje konto | my-account | czeka | makieta | login |
 | 14 | Pulpit | dashboard | czeka | makieta | my-leave, leave-requests, tasks |
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-19: Historia zmian: makieta (dziennik pogrupowany po dniach, wpis rozwija się z „przed → po” i przyciskiem „Otwórz”, filtry: wyszukiwarka, obszar, kto zmienił, daty od–do, wpis usuniętego projektu, telefon); 9 pytań.
 - 2026-11-19: Poprawka: klik w wiersz Wniosków urlopowych zaraz po wyszukaniu gubił wyszukiwanie (router zmienia adres przed przerysowaniem ekranu); filtry czytane w chwili kliknięcia (`useCurrentSearch`).
 - 2026-11-19: Moduł Zadania zrobiony (część 2, komentarze, potwierdzona przez użytkownika: „działa”).
 - 2026-11-19: Zadania, część 2: 9 prób nadużyć (prawdziwa baza) odpartych, sprawdzenie w przeglądarce trzech ról i telefonu; `npm run check` i 43 testy e2e zielone.
