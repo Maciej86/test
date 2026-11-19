@@ -13,14 +13,18 @@ export type { ExtraScreen };
  * Ekran makiety dla każdej pozycji nawigacji (klucz = NavItem.key).
  * Po zamknięciu modułu: zamień wpis na () => <Done labelKey="<etykieta z nawigacji>" /> (zob. mockups.md), a pliki ekranu zostaw.
  */
+const TASKS_DONE: Record<string, ComponentType> = Object.fromEntries(
+  Object.keys(TASK_SCREENS).map((key) => [key, () => <Done labelKey={key === 'task-projects' ? 'common.nav.task_projects' : 'common.nav.tasks'} />]),
+);
+
 export const SCREENS: Record<string, ComponentType> = {
   dashboard: DashboardMockup,
   // Moduł Moje urlopy zrobiony; makieta zostaje w modules/my-leave/MyLeaveMockup.tsx.
   'my-leave': () => <Done labelKey="common.nav.my_leave" />,
   // Moduł Wnioski urlopowe zrobiony; makieta zostaje w modules/leave-requests/LeaveRequestsMockup.tsx.
   'leave-requests': () => <Done labelKey="common.nav.leave_requests" />,
-  // Zadania: grupa z projektami (modules/tasks/navigation.tsx).
-  ...TASK_SCREENS,
+  // Moduł Zadania zrobiony; makieta zostaje w modules/tasks/ (projekty w menu dokłada withTaskProjects).
+  ...TASKS_DONE,
   // Moduł Pracownicy zrobiony; makieta zostaje w modules/employees/EmployeesMockup.tsx.
   'employees': () => <Done labelKey="common.nav.employees" />,
   // Moduł Typy urlopów zrobiony; makieta zostaje w modules/leave-types/LeaveTypesMockup.tsx.

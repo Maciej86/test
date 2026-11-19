@@ -1,6 +1,6 @@
 # Spec: Zadania (ogólny)
 
-**Data:** 2026-11-18 · **Status:** do akceptacji
+**Data:** 2026-11-18 · **Status:** zaakceptowany; moduł zrobiony 2026-11-19
 **Podstawa:** `QUESTIONS.md` (odpowiedzi 2026-11-18), `SPEC-GENERAL.md`, makieta `mockups/src/modules/tasks/`
 
 ## Cel
