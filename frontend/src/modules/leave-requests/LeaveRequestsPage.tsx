@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Paper, Stack } from '@mantine/core';
 import { CalendarCheck, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { formatDate, leaveRequestsListQuerySchema, type LeaveRequestListItem } from '@app/shared';
 import { DataState } from '../../common/DataState';
 import { EmptyState } from '../../common/EmptyState';
@@ -10,6 +10,7 @@ import { ListPagination } from '../../common/ListPagination';
 import { PageHeader } from '../../common/PageHeader';
 import { apiErrorKey } from '../../core/api/client';
 import { notify } from '../../core/notify';
+import { useCurrentSearch } from '../../core/routes/useCurrentSearch';
 import { useListParams } from '../../core/useListParams';
 import { LeaveRequestsFilters } from './components/LeaveRequestsFilters';
 import { LeaveRequestCards, LeaveRequestsTable, type RowActions } from './components/LeaveRequestsTable';
@@ -37,7 +38,8 @@ const DecisionWindow = ({ dialog, onClose, onDone }: { dialog: DecisionDialog; o
 export const LeaveRequestsPage = () => {
   const { t } = useTranslation('leave-requests');
   const navigate = useNavigate();
-  const location = useLocation();
+  // Filtry listy czytane w chwili kliknięcia: klik zaraz po wyszukaniu zabiera już nowe wyszukiwanie.
+  const currentSearch = useCurrentSearch();
   const [params, setParams] = useListParams(leaveRequestsListQuerySchema, LIST_DEFAULTS);
   const requests = useLeaveRequests(params);
   const [dialog, setDialog] = useState<DecisionDialog | null>(null);
@@ -45,13 +47,14 @@ export const LeaveRequestsPage = () => {
   const { id: rawId } = useParams();
   const id = rawId !== undefined && /^[1-9]\d{0,9}$/.test(rawId) ? Number(rawId) : null;
   const details = useLeaveRequest(id);
-  const backToList = () => navigate(`${LIST_PATH}${location.search}`);
+  const backToList = () => navigate(`${LIST_PATH}${currentSearch()}`);
   const missing = rawId !== undefined && (id === null || apiErrorKey(details.error) === 'server.not_found');
   useEffect(() => {
     if (!missing) return;
     notify.error(t('not_found'));
-    navigate(`${LIST_PATH}${location.search}`, { replace: true });
-  }, [missing, navigate, location.search, t]);
+    navigate(`${LIST_PATH}${currentSearch()}`, { replace: true });
+    // Filtry czytane w chwili przejścia (currentSearch) nie są powodem efektu, więc ich tu nie ma.
+  }, [missing, navigate, t]);
   const data = requests.data;
   const filtered = params.status !== 'pending' || params.search !== '' || params.leaveTypeId !== undefined;
   // Ostatni wniosek ze strony 2+ rozpatrzony: pusta strona to nie „Wszystko rozpatrzone”, tylko powrót na stronę 1.
@@ -61,7 +64,7 @@ export const LeaveRequestsPage = () => {
   }, [emptyLaterPage, setParams]);
 
   const actions: RowActions = {
-    onDetails: (r) => navigate(`${LIST_PATH}/${r.id}${location.search}`),
+    onDetails: (r) => navigate(`${LIST_PATH}/${r.id}${currentSearch()}`),
     onApprove: (request) => setDialog({ kind: 'approve', request }),
     onReject: (request) => setDialog({ kind: 'reject', request }),
     onCancel: (request) => setDialog({ kind: 'cancel', request }),
