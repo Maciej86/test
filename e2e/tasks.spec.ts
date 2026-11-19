@@ -349,6 +349,80 @@ test.describe('abuse', () => {
     await page.request.delete(`/api/tasks/projects/${s.projectId}`, { data: { confirmName: `E2E Nadużycia ${String(s.projectId)}x` } });
     await s.cleanup();
   });
+
+  // Część 2: komentarze.
+  interface Comment { id: number; authorName: string; text: string; editedAt: string | null; canEdit: boolean; canDelete: boolean }
+  const commentsOf = async (as: Page, taskId: number) => (await (await as.request.get(`/api/tasks/${taskId}/comments`)).json()) as Comment[];
+  const addComment = async (as: Page, taskId: number, data: object) => {
+    const res = await as.request.post(`/api/tasks/${taskId}/comments`, { data });
+    expect(res.status()).toBe(201);
+    return ((await res.json()) as { id: number }).id;
+  };
+
+  test('komentarze: osoba spoza projektu i zadanie w archiwum → 404; cudzy komentarz → 403; autor i daty z serwera', async ({ page, browser }) => {
+    test.setTimeout(90_000);
+    const s = await setup(page, browser);
+    const taskId = await s.newTask(s.member, s.projectId, 'Zadanie z komentarzem');
+    // Podrobione pola: autor, data i „edytowany” zawsze z serwera.
+    const commentId = await addComment(s.member, taskId, { text: 'Mój komentarz', userId: 1, authorName: 'Prezes', editedAt: '2020-01-01', createdAt: '2020-01-01' });
+    const [saved] = await commentsOf(s.member, taskId);
+    expect(saved).toMatchObject({ id: commentId, text: 'Mój komentarz', editedAt: null, canEdit: true, canDelete: true });
+    expect(saved!.authorName).toMatch(/^Ala Członek/);
+    // Osoba spoza projektu: odczyt, dodanie, poprawka i usunięcie → 404, komentarz bez zmian.
+    expect((await s.outsider.request.get(`/api/tasks/${taskId}/comments`)).status()).toBe(404);
+    expect((await s.outsider.request.post(`/api/tasks/${taskId}/comments`, { data: { text: 'Obcy' } })).status()).toBe(404);
+    expect((await s.outsider.request.put(`/api/tasks/comments/${commentId}`, { data: { text: 'Przejęty' } })).status()).toBe(404);
+    expect((await s.outsider.request.delete(`/api/tasks/comments/${commentId}`)).status()).toBe(404);
+    // Ten sam pracownik dodany do projektu: widzi, ale cudzego nie poprawi ani nie usunie (403); administrator nie poprawi.
+    const name = (await (await page.request.get('/api/tasks/projects')).json() as { items: { id: number; name: string }[] }).items.find((p) => p.id === s.projectId)!.name;
+    expect((await page.request.put(`/api/tasks/projects/${s.projectId}`, { data: { name, memberIds: [s.memberId, s.outsiderId] } })).status()).toBe(200);
+    expect((await commentsOf(s.outsider, taskId))[0]).toMatchObject({ canEdit: false, canDelete: false });
+    expect((await s.outsider.request.put(`/api/tasks/comments/${commentId}`, { data: { text: 'Przejęty' } })).status()).toBe(403);
+    expect((await s.outsider.request.delete(`/api/tasks/comments/${commentId}`)).status()).toBe(403);
+    expect((await page.request.put(`/api/tasks/comments/${commentId}`, { data: { text: 'Poprawiony przez szefa' } })).status()).toBe(403);
+    expect((await commentsOf(s.member, taskId))[0]).toMatchObject({ text: 'Mój komentarz', editedAt: null });
+    // Zadanie w archiwum: komentarze niedostępne dla wszystkich (404), także dla autora.
+    expect((await s.member.request.post(`/api/tasks/${taskId}/archive`)).status()).toBe(200);
+    expect((await s.member.request.get(`/api/tasks/${taskId}/comments`)).status()).toBe(404);
+    expect((await s.member.request.post(`/api/tasks/${taskId}/comments`, { data: { text: 'Po archiwum' } })).status()).toBe(404);
+    expect((await s.member.request.put(`/api/tasks/comments/${commentId}`, { data: { text: 'Po archiwum' } })).status()).toBe(404);
+    expect((await page.request.delete(`/api/tasks/comments/${commentId}`)).status()).toBe(404);
+    // Usunięcie projektu: zadania z komentarzami znikają na stałe.
+    await s.cleanup();
+    expect((await page.request.get(`/api/tasks/${taskId}/comments`)).status()).toBe(404);
+  });
+
+  test('komentarze: kilka zmian naraz bez błędu serwera; skrypt widać jako tekst; za długi → 400 przy polu', async ({ page, browser }) => {
+    test.setTimeout(90_000);
+    const s = await setup(page, browser);
+    const taskId = await s.newTask(s.member, s.projectId, 'Zadanie naraz', { assigneeIds: [s.memberId] });
+    // Poprawka i usunięcie naraz (autor i administrator): bez 500, na końcu komentarza nie ma.
+    const first = await addComment(s.member, taskId, { text: 'Pierwszy' });
+    const results = await Promise.all([
+      s.member.request.put(`/api/tasks/comments/${first}`, { data: { text: 'Poprawiony' } }),
+      page.request.delete(`/api/tasks/comments/${first}`),
+      s.member.request.delete(`/api/tasks/comments/${first}`),
+      page.request.post(`/api/tasks/${taskId}/archive`),
+    ]);
+    for (const r of results) expect([200, 404]).toContain(r.status());
+    // Dwa usunięcia tego samego komentarza: najwyżej jedno się udaje (drugie widzi, że go już nie ma).
+    expect([results[1]!, results[2]!].filter((r) => r.status() === 200).length).toBeLessThanOrEqual(1);
+    const again = await s.newTask(s.member, s.projectId, 'Zadanie skrypt');
+    // Kilka komentarzy naraz: wszystkie zapisane.
+    await Promise.all(Array.from({ length: 5 }, (_, i) => addComment(i % 2 ? page : s.member, again, { text: `Naraz ${i}` })));
+    expect(await commentsOf(s.member, again)).toHaveLength(5);
+    // Złe dane: za długi → 400 przy polu; skrypt widać jako zwykły tekst.
+    const tooLong = await s.member.request.post(`/api/tasks/${again}/comments`, { data: { text: 'a'.repeat(2001) } });
+    expect(tooLong.status()).toBe(400);
+    expect(((await tooLong.json()) as { error: { fields: Record<string, string> } }).error.fields).toEqual({ text: 'validation.too_long' });
+    await addComment(s.member, again, { text: '<script>alert(1)</script>' });
+    let dialogs = 0;
+    s.member.on('dialog', async (d) => { dialogs += 1; await d.dismiss(); });
+    await s.member.goto(`/admin/tasks/${s.projectId}?task=${again}`);
+    await expect(s.member.getByText('<script>alert(1)</script>')).toBeVisible();
+    expect(dialogs).toBe(0);
+    await s.cleanup();
+  });
 });
 
 // Część 2 (TESTS-2.md): Jan komentuje zadanie Piotra, Piotr dostaje powiadomienie i widzi komentarz bez przycisków

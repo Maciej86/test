@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.44
 
-**Następny krok:** Moduł Zadania, część 2/2 (komentarze): testy (próby nadużyć, przeglądarka, potem użytkownik przechodzi `TESTS-2.md`). Poprawka z `FIXES.md` czeka na po module Zadania.
+**Następny krok:** Moduł Zadania, część 2/2 (komentarze): użytkownik przechodzi `TESTS-2.md` w przeglądarce i potwierdza „działa”; potem zamknięcie modułu. Poprawka z `FIXES.md` czeka na po module Zadania.
 
 ## Start aplikacji
 
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-19: Zadania, część 2: 9 prób nadużyć (prawdziwa baza) odpartych, sprawdzenie w przeglądarce trzech ról i telefonu; `npm run check` i 43 testy e2e zielone.
 - 2026-11-19: Zadania, część 2: zbudowana (kroki 0–10), przegląd kodu z poprawkami (komunikat i odświeżenie przy komentarzu do usuniętego zadania, kolejność blokad, fragment powiadomienia bez przecinania emotikon); `npm run check` i 41 testów e2e zielone.
 - 2026-11-19: Zadania: spec części 2 zaakceptowany (`SPEC-2.md`: komentarze w podglądzie, poprawia autor, usuwa autor albo administrator, licznik na karcie, powiadomienie `task_comment` dla przypisanych); napisane `PLAN-2.md` (11 kroków) i `TESTS-2.md`.
 - 2026-11-19: Zadania, część 1 (projekty i tablice) gotowa, potwierdzona przez użytkownika („działa”).

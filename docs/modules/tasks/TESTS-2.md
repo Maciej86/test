@@ -30,4 +30,14 @@ w trybie prywatnym).
 
 ## Próby nadużyć
 
-(uzupełniane na etapie testy według `abuse.md`)
+Testy automatyczne w `e2e/tasks.spec.ts`, blok `abuse` (prawdziwa baza), 2026-11-19:
+- Pracownik spoza projektu czyta, dodaje, poprawia i usuwa komentarze przez adres → 404, komentarz bez zmian: przeszła
+- Pracownik z projektu poprawia albo usuwa cudzy komentarz → 403; administrator poprawia cudzy → 403: przeszła
+- Podrobione pola (autor, „Prezes”, daty, „edytowany”) → autor i daty z serwera: przeszła
+- Zadanie w archiwum: odczyt, dodanie, poprawka, usunięcie komentarza → 404 (także autor i administrator): przeszła
+- Usunięcie projektu usuwa zadania razem z komentarzami: przeszła
+- Poprawka, dwa usunięcia i archiwizacja zadania naraz → bez błędu serwera, najwyżej jedno usunięcie: przeszła
+- Pięć komentarzy naraz od dwóch osób → wszystkie zapisane: przeszła
+- `<script>alert(1)</script>` w komentarzu → widać jako tekst, bez okienka; 2001 znaków → 400 przy polu: przeszła
+- Komentarz do zadania usuniętego w międzyczasie → wcześniej niejasny dymek; naprawiona (przegląd kodu): „Nie znaleziono
+  zadania.” i odświeżona tablica
