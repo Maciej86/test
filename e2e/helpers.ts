@@ -1,6 +1,6 @@
 import { expect, type Browser, type Page } from '@playwright/test';
 
-// Wspólne kroki testów w przeglądarce. Konto administratora i hasło zakłada e2e/global-setup.ts.
+// Wspólne kroki testów w przeglądarce. Stałe konta zakłada e2e/global-setup.ts, hasło E2E_PASSWORD jest w .env.
 export const ADMIN = 'e2e.admin@test.local';
 export const password = () => process.env.E2E_PASSWORD!;
 

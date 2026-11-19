@@ -46,10 +46,16 @@ logowaniem). W projekcie ten plik jest w `docs/conventions/`.
   się od `/account` albo `/admin`, bez `//`, `\`, `..`, zakodowanych `%2e`/`%2f`/`%5c` ani znaków sterujących;
   inaczej `ROLE_HOME[user.role]`. Konto z hasłem tymczasowym najpierw ustawia własne hasło (bez powrotu pod `next`).
   Własnego sprawdzania adresu nie piszesz.
+- **Konta do testów E2E** (zasady w `CONVENTIONS.md`, „Konta i dane w E2E”): ten moduł tworzy `e2e/global-setup.ts`
+  i `e2e/global-teardown.ts` (połączenie przez `mysql2`, hasło przez `bcryptjs`, oba są w backendzie) i dopisuje
+  `globalSetup: './global-setup.ts', globalTeardown: './global-teardown.ts'` w `e2e/playwright.config.ts`.
+  `E2E_PASSWORD` dopisujesz do `.env` losowe, poleceniem, które go nie wyświetla (jak `JWT_SECRET`).
 
 ## Lista kontrolna
 
 - [ ] `POST /api/auth/login` ma `loginLimiter` i test na 429
+- [ ] stałe konta E2E po jednym na rolę z `global-setup.ts`; dwa przebiegi `npm run test:e2e` pod rząd nie dokładają
+  ani jednego konta
 - [ ] `authenticate` czyta konto z bazy przy każdym żądaniu; testy: konto w archiwum → 401, zmieniona rola → nowa rola
 - [ ] zmiana hasła podnosi `token_version`; stary token → 401
 - [ ] niezalogowany na `/admin/<cokolwiek>` → `/login?next=…`, po zalogowaniu powrót tam; `?next=https://obca.pl`

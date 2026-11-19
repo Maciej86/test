@@ -26,10 +26,19 @@ describe('seedE2eAccounts', () => {
     expect(await verifyPassword('Test-123', String(admin!.passwordHash))).toBe(true);
   });
 
-  it('removes temporary accounts, leave types and contract types added by browser tests', async () => {
+  it('refuses to clean up in production', async () => {
+    vi.mocked(pool.query).mockClear();
+    await expect(removeTemporaryData({ NODE_ENV: 'production' })).rejects.toThrow();
+    expect(pool.query).not.toHaveBeenCalled();
+  });
+
+  it('removes temporary accounts, projects, leave types and contract types added by browser tests', async () => {
+    vi.mocked(pool.query).mockClear();
     vi.mocked(pool.query).mockResolvedValue([{}] as never);
-    await removeTemporaryData();
+    await removeTemporaryData({ NODE_ENV: 'development' });
     expect(vi.mocked(pool.query).mock.calls).toEqual([
+      // Projekty testowe znikają razem z zadaniami i członkami (CASCADE).
+      ['DELETE FROM projects WHERE name LIKE ?', ['E2E %']],
       // Wnioski mają RESTRICT do kont i typów, więc znikają pierwsze (także wnioski stałego konta e2e pracownika).
       [
         'DELETE FROM leave_requests WHERE user_id IN (SELECT id FROM users WHERE login LIKE ? OR login = ?) OR leave_type_id IN (SELECT id FROM leave_types WHERE name LIKE ?)',

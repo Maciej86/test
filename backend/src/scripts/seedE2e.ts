@@ -1,5 +1,6 @@
-// Konta do testów w przeglądarce (npm run test:e2e). Woła je e2e/global-setup.ts z losowym hasłem w E2E_PASSWORD,
-// za każdym razem od nowa (pracownik znów ma hasło tymczasowe). Nigdy na serwerze produkcyjnym.
+// Konta do testów w przeglądarce (npm run test:e2e). Woła je e2e/global-setup.ts z hasłem E2E_PASSWORD z pliku .env,
+// za każdym razem od nowa (pracownik znów ma hasło tymczasowe). Z `--cleanup` (npm run cleanup:e2e, woła je
+// e2e/global-teardown.ts) tylko sprząta dane testowe. Nigdy na serwerze produkcyjnym.
 import { pathToFileURL } from 'node:url';
 import type { Role } from '@app/shared';
 import { hashPassword } from '../auth/password';
@@ -8,6 +9,8 @@ import { pool } from '../db/pool';
 export const E2E_ACCOUNTS = { admin: 'e2e.admin@test.local', employee: 'e2e.employee@test.local' } as const;
 /** Konta zakładane przez testy w przeglądarce (np. e2e.tmp.1731600000000@test.local); usuwane przy każdym seedzie. */
 export const E2E_TEMP_LOGIN_LIKE = 'e2e.tmp.%@test.local';
+/** Projekty dodawane przez testy w przeglądarce (np. „E2E Projekt 1731600000000”); zadania znikają z nimi (CASCADE). */
+export const E2E_TEMP_PROJECT_LIKE = 'E2E %';
 /** Typy urlopów dodawane przez testy w przeglądarce (np. „E2E 1731600000000”); bez wniosków, więc można je usunąć. */
 export const E2E_TEMP_LEAVE_TYPE_LIKE = 'E2E %';
 /** Typy umów dodawane przez testy w przeglądarce (np. „E2E 1731600000000”). */
@@ -44,10 +47,12 @@ const saveToDb = async (account: E2eAccount): Promise<void> => {
 };
 
 /**
- * Porządek przed testami: bez wniosków, kont, typów urlopów i typów umów z poprzednich uruchomień (pule znikają z kontami,
+ * Porządek przed testami i po nich: bez projektów, wniosków, kont, typów urlopów i typów umów z poprzednich uruchomień (pule znikają z kontami,
  * CASCADE). Typ umowy ma u pracowników RESTRICT, więc najpierw konta przestają go wskazywać.
  */
-export const removeTemporaryData = async (): Promise<void> => {
+export const removeTemporaryData = async (env: Record<string, string | undefined>): Promise<void> => {
+  if (env.NODE_ENV === 'production') throw new Error('Dane testowe e2e nie są sprzątane na serwerze produkcyjnym.');
+  await pool.query('DELETE FROM projects WHERE name LIKE ?', [E2E_TEMP_PROJECT_LIKE]);
   // Wnioski mają RESTRICT do kont i typów, więc znikają pierwsze; stałe konto e2e pracownika zaczyna bez wniosków.
   await pool.query(
     'DELETE FROM leave_requests WHERE user_id IN (SELECT id FROM users WHERE login LIKE ? OR login = ?) OR leave_type_id IN (SELECT id FROM leave_types WHERE name LIKE ?)',
@@ -83,9 +88,13 @@ export const seedE2eNotifications = async (): Promise<void> => {
 };
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  removeTemporaryData()
-    .then(() => seedE2eAccounts(process.env, saveToDb))
-    .then(() => seedE2eNotifications())
+  const cleanupOnly = process.argv.includes('--cleanup');
+  removeTemporaryData(process.env)
+    .then(async () => {
+      if (cleanupOnly) return;
+      await seedE2eAccounts(process.env, saveToDb);
+      await seedE2eNotifications();
+    })
     .then(() => pool.end())
     .catch(async (error: unknown) => {
       console.error(error);

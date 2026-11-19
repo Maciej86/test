@@ -41,7 +41,7 @@ Czy stan może zejść poniżej zera; ile poziomów miejsc ma magazyn i jak się
 półka; jeden poziom, gdy firma nie szuka towaru po półkach); czy przyjęcie zawsze idzie z fakturą zakupu, czy też
 bez (zwrot od klienta, przyjęcie z produkcji); czy jedną fakturę można przyjmować w częściach; czy magazyn liczy także
 wartość towaru (wtedy metoda wyceny, np. średnia albo FIFO, „warto potwierdzić z księgową”); czy drukować etykiety
-z kodem miejsca (kod kreskowy albo QR to biblioteka spoza listy, więc za zgodą).
+z kodem miejsca (kod kreskowy albo QR: `bwip-js` z listy).
 
 ## Lista kontrolna
 

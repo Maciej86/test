@@ -1,6 +1,6 @@
 # Stan projektu: test
 
-**Wersja stepkit:** 0.1.40
+**Wersja stepkit:** 0.1.44
 
 **Następny krok:** Moduł Zadania, część 1/2: użytkownik przechodzi `docs/modules/tasks/TESTS-1.md` i pisze „działa”; potem zamknięcie części 1 i poprawka z `FIXES.md` (`/stepkit:dalej`).
 
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-19: Aktualizacja stepkit do 0.1.44: hasło stałych kont testowych `E2E_PASSWORD` w `.env` (losowe), sprzątanie po testach w przeglądarce (`e2e/global-teardown.ts`, `npm run cleanup:e2e -w @app/backend`) także projektów „E2E …”; konta tymczasowe zostają tam, gdzie test potrzebuje świeżego pracownika (pula, wnioski, osoby w projekcie), i znikają po testach; aktualne `docs/CONVENTIONS.md` i `docs/conventions/`. Dwa przebiegi e2e (40 testów) zielone, potem w bazie tylko stałe konta testowe.
 - 2026-11-19: Zadania: znacznik „Zakończone” (prośba użytkownika): karta zostaje w kolumnie, wyszarzona, z plakietką; poprawki przeciągania zgłoszone przy testach (pętla przy nagłówku, ramka pod kursorem, kopia karty bez rozciągania i bez lotu do starej kolumny).
 - 2026-11-18: Zadania, część 1: zbudowana (kroki 0–19), przegląd kodu z poprawkami (blokada projektu przy zapisach, tablica zostaje przy nieudanym odświeżeniu, zapis tylko zmienionych pól); `npm run check` i 33 testy e2e zielone.
 - 2026-11-18: Zadania: spec części 1 zaakceptowany; napisane `PLAN-1.md` (20 kroków) i `TESTS-1.md`.
