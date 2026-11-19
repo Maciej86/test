@@ -7,7 +7,7 @@ import { TaskDrawer } from '../components/TaskDrawer';
 
 const task: BoardTask = {
   id: 7, title: 'Oferta dla hurtowni', description: null, dueDate: '2026-11-10', column: 'in_progress', position: 1, completedAt: null, finishedAt: null,
-  createdByName: 'Anna Nowak', createdAt: '2026-11-05T09:00:00.000Z', assigneeIds: [5, 8], leaves: [],
+  createdByName: 'Anna Nowak', createdAt: '2026-11-05T09:00:00.000Z', assigneeIds: [5, 8], leaves: [], commentCount: 0,
 };
 const board: BoardResponse = {
   project: { id: 9, name: 'Marketing' },
@@ -20,6 +20,10 @@ const board: BoardResponse = {
   leaves: [],
 };
 
+// Komentarze pod formularzem (część 2) pobierają się same; tu bez komentarzy.
+beforeEach(() => {
+  vi.spyOn(api, 'get').mockResolvedValue({ data: [] });
+});
 afterEach(() => vi.restoreAllMocks());
 
 describe('TaskDrawer', () => {
@@ -50,6 +54,22 @@ describe('TaskDrawer', () => {
     expect(await screen.findByText('Ewa Mazur')).toBeInTheDocument();
     fireEvent.click(document.querySelector('.mantine-MultiSelect-inputField') as HTMLElement);
     expect(screen.queryByRole('option', { name: /Ewa Mazur/ })).not.toBeInTheDocument();
+  });
+
+  it('comments sit under the task form and are saved apart from it (adding one does not save the task)', async () => {
+    const put = vi.spyOn(api, 'put').mockResolvedValue({ data: { ok: true } });
+    const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { id: 12 } });
+    const onClose = vi.fn();
+    renderWithProviders(<TaskDrawer projectId={9} board={board} task={task} onClose={onClose} onArchive={vi.fn()} />);
+    expect(await screen.findByText('Nikt jeszcze nie skomentował tego zadania.')).toBeInTheDocument();
+    expect(api.get).toHaveBeenCalledWith('/tasks/7/comments');
+    const comment = screen.getByRole('textbox', { name: 'Napisz komentarz' });
+    expect(comment.closest('form')).toBeNull();
+    fireEvent.change(comment, { target: { value: 'Tonery' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Dodaj komentarz' }));
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/tasks/7/comments', { text: 'Tonery' }));
+    expect(put).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it('delete calls onArchive with the task', async () => {

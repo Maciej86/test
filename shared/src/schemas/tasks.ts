@@ -6,6 +6,8 @@ import {
   PROJECT_NAME_MIN,
   TASK_ASSIGNEES_MAX,
   TASK_COLUMNS,
+  TASK_COMMENT_EXCERPT,
+  TASK_COMMENT_MAX,
   TASK_DESCRIPTION_MAX,
   TASK_MESSAGES,
   TASK_TITLE_MAX,
@@ -48,6 +50,17 @@ export const taskMoveSchema = z.object({
 /** Znacznik „Zakończone” (POST /api/tasks/:id/finish). */
 export const taskFinishSchema = z.object({ finished: z.boolean({ error: 'validation.required' }) });
 export type TaskFinishInput = z.output<typeof taskFinishSchema>;
+
+/** Komentarz do zadania (dodanie i poprawka); autor zawsze z sesji, nie z treści. */
+export const commentSchema = z.object({ text: text(TASK_COMMENT_MAX) });
+export type CommentInput = z.input<typeof commentSchema>;
+export type CommentData = z.output<typeof commentSchema>;
+
+/** Początek komentarza do powiadomienia: jedna linia, najwyżej `max` znaków razem z „…”. */
+export const commentExcerpt = (value: string, max = TASK_COMMENT_EXCERPT): string => {
+  const line = value.replace(/\s+/g, ' ').trim();
+  return line.length <= max ? line : `${line.slice(0, max - 1).trimEnd()}…`;
+};
 
 /** Parametry tablicy: `oldDone=1` dokłada zrealizowane starsze niż 30 dni. */
 export const boardQuerySchema = z.object({
@@ -138,6 +151,21 @@ export interface BoardTask {
   createdAt: string;
   assigneeIds: number[];
   leaves: TaskLeave[];
+  commentCount: number;
+}
+
+/** Komentarz w podglądzie zadania (GET /api/tasks/:taskId/comments); prawa liczy serwer. */
+export interface TaskComment {
+  id: number;
+  /** `null`, gdy konto autora usunięto na stałe (zostaje kopia nazwiska). */
+  authorId: number | null;
+  authorName: string;
+  authorArchived: boolean;
+  text: string;
+  createdAt: string;
+  editedAt: string | null;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
 /** Tablica projektu (GET /api/tasks/projects/:id/board). */

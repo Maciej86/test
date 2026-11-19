@@ -1,6 +1,6 @@
 import type { CSSProperties, HTMLAttributes, Ref } from 'react';
 import { ActionIcon, Avatar, Badge, Card, Group, Menu, Stack, Text, Tooltip } from '@mantine/core';
-import { CalendarDays, CheckCheck, EllipsisVertical, GripVertical, MoveRight } from 'lucide-react';
+import { CalendarDays, CheckCheck, EllipsisVertical, GripVertical, MessageSquare, MoveRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TASK_COLUMNS, formatDate, type BoardPerson, type BoardTask, type TaskColumn } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
@@ -85,19 +85,29 @@ export const TaskCard = ({ task, people, meId, drag, onOpen, onMove, onFinish, o
           {task.description && !done && <Text size="xs" c="dimmed" lineClamp={2}>{task.description}</Text>}
 
           <Group justify="space-between" wrap="nowrap" gap="xs">
-            {done && task.completedAt ? (
-              <Group gap={4} c="dimmed" wrap="nowrap">
-                <CheckCheck size={14} />
-                <Text size="xs" c="inherit">{t('completed_on', { date: formatDate(task.completedAt) })}</Text>
-              </Group>
-            ) : due && task.dueDate ? (
-              <Tooltip label={t(DUE_KEY[due], { date: formatDate(task.dueDate) })}>
-                <Group gap={4} c={DUE_COLOR[due]} wrap="nowrap" data-due={due}>
-                  <CalendarDays size={14} />
-                  <Text size="xs" c="inherit" fw={due === 'normal' ? 400 : 600}>{formatDate(task.dueDate)}</Text>
+            <Group gap="xs" wrap="nowrap">
+              {done && task.completedAt ? (
+                <Group gap={4} c="dimmed" wrap="nowrap">
+                  <CheckCheck size={14} />
+                  <Text size="xs" c="inherit">{t('completed_on', { date: formatDate(task.completedAt) })}</Text>
                 </Group>
-              </Tooltip>
-            ) : <span />}
+              ) : due && task.dueDate ? (
+                <Tooltip label={t(DUE_KEY[due], { date: formatDate(task.dueDate) })}>
+                  <Group gap={4} c={DUE_COLOR[due]} wrap="nowrap" data-due={due}>
+                    <CalendarDays size={14} />
+                    <Text size="xs" c="inherit" fw={due === 'normal' ? 400 : 600}>{formatDate(task.dueDate)}</Text>
+                  </Group>
+                </Tooltip>
+              ) : null}
+              {task.commentCount > 0 && (
+                <Tooltip label={t('comments_count', { count: task.commentCount })}>
+                  <Group gap={4} c="dimmed" wrap="nowrap" data-comments={task.commentCount}>
+                    <MessageSquare size={14} />
+                    <Text size="xs" c="inherit">{task.commentCount}</Text>
+                  </Group>
+                </Tooltip>
+              )}
+            </Group>
 
             {assigned.length === 0 ? (
               <Text size="xs" c="dimmed">{t('nobody')}</Text>

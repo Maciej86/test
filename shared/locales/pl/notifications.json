@@ -42,6 +42,10 @@
     "project_added": {
       "title": "Dodano Cię do projektu",
       "detail": "„{{project}}”"
+    },
+    "task_comment": {
+      "title": "Nowy komentarz do zadania",
+      "detail": "„{{task}}”: {{excerpt}}"
     }
   },
   "mockup_state": "Pokaż stan:",

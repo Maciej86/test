@@ -6,6 +6,7 @@ vi.mock('../../../db/transaction', () => ({ withTransaction: vi.fn(async (work: 
 vi.mock('../../../db/activityLog', async (orig) => ({ ...(await orig<object>()), logActivity: vi.fn() }));
 vi.mock('../../notifications/notifications.service', () => ({ notifyUsers: vi.fn() }));
 vi.mock('../../leave-requests/leave-requests.queries', () => ({ listApprovedLeaves: vi.fn() }));
+vi.mock('../comments.queries', () => ({ commentCounts: vi.fn() }));
 vi.mock('../tasks.queries', () => ({
   findVisibleProject: vi.fn(),
   boardPeople: vi.fn(),
@@ -25,6 +26,7 @@ vi.mock('../tasks.queries', () => ({
 }));
 
 const q = await import('../tasks.queries');
+const { commentCounts } = await import('../comments.queries');
 const { listApprovedLeaves } = await import('../../leave-requests/leave-requests.queries');
 const { notifyUsers } = await import('../../notifications/notifications.service');
 const { logActivity } = await import('../../../db/activityLog');
@@ -46,6 +48,7 @@ beforeEach(() => {
   vi.mocked(q.countOldDone).mockResolvedValue(2);
   vi.mocked(q.assigneesOf).mockResolvedValue(new Map());
   vi.mocked(listApprovedLeaves).mockResolvedValue([]);
+  vi.mocked(commentCounts).mockResolvedValue(new Map());
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -82,6 +85,14 @@ describe('board', () => {
     expect(q.boardTasks).toHaveBeenCalledWith(expect.anything(), 9, { includeOldDone: true, doneSince: expect.any(Date) });
     expect(q.countOldDone).not.toHaveBeenCalled();
     expect(all).toMatchObject({ oldDoneCount: 0 });
+  });
+
+  it('board tasks carry commentCount (0 when the task has no comments)', async () => {
+    vi.mocked(q.boardTasks).mockResolvedValue([row({ id: 7 }), row({ id: 8 })]);
+    vi.mocked(commentCounts).mockResolvedValue(new Map([[7, 2]]));
+    const board = await s.getBoard(9, jan, false);
+    expect(commentCounts).toHaveBeenCalledWith(expect.anything(), [7, 8]);
+    expect(board).toMatchObject({ tasks: [{ id: 7, commentCount: 2 }, { id: 8, commentCount: 0 }] });
   });
 
   it('board leaves: approved leaves of everyone on the board for the next 180 days (task form warning)', async () => {

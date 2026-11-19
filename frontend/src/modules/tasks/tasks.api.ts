@@ -2,11 +2,13 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import {
   TASK_BOARD_REFRESH_MS,
   type BoardResponse,
+  type CommentInput,
   type OrderDirection,
   type ProjectCandidate,
   type ProjectInput,
   type ProjectsResponse,
   type TaskInput,
+  type TaskComment,
   type TaskMoveInput,
 } from '@app/shared';
 import { api } from '../../core/api/client';
@@ -50,12 +52,17 @@ export const useBoard = (projectId: number, oldDone: boolean) => {
   });
 };
 
-/** Każda zmiana projektów i zadań odświeża wszystkie dane modułu (menu, listę projektów, tablice). */
-const useTasksMutation = <T, R = unknown>(fn: (input: T) => Promise<R>) => {
+/**
+ * Każda zmiana projektów i zadań odświeża wszystkie dane modułu (menu, listę projektów, tablice). `alsoOnError`:
+ * także po błędzie (np. komentarz usunięty w międzyczasie przez kogoś innego znika z listy).
+ */
+const useTasksMutation = <T, R = unknown>(fn: (input: T) => Promise<R>, { alsoOnError = false } = {}) => {
   const queryClient = useQueryClient();
+  const refresh = () => queryClient.invalidateQueries({ queryKey: KEY });
   return useMutation({
     mutationFn: fn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY }),
+    onSuccess: refresh,
+    onError: alsoOnError ? refresh : undefined,
   });
 };
 
@@ -102,3 +109,23 @@ export const useMoveTask = (projectId: number, oldDone: boolean) => {
     onSettled: () => queryClient.invalidateQueries({ queryKey: KEY }),
   });
 };
+
+/** Komentarze zadania w podglądzie: odświeżane co 5 s przy widocznej karcie przeglądarki, jak tablica. */
+export const useTaskComments = (taskId: number) => {
+  return useQuery({
+    queryKey: [...KEY, 'comments', taskId],
+    queryFn: () => api.get<TaskComment[]>(`/tasks/${taskId}/comments`).then((r) => r.data),
+    refetchInterval: TASK_BOARD_REFRESH_MS,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
+  });
+};
+
+/** Dodanie, poprawka i usunięcie komentarza odświeżają komentarze i licznik na karcie (cały klucz modułu). */
+export const useAddComment = (taskId: number) =>
+  useTasksMutation((input: CommentInput) => api.post<{ id: number }>(`/tasks/${taskId}/comments`, input));
+
+export const useEditComment = () =>
+  useTasksMutation(({ id, ...input }: CommentInput & { id: number }) => api.put(`/tasks/comments/${id}`, input), { alsoOnError: true });
+
+export const useDeleteComment = () => useTasksMutation((id: number) => api.delete(`/tasks/comments/${id}`), { alsoOnError: true });

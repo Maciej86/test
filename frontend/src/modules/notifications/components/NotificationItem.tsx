@@ -1,5 +1,5 @@
 import { Box, Group, Stack, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
-import { Ban, Check, FilePlus2, Folder, SquareKanban, Undo2, X, type LucideIcon } from 'lucide-react';
+import { Ban, Check, FilePlus2, Folder, MessageSquare, SquareKanban, Undo2, X, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatRelativeDateTime, formatTime, type NotificationItem as Item, type NotificationType } from '@app/shared';
 import { notificationTexts } from '../notificationTexts';
@@ -13,6 +13,7 @@ const TYPE_LOOK: Record<NotificationType, { icon: LucideIcon; color: string }> =
   leave_cancelled: { icon: Ban, color: 'red' },
   task_assigned: { icon: SquareKanban, color: 'navy' },
   project_added: { icon: Folder, color: 'navy' },
+  task_comment: { icon: MessageSquare, color: 'navy' },
 };
 
 /**

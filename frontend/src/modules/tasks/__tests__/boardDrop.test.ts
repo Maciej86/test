@@ -3,7 +3,7 @@ import { columnDropId, dragOverTarget, dropTarget, overColumn, placementOf, pref
 import { moveInBoard } from '../boardMove';
 
 const task = (id: number, column: BoardTask['column'], position: number): BoardTask => ({
-  id, title: `Z${id}`, description: null, dueDate: null, column, position, completedAt: null, finishedAt: null, createdByName: 'A', createdAt: '2026-11-10T10:00:00.000Z', assigneeIds: [], leaves: [],
+  id, title: `Z${id}`, description: null, dueDate: null, column, position, completedAt: null, finishedAt: null, createdByName: 'A', createdAt: '2026-11-10T10:00:00.000Z', assigneeIds: [], leaves: [], commentCount: 0,
 });
 const tasks = [task(1, 'draft', 1), task(2, 'draft', 2), task(3, 'draft', 3), task(4, 'in_progress', 1)];
 

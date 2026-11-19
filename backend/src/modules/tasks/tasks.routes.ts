@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   boardQuerySchema,
+  commentSchema,
   newTaskSchema,
   orderMoveSchema,
   projectDeleteSchema,
@@ -9,6 +10,7 @@ import {
   taskMoveSchema,
   taskSchema,
   type BoardQuery,
+  type CommentData,
   type OrderMoveInput,
   type ProjectData,
   type ProjectDeleteInput,
@@ -20,6 +22,7 @@ import { requireRole } from '../../middleware/requireRole';
 import { actorOf, idParam, reply, viewerOf } from '../../middleware/routeHelpers';
 import { validateBody } from '../../middleware/validateBody';
 import { validateQuery } from '../../middleware/validateQuery';
+import { addComment, editComment, listTaskComments, removeComment } from './comments.service';
 import { createProject, deleteProject, listCandidates, listProjects, moveProject, updateProject } from './projects.service';
 import { archiveTask, createTask, finishTask, getBoard, moveTask, updateTask } from './tasks.service';
 
@@ -85,4 +88,25 @@ tasksRoutes.post('/:taskId/archive', async (req, res) => { // rule-ok: bez danyc
 tasksRoutes.post('/:taskId/finish', validateBody(taskFinishSchema), async (req, res) => {
   const id = idParam(res, req.params.taskId);
   if (id !== null) reply(res, await finishTask(id, (req.body as TaskFinishInput).finished, viewerOf(req.user)));
+});
+
+// Komentarze (część 2): każdy, kto widzi zadanie; poprawia autor, usuwa autor albo administrator (sprawdza usługa).
+tasksRoutes.get('/:taskId/comments', async (req, res) => {
+  const id = idParam(res, req.params.taskId);
+  if (id !== null) reply(res, await listTaskComments(id, viewerOf(req.user)));
+});
+
+tasksRoutes.post('/:taskId/comments', validateBody(commentSchema), async (req, res) => {
+  const id = idParam(res, req.params.taskId);
+  if (id !== null) reply(res, await addComment(id, req.body as CommentData, viewerOf(req.user)), 201);
+});
+
+tasksRoutes.put('/comments/:commentId', validateBody(commentSchema), async (req, res) => {
+  const id = idParam(res, req.params.commentId);
+  if (id !== null) reply(res, await editComment(id, req.body as CommentData, viewerOf(req.user)));
+});
+
+tasksRoutes.delete('/comments/:commentId', async (req, res) => { // rule-ok: bez danych wejściowych, tylko numer z adresu
+  const id = idParam(res, req.params.commentId);
+  if (id !== null) reply(res, await removeComment(id, viewerOf(req.user)));
 });

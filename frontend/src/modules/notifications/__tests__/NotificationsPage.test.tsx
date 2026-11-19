@@ -58,6 +58,12 @@ describe('NotificationsPage', () => {
     expect(screen.getByText('„Marketing”')).toBeInTheDocument();
   });
 
+  it('task_comment: title, task title and the comment excerpt (module Zadania, part 2)', async () => {
+    show(page({ total: 1, unread: 1, items: [item({ id: 5, type: 'task_comment', params: { task: 'Zamówić ulotki', excerpt: 'Tonery będą w piątek' }, link: '/admin/tasks/9?task=40' })] }));
+    expect(await screen.findByText('Nowy komentarz do zadania')).toBeInTheDocument();
+    expect(screen.getByText('„Zamówić ulotki”: Tonery będą w piątek')).toBeInTheDocument();
+  });
+
   it('?unread=1 sends unread 1; the switch changes the address', async () => {
     const { router } = show(page({ unread: 2 }), '/admin/notifications?unread=1');
     await waitFor(() => expect(api.get).toHaveBeenCalledWith('/notifications', { params: { page: 1, unread: '1' } }));

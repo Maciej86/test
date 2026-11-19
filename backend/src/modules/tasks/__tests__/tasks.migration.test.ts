@@ -46,4 +46,16 @@ describe('tasks migrations', () => {
     expect(finished).toMatch(/ALTER TABLE tasks ADD COLUMN finished_at DATETIME NULL/);
     expect(finished.match(/ALTER TABLE/g)).toHaveLength(1);
   });
+
+  it('024 task_comments: FK task CASCADE, user SET NULL, copied name, text, edited_at, index (task_id, created_at)', () => {
+    const comments = read('024_task_comments.sql');
+    expect(comments.match(/CREATE TABLE task_comments/g)).toHaveLength(1);
+    expect(comments).toMatch(/FOREIGN KEY \(task_id\) REFERENCES tasks \(id\) ON DELETE CASCADE/);
+    expect(comments).toMatch(/user_id INT UNSIGNED NULL/);
+    expect(comments).toMatch(/FOREIGN KEY \(user_id\) REFERENCES users \(id\) ON DELETE SET NULL/);
+    expect(comments).toMatch(/user_name VARCHAR\(141\) NOT NULL/);
+    expect(comments).toMatch(/text TEXT NOT NULL/);
+    expect(comments).toMatch(/edited_at DATETIME NULL/);
+    expect(comments).toMatch(/INDEX idx_task_comments_task \(task_id, created_at\)/);
+  });
 });

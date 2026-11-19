@@ -21,6 +21,7 @@ import { notifyUsers } from '../notifications/notifications.service';
 import { pool } from '../../db/pool';
 import { fail, notFound, type Result, type Viewer } from '../../middleware/routeHelpers';
 import { listApprovedLeaves } from '../leave-requests/leave-requests.queries';
+import { commentCounts } from './comments.queries';
 import * as q from './tasks.queries';
 
 /** Do kiedy szukać urlopów przy zadaniu: termin, a bez terminu dziś + 14 dni; zrealizowane i po terminie: wcale. */
@@ -44,7 +45,8 @@ export const getBoard = async (projectId: number, viewer: Viewer, includeOldDone
     q.boardTasks(pool, projectId, { includeOldDone, doneSince }),
     includeOldDone ? Promise.resolve(0) : q.countOldDone(pool, projectId, doneSince),
   ]);
-  const assignees = await q.assigneesOf(pool, rows.map((t) => t.id));
+  const taskIds = rows.map((t) => t.id);
+  const [assignees, comments] = await Promise.all([q.assigneesOf(pool, taskIds), commentCounts(pool, taskIds)]);
 
   const today = todayIsoDate();
   const ranges = rows.map((t) => ({ task: t, until: leaveUntil(t, today), ids: assignees.get(t.id) ?? [] }));
@@ -60,6 +62,7 @@ export const getBoard = async (projectId: number, viewer: Viewer, includeOldDone
     return {
       ...rest,
       assigneeIds: ids,
+      commentCount: comments.get(task.id) ?? 0,
       leaves: until === null ? [] : leaves.filter((l) => ids.includes(l.userId) && l.dateFrom <= until && l.dateTo >= today),
     };
   });

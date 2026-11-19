@@ -15,6 +15,10 @@ export const PROJECT_NAME_MIN = 2;
 export const PROJECT_NAME_MAX = 60;
 export const PROJECT_MEMBERS_MAX = 50;
 
+/** Komentarz 1–2000 znaków; w powiadomieniu widać jego początek, do 80 znaków. */
+export const TASK_COMMENT_MAX = 2000;
+export const TASK_COMMENT_EXCERPT = 80;
+
 /** Co ile tablica pyta serwer o zmiany innych osób (gdy karta przeglądarki jest widoczna). */
 export const TASK_BOARD_REFRESH_MS = 5_000;
 /** Zrealizowane dawniej niż tyle dni temu chowają się same. */
@@ -32,6 +36,8 @@ export const TASK_MESSAGES = {
   memberNotAllowed: 'tasks.member_not_allowed',
   dueInPast: 'tasks.due_in_past',
   beforeTaskInvalid: 'tasks.before_task_invalid',
+  commentNotFound: 'tasks.comment_not_found',
+  commentNotAuthor: 'tasks.comment_not_author',
 } as const;
 
 /** Adresy ekranów: sam „Zadania” (przekierowanie), lista projektów, tablica projektu. */

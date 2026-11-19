@@ -350,3 +350,81 @@ test.describe('abuse', () => {
     await s.cleanup();
   });
 });
+
+// Część 2 (TESTS-2.md): Jan komentuje zadanie Piotra, Piotr dostaje powiadomienie i widzi komentarz bez przycisków
+// przy cudzym; autor poprawia i usuwa swój, administrator usuwa cudzy; licznik na karcie.
+test('komentarze: powiadomienie przypisanej osoby, poprawka i usunięcie przez autora, usunięcie przez administratora', async ({ page, browser }) => {
+  test.setTimeout(120_000);
+  const suffix = String(Date.now()).slice(-6);
+  const projectName = `E2E Komentarze ${suffix}`;
+  await logIn(page, ADMIN, password());
+  await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+  const { page: piotr } = await employee(page, browser, 'Piotr', `Komentarz${suffix}`);
+  const { page: jan } = await employee(page, browser, 'Jan', `Komentarz${suffix}`);
+  const candidates = (await (await page.request.get('/api/tasks/projects/candidates')).json()) as { id: number; name: string }[];
+  const idOf = (name: string) => candidates.find((c) => c.name === name)!.id;
+  const project = await page.request.post('/api/tasks/projects', { data: { name: projectName, memberIds: [idOf(`Piotr Komentarz${suffix}`), idOf(`Jan Komentarz${suffix}`)] } });
+  const projectId = ((await project.json()) as { id: number }).id;
+  const created = await page.request.post(`/api/tasks/projects/${projectId}/tasks`, {
+    data: { title: 'Zamówić tonery', description: '', dueDate: '', column: 'draft', assigneeIds: [idOf(`Piotr Komentarz${suffix}`)] },
+  });
+  const taskId = ((await created.json()) as { id: number }).id;
+
+  // Jan komentuje (dwie linie); licznik na karcie.
+  await jan.goto(`/admin/tasks/${projectId}?task=${taskId}`);
+  const janDrawer = jan.getByRole('dialog', { name: `Zadanie: ${projectName}` });
+  await expect(janDrawer.getByText('Nikt jeszcze nie skomentował tego zadania.')).toBeVisible();
+  await expect(janDrawer.getByRole('button', { name: 'Dodaj komentarz' })).toBeDisabled();
+  await janDrawer.getByRole('textbox', { name: 'Napisz komentarz' }).fill('Tonery zamówione,\nbędą w piątek.');
+  await janDrawer.getByRole('button', { name: 'Dodaj komentarz' }).click();
+  await expect(jan.getByText('Dodano komentarz.')).toBeVisible();
+  await expect(janDrawer.getByText(/Tonery zamówione,\s+będą w piątek\./)).toBeVisible();
+  await expect(janDrawer.getByRole('textbox', { name: 'Napisz komentarz' })).toHaveValue('');
+  await janDrawer.getByRole('button', { name: 'Anuluj' }).first().click();
+  await expect(jan.locator('.mantine-Card-root', { hasText: 'Zamówić tonery' }).locator('[data-comments]')).toHaveText('1');
+
+  // Piotr (przypisany) ma powiadomienie; link otwiera podgląd z komentarzem, bez przycisków przy cudzym.
+  await piotr.goto('/admin/notifications');
+  await expect(piotr.getByText('„Zamówić tonery”: Tonery zamówione, będą w piątek.')).toBeVisible();
+  await piotr.getByText('Nowy komentarz do zadania').first().click();
+  await expect(piotr).toHaveURL(new RegExp(`/admin/tasks/${projectId}\\?task=${taskId}`));
+  const piotrDrawer = piotr.getByRole('dialog', { name: `Zadanie: ${projectName}` });
+  const janComment = piotrDrawer.locator('[data-comment]', { hasText: 'Tonery zamówione' });
+  await expect(janComment).toBeVisible();
+  await expect(janComment.getByRole('button')).toHaveCount(0);
+  await piotrDrawer.getByRole('textbox', { name: 'Napisz komentarz' }).fill('Dzięki!');
+  await piotrDrawer.getByRole('button', { name: 'Dodaj komentarz' }).click();
+  await expect(piotrDrawer.locator('[data-comment]', { hasText: 'Dzięki!' })).toBeVisible();
+  // Autor nie dostaje powiadomienia o własnym komentarzu (Jan nie jest przypisany, więc też nie).
+  const piotrNotes = (await (await piotr.request.get('/api/notifications')).json()) as { items: { type: string }[] };
+  expect(piotrNotes.items.filter((n) => n.type === 'task_comment')).toHaveLength(1);
+
+  // Jan poprawia swój komentarz („(edytowany)”), potem go usuwa.
+  await jan.goto(`/admin/tasks/${projectId}?task=${taskId}`);
+  // Po numerze komentarza: w trakcie poprawki treść jest w polu, a nie w tekście komentarza.
+  const ownId = await jan.locator('[data-comment]', { hasText: 'Tonery zamówione' }).getAttribute('data-comment');
+  const own = jan.locator(`[data-comment="${ownId}"]`);
+  await own.getByRole('button', { name: 'Edytuj' }).click();
+  await own.getByRole('textbox', { name: 'Popraw komentarz' }).fill('Tonery będą w poniedziałek.');
+  await own.getByRole('button', { name: 'Zapisz' }).click();
+  await expect(jan.getByText('Zapisano komentarz.')).toBeVisible();
+  const edited = jan.locator('[data-comment]', { hasText: 'Tonery będą w poniedziałek.' });
+  await expect(edited.getByText('(edytowany)')).toBeVisible();
+  await expect(jan.locator('[data-comment]', { hasText: 'Dzięki!' }).getByRole('button')).toHaveCount(0);
+  await edited.getByRole('button', { name: 'Usuń' }).click();
+  const confirm = jan.getByRole('dialog', { name: 'Usunąć komentarz?' });
+  await expect(confirm.getByText(`Komentarz osoby Jan Komentarz${suffix} zniknie na stałe.`)).toBeVisible();
+  await confirm.getByRole('button', { name: 'Usuń' }).click();
+  await expect(jan.getByText('Usunięto komentarz.')).toBeVisible();
+  await expect(edited).toHaveCount(0);
+
+  // Administrator usuwa cudzy komentarz (bez „Edytuj”); u Piotra znika bez odświeżania strony.
+  await page.goto(`/admin/tasks/${projectId}?task=${taskId}`);
+  const piotrComment = page.locator('[data-comment]', { hasText: 'Dzięki!' });
+  await expect(piotrComment.getByRole('button', { name: 'Edytuj' })).toHaveCount(0);
+  await piotrComment.getByRole('button', { name: 'Usuń' }).click();
+  await page.getByRole('dialog', { name: 'Usunąć komentarz?' }).getByRole('button', { name: 'Usuń' }).click();
+  await expect(page.getByText('Usunięto komentarz.')).toBeVisible();
+  await expect(piotrDrawer.locator('[data-comment]', { hasText: 'Dzięki!' })).toHaveCount(0, { timeout: 7_000 });
+  await expect(piotrDrawer.getByText('Nikt jeszcze nie skomentował tego zadania.')).toBeVisible();
+});

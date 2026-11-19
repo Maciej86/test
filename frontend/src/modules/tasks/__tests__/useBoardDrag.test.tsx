@@ -4,7 +4,7 @@ import { columnDropId } from '../components/boardDrop';
 import { useBoardDrag } from '../components/useBoardDrag';
 
 const task = (id: number, column: BoardTask['column'], position: number): BoardTask => ({
-  id, title: `Z${id}`, description: null, dueDate: null, column, position, completedAt: null, finishedAt: null, createdByName: 'A', createdAt: '2026-11-10T10:00:00.000Z', assigneeIds: [], leaves: [],
+  id, title: `Z${id}`, description: null, dueDate: null, column, position, completedAt: null, finishedAt: null, createdByName: 'A', createdAt: '2026-11-10T10:00:00.000Z', assigneeIds: [], leaves: [], commentCount: 0,
 });
 const before = [task(1, 'draft', 1), task(2, 'in_progress', 1)];
 const event = (over: number | string | null) => ({ active: { id: 1 }, over: over === null ? null : { id: over } }) as never;

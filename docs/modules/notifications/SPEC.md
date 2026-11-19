@@ -63,6 +63,7 @@ Stałe w `shared/src/constants/notifications.ts`: `NOTIFICATION_TYPES`. Treść 
 | `leave_cancelled` | pracownik wniosku | Urlop anulowany | {typ}, {od} – {do}. Dni wróciły do puli. | jw. | jw. |
 | `task_assigned` | nowo przypisana osoba | Nowe zadanie dla Ciebie | „{tytuł}”, termin: {termin} (bez terminu: sam tytuł) | `task`, `dueDate` (może nie być) | `/admin/tasks/<projectId>?task=<id>` (zmiana 2026-11-18, moduł Zadania) |
 | `project_added` | pracownik nowo dodany do projektu | Dodano Cię do projektu | „{projekt}” | `project` | `/admin/tasks/<projectId>` (moduł Zadania, 2026-11-18) |
+| `task_comment` | osoby przypisane do zadania, bez autora komentarza | Nowy komentarz do zadania | „{tytuł}”: {początek komentarza, do 80 znaków z „…”} | `task`, `excerpt` | `/admin/tasks/<projectId>?task=<id>` (moduł Zadania, część 2, 2026-11-19) |
 
 Daty w parametrach zapisane jako `RRRR-MM-DD`, na ekranie przez `formatDate`.
 

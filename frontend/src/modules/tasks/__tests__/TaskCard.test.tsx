@@ -9,7 +9,7 @@ const people = new Map(
 );
 const task = (o: Partial<BoardTask> = {}): BoardTask => ({
   id: 7, title: 'Oferta dla hurtowni', description: 'Cennik na 2027.', dueDate: null, column: 'in_progress', position: 1, completedAt: null, finishedAt: null,
-  createdByName: 'Anna Nowak', createdAt: '2026-11-05T10:00:00.000Z', assigneeIds: [], leaves: [], ...o,
+  createdByName: 'Anna Nowak', createdAt: '2026-11-05T10:00:00.000Z', assigneeIds: [], leaves: [], commentCount: 0, ...o,
 });
 const show = (t: BoardTask, meId = 5) =>
   renderWithProviders(<TaskCard task={t} people={people} meId={meId} onOpen={vi.fn()} onMove={vi.fn()} onFinish={vi.fn()} onArchive={vi.fn()} />);
@@ -69,5 +69,16 @@ describe('TaskCard', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Więcej działań' }));
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Cofnij zakończenie' }));
     expect(onFinish).toHaveBeenCalled();
+  });
+
+  it('comment count: none → nothing shown, 3 → icon with 3 and the tooltip „3 komentarze”', async () => {
+    const { unmount } = show(task());
+    expect(document.querySelector('[data-comments]')).toBeNull();
+    unmount();
+    show(task({ commentCount: 3 }));
+    const count = document.querySelector('[data-comments]') as HTMLElement;
+    expect(count).toHaveTextContent('3');
+    fireEvent.mouseEnter(count);
+    expect(await screen.findByText('3 komentarze')).toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { boardQuerySchema, boardViewSchema, newTaskSchema, taskFinishSchema, projectDeleteSchema, projectSchema, taskMoveSchema, taskSchema } from '../tasks';
+import { boardQuerySchema, boardViewSchema, commentExcerpt, commentSchema, newTaskSchema, taskFinishSchema, projectDeleteSchema, projectSchema, taskMoveSchema, taskSchema } from '../tasks';
 import { textRange } from '../fields';
 import { TASK_COLUMNS } from '../../constants/tasks';
 
@@ -103,5 +103,37 @@ describe('tasks schemas', () => {
     expect(taskFinishSchema.parse({ finished: true })).toEqual({ finished: true });
     expect(taskFinishSchema.safeParse({ finished: 'yes' }).success).toBe(false);
     expect(taskFinishSchema.safeParse({}).success).toBe(false);
+  });
+});
+
+describe('commentSchema (part 2)', () => {
+  it('empty or only spaces → validation.required', () => {
+    expect(fieldErrors(commentSchema.safeParse({ text: '' }))).toEqual({ text: 'validation.required' });
+    expect(fieldErrors(commentSchema.safeParse({ text: '   ' }))).toEqual({ text: 'validation.required' });
+    expect(fieldErrors(commentSchema.safeParse({}))).toEqual({ text: 'validation.required' });
+  });
+
+  it('2000 chars ok, 2001 → validation.too_long', () => {
+    expect(commentSchema.safeParse({ text: chars(2000) }).success).toBe(true);
+    expect(fieldErrors(commentSchema.safeParse({ text: chars(2001) }))).toEqual({ text: 'validation.too_long' });
+  });
+
+  it('trims the edges, keeps new lines inside, drops unknown fields', () => {
+    expect(commentSchema.parse({ text: '  Tonery\nw piątek \n', userId: 1, authorName: 'X' })).toEqual({ text: 'Tonery\nw piątek' });
+  });
+});
+
+describe('commentExcerpt', () => {
+  it('short text unchanged, new lines collapsed to one space', () => {
+    expect(commentExcerpt('Tonery zamówione')).toBe('Tonery zamówione');
+    expect(commentExcerpt('Tonery\n\n  zamówione')).toBe('Tonery zamówione');
+  });
+
+  it('exactly 80 unchanged; longer → 80 chars ending with …, no space before it', () => {
+    expect(commentExcerpt(chars(80))).toBe(chars(80));
+    const cut = commentExcerpt(chars(81));
+    expect(cut).toHaveLength(80);
+    expect(cut.endsWith('…')).toBe(true);
+    expect(commentExcerpt(`${chars(78)} bbbb`)).toBe(`${chars(78)}…`);
   });
 });

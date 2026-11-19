@@ -5,8 +5,11 @@ import type { BoardResponse, BoardTask } from '@app/shared';
 import { api } from '../../../core/api/client';
 import {
   boardKey,
+  useAddComment,
   useArchiveTask,
   useBoard,
+  useDeleteComment,
+  useEditComment,
   useDeleteProject,
   useMoveProject,
   useMoveTask,
@@ -14,6 +17,7 @@ import {
   useProjects,
   useSaveProject,
   useSaveTask,
+  useTaskComments,
 } from '../tasks.api';
 import { moveInBoard } from '../boardMove';
 
@@ -26,7 +30,7 @@ const setup = () => {
 
 const task = (id: number, column: BoardTask['column'], position: number): BoardTask => ({
   id, title: `Zadanie ${id}`, description: null, dueDate: null, column, position, completedAt: null, finishedAt: null, createdByName: 'Anna Nowak',
-  createdAt: '2026-11-10T10:00:00.000Z', assigneeIds: [], leaves: [],
+  createdAt: '2026-11-10T10:00:00.000Z', assigneeIds: [], leaves: [], commentCount: 0,
 });
 const board = (): BoardResponse => ({
   project: { id: 9, name: 'Marketing' }, people: [], oldDoneCount: 0, leaves: [],
@@ -59,6 +63,46 @@ describe('tasks api', () => {
     await act(async () => { await vi.advanceTimersByTimeAsync(5_000); });
     await waitFor(() => expect(get).toHaveBeenCalledTimes(2));
     vi.useRealTimers();
+  });
+
+  it('useTaskComments asks for the task comments and refreshes every 5 seconds', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const get = vi.spyOn(api, 'get').mockResolvedValue({ data: [] });
+    const { wrapper } = setup();
+    renderHook(() => useTaskComments(7), { wrapper });
+    await waitFor(() => expect(get).toHaveBeenCalledWith('/tasks/7/comments'));
+    await act(async () => { await vi.advanceTimersByTimeAsync(5_000); });
+    await waitFor(() => expect(get).toHaveBeenCalledTimes(2));
+    vi.useRealTimers();
+  });
+
+  it('comment mutations call their addresses and refresh the tasks data (comments and the card counter)', async () => {
+    const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { id: 12 } });
+    const put = vi.spyOn(api, 'put').mockResolvedValue({ data: { ok: true } });
+    const del = vi.spyOn(api, 'delete').mockResolvedValue({ data: { ok: true } });
+    const { wrapper, invalidate } = setup();
+    const add = renderHook(() => useAddComment(7), { wrapper });
+    await act(() => add.result.current.mutateAsync({ text: 'Tonery' }));
+    expect(post).toHaveBeenCalledWith('/tasks/7/comments', { text: 'Tonery' });
+    const edit = renderHook(() => useEditComment(), { wrapper });
+    await act(() => edit.result.current.mutateAsync({ id: 3, text: 'Nowy' }));
+    expect(put).toHaveBeenCalledWith('/tasks/comments/3', { text: 'Nowy' });
+    const remove = renderHook(() => useDeleteComment(), { wrapper });
+    await act(() => remove.result.current.mutateAsync(3));
+    expect(del).toHaveBeenCalledWith('/tasks/comments/3');
+    expect(invalidate).toHaveBeenCalledTimes(3);
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['tasks'] });
+  });
+
+  it('a failed comment edit or delete (e.g. removed by someone else) still refreshes the comments', async () => {
+    vi.spyOn(api, 'put').mockRejectedValue(new Error('404'));
+    vi.spyOn(api, 'delete').mockRejectedValue(new Error('404'));
+    const { wrapper, invalidate } = setup();
+    const edit = renderHook(() => useEditComment(), { wrapper });
+    await act(async () => { await edit.result.current.mutateAsync({ id: 3, text: 'Nowy' }).catch(() => undefined); });
+    const remove = renderHook(() => useDeleteComment(), { wrapper });
+    await act(async () => { await remove.result.current.mutateAsync(3).catch(() => undefined); });
+    expect(invalidate).toHaveBeenCalledTimes(2);
   });
 
   it('moveInBoard puts the card before another one or at the end of a column', () => {

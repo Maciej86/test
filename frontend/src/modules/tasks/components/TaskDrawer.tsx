@@ -1,4 +1,4 @@
-import { Button, Drawer, Group, Stack, Text } from '@mantine/core';
+import { Button, Divider, Drawer, Group, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime, type BoardResponse, type BoardTask } from '@app/shared';
@@ -6,6 +6,7 @@ import { ButtonIcon } from '../../../common/ButtonIcon';
 import { apiErrorMessage } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
 import { useFinishTask } from '../tasks.api';
+import { TaskComments } from './TaskComments';
 import { TaskFields } from './TaskFields';
 import { useTaskForm } from './useTaskForm';
 
@@ -13,7 +14,7 @@ import { useTaskForm } from './useTaskForm';
 const DRAWER_WIDTH = 540;
 const PHONE_QUERY = '(max-width: 48em)';
 
-/** Podgląd klikniętej karty z prawej: od razu można zmieniać pola i zapisać (odpowiedź 1a). */
+/** Podgląd klikniętej karty z prawej: od razu można zmieniać pola i zapisać (odpowiedź 1a); pod spodem komentarze. */
 export const TaskDrawer = ({ projectId, board, task, onClose, onArchive }: {
   projectId: number;
   board: BoardResponse;
@@ -63,6 +64,9 @@ export const TaskDrawer = ({ projectId, board, task, onClose, onArchive }: {
           </Group>
         </Stack>
       </form>
+      {/* Poza formularzem: Enter i „Zapisz” zadania nie dotyczą komentarzy (zapisują się osobno). */}
+      <Divider my="lg" />
+      <TaskComments taskId={task.id} />
     </Drawer>
   );
 };

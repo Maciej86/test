@@ -9,7 +9,7 @@ import { TaskBoardPage } from '../TaskBoardPage';
 const jan: SessionUser = { id: 5, name: 'Jan Kowalski', role: 'employee', mustChangePassword: false };
 const task = (id: number, column: BoardTask['column'], o: Partial<BoardTask> = {}): BoardTask => ({
   id, title: `Zadanie ${id}`, description: null, dueDate: null, column, position: id, completedAt: column === 'done' ? '2026-11-17T10:00:00.000Z' : null, finishedAt: null,
-  createdByName: 'Anna Nowak', createdAt: '2026-11-05T10:00:00.000Z', assigneeIds: [], leaves: [], ...o,
+  createdByName: 'Anna Nowak', createdAt: '2026-11-05T10:00:00.000Z', assigneeIds: [], leaves: [], commentCount: 0, ...o,
 });
 const board = (o: Partial<BoardResponse> = {}): BoardResponse => ({
   project: { id: 9, name: 'Marketing' },
@@ -18,7 +18,7 @@ const board = (o: Partial<BoardResponse> = {}): BoardResponse => ({
     task(1, 'draft', { title: 'Ulotki na targi', assigneeIds: [5] }),
     task(2, 'draft'),
     task(3, 'in_progress', { dueDate: '2026-11-10' }),
-    task(4, 'in_progress'),
+    task(4, 'in_progress', { commentCount: 3 }),
     task(5, 'done'),
   ],
   oldDoneCount: 2,
@@ -37,6 +37,7 @@ const show = (data: BoardResponse | 'missing', path = '/admin/tasks/9', user: Se
     if (url === '/auth/me') return { data: { user } };
     if (url === '/tasks/projects') return { data: { items: [{ id: 9, name: 'Marketing', position: 1, members: [], openCount: 4, doneCount: 1, archivedCount: 0, createdAt: '2026-11-02' }] } };
     if (url === '/tasks/projects/candidates') return { data: [] };
+    if (url.endsWith('/comments')) return { data: [] };
     if (data === 'missing') throw Object.assign(new Error('404'), { isAxiosError: true, response: { status: 404, data: { error: { message: 'server.not_found' } } } });
     return { data };
   });
@@ -149,6 +150,7 @@ describe('TaskBoardPage', () => {
     fireEvent.click(within(card).getByRole('button', { name: 'Więcej działań' }));
     fireEvent.click(await screen.findByRole('menuitem', { name: 'Usuń' }));
     expect(await screen.findByText('Usunąć zadanie?')).toBeInTheDocument();
+    expect(screen.getByText(/Zadanie „Zadanie 4” razem z 3 komentarzami zniknie z tablicy/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Usuń' }));
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/tasks/4/archive'));
   });
@@ -167,6 +169,7 @@ describe('TaskBoardPage', () => {
     let fail = false;
     vi.spyOn(api, 'get').mockImplementation(async (url: string) => {
       if (url === '/auth/me') return { data: { user: jan } };
+      if (url.endsWith('/comments') && !fail) return { data: [] };
       if (fail) throw Object.assign(new Error('503'), { isAxiosError: true, response: { status: 503, data: { error: { message: 'server.unavailable' } } } });
       return { data: board() };
     });

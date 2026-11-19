@@ -7,6 +7,7 @@ export const NOTIFICATION_TYPES = [
   'leave_cancelled',
   'task_assigned',
   'project_added',
+  'task_comment',
 ] as const;
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 
