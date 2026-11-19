@@ -66,3 +66,5 @@ Sprawdzone 2026-11-18 na prawdziwej bazie (`e2e/tasks.spec.ts`, blok `abuse`) i 
 - Zmyślone numery w adresie (`0`, `1e3`, `0x10`, `007`, `21;DROP`) → 404 bez wywołania usługi: przeszła
 - `<script>alert(1)</script>` w tytule → na tablicy zwykły tekst, bez okienka; tytuł 151 znaków → 400: przeszła
 - Usunięcie osoby z projektu → jej otwarte zadanie zostaje bez niej, a ona traci dostęp do tablicy (404): przeszła
+
+**Potwierdzenie użytkownika:** 2026-11-19, „działa”.
