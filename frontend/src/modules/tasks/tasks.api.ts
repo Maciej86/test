@@ -123,7 +123,7 @@ export const useTaskComments = (taskId: number) => {
 
 /** Dodanie, poprawka i usunięcie komentarza odświeżają komentarze i licznik na karcie (cały klucz modułu). */
 export const useAddComment = (taskId: number) =>
-  useTasksMutation((input: CommentInput) => api.post<{ id: number }>(`/tasks/${taskId}/comments`, input));
+  useTasksMutation((input: CommentInput) => api.post<{ id: number }>(`/tasks/${taskId}/comments`, input), { alsoOnError: true });
 
 export const useEditComment = () =>
   useTasksMutation(({ id, ...input }: CommentInput & { id: number }) => api.put(`/tasks/comments/${id}`, input), { alsoOnError: true });

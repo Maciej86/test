@@ -94,15 +94,18 @@ describe('tasks api', () => {
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['tasks'] });
   });
 
-  it('a failed comment edit or delete (e.g. removed by someone else) still refreshes the comments', async () => {
+  it('a failed comment add, edit or delete (task or comment removed by someone else) still refreshes the data', async () => {
+    vi.spyOn(api, 'post').mockRejectedValue(new Error('404'));
     vi.spyOn(api, 'put').mockRejectedValue(new Error('404'));
     vi.spyOn(api, 'delete').mockRejectedValue(new Error('404'));
     const { wrapper, invalidate } = setup();
+    const add = renderHook(() => useAddComment(7), { wrapper });
+    await act(async () => { await add.result.current.mutateAsync({ text: 'Ok' }).catch(() => undefined); });
     const edit = renderHook(() => useEditComment(), { wrapper });
     await act(async () => { await edit.result.current.mutateAsync({ id: 3, text: 'Nowy' }).catch(() => undefined); });
     const remove = renderHook(() => useDeleteComment(), { wrapper });
     await act(async () => { await remove.result.current.mutateAsync(3).catch(() => undefined); });
-    expect(invalidate).toHaveBeenCalledTimes(2);
+    expect(invalidate).toHaveBeenCalledTimes(3);
   });
 
   it('moveInBoard puts the card before another one or at the end of a column', () => {

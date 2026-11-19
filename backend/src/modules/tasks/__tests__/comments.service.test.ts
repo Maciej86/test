@@ -56,7 +56,7 @@ describe('comments service', () => {
       expect.objectContaining({ id: 5, canEdit: false, canDelete: true }),
     ]);
     vi.mocked(tq.findTask).mockResolvedValue(null);
-    expect(await s.listTaskComments(7, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
+    expect(await s.listTaskComments(7, jan)).toEqual({ error: expect.objectContaining({ status: 404, message: 'tasks.task_not_found' }) });
   });
 
   it('addComment: locks the task, saves with the viewer as author, notifies assignees except the author', async () => {
@@ -82,13 +82,17 @@ describe('comments service', () => {
     expect(await s.addComment(7, { text: 'Ok' }, jan)).toEqual({ id: 13 });
     expect(notifyUsers).not.toHaveBeenCalled();
     vi.mocked(tq.findTask).mockResolvedValue(null);
-    expect(await s.addComment(7, { text: 'Ok' }, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
+    expect(await s.addComment(7, { text: 'Ok' }, jan)).toEqual({ error: expect.objectContaining({ status: 404, message: 'tasks.task_not_found' }) });
     expect(cq.insertComment).toHaveBeenCalledTimes(1);
   });
 
   it('editComment: author ok; the same text changes nothing; someone else (employee or admin) → 403; missing → 404', async () => {
     expect(await s.editComment(3, { text: 'Nowy' }, jan)).toEqual({ ok: true });
-    expect(cq.findComment).toHaveBeenCalledWith(conn, 3, jan, { lock: true });
+    // Kolejność blokad jak przy usuwaniu zadania i projektu (zadanie → komentarz): najpierw zadanie, potem komentarz.
+    expect(cq.findComment).toHaveBeenNthCalledWith(1, conn, 3, jan);
+    expect(tq.findTask).toHaveBeenCalledWith(conn, 7, jan, { lock: true });
+    expect(cq.findComment).toHaveBeenNthCalledWith(2, conn, 3, jan, { lock: true });
+    expect(vi.mocked(tq.findTask).mock.invocationCallOrder[0]!).toBeLessThan(vi.mocked(cq.findComment).mock.invocationCallOrder[1]!);
     expect(cq.updateCommentText).toHaveBeenCalledWith(conn, 3, 'Nowy');
     vi.mocked(cq.updateCommentText).mockClear();
     expect(await s.editComment(3, { text: 'Tonery' }, jan)).toEqual({ ok: true });

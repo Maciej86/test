@@ -31,7 +31,7 @@ export const listComments = async (db: Db, taskId: number): Promise<CommentRow[]
 
 /**
  * Komentarz zadania spoza archiwum z projektu, który osoba widzi (ten sam warunek co `findTask`), inaczej null;
- * `lock` blokuje wiersz komentarza do końca transakcji.
+ * `lock` blokuje tylko wiersz komentarza (nie zadanie ani konto autora) do końca transakcji.
  */
 export const findComment = async (
   db: Db,
@@ -42,7 +42,7 @@ export const findComment = async (
   const sql = `SELECT c.id, c.task_id, t.project_id, c.user_id, c.user_name, c.text, c.edited_at, c.created_at, u.archived_at
      FROM task_comments c JOIN tasks t ON t.id = c.task_id LEFT JOIN users u ON u.id = c.user_id
      WHERE c.id = ? AND t.archived_at IS NULL AND (? = 'admin' OR EXISTS (SELECT 1 FROM project_members pm WHERE pm.project_id = t.project_id AND pm.user_id = ?))`;
-  const [rows] = await db.query<RowDataPacket[]>(opts.lock ? `${sql} FOR UPDATE` : sql, [id, viewer.role, viewer.id]); // rule-ok: wstawione tylko stałe FOR UPDATE z tego pliku, dane idą przez ?
+  const [rows] = await db.query<RowDataPacket[]>(opts.lock ? `${sql} FOR UPDATE OF c` : sql, [id, viewer.role, viewer.id]); // rule-ok: wstawione tylko stałe FOR UPDATE OF c z tego pliku, dane idą przez ?
   const r = rows[0];
   return r ? { ...toComment(r), taskId: r.task_id as number, projectId: r.project_id as number } : null;
 };

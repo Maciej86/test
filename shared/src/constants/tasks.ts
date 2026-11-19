@@ -36,6 +36,7 @@ export const TASK_MESSAGES = {
   memberNotAllowed: 'tasks.member_not_allowed',
   dueInPast: 'tasks.due_in_past',
   beforeTaskInvalid: 'tasks.before_task_invalid',
+  taskNotFound: 'tasks.task_not_found',
   commentNotFound: 'tasks.comment_not_found',
   commentNotAuthor: 'tasks.comment_not_author',
 } as const;

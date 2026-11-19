@@ -39,6 +39,13 @@ describe('TaskComments', () => {
     expect(screen.getByRole('button', { name: 'Dodaj komentarz' })).toBeDisabled();
   });
 
+  it('the count badge waits for the list (no „0” while loading)', async () => {
+    vi.spyOn(api, 'get').mockReturnValue(new Promise(() => undefined));
+    renderWithProviders(<TaskComments taskId={7} />);
+    expect(await screen.findByText('Komentarze')).toBeInTheDocument();
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+  });
+
   it('add → POST, field cleared, toast', async () => {
     show([]);
     const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { id: 12 } });

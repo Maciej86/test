@@ -135,5 +135,8 @@ describe('commentExcerpt', () => {
     expect(cut).toHaveLength(80);
     expect(cut.endsWith('…')).toBe(true);
     expect(commentExcerpt(`${chars(78)} bbbb`)).toBe(`${chars(78)}…`);
+    // Emotikona (dwie jednostki UTF-16) na granicy cięcia zostaje cała albo znika, nigdy połówka.
+    const emoji = commentExcerpt(`${chars(78)}😀😀😀`);
+    expect(emoji).toBe(`${chars(78)}😀…`);
   });
 });

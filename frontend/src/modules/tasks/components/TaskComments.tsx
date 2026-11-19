@@ -155,7 +155,7 @@ export const TaskComments = ({ taskId }: { taskId: number }) => {
       <Group gap="xs">
         <MessageSquare size={18} />
         <Title order={4}>{t('comments')}</Title>
-        <Badge variant="light" color="gray" tt="none">{list.length}</Badge>
+        {comments.data && <Badge variant="light" color="gray" tt="none">{list.length}</Badge>}
       </Group>
       <DataState query={loadState}>
         {list.length === 0 && <Text size="sm" c="dimmed">{t('comments_empty')}</Text>}

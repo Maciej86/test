@@ -70,7 +70,7 @@ bez urlopu, więc nie wymaga zmian poza ewentualnym `leave` opcjonalnym).
 
 - [x] **4. Usługa i trasy komentarzy.** `comments.service.ts`, trasy w `tasks.routes.ts`.
   - `listTaskComments(taskId, viewer): Result<TaskComment[]>` (`canEdit` = autor; `canDelete` = autor albo
-    administrator); `addComment(taskId, data, viewer): Result<{ id }>` (w `withTransaction`: `lockTaskForWrite`,
+    administrator); `addComment(taskId, data, viewer): Result<{ id }>` (w `withTransaction`: blokada zadania,
     zapis, `notifyUsers` `task_comment` do przypisanych bez autora z `params { task, excerpt }`, link
     `taskBoardPath(projectId, taskId)`, `actor`); `editComment(commentId, data, viewer)`; `removeComment(commentId,
     viewer)`.
@@ -80,7 +80,7 @@ bez urlopu, więc nie wymaga zmian poza ewentualnym `leave` opcjonalnym).
     powiadomienie dostają przypisani bez autora (autor przypisany → nie dostaje; nikt przypisany → bez wywołania).
     `PUT /tasks/comments/:commentId` autor → `{ ok }` i `edited_at`; ten sam tekst → bez zmiany `edited_at`;
     cudzy (pracownik i administrator) → 403 `tasks.comment_not_author`; nieistniejący albo z niewidocznego zadania →
-    404 `tasks.comment_not_found`; numer `abc` → 400.
+    404 `tasks.comment_not_found`; numer `abc` → 404 (`idParam`).
     `DELETE` autor → `{ ok }`; administrator cudzy → `{ ok }`; pracownik cudzy → 403; nieistniejący → 404.
     **Uwaga:** `addComment` blokuje tylko wiersz zadania (`findTask` z `lock`), nie projekt: komentarz nie zmienia
     pozycji, a jedna blokada nie może się zakleszczyć z innymi zapisami.
@@ -118,4 +118,9 @@ bez urlopu, więc nie wymaga zmian poza ewentualnym `leave` opcjonalnym).
   („(edytowany)”) i usuwa swój; administrator usuwa cudzy; pracownik nie widzi przycisków przy cudzym →
   `npm run test:e2e`.
 
-- [ ] **10. Przegląd kodu** całej części (lista kontrolna z `CONVENTIONS.md`), poprawki z testami → `npm run check`.
+- [x] **10. Przegląd kodu** całej części (lista kontrolna z `CONVENTIONS.md`), poprawki z testami → `npm run check`.
+  Poprawione: komentarz do zadania usuniętego w międzyczasie → 404 `tasks.task_not_found` („Nie znaleziono zadania.”)
+  i od razu odświeżona tablica; poprawka i usunięcie komentarza blokują najpierw zadanie, potem tylko wiersz
+  komentarza (`FOR UPDATE OF c`, ta sama kolejność co usuwanie zadania i projektu); fragment w powiadomieniu cięty po
+  znakach (emotikona nie jest przecinana); licznik w nagłówku komentarzy dopiero po wczytaniu listy. Próby nadużyć na
+  prawdziwej bazie: etap testy (`describe('abuse')`).

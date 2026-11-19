@@ -58,8 +58,9 @@ export type CommentData = z.output<typeof commentSchema>;
 
 /** Początek komentarza do powiadomienia: jedna linia, najwyżej `max` znaków razem z „…”. */
 export const commentExcerpt = (value: string, max = TASK_COMMENT_EXCERPT): string => {
-  const line = value.replace(/\s+/g, ' ').trim();
-  return line.length <= max ? line : `${line.slice(0, max - 1).trimEnd()}…`;
+  // Po znakach (punktach kodowych), nie jednostkach UTF-16: emotikona nie zostanie przecięta na pół.
+  const chars = Array.from(value.replace(/\s+/g, ' ').trim());
+  return chars.length <= max ? chars.join('') : `${chars.slice(0, max - 1).join('').trimEnd()}…`;
 };
 
 /** Parametry tablicy: `oldDone=1` dokłada zrealizowane starsze niż 30 dni. */

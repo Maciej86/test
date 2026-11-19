@@ -42,7 +42,7 @@ describe('comments queries', () => {
     const [sql, params] = calls[0]!;
     expect(sql).toMatch(/JOIN tasks t ON t\.id = c\.task_id/);
     expect(sql).toMatch(/c\.id = \? AND t\.archived_at IS NULL AND \(\? = 'admin' OR EXISTS \(SELECT 1 FROM project_members pm WHERE pm\.project_id = t\.project_id AND pm\.user_id = \?\)\)/);
-    expect(sql).toMatch(/FOR UPDATE$/);
+    expect(sql).toMatch(/FOR UPDATE OF c$/);
     expect(params).toEqual([3, 'employee', 5]);
     const none = spyDb([]);
     expect(await q.findComment(none.db, 3, jan)).toBeNull();
