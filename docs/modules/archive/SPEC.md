@@ -1,6 +1,6 @@
 # Spec: Archiwum
 
-**Data:** 2026-11-20 · **Status:** do akceptacji
+**Data:** 2026-11-20 · **Status:** zaakceptowany przez użytkownika 2026-11-20
 **Podstawa:** `QUESTIONS.md` (odpowiedzi 1a–8a), `SPEC-GENERAL.md` („Archiwum”, „Relacje”), makieta
 `mockups/src/modules/archive/`
 
