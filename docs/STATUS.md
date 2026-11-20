@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Moduł Pulpit: akceptacja planu (`docs/modules/dashboard/PLAN.md`), potem implementacja.
+**Następny krok:** Moduł Pulpit, implementacja: krok 1 z 10 (wydzielenie terminu zadania).
 
 ## Start aplikacji
 
@@ -32,7 +32,7 @@
 | 11 | Historia zmian | activity-log | zrobiony | zamknięcie | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
-| 14 | Pulpit | dashboard | w toku | plan | my-leave, leave-requests, tasks |
+| 14 | Pulpit | dashboard | w toku | implementacja (krok 1/10) | my-leave, leave-requests, tasks |
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje

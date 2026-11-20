@@ -20,7 +20,7 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
 
 ## Kroki
 
-- [ ] 0. Szkielet testów (`it.todo`) z wymagań specu → `npm run check`:
+- [x] 0. Szkielet testów (`it.todo`) z wymagań specu → `npm run check`:
   - `backend/src/modules/dashboard/__tests__/dashboard.routes.test.ts`: GET bez logowania → 401; z hasłem
     tymczasowym → 403; administrator → `role: 'admin'` ze wszystkimi boksami; pracownik → `role: 'employee'` bez
     `pending`, `absences`, `projects`, `overdue`; pracownik nie widzi cudzych wniosków ani zadań z cudzych projektów.
