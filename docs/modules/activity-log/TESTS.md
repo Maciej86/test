@@ -28,4 +28,25 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180.
 ## Jako pracownik
 
 11. Zaloguj się jako pracownik → w menu nie ma „Historii zmian”; adres http://localhost:5180/admin/activity-log
-    pokazuje „Brak dostępu”.
+    pokazuje „Nie masz dostępu do tej części aplikacji.”
+
+## Próby nadużyć
+
+Testy automatyczne w blokach `describe('abuse')` (`activity-log.routes.test.ts`, `activity-log.service.test.ts`,
+`ActivityLogPage.test.tsx`), 2026-11-20:
+
+| Próba | Wynik |
+|---|---|
+| Pracownik otwiera historię i listę osób, także z dopisanymi parametrami → 403, bez danych | przeszła (zablokowane) |
+| Ekran historii wpisany ręcznie przez pracownika → brak ekranu i menu (e2e) | przeszła (zablokowane) |
+| Zapis, zmiana albo usunięcie wpisu historii (POST/PUT/PATCH/DELETE), także przez administratora → 404 | przeszła (zablokowane) |
+| SQL w wyszukiwarce, nieznane pola, sortowanie, numery `1e3`/`0x10`/`007`, ujemna strona, za długie szukanie, zła data → pominięte | przeszła (zablokowane) |
+| „Kto zmienił” podrobiony w treści żądania (`userId`, `userName`) → zapis z osobą z sesji | przeszła (zablokowane) |
+| Login ze znakami `&`, `=`, `#`, `//` w przycisku „Otwórz” → zakodowany, adres zostaje w panelu | przeszła (zablokowane) |
+| Usunięte konto w zmianach → „usunięte konto”, nigdy inna osoba | przeszła (zablokowane) |
+| `<script>` w nazwie, opisie i zmianie → widać jako zwykły tekst | przeszła (zablokowane) |
+| Adres spoza panelu w odpowiedzi serwera → przycisk „Otwórz” pokazany | **naprawiona**: ekran pokazuje przycisk tylko dla adresów w panelu |
+| Nowy typ: „Limit dni w roku” pokazywał „bez limitu → bez limitu” (sprawdzenie w przeglądarce) | **naprawiona**: przy nowym rekordzie pole „przed” jest puste |
+| Data „do” przed „od” → 400 przy polu `to` (serwer) i błąd pod polem (ekran) | przeszła (zablokowane) |
+| Usunięcie projektu na stałe → wpisy zostają z nazwą i plakietką (e2e) | przeszła (zablokowane) |
+| Hasło w historii → tylko „ustawiono hasło tymczasowe” (test Pracowników) | przeszła (zablokowane) |

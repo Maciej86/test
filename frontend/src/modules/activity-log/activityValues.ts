@@ -15,7 +15,7 @@ const isEmpty = (value: unknown) => value === null || value === undefined || val
  * Statusy, kolumny i role biorą tekst z modułów, z których pochodzą.
  */
 export const formatChangeValue = (field: string, value: unknown, t: TFunction): string | null => {
-  if (field === 'yearly_limit' && isEmpty(value)) return t('values.no_limit');
+  if (field === 'yearly_limit' && value === null) return t('values.no_limit');
   if (isEmpty(value)) return null;
   if (field === 'password') return t('values.password_reset');
   if (field === 'status') return translateKey(t, `my-leave.status.${String(value)}`);

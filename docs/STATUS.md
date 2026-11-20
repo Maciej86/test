@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.44
 
-**Następny krok:** Moduł Historia zmian, testy: próby nadużyć (`describe('abuse')`), sprawdzenie w przeglądarce, potem użytkownik przechodzi `docs/modules/activity-log/TESTS.md`.
+**Następny krok:** Moduł Historia zmian, testy: użytkownik przechodzi `docs/modules/activity-log/TESTS.md` i potwierdza „działa”; potem zamknięcie modułu.
 
 ## Start aplikacji
 

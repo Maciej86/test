@@ -4,7 +4,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { describeActivity, formatTime, type ActivityArea, type ActivityLogItem, type ActivityTone } from '@app/shared';
+import { describeActivity, formatTime, isPanelLink, type ActivityArea, type ActivityLogItem, type ActivityTone } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { formatChangeValue, formatContext } from '../activityValues';
 
@@ -54,7 +54,8 @@ const Changes = ({ entry }: { entry: ActivityLogItem }) => {
 const OpenRecord = ({ entry }: { entry: ActivityLogItem }) => {
   const { t } = useTranslation('activity-log');
   if (entry.state === 'deleted') return <Text size="xs" c="dimmed">{t('deleted_hint')}</Text>;
-  if (entry.state === 'archived' || !entry.link) return <Text size="xs" c="dimmed">{t('archived_hint')}</Text>;
+  // Tylko adresy w panelu (jak w Powiadomieniach); inny adres z odpowiedzi nie staje się przyciskiem.
+  if (entry.state === 'archived' || !isPanelLink(entry.link)) return <Text size="xs" c="dimmed">{t('archived_hint')}</Text>;
   return (
     <Button
       component={Link}

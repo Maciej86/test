@@ -138,3 +138,21 @@ describe('ActivityLogPage', () => {
     expect(screen.queryByRole('link', { name: /Otwórz/, hidden: true })).not.toBeInTheDocument();
   });
 });
+
+describe('abuse', () => {
+  it('a script in a name, a change or a context is shown as plain text', async () => {
+    const script = '<script>alert(1)</script>';
+    show(page([item({ entityName: script, entityContext: { project: script }, area: 'tasks', action: 'update', changes: { title: { before: 'a', after: script } } })]));
+    fireEvent.click(await screen.findByRole('button', { name: /Zmiana zadania/ }));
+    expect(screen.getAllByText(script).length).toBeGreaterThan(0);
+    expect(screen.getByText(`, projekt ${script}`)).toBeInTheDocument();
+    expect(document.querySelector('script')).toBeNull();
+  });
+
+  it('a link outside the panel from a broken response is not shown as "Open"', async () => {
+    show(page([item({ link: 'https://evil.example/' })]));
+    fireEvent.click(await screen.findByRole('button', { name: /Zatwierdzenie wniosku/ }));
+    expect(screen.queryByRole('link', { name: /Otwórz/, hidden: true })).not.toBeInTheDocument();
+  });
+});
+

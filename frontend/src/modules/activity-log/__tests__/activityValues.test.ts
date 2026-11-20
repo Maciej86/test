@@ -21,6 +21,8 @@ describe('formatChangeValue', () => {
     expect(v('added_member_id', null)).toBeNull();
     expect(v('password', 'reset')).toBe('ustawiono hasło tymczasowe');
     expect(v('yearly_limit', null)).toBe('bez limitu');
+    // Nowy rekord: brak wartości „przed” (undefined) to nie „bez limitu”.
+    expect(v('yearly_limit', undefined)).toBeNull();
     expect(v('title', '')).toBeNull();
     expect(v('working_days', 6)).toBe('6');
   });

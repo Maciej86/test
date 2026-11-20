@@ -102,3 +102,17 @@ describe('activity-log service', () => {
     expect(await s.getPeople()).toEqual([{ userId: 1, userName: 'Anna Nowak' }]);
   });
 });
+
+describe('abuse', () => {
+  it('"Open" links stay inside the panel: a login with special characters is encoded, not a new parameter or address', async () => {
+    list([entry({ area: 'users', entityId: 2 })], [['users:2', { archived: false, login: 'a&role=admin#//evil.example' }]]);
+    const [item] = (await s.getList(query)).items;
+    expect(item!.link).toBe('/admin/employees?search=a%26role%3Dadmin%23%2F%2Fevil.example');
+  });
+
+  it('a person id that does not exist any more is shown as a deleted account, never as another person', async () => {
+    list([entry({ changes: { assignee_ids: { before: [], after: [404] } } })], [], [[5, 'Jan Kowalski']]);
+    expect((await s.getList(query)).items[0]!.changes.assignee_ids).toEqual({ before: [], after: [null] });
+  });
+});
+
