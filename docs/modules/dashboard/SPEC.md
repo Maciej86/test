@@ -1,6 +1,6 @@
 # Spec: Pulpit
 
-**Data:** 2026-11-20 · **Status:** do akceptacji
+**Data:** 2026-11-20 · **Status:** zaakceptowany 2026-11-20
 **Podstawa:** `QUESTIONS.md` (odpowiedzi 1a–7a), `SPEC-GENERAL.md`, makieta
 `mockups/src/modules/dashboard/DashboardMockup.tsx`
 
@@ -104,7 +104,7 @@ Bez wpisów w Historii zmian (nic nie zmienia).
   `pending`, `absences`, `projects` i `overdue`.
 - Liczy serwer: „dziś” (`todayIsoDate()` w strefie aplikacji), wszystkie liczby, kolejność, przycięcie list do 5
   i `total`, „po terminie”.
-- Schemat odpowiedzi (zod) w `shared/src/schemas/dashboard.ts` jako unia rozróżniana polem `role`.
+- Typy odpowiedzi w `shared/src/schemas/dashboard.ts` (jak w innych modułach: typy TypeScript, bez zod, bo Pulpit nic nie przyjmuje), unia rozróżniana polem `role`.
 
 ## Powiązania
 
