@@ -74,7 +74,7 @@ i edycję).
   `useArchivedTasks(params)`, `useArchivedTask(id | null)`, `useRestoreEmployee`, `useDeleteEmployee`,
   `useRestoreTask`, `useDeleteTask` (sukces i błąd odświeżają `['archive']`, przywrócenie też `['employees']` /
   `['tasks']`, `keepPreviousData` na listach); testy z podmienionym `api` → `npm run check`
-- [ ] 9. **Ekran i zakładka Pracownicy**: `ArchivePage.tsx` (nagłówek, zakładki z licznikami, parametry w adresie
+- [x] 9. **Ekran i zakładka Pracownicy**: `ArchivePage.tsx` (nagłówek, zakładki z licznikami, parametry w adresie
   przez `useListParams(archivePageSchema, …)`, zmiana zakładki czyści `search`, `projectId`, `page`),
   `components/ArchivedEmployees.tsx` (tabela + karty na telefonie, dymek przy wyłączonym „Usuń na stałe”),
   `components/EmployeeModals.tsx` (przywróć, usuń przez `ConfirmByNameModal`); błąd 404/409 → dymek `gone`,
@@ -97,3 +97,4 @@ i edycję).
 - Krok 2: klucze błędów modułu jak w innych modułach: `archive.server.has_leave_requests`, `archive.server.not_archived`, `archive.server.confirm_mismatch` (spec pisał `archive.has_leave_requests`); `ARCHIVE_TABS` w stałych. Komentarze w podglądzie: pole `commentsList` (liczba komentarzy to `comments`).
 - Krok 5: `logTask` w Zadaniach przyjmuje `Actor` (wystarczy numer i imię), żeby Archiwum mogło zapisać przywrócenie i usunięcie. Komentarz autora usuniętego na stałe ma w podglądzie szare kółko (`authorArchived`), jak na tablicy. Zadanie blokowane `FOR UPDATE OF t` (tylko wiersz zadania, MySQL 8.4).
 - Krok 8: akcje odświeżają też Historię zmian (`activity-log`) i robią to po sukcesie i po błędzie (`onSettled`), bo 404/409 znaczy, że ktoś już zmienił archiwum.
+- Krok 9: moduły nie importują `axios`, więc doszło `apiErrorStatus` w `core/api/client.ts` (z testem); rozpoznanie „rekordu już nie ma” w `archive/archiveErrors.ts` (404 albo 409 z kluczem „nie w archiwum”). Rola w znaczniku przez `ROLE_LABELS` (jak w Pracownikach).

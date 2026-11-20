@@ -13,6 +13,11 @@ export const apiErrorKey = (err: unknown): string | null => {
   return (err.response.data as { error?: { message?: string } } | undefined)?.error?.message ?? null;
 };
 
+/** Kod odpowiedzi serwera (np. 404, 409) albo null (brak połączenia, inny błąd). */
+export const apiErrorStatus = (err: unknown): number | null => {
+  return isAxiosError(err) && err.response ? err.response.status : null;
+};
+
 /** Błędy pól z odpowiedzi 400 (`{ pole: klucz }`), do pokazania pod polami formularza; brak = null. */
 export const apiErrorFields = (err: unknown): Record<string, string> | null => {
   if (!isAxiosError(err) || !err.response) return null;

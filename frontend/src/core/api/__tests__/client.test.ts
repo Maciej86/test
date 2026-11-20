@@ -70,3 +70,11 @@ describe('handleSessionError', () => {
     expect(go).not.toHaveBeenCalled();
   });
 });
+
+describe('apiErrorStatus', () => {
+  it('gives the HTTP status of a server answer, null without an answer', async () => {
+    const { apiErrorStatus } = await import('../client');
+    expect(apiErrorStatus(axiosError({ error: { message: 'server.not_found' } }, 404))).toBe(404);
+    expect(apiErrorStatus(new Error('offline'))).toBeNull();
+  });
+});
