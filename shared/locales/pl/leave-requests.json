@@ -69,8 +69,6 @@
   "strip_request": "ten wniosek",
   "strip_approved": "urlop zatwierdzony",
   "strip_pending": "wniosek czeka na decyzję",
-  "strip_off": "weekend albo święto",
-  "strip_weekend": "Weekend, nie liczy się do urlopu",
   "strip_working": "Dzień roboczy, nikt nie ma urlopu",
   "strip_nobody": "W tym terminie nikt inny nie ma urlopu.",
   "comment": "Komentarz",

@@ -105,5 +105,9 @@
     "legend_pending": "czeka na decyzję",
     "legend_carried": "zostało z zaległego z {{year}}",
     "legend_annual": "zostało z puli rocznej"
+  },
+  "strip": {
+    "weekend": "Weekend, nie liczy się do urlopu",
+    "off": "weekend albo święto"
   }
 }

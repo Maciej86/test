@@ -36,11 +36,11 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
   'overdue' | 'soon' | 'normal' | null` w `shared/src/taskDue.ts` (eksport z `index.ts`), test w
   `shared/src/__tests__/taskDue.test.ts` (wczoraj → overdue, dziś i jutro → soon, pojutrze → normal, `done` i `null`
   → null); `TaskCard` i `TaskBoardPage` wołają nową funkcję, `dueState` znika z `tasks/taskDue.ts` → `npm run check`.
-- [ ] 2. Wydzielenie karty puli: `common/PoolCard.tsx` (`PoolCard({ pool, actions? }: { pool: MyLeaveOverview['pool'];
+- [x] 2. Wydzielenie karty puli: `common/PoolCard.tsx` (`PoolCard({ pool, actions? }: { pool: MyLeaveOverview['pool'];
   actions?: ReactNode })`), klucze `pool_title`, `pool_left`, `pool_aria`, `pool_hint`, `legend_*` przeniesione do
   `common.json` jako `pool.*`; test `common/__tests__/PoolCard.test.tsx` (liczba, legenda, 0 dni → `red.4`
   `data-left="none"`, przycisk z `actions`); Moje urlopy używają klocka, ich testy bez zmian zielone → `npm run check`.
-- [ ] 3. Wydzielenie paska: `common/LeaveStrip.tsx`:
+- [x] 3. Wydzielenie paska: `common/LeaveStrip.tsx`:
   `LeaveStrip({ days, rows, labels, highlight? })`, `rows: { name: string; bold?: boolean; markOn: (iso) => StripMark }[]`,
   `StripMark = 'request' | 'approved' | 'pending' | 'none'`, `labels: Partial<Record<StripMark, string>>` (legenda
   pokazuje tylko podane), `highlight` = dzień podkreślony `navy.4` (`data-today`); dymek święta i weekendu z
