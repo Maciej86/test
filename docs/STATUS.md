@@ -1,6 +1,6 @@
 # Stan projektu: test
 
-**Wersja stepkit:** 0.1.47
+**Wersja stepkit:** 0.1.48
 
 **Następny krok:** Moduł Pulpit (makieta).
 
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-20: Aktualizacja stepkit do 0.1.48: strona „Postęp” w makietach widzi zmiany statusu bez ponownego uruchamiania.
 - 2026-11-20: Moduł Moje konto zrobiony (potwierdzony przez użytkownika): własne dane, e-mail do powiadomień (obie role), zmiana hasła z obecnym (limit 10 nieudanych prób na konto, inne sesje kończą się, ochrona przed nadpisaniem hasła zmienionego w międzyczasie), wpis „Zmiana własnego hasła” w Historii zmian. Wspólne klocki: `DetailRow`, `RoleBadge`, `withRepeatPassword`.
 - 2026-11-20: Poprawka: testy w przeglądarce czekają na element 10 s (było 5 s), cały test do 45 s; przy zajętym komputerze zapis z hasłem trwa kilka sekund. Aplikacja bez zmian.
 - 2026-11-20: Aktualizacja stepkit do 0.1.47: szuflady, okna formularzy i kółka osób są wspólnymi klockami (`SideDrawer`, `FormModal`, `PersonAvatar` w `common/` frontu i makiet); szczegóły wniosku mają teraz 540 px jak reszta podglądów (było szerzej), kółka osób w archiwum wszędzie szare i przygaszone; „Zamknij rok” na `ConfirmModal`.
