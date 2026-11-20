@@ -37,4 +37,13 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180 i zalog
 
 ## Próby nadużyć
 
-(uzupełniane na etapie testy według `abuse.md`)
+Sprawdzone 2026-11-20 na prawdziwej bazie (`e2e/archive.spec.ts`, blok `abuse`, 3 powtórzenia):
+
+- Pracownik wywołuje każdą trasę archiwum (lista, podgląd, przywrócenie, usunięcie kont i zadań) → 403, nic się nie zmienia: przeszła
+- Rekord spoza archiwum przez Archiwum: podgląd 404, usunięcie 409, przywrócenie 409; nieistniejący i „1e3” w adresie → 404: przeszła
+- Podrobione pola przy przywróceniu (kolumna, pozycja, kto przywrócił) → zadanie wraca do swojej kolumny, w historii osoba z sesji: przeszła
+- Dwa przywrócenia naraz → jedno 200, drugie 409, pozycje w kolumnie bez powtórzeń: przeszła
+- Przywrócenie i usunięcie naraz (zadanie i konto) → dokładnie jedno się udaje, bez błędu serwera: przeszła (przed przeglądem kodu dwa przywrócenia konta naraz oba dawały „sukces”: naprawiona blokadą wiersza)
+- Usunięcie konta w chwili zapisu zadania, do którego jest przypisane → bez błędu serwera; historia konta zostaje: przeszła
+- Skrypt w tytule zadania widać w podglądzie jako zwykły tekst; za długie i złe imię i nazwisko → 400; zły projekt i kolumna sortowania → 400: przeszła
+- Osoba z wnioskami urlopowymi (także wycofanymi) → „Usuń na stałe” wyszarzony, serwer 409: przeszła

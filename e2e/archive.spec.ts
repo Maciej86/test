@@ -142,3 +142,116 @@ test('pracownik nie ma dostępu do archiwum', async ({ page }) => {
   await page.goto('/admin/archive');
   await expect(page.getByText('Nie masz dostępu do tej części aplikacji.')).toBeVisible();
 });
+
+test.describe('abuse', () => {
+  test('pracownik: każda trasa archiwum → 403, nic się nie zmienia', async ({ page, browser }) => {
+    const { taskId } = await archivedTask(page, `Nadużycie ${Date.now()}`);
+    const { id } = await archivedAccount(page, 'Ola', `Nadużycie${String(Date.now()).slice(-6)}`);
+    const { page: jan } = await employee(page, browser, 'Jan');
+    const calls = [
+      jan.request.get('/api/archive/counts'),
+      jan.request.get('/api/archive/employees'),
+      jan.request.get('/api/archive/tasks'),
+      jan.request.get(`/api/archive/tasks/${taskId}`),
+      jan.request.post(`/api/archive/tasks/${taskId}/restore`, { data: {} }),
+      jan.request.delete(`/api/archive/tasks/${taskId}`),
+      jan.request.post(`/api/archive/employees/${id}/restore`, { data: {} }),
+      jan.request.delete(`/api/archive/employees/${id}`, { data: { confirmName: 'x' } }),
+    ];
+    for (const res of await Promise.all(calls)) expect(res.status()).toBe(403);
+    expect((await page.request.get(`/api/archive/tasks/${taskId}`)).status()).toBe(200);
+  });
+
+  test('rekord spoza archiwum: podgląd 404, usunięcie 409, przywrócenie 409; nieistniejący 404', async ({ page }) => {
+    const project = await ok(await page.request.post('/api/tasks/projects', { data: { name: `E2E Aktywny ${Date.now()}`, memberIds: [] } }));
+    const task = await ok(await page.request.post(`/api/tasks/projects/${project.id}/tasks`, { data: { title: 'Aktywne', description: null, dueDate: null, column: 'draft', assigneeIds: [] } }));
+    expect((await page.request.get(`/api/archive/tasks/${task.id}`)).status()).toBe(404);
+    expect((await page.request.delete(`/api/archive/tasks/${task.id}`)).status()).toBe(409);
+    expect((await page.request.post(`/api/archive/tasks/${task.id}/restore`, { data: {} })).status()).toBe(409);
+    const login = `e2e.tmp.${Date.now()}@test.local`;
+    const active = await ok(await page.request.post('/api/employees', { data: { firstName: 'Ala', lastName: 'Aktywna', login, email: '', role: 'employee', password: 'Urlop-2026!', annualDays: 20, carriedDays: 0 } }));
+    const del = await page.request.delete(`/api/archive/employees/${active.id}`, { data: { confirmName: 'Ala Aktywna' } });
+    expect(del.status()).toBe(409);
+    expect(((await del.json()) as { error: { message: string } }).error.message).toBe('server.archive_first');
+    expect((await page.request.post(`/api/archive/employees/${active.id}/restore`, { data: {} })).status()).toBe(409);
+    expect((await page.request.delete('/api/archive/tasks/999999999')).status()).toBe(404);
+    expect((await page.request.post('/api/archive/employees/1e3/restore', { data: {} })).status()).toBe(404);
+    const board = (await (await page.request.get(`/api/tasks/projects/${project.id}/board`)).json()) as { tasks: { id: number }[] };
+    expect(board.tasks.map((t) => t.id)).toContain(task.id);
+  });
+
+  test('podrobione pola: kto przywrócił i usunął zawsze z sesji, dopisane pola bez skutku', async ({ page }) => {
+    const title = `Podrobione ${Date.now()}`;
+    const { projectId, taskId } = await archivedTask(page, title);
+    const res = await page.request.post(`/api/archive/tasks/${taskId}/restore`, { data: { position: 1, column: 'done', archivedBy: 1, userId: 1 } });
+    expect(res.status()).toBe(200);
+    const board = (await (await page.request.get(`/api/tasks/projects/${projectId}/board`)).json()) as { tasks: { id: number; column: string }[] };
+    expect(board.tasks.find((t) => t.id === taskId)?.column).toBe('in_progress');
+    const history = (await (await page.request.get(`/api/activity-log?search=${encodeURIComponent(title)}`)).json()) as { items: { action: string; userName: string }[] };
+    expect(history.items.find((i) => i.action === 'restore')?.userName).toBe('Test Administrator');
+  });
+
+  test('dwa razy naraz: dwa przywrócenia, przywrócenie i usunięcie → jedno się udaje, bez błędu serwera i bez powtórzonych pozycji', async ({ page }) => {
+    const { projectId, taskId } = await archivedTask(page, `Naraz ${Date.now()}`);
+    const twice = await Promise.all([
+      page.request.post(`/api/archive/tasks/${taskId}/restore`, { data: {} }),
+      page.request.post(`/api/archive/tasks/${taskId}/restore`, { data: {} }),
+    ]);
+    expect(twice.map((r) => r.status()).sort()).toEqual([200, 409]);
+    const board = (await (await page.request.get(`/api/tasks/projects/${projectId}/board`)).json()) as { tasks: { id: number; column: string; position: number }[] };
+    const positions = board.tasks.filter((t) => t.column === 'in_progress').map((t) => t.position);
+    expect(new Set(positions).size).toBe(positions.length);
+
+    await ok(await page.request.post(`/api/tasks/${taskId}/archive`, { data: {} }));
+    const mixed = await Promise.all([
+      page.request.post(`/api/archive/tasks/${taskId}/restore`, { data: {} }),
+      page.request.delete(`/api/archive/tasks/${taskId}`),
+    ]);
+    const statuses = mixed.map((r) => r.status());
+    expect(statuses.filter((s) => s === 200)).toHaveLength(1);
+    expect(statuses.every((s) => s < 500)).toBe(true);
+
+    const lastName = `Naraz${String(Date.now()).slice(-6)}`;
+    const account = await archivedAccount(page, 'Ewa', lastName);
+    const people = await Promise.all([
+      page.request.post(`/api/archive/employees/${account.id}/restore`, { data: {} }),
+      page.request.delete(`/api/archive/employees/${account.id}`, { data: { confirmName: `Ewa ${lastName}` } }),
+    ]);
+    const peopleStatuses = people.map((r) => r.status());
+    expect(peopleStatuses.filter((s) => s === 200)).toHaveLength(1);
+    expect(peopleStatuses.every((s) => s < 500)).toBe(true);
+  });
+
+  test('usunięcie konta w chwili zapisu zadania, do którego jest przypisane → bez błędu serwera', async ({ page, browser }) => {
+    const lastName = `Przypisana${String(Date.now()).slice(-6)}`;
+    const { login } = await employee(page, browser, 'Iza', lastName);
+    const people = (await (await page.request.get(`/api/employees?search=${encodeURIComponent(login)}`)).json()) as { items: { id: number }[] };
+    const izaId = people.items[0]!.id;
+    const project = await ok(await page.request.post('/api/tasks/projects', { data: { name: `E2E Przypisania ${Date.now()}`, memberIds: [izaId] } }));
+    const task = await ok(await page.request.post(`/api/tasks/projects/${project.id}/tasks`, { data: { title: 'Z Izą', description: null, dueDate: null, column: 'draft', assigneeIds: [izaId] } }));
+    await ok(await page.request.post(`/api/employees/${izaId}/archive`, { data: {} }));
+    for (let round = 0; round < 3; round += 1) {
+      const [save, del] = await Promise.all([
+        page.request.put(`/api/tasks/${task.id}`, { data: { title: `Z Izą ${round}`, description: null, dueDate: null, column: 'draft', assigneeIds: [izaId] } }),
+        round === 2 ? page.request.delete(`/api/archive/employees/${izaId}`, { data: { confirmName: `Iza ${lastName}` } }) : page.request.get('/api/archive/counts'),
+      ]);
+      expect(save.status(), await save.text()).toBeLessThan(500);
+      expect(del.status(), await del.text()).toBeLessThan(500);
+    }
+    const history = (await (await page.request.get(`/api/activity-log?search=${encodeURIComponent(`Iza ${lastName}`)}`)).json()) as { items: { action: string }[] };
+    expect(history.items.map((i) => i.action)).toContain('archive');
+  });
+
+  test('złe dane: skrypt w tytule jako tekst, za długa nazwa i zły projekt → 400', async ({ page }) => {
+    const script = '<script>alert(1)</script>';
+    const { taskId } = await archivedTask(page, script);
+    await page.goto(`/admin/archive?tab=tasks&taskId=${taskId}`);
+    await expect(page.getByRole('dialog', { name: 'Zadanie w archiwum' }).getByText(script)).toBeVisible();
+    expect(await page.evaluate(() => document.querySelectorAll('script:not([src]):not([type])').length)).toBeLessThanOrEqual(1);
+    const { id } = await archivedAccount(page, 'Ula', 'Długa');
+    expect((await page.request.delete(`/api/archive/employees/${id}`, { data: { confirmName: 'x'.repeat(500) } })).status()).toBe(400);
+    expect((await page.request.delete(`/api/archive/employees/${id}`, { data: { confirmName: 'Ula długa' } })).status()).toBe(400);
+    expect((await page.request.get('/api/archive/tasks?projectId=-1')).status()).toBe(400);
+    expect((await page.request.get('/api/archive/employees?sort=password_hash')).status()).toBe(400);
+  });
+});
