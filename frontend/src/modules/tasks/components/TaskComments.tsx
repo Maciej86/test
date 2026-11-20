@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Avatar, Badge, Button, Group, Stack, Text, Textarea, Title, Tooltip } from '@mantine/core';
+import { Badge, Button, Group, Stack, Text, Textarea, Title, Tooltip } from '@mantine/core';
 import { MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { commentSchema, formatDateTime, formatRelativeDateTime, initials, type TaskComment } from '@app/shared';
+import { commentSchema, formatDateTime, formatRelativeDateTime, type TaskComment } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { ConfirmModal } from '../../../common/ConfirmModal';
 import { DataState } from '../../../common/DataState';
+import { PersonAvatar } from '../../../common/PersonAvatar';
 import { apiErrorFields, apiErrorMessage } from '../../../core/api/client';
 import { fieldError } from '../../../core/fieldError';
 import { notify } from '../../../core/notify';
@@ -67,9 +68,7 @@ const CommentItem = ({ comment, onDelete }: { comment: TaskComment; onDelete: (c
   };
   return (
     <Group gap="sm" align="flex-start" wrap="nowrap" data-comment={comment.id}>
-      <Avatar size="sm" radius="xl" color={gone ? 'gray' : 'navy'} variant={gone ? 'outline' : 'light'} opacity={gone ? 0.6 : 1}>
-        {initials(comment.authorName)}
-      </Avatar>
+      <PersonAvatar name={comment.authorName} archived={gone} />
       <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
         <Group gap={6} wrap="wrap">
           <Text size="sm" fw={600}>{comment.authorName}</Text>

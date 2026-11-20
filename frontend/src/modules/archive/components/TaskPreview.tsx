@@ -1,25 +1,23 @@
 import { useEffect, useRef } from 'react';
-import { Alert, Avatar, Badge, Button, Divider, Drawer, Group, Stack, Text } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
+import { Alert, Badge, Button, Divider, Group, Stack, Text } from '@mantine/core';
 import { Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatDateTime, initials, type ArchivedTask } from '@app/shared';
-import { useMantineTheme } from '@mantine/core';
+import { formatDateTime, type ArchivedTask } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DataState } from '../../../common/DataState';
 import { DateText } from '../../../common/DateText';
+import { PersonAvatar } from '../../../common/PersonAvatar';
+import { SideDrawer } from '../../../common/SideDrawer';
 import { notify } from '../../../core/notify';
 import { useArchivedTask } from '../archive.api';
 import { isGone } from '../archiveErrors';
-
-const DRAWER_WIDTH = 540;
 
 /** Kółko i imię osoby; w archiwum albo usunięta na stałe: szare, ze znacznikiem „w archiwum”. */
 const Person = ({ name, archived }: { name: string; archived: boolean }) => {
   const { t } = useTranslation('archive');
   return (
     <Group gap={8} wrap="nowrap">
-      <Avatar size="sm" radius="xl" color={archived ? 'gray' : 'navy'} variant="light">{initials(name)}</Avatar>
+      <PersonAvatar name={name} archived={archived} />
       <Text size="sm" c={archived ? 'dimmed' : undefined}>{name}</Text>
       {archived && <Badge size="xs" variant="light" color="gray">{t('archived_person')}</Badge>}
     </Group>
@@ -38,9 +36,6 @@ export const TaskPreview = ({ taskId, onClose, onRestore, onDelete }: {
 }) => {
   const { t } = useTranslation('archive');
   const { t: tTasks } = useTranslation('tasks');
-  const { t: tCommon } = useTranslation();
-  const theme = useMantineTheme();
-  const phone = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`) ?? false;
   const query = useArchivedTask(taskId);
   const task = query.data;
   const gone = query.isError && isGone(query.error);
@@ -54,7 +49,7 @@ export const TaskPreview = ({ taskId, onClose, onRestore, onDelete }: {
   }, [gone, onClose, t]);
 
   return (
-    <Drawer opened onClose={onClose} position="right" size={phone ? '100%' : DRAWER_WIDTH} closeButtonProps={{ 'aria-label': tCommon('close') }} title={<Text ff="heading" fw={600} size="lg">{t('task_details')}</Text>}>
+    <SideDrawer title={t('task_details')} onClose={onClose}>
       <DataState query={query}>
         {task && (
           <Stack>
@@ -101,6 +96,6 @@ export const TaskPreview = ({ taskId, onClose, onRestore, onDelete }: {
           </Stack>
         )}
       </DataState>
-    </Drawer>
+    </SideDrawer>
   );
 };

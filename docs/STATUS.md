@@ -1,6 +1,6 @@
 # Stan projektu: test
 
-**Wersja stepkit:** 0.1.44
+**Wersja stepkit:** 0.1.47
 
 **Następny krok:** Moduł Moje konto (makieta).
 
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-20: Aktualizacja stepkit do 0.1.47: szuflady, okna formularzy i kółka osób są wspólnymi klockami (`SideDrawer`, `FormModal`, `PersonAvatar` w `common/` frontu i makiet); szczegóły wniosku mają teraz 540 px jak reszta podglądów (było szerzej), kółka osób w archiwum wszędzie szare i przygaszone; „Zamknij rok” na `ConfirmModal`.
 - 2026-11-20: Poprawka (zgłoszenie użytkownika): Archiwum przy każdym wejściu pobiera świeżą listę i liczniki (osoba przeniesiona do archiwum w Pracownikach nie była widoczna bez odświeżenia strony).
 - 2026-11-20: Moduł Archiwum gotowy (użytkownik potwierdził testy: „działa”). Wspólne `ConfirmByNameModal` (common) i `useEmptyLaterPage` (core), `apiErrorStatus` w kliencie API, „Otwórz w archiwum” w Historii zmian.
 - 2026-11-20: Archiwum: próby nadużyć na prawdziwej bazie odparte, przeklikane w przeglądarce (administrator, pracownik, telefon); poprawiona odmiana w oknach usuwania; 59 testów e2e zielonych.

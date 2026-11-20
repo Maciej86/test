@@ -52,6 +52,26 @@ export const polishTextInCode = (text: string) => lines(withoutComments(text), (
 /** 13. Własne wyrażenie regularne w schemacie modułu zamiast gotowego pola z shared/src/schemas/fields.ts. */
 export const ownRegex = (text: string) => lines(text, (l) => /\.regex\(/.test(l));
 
+/**
+ * 14. Ta sama rama z wyglądem w dwóch modułach. Czerwony: wydziel ramę do common/ (treść przez children)
+ * i podmień wszystkie kopie („Wspólne zamiast kopii”).
+ */
+export const FRAMES = ['Drawer', 'Modal', 'Avatar', 'Tabs'] as const;
+
+export const framesIn = (text: string): string[] => {
+  const code = withoutComments(text);
+  return FRAMES.filter((c) => lines(code, (l) => new RegExp(`<${c}(\\s|>|$)`).test(l)).length > 0);
+};
+
+/** Ramy użyte wprost w więcej niż jednym module, np. { Drawer: ['archive', 'tasks'] }. */
+export const sharedFrames = (byFile: { module: string; text: string }[]): Record<string, string[]> => {
+  const where: Record<string, Set<string>> = {};
+  for (const { module, text } of byFile) for (const f of framesIn(text)) (where[f] ??= new Set()).add(module);
+  return Object.fromEntries(
+    Object.entries(where).filter(([, m]) => m.size > 1).map(([f, m]) => [f, [...m].sort()]),
+  );
+};
+
 describe('convention checks catch violations', () => {
   it('8. own HTTP client', () => {
     expect(ownHttpClient("const r = await fetch('/api/x');")).toEqual([1]);
@@ -79,6 +99,18 @@ describe('convention checks catch violations', () => {
   it('13. own regular expressions in module schemas', () => {
     expect(ownRegex("zip: z.string().regex(/^\\d{2}-\\d{3}$/, 'x'),")).toEqual([1]);
     expect(ownRegex('zip: postalCode,')).toEqual([]);
+  });
+
+  it('14. the same frame in two modules', () => {
+    expect(framesIn('<Drawer opened onClose={close}>')).toEqual(['Drawer']);
+    expect(framesIn('<Drawer\n  opened')).toEqual(['Drawer']);
+    expect(framesIn('<SideDrawer title="x">')).toEqual([]);
+    expect(framesIn('<Tabs.Tab value="a">')).toEqual([]);
+    expect(framesIn('<Modal // rule-ok: okno z mapą na cały ekran, inna rama\n  opened>')).toEqual([]);
+    expect(sharedFrames([{ module: 'tasks', text: '<Drawer>' }, { module: 'tasks', text: '<Drawer>' }])).toEqual({});
+    expect(sharedFrames([{ module: 'tasks', text: '<Drawer>' }, { module: 'archive', text: '<Drawer>' }])).toEqual({
+      Drawer: ['archive', 'tasks'],
+    });
   });
 
   it('12. Polish text in code', () => {
@@ -116,6 +148,11 @@ describe('frontend follows the conventions', () => {
 
   it.each(modules.map(name))('%s: texts in shared/locales, not in code', (f) => {
     expect(polishTextInCode(read(join(src, f)))).toEqual([]);
+  });
+
+  it('modules: Drawer, Modal, Avatar and Tabs used in two modules live in common/', () => {
+    const byFile = modules.map((f) => ({ module: relative(modulesDir, f).split(sep)[0]!, text: read(f) }));
+    expect(sharedFrames(byFile)).toEqual({});
   });
 
   it('shared/src/schemas: module schemas take formats only from fields.ts', () => {

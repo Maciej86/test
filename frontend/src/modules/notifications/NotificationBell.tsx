@@ -46,7 +46,7 @@ export const NotificationBell = () => {
     return (
       <>
         {bell}
-        <Drawer
+        <Drawer // rule-ok: panel dzwonka na telefonie: cały ekran bez tytułu i krzyżyka, inna rama niż SideDrawer
           opened={opened}
           onClose={close}
           position="right"

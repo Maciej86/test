@@ -1,11 +1,11 @@
 import { useState, type ReactNode } from 'react';
-import { Alert, Anchor, Button, Group, Modal, NumberInput, Stack, Switch, TextInput } from '@mantine/core';
+import { Alert, Anchor, NumberInput, Switch, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LEAVE_TYPE_LIMIT_MAX, LEAVE_TYPE_LIMIT_MIN, LEAVE_TYPE_MESSAGES, leaveTypeSchema, type LeaveTypeItem } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
+import { FormModal } from '../../../common/FormModal';
 import { apiErrorBody, apiErrorFields, apiErrorMessage } from '../../../core/api/client';
 import { fieldError } from '../../../core/fieldError';
 import { notify } from '../../../core/notify';
@@ -79,49 +79,39 @@ export const LeaveTypeFormModal = ({ leaveType, onClose }: { leaveType: LeaveTyp
   };
 
   return (
-    <Modal opened onClose={onClose} title={isNew ? t('add') : t('edit_title', { name: leaveType.name })}>
-      <form onSubmit={submit} noValidate>
-        <Stack>
-          {!isNew && leaveType.requestsCount > 0 && (
-            <Alert color="yellow" icon={<CircleAlert size={18} />}>
-              {t('used_warning', { count: leaveType.requestsCount })}
-            </Alert>
-          )}
-          <TextInput
-            label={t('field_name')}
-            withAsterisk
-            description={t('field_name_hint')}
-            autoComplete="off"
-            {...form.getInputProps('name')}
-            error={nameError()}
-          />
-          <Switch
-            label={t('field_deducts')}
-            description={t('field_deducts_hint')}
-            {...form.getInputProps('deductsPool', { type: 'checkbox' })}
-          />
-          <NumberInput
-            label={t('field_limit')}
-            description={t('field_limit_hint')}
-            min={LEAVE_TYPE_LIMIT_MIN}
-            max={LEAVE_TYPE_LIMIT_MAX}
-            allowDecimal={false}
-            allowNegative={false}
-            // Bez samoczynnego poprawiania na 1 albo 365: wartość spoza zakresu pokazuje błąd pod polem.
-            clampBehavior="none"
-            suffix={t('field_limit_suffix')}
-            w={{ base: '100%', xs: 220 }}
-            {...form.getInputProps('yearlyLimit')}
-            error={fieldError(t, form.errors.yearlyLimit)}
-          />
-          <Group justify="flex-end" mt="xs">
-            <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-            <Button type="submit" leftSection={<ButtonIcon action="save" />} loading={create.isPending || update.isPending}>
-              {t('save')}
-            </Button>
-          </Group>
-        </Stack>
-      </form>
-    </Modal>
+    <FormModal title={isNew ? t('add') : t('edit_title', { name: leaveType.name })} submitLabel={t('save')} submitAction="save" loading={create.isPending || update.isPending} onSubmit={submit} onClose={onClose}>
+      {!isNew && leaveType.requestsCount > 0 && (
+        <Alert color="yellow" icon={<CircleAlert size={18} />}>
+          {t('used_warning', { count: leaveType.requestsCount })}
+        </Alert>
+      )}
+      <TextInput
+        label={t('field_name')}
+        withAsterisk
+        description={t('field_name_hint')}
+        autoComplete="off"
+        {...form.getInputProps('name')}
+        error={nameError()}
+      />
+      <Switch
+        label={t('field_deducts')}
+        description={t('field_deducts_hint')}
+        {...form.getInputProps('deductsPool', { type: 'checkbox' })}
+      />
+      <NumberInput
+        label={t('field_limit')}
+        description={t('field_limit_hint')}
+        min={LEAVE_TYPE_LIMIT_MIN}
+        max={LEAVE_TYPE_LIMIT_MAX}
+        allowDecimal={false}
+        allowNegative={false}
+        // Bez samoczynnego poprawiania na 1 albo 365: wartość spoza zakresu pokazuje błąd pod polem.
+        clampBehavior="none"
+        suffix={t('field_limit_suffix')}
+        w={{ base: '100%', xs: 220 }}
+        {...form.getInputProps('yearlyLimit')}
+        error={fieldError(t, form.errors.yearlyLimit)}
+      />
+    </FormModal>
   );
 };

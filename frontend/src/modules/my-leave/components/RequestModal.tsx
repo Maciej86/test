@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Button, Grid, Group, Modal, Select, Stack, Textarea } from '@mantine/core';
+import { Alert, Grid, Select, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { AlertTriangle } from 'lucide-react';
@@ -13,7 +13,7 @@ import {
   type MyLeaveOverview,
   type MyLeaveRequest,
 } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
+import { FormModal } from '../../../common/FormModal';
 import { DateField } from '../../../common/DateField';
 import { apiErrorBody, apiErrorFields, apiErrorKey, apiErrorMessage } from '../../../core/api/client';
 import { fieldError } from '../../../core/fieldError';
@@ -108,64 +108,54 @@ export const RequestModal = ({
   });
 
   return (
-    <Modal opened onClose={onClose} title={t('new_request')} size="lg">
-      <form onSubmit={submit} noValidate>
-        <Stack>
-          <Select
-            label={t('field_type')}
-            data={overview.types.map((lt) => ({ value: String(lt.id), label: lt.name }))}
-            {...form.getInputProps('leaveTypeId')}
-            error={fieldError(t, form.errors.leaveTypeId)}
-            description={typeHint}
-            allowDeselect={false}
+    <FormModal title={t('new_request')} size="lg" submitLabel={t('submit')} submitAction="send" submitDisabled={check.kind !== 'ok'} loading={create.isPending} onSubmit={submit} onClose={onClose}>
+      <Select
+        label={t('field_type')}
+        data={overview.types.map((lt) => ({ value: String(lt.id), label: lt.name }))}
+        {...form.getInputProps('leaveTypeId')}
+        error={fieldError(t, form.errors.leaveTypeId)}
+        description={typeHint}
+        allowDeselect={false}
+        required
+      />
+      <Grid>
+        <Grid.Col span={{ base: 12, xs: 6 }}>
+          <DateField
+            label={t('field_from')}
+            value={dateFrom}
+            onChange={setDateFrom}
+            minDate={today}
+            error={fieldError(t, form.errors.dateFrom)}
             required
           />
-          <Grid>
-            <Grid.Col span={{ base: 12, xs: 6 }}>
-              <DateField
-                label={t('field_from')}
-                value={dateFrom}
-                onChange={setDateFrom}
-                minDate={today}
-                error={fieldError(t, form.errors.dateFrom)}
-                required
-              />
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, xs: 6 }}>
-              <DateField
-                label={t('field_to')}
-                value={dateTo}
-                onChange={(v) => form.setFieldValue('dateTo', v)}
-                minDate={dateFrom ?? today}
-                error={check.kind === 'order' ? t('error_order') : fieldError(t, form.errors.dateTo)}
-                required
-              />
-            </Grid.Col>
-          </Grid>
-
-          {dateFrom && dateTo && check.kind !== 'order' && <DayStrip from={dateFrom} to={dateTo} />}
-          {serverError ? (
-            <Alert color="red" variant="light" icon={<AlertTriangle size={18} />}>{serverError}</Alert>
-          ) : (
-            <RequestCheck check={check} poolYear={pool.year} typeName={type?.name ?? ''} />
-          )}
-
-          <Textarea
-            label={t('field_comment')}
-            description={t('field_comment_hint')}
-            rows={3}
-            maxLength={LEAVE_REQUEST_COMMENT_MAX}
-            {...form.getInputProps('comment')}
-            error={fieldError(t, form.errors.comment)}
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, xs: 6 }}>
+          <DateField
+            label={t('field_to')}
+            value={dateTo}
+            onChange={(v) => form.setFieldValue('dateTo', v)}
+            minDate={dateFrom ?? today}
+            error={check.kind === 'order' ? t('error_order') : fieldError(t, form.errors.dateTo)}
+            required
           />
-          <Group justify="flex-end">
-            <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-            <Button type="submit" leftSection={<ButtonIcon action="send" />} disabled={check.kind !== 'ok'} loading={create.isPending}>
-              {t('submit')}
-            </Button>
-          </Group>
-        </Stack>
-      </form>
-    </Modal>
+        </Grid.Col>
+      </Grid>
+
+      {dateFrom && dateTo && check.kind !== 'order' && <DayStrip from={dateFrom} to={dateTo} />}
+      {serverError ? (
+        <Alert color="red" variant="light" icon={<AlertTriangle size={18} />}>{serverError}</Alert>
+      ) : (
+        <RequestCheck check={check} poolYear={pool.year} typeName={type?.name ?? ''} />
+      )}
+
+      <Textarea
+        label={t('field_comment')}
+        description={t('field_comment_hint')}
+        rows={3}
+        maxLength={LEAVE_REQUEST_COMMENT_MAX}
+        {...form.getInputProps('comment')}
+        error={fieldError(t, form.errors.comment)}
+      />
+    </FormModal>
   );
 };

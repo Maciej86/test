@@ -1,10 +1,10 @@
-import { Alert, Button, Group, Modal, MultiSelect, Stack, Text, TextInput } from '@mantine/core';
+import { Alert, MultiSelect, Stack, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { UserMinus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { projectSchema, type ProjectItem } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
+import { FormModal } from '../../../common/FormModal';
 import { apiErrorFields, apiErrorMessage } from '../../../core/api/client';
 import { fieldError } from '../../../core/fieldError';
 import { notify } from '../../../core/notify';
@@ -49,45 +49,35 @@ export const ProjectModal = ({ project, onClose }: { project: ProjectItem | null
   });
 
   return (
-    <Modal opened onClose={onClose} title={project ? t('project_edit_title', { name: project.name }) : t('project_new')} size="lg">
-      <form onSubmit={submit} noValidate>
-        <Stack>
-          <TextInput
-            label={t('project_field_name')}
-            description={t('project_field_name_hint')}
-            withAsterisk
-            autoComplete="off"
-            data-autofocus
-            {...form.getInputProps('name')}
-            error={fieldError(t, form.errors.name)}
-          />
-          <MultiSelect
-            label={t('project_field_members')}
-            description={t('project_field_members_hint')}
-            placeholder={values.memberIds.length === 0 ? t('field_people_placeholder') : undefined}
-            data={options}
-            searchable
-            hidePickedOptions
-            {...form.getInputProps('memberIds')}
-            error={fieldError(t, form.errors.memberIds)}
-          />
-          {removed.length > 0 && (
-            <Alert variant="light" color="yellow" icon={<UserMinus size={18} />} title={t('project_remove_title')}>
-              <Stack gap={2}>
-                {removed.map((m) => (
-                  <Text key={m.id} size="sm">{t('project_remove_text', { name: m.name, count: m.openTasks })}</Text>
-                ))}
-              </Stack>
-            </Alert>
-          )}
-          <Group justify="flex-end" mt="sm">
-            <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-            <Button type="submit" leftSection={<ButtonIcon action={project ? 'save' : 'add'} />} loading={save.isPending}>
-              {project ? t('save') : t('project_add')}
-            </Button>
-          </Group>
-        </Stack>
-      </form>
-    </Modal>
+    <FormModal title={project ? t('project_edit_title', { name: project.name }) : t('project_new')} size="lg" submitLabel={project ? t('save') : t('project_add')} submitAction={project ? 'save' : 'add'} loading={save.isPending} onSubmit={submit} onClose={onClose}>
+      <TextInput
+        label={t('project_field_name')}
+        description={t('project_field_name_hint')}
+        withAsterisk
+        autoComplete="off"
+        data-autofocus
+        {...form.getInputProps('name')}
+        error={fieldError(t, form.errors.name)}
+      />
+      <MultiSelect
+        label={t('project_field_members')}
+        description={t('project_field_members_hint')}
+        placeholder={values.memberIds.length === 0 ? t('field_people_placeholder') : undefined}
+        data={options}
+        searchable
+        hidePickedOptions
+        {...form.getInputProps('memberIds')}
+        error={fieldError(t, form.errors.memberIds)}
+      />
+      {removed.length > 0 && (
+        <Alert variant="light" color="yellow" icon={<UserMinus size={18} />} title={t('project_remove_title')}>
+          <Stack gap={2}>
+            {removed.map((m) => (
+              <Text key={m.id} size="sm">{t('project_remove_text', { name: m.name, count: m.openTasks })}</Text>
+            ))}
+          </Stack>
+        </Alert>
+      )}
+    </FormModal>
   );
 };

@@ -1,18 +1,14 @@
-import { Button, Divider, Drawer, Group, Stack, Text } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
+import { Button, Divider, Group, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime, type BoardResponse, type BoardTask } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
+import { SideDrawer } from '../../../common/SideDrawer';
 import { apiErrorMessage } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
 import { useFinishTask } from '../tasks.api';
 import { TaskComments } from './TaskComments';
 import { TaskFields } from './TaskFields';
 import { useTaskForm } from './useTaskForm';
-
-/** Szerokość podglądu: 440 px (rozmiar `md`) + 100 px (zmiana z 2026-11-18). Na telefonie cały ekran. */
-const DRAWER_WIDTH = 540;
-const PHONE_QUERY = '(max-width: 48em)';
 
 /** Podgląd klikniętej karty z prawej: od razu można zmieniać pola i zapisać (odpowiedź 1a); pod spodem komentarze. */
 export const TaskDrawer = ({ projectId, board, task, onClose, onArchive }: {
@@ -23,7 +19,6 @@ export const TaskDrawer = ({ projectId, board, task, onClose, onArchive }: {
   onArchive: (task: BoardTask) => void;
 }) => {
   const { t } = useTranslation('tasks');
-  const phone = useMediaQuery(PHONE_QUERY) ?? false;
   const { form, submit, saving } = useTaskForm(projectId, task, onClose);
   const finish = useFinishTask();
   const finished = task.finishedAt !== null;
@@ -36,13 +31,7 @@ export const TaskDrawer = ({ projectId, board, task, onClose, onArchive }: {
       },
     );
   return (
-    <Drawer
-      opened
-      onClose={onClose}
-      position="right"
-      size={phone ? '100%' : DRAWER_WIDTH}
-      title={<Text ff="heading" fw={600} size="lg">{t('task_in', { project: board.project.name })}</Text>}
-    >
+    <SideDrawer title={t('task_in', { project: board.project.name })} onClose={onClose}>
       <form onSubmit={submit} noValidate>
         <Stack>
           <TaskFields form={form} board={board} isNew={false} />
@@ -67,6 +56,6 @@ export const TaskDrawer = ({ projectId, board, task, onClose, onArchive }: {
       {/* Poza formularzem: Enter i „Zapisz” zadania nie dotyczą komentarzy (zapisują się osobno). */}
       <Divider my="lg" />
       <TaskComments taskId={task.id} />
-    </Drawer>
+    </SideDrawer>
   );
 };

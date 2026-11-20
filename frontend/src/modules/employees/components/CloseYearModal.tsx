@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Alert, Button, Group, Modal, NumberInput, Stack, Table, Text } from '@mantine/core';
+import { Alert, NumberInput, Stack, Table, Text } from '@mantine/core';
 import { CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ANNUAL_DAYS_MAX, TABLE_MIN_WIDTH } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
+import { ConfirmModal } from '../../../common/ConfirmModal';
 import { DataState } from '../../../common/DataState';
 import { apiErrorMessage } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
@@ -18,6 +18,8 @@ export const CloseYearModal = ({ opened, onClose }: { opened: boolean; onClose: 
   const data = preview.data;
   const annualOf = (userId: number, fallback: number) => annuals[userId] ?? fallback;
 
+  if (!opened) return null;
+
   const confirm = () => {
     if (!data) return;
     closeYear.mutate(
@@ -30,7 +32,16 @@ export const CloseYearModal = ({ opened, onClose }: { opened: boolean; onClose: 
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title={data ? t('close_year', { year: data.year }) : ''} size="xl">
+    <ConfirmModal
+      title={data ? t('close_year', { year: data.year }) : ''}
+      size="xl"
+      confirmLabel={data ? t('close_confirm', { year: data.year }) : ''}
+      confirmAction="close_year"
+      loading={closeYear.isPending}
+      confirmDisabled={!data || !data.canClose || data.rows.length === 0 || data.pendingRequests > 0}
+      onConfirm={confirm}
+      onClose={onClose}
+    >
       <DataState query={preview}>
         {data && (
           <Stack>
@@ -80,15 +91,9 @@ export const CloseYearModal = ({ opened, onClose }: { opened: boolean; onClose: 
                 </Table>
               </Table.ScrollContainer>
             )}
-            <Group justify="flex-end">
-              <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-              <Button leftSection={<ButtonIcon action="close_year" />} loading={closeYear.isPending} disabled={!data.canClose || data.rows.length === 0 || data.pendingRequests > 0} onClick={confirm}>
-                {t('close_confirm', { year: data.year })}
-              </Button>
-            </Group>
           </Stack>
         )}
       </DataState>
-    </Modal>
+    </ConfirmModal>
   );
 };

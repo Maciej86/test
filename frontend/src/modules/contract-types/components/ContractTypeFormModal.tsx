@@ -1,11 +1,11 @@
 import { useState, type ReactNode } from 'react';
-import { Alert, Anchor, Button, Group, Modal, Stack, TextInput } from '@mantine/core';
+import { Alert, Anchor, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CONTRACT_TYPE_MESSAGES, contractTypeSchema, type ContractTypeItem } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
+import { FormModal } from '../../../common/FormModal';
 import { apiErrorBody, apiErrorFields, apiErrorMessage } from '../../../core/api/client';
 import { fieldError } from '../../../core/fieldError';
 import { notify } from '../../../core/notify';
@@ -68,31 +68,21 @@ export const ContractTypeFormModal = ({ contractType, onClose }: { contractType:
   };
 
   return (
-    <Modal opened onClose={onClose} title={isNew ? t('add') : t('edit_title', { name: contractType.name })}>
-      <form onSubmit={submit} noValidate>
-        <Stack>
-          {!isNew && contractType.employeesCount > 0 && (
-            <Alert color="yellow" icon={<CircleAlert size={18} />}>
-              {t('used_warning', { count: contractType.employeesCount })}
-            </Alert>
-          )}
-          <TextInput
-            label={t('field_name')}
-            withAsterisk
-            description={t('field_name_hint')}
-            autoComplete="off"
-            data-autofocus
-            {...form.getInputProps('name')}
-            error={nameError()}
-          />
-          <Group justify="flex-end" mt="xs">
-            <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-            <Button type="submit" leftSection={<ButtonIcon action="save" />} loading={create.isPending || update.isPending}>
-              {t('save')}
-            </Button>
-          </Group>
-        </Stack>
-      </form>
-    </Modal>
+    <FormModal title={isNew ? t('add') : t('edit_title', { name: contractType.name })} submitLabel={t('save')} submitAction="save" loading={create.isPending || update.isPending} onSubmit={submit} onClose={onClose}>
+      {!isNew && contractType.employeesCount > 0 && (
+        <Alert color="yellow" icon={<CircleAlert size={18} />}>
+          {t('used_warning', { count: contractType.employeesCount })}
+        </Alert>
+      )}
+      <TextInput
+        label={t('field_name')}
+        withAsterisk
+        description={t('field_name_hint')}
+        autoComplete="off"
+        data-autofocus
+        {...form.getInputProps('name')}
+        error={nameError()}
+      />
+    </FormModal>
   );
 };

@@ -1,7 +1,6 @@
-import { Button, Group, Modal, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { BoardResponse } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
+import { FormModal } from '../../../common/FormModal';
 import { TaskFields } from './TaskFields';
 import { useTaskForm } from './useTaskForm';
 
@@ -10,16 +9,8 @@ export const TaskFormModal = ({ projectId, board, onClose }: { projectId: number
   const { t } = useTranslation('tasks');
   const { form, submit, saving } = useTaskForm(projectId, null, onClose);
   return (
-    <Modal opened onClose={onClose} title={t('new_task_in', { project: board.project.name })} size="lg">
-      <form onSubmit={submit} noValidate>
-        <Stack>
-          <TaskFields form={form} board={board} isNew />
-          <Group justify="flex-end" mt="sm">
-            <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-            <Button type="submit" leftSection={<ButtonIcon action="add" />} loading={saving}>{t('add')}</Button>
-          </Group>
-        </Stack>
-      </form>
-    </Modal>
+    <FormModal title={t('new_task_in', { project: board.project.name })} size="lg" submitLabel={t('add')} submitAction="add" loading={saving} onSubmit={submit} onClose={onClose}>
+      <TaskFields form={form} board={board} isNew />
+    </FormModal>
   );
 };

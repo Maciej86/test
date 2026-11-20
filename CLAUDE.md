@@ -57,6 +57,9 @@ Zapytania w `<module>.queries.ts` przyjmują `db: Db` z `backend/src/db/pool.ts`
   tego samego. Wtedy przenosisz to z parametrami do `common/` (komponent), `core/` (hook), `backend/src/db/` lub
   `middleware/` (backend) albo `shared/src/` (front i backend), z testem, i od razu podmieniasz wszystkie kopie
   (bez odkładania na później). Bez parametrów na siłę: kilka linii albo przypadkowe podobieństwo zostaje osobno. Nie importujesz z folderu innego modułu.
+  Przed nowym komponentem: znajdź ten sam komponent Mantine w `frontend/src` i `mockups/src`, porównaj ramę (nie
+  treść) i zapisz w planie „Porównane z: …”. Ta sama rama z inną treścią = klocek w `common/` z `children`; „kilka
+  linii” nie usprawiedliwia innego wyglądu.
 
 ## Wygląd i teksty
 

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Anchor, Button, Divider, Group, Modal, NumberInput, Select, SimpleGrid, Stack, Text, TextInput } from '@mantine/core';
+import { Anchor, Divider, NumberInput, Select, SimpleGrid, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ import {
   type EmployeeCreateInput,
   type EmployeeListItem,
 } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
+import { FormModal } from '../../../common/FormModal';
 import { ConfirmModal } from '../../../common/ConfirmModal';
 import { DateField } from '../../../common/DateField';
 import { apiErrorBody, apiErrorFields, apiErrorMessage } from '../../../core/api/client';
@@ -110,121 +110,111 @@ export const EmployeeFormModal = ({ opened, employee, year, onClose }: {
     if (isNew && archived && key === archivedKey) {
       return (
         <>
-          {t(`${field}_taken_archived`, { name: archived.name })}{' '}
-          <Anchor component="button" type="button" size="xs" c="red.3" td="underline" onClick={() => setConfirmRestore(true)}>
-            {t('login_restore')}
-          </Anchor>
-        </>
-      );
-    }
-    // W „Edytuj” przywracanie innego konta nie ma sensu: sam tekst z imieniem, bez linku.
-    if (archived && key === archivedKey) return t(`${field}_taken_archived`, { name: archived.name });
-    return fieldError(t, key);
-  };
+            {t(`${field}_taken_archived`, { name: archived.name })}{' '}
+            <Anchor component="button" type="button" size="xs" c="red.3" td="underline" onClick={() => setConfirmRestore(true)}>
+              {t('login_restore')}
+            </Anchor>
+          </>
+        );
+      }
+      // W „Edytuj” przywracanie innego konta nie ma sensu: sam tekst z imieniem, bez linku.
+      if (archived && key === archivedKey) return t(`${field}_taken_archived`, { name: archived.name });
+      return fieldError(t, key);
+    };
 
-  return (
-    <Modal opened={opened} onClose={onClose} title={isNew ? t('add') : t('edit_title', { name: employee.name })} size="lg">
-      <form onSubmit={submit} noValidate>
-        <Stack>
-          <SimpleGrid cols={{ base: 1, xs: 2 }}>
-            <TextInput
-              label={t('first_name')}
-              withAsterisk
-              autoComplete="off"
-              {...form.getInputProps('firstName')}
-              error={fieldError(t, form.errors.firstName)}
-            />
-            <TextInput
-              label={t('last_name')}
-              withAsterisk
-              autoComplete="off"
-              {...form.getInputProps('lastName')}
-              error={fieldError(t, form.errors.lastName)}
-            />
-          </SimpleGrid>
+    return (
+      <>
+      <FormModal opened={opened} title={isNew ? t('add') : t('edit_title', { name: employee.name })} size="lg" submitLabel={t('save')} submitAction="save" loading={create.isPending || update.isPending} onSubmit={submit} onClose={onClose}>
+        <SimpleGrid cols={{ base: 1, xs: 2 }}>
           <TextInput
-            label={t('login')}
+            label={t('first_name')}
             withAsterisk
-            description={t('login_hint')}
             autoComplete="off"
-            {...form.getInputProps('login')}
-            error={errorOf('login')}
+            {...form.getInputProps('firstName')}
+            error={fieldError(t, form.errors.firstName)}
           />
-          <TextInput label={t('notify_email')} description={t('notify_hint')} {...form.getInputProps('email')} error={errorOf('email')} />
-          <Select
-            label={t('col_role')}
+          <TextInput
+            label={t('last_name')}
             withAsterisk
-            data={ROLES.map((r) => ({ value: r, label: translateKey(t, ROLE_LABELS[r]) }))}
-            allowDeselect={false}
-            disabled={employee?.isMe}
-            description={employee?.isMe ? t('role_self') : undefined}
-            {...form.getInputProps('role')}
-            error={fieldError(t, form.errors.role)}
+            autoComplete="off"
+            {...form.getInputProps('lastName')}
+            error={fieldError(t, form.errors.lastName)}
           />
-          <SimpleGrid cols={{ base: 1, xs: 2 }}>
-            <DateField
-              label={t('hired_on')}
-              value={form.values.hiredOn}
-              onChange={(v) => form.setFieldValue('hiredOn', v)}
-              error={fieldError(t, form.errors.hiredOn)}
-            />
-            <Select
-              label={t('contract_type')}
-              data={contractOptions}
-              clearable
-              clearButtonProps={{ 'aria-label': t('contract_type_clear') }}
-              nothingFoundMessage={t('contract_types_empty')}
-              {...form.getInputProps('contractTypeId')}
-              error={fieldError(t, form.errors.contractTypeId) ?? (contractTypes.isError ? t('contract_types_error') : undefined)}
-            />
-          </SimpleGrid>
-          {isNew && (
-            <PasswordField
-              value={form.values.password}
-              error={fieldError(t, form.errors.password)}
-              onChange={(v) => form.setFieldValue('password', v)}
-            />
-          )}
+        </SimpleGrid>
+        <TextInput
+          label={t('login')}
+          withAsterisk
+          description={t('login_hint')}
+          autoComplete="off"
+          {...form.getInputProps('login')}
+          error={errorOf('login')}
+        />
+        <TextInput label={t('notify_email')} description={t('notify_hint')} {...form.getInputProps('email')} error={errorOf('email')} />
+        <Select
+          label={t('col_role')}
+          withAsterisk
+          data={ROLES.map((r) => ({ value: r, label: translateKey(t, ROLE_LABELS[r]) }))}
+          allowDeselect={false}
+          disabled={employee?.isMe}
+          description={employee?.isMe ? t('role_self') : undefined}
+          {...form.getInputProps('role')}
+          error={fieldError(t, form.errors.role)}
+        />
+        <SimpleGrid cols={{ base: 1, xs: 2 }}>
+          <DateField
+            label={t('hired_on')}
+            value={form.values.hiredOn}
+            onChange={(v) => form.setFieldValue('hiredOn', v)}
+            error={fieldError(t, form.errors.hiredOn)}
+          />
+          <Select
+            label={t('contract_type')}
+            data={contractOptions}
+            clearable
+            clearButtonProps={{ 'aria-label': t('contract_type_clear') }}
+            nothingFoundMessage={t('contract_types_empty')}
+            {...form.getInputProps('contractTypeId')}
+            error={fieldError(t, form.errors.contractTypeId) ?? (contractTypes.isError ? t('contract_types_error') : undefined)}
+          />
+        </SimpleGrid>
+        {isNew && (
+          <PasswordField
+            value={form.values.password}
+            error={fieldError(t, form.errors.password)}
+            onChange={(v) => form.setFieldValue('password', v)}
+          />
+        )}
 
-          {form.values.role === 'employee' && (
-            <>
-              <Divider label={t('pool_section', { year })} labelPosition="left" mt="xs" />
-              <Text size="xs" c="dimmed" mt={-8}>{t('pool_section_hint')}</Text>
-              <SimpleGrid cols={{ base: 1, xs: 2 }}>
-                <NumberInput
-                  label={t('annual')}
-                  withAsterisk
-                  description={t('days_hint', { max: ANNUAL_DAYS_MAX })}
-                  min={0}
-                  max={ANNUAL_DAYS_MAX}
-                  allowDecimal={false}
-                  allowNegative={false}
-                  {...form.getInputProps('annualDays')}
-                  error={fieldError(t, form.errors.annualDays)}
-                />
-                <NumberInput
-                  label={t('carried', { year: year - 1 })}
-                  description={t('days_hint', { max: CARRIED_DAYS_MAX })}
-                  min={0}
-                  max={CARRIED_DAYS_MAX}
-                  allowDecimal={false}
-                  allowNegative={false}
-                  {...form.getInputProps('carriedDays')}
-                  error={fieldError(t, form.errors.carriedDays)}
-                />
-              </SimpleGrid>
-            </>
-          )}
-
-          <Group justify="flex-end" mt="sm">
-            <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-            <Button type="submit" leftSection={<ButtonIcon action="save" />} loading={create.isPending || update.isPending}>
-              {t('save')}
-            </Button>
-          </Group>
-        </Stack>
-      </form>
-
+        {form.values.role === 'employee' && (
+          <>
+            <Divider label={t('pool_section', { year })} labelPosition="left" mt="xs" />
+            <Text size="xs" c="dimmed" mt={-8}>{t('pool_section_hint')}</Text>
+            <SimpleGrid cols={{ base: 1, xs: 2 }}>
+              <NumberInput
+                label={t('annual')}
+                withAsterisk
+                description={t('days_hint', { max: ANNUAL_DAYS_MAX })}
+                min={0}
+                max={ANNUAL_DAYS_MAX}
+                allowDecimal={false}
+                allowNegative={false}
+                {...form.getInputProps('annualDays')}
+                error={fieldError(t, form.errors.annualDays)}
+              />
+              <NumberInput
+                label={t('carried', { year: year - 1 })}
+                description={t('days_hint', { max: CARRIED_DAYS_MAX })}
+                min={0}
+                max={CARRIED_DAYS_MAX}
+                allowDecimal={false}
+                allowNegative={false}
+                {...form.getInputProps('carriedDays')}
+                error={fieldError(t, form.errors.carriedDays)}
+              />
+            </SimpleGrid>
+          </>
+        )}
+      </FormModal>
       {confirmRestore && (
         <ConfirmModal
           title={t('restore_title', { name: archived?.name })}
@@ -237,6 +227,6 @@ export const EmployeeFormModal = ({ opened, employee, year, onClose }: {
           <Text size="sm">{t('restore_text')}</Text>
         </ConfirmModal>
       )}
-    </Modal>
+    </>
   );
 };

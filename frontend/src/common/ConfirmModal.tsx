@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Button, Group, Modal, Stack, type MantineColor } from '@mantine/core';
+import { Button, Group, Modal, Stack, type MantineColor, type ModalProps } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ButtonIcon, type ButtonAction } from './ButtonIcon';
 
@@ -22,6 +22,7 @@ export const ConfirmModal = ({
   confirmColor,
   loading = false,
   confirmDisabled = false,
+  size,
   onConfirm,
   onClose,
   children,
@@ -37,13 +38,15 @@ export const ConfirmModal = ({
   loading?: boolean;
   /** Przycisk akcji wyłączony, np. dopóki nie wpisano nazwy projektu do usunięcia. */
   confirmDisabled?: boolean;
+  /** Szerokość okna, np. `xl` przy podglądzie z tabelą („Zamknij rok”). */
+  size?: ModalProps['size'];
   onConfirm: () => void;
   onClose: () => void;
   children: ReactNode;
 }) => {
   const { t } = useTranslation();
   return (
-    <Modal opened onClose={onClose} title={title}>
+    <Modal opened onClose={onClose} title={title} size={size}>
       <Stack>
         {children}
         <Group justify="flex-end">

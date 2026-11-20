@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
-import { Alert, Button, Divider, Drawer, Group, Paper, Progress, Stack, Text } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
+import { Alert, Button, Divider, Group, Paper, Progress, Stack, Text } from '@mantine/core';
 import { Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { LeaveRequestDetails } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DataState } from '../../../common/DataState';
 import { DateText } from '../../../common/DateText';
+import { SideDrawer } from '../../../common/SideDrawer';
 import { LeaveDates, LeaveStatusBadge, leaveSplitText } from '../../../common/LeaveRequestParts';
 import { leaveRequestPdfUrl, type useLeaveRequest } from '../leave-requests.api';
 import { isLate, type RowActions } from './LeaveRequestsTable';
@@ -115,19 +115,9 @@ export const DetailsDrawer = ({ id, details, onClose, ...actions }: Omit<RowActi
   onClose: () => void;
 }) => {
   const { t } = useTranslation('leave-requests');
-  const phone = useMediaQuery('(max-width: 48em)');
   return (
-    <Drawer
-      opened={id !== null}
-      onClose={onClose}
-      position="right"
-      size={phone ? '100%' : 'xl'}
-      title={id !== null ? t('details_title', { id }) : ''}
-      closeButtonProps={{ 'aria-label': t('close') }}
-      // Tytuł jak nagłówek karty w księdze wyglądu (szeryfowy, h3).
-      styles={{ title: { fontFamily: 'var(--mantine-font-family-headings)', fontSize: 'var(--mantine-h3-font-size)', fontWeight: 600 } }}
-    >
+    <SideDrawer opened={id !== null} title={id !== null ? t('details_title', { id }) : ''} onClose={onClose}>
       <DataState query={details}>{details.data && <Content r={details.data} actions={actions} />}</DataState>
-    </Drawer>
+    </SideDrawer>
   );
 };

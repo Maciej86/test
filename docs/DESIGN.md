@@ -86,10 +86,11 @@ Każda kolejna sekcja to `PageSection` z tłem na całą szerokość, na zmianę
 | Statusy | `Badge variant="light"`: czeka = `yellow`, zatwierdzony = `green`, odrzucony / anulowany = `red`, wycofany = `gray` | Wygląd |
 | Kolumny tablicy | `Paper withBorder` na tle panelu (`var(--app-panel-background)`), karty zadań na `dark.6` | Wygląd |
 | Karta z liczbą | duża liczba (40 px, 700) i przygaszony opis obok, pod spodem pasek `Progress` | Wygląd |
-| Potwierdzenie usunięcia | `Modal` z liczbą rzeczy, które znikną; przycisk `red` wypełniony, obok „Anuluj” `default` | Wygląd |
+| Potwierdzenie usunięcia | `ConfirmModal` (common) z liczbą rzeczy, które znikną; przycisk `red` wypełniony, obok „Anuluj” `default` | Wygląd |
 | Dzwonek powiadomień | w belce przed menu użytkownika; czerwona liczba nieprzeczytanych (`red.8`, powyżej 99 „99+”); na komputerze okienko 420 px pod dzwonkiem, na telefonie panel z prawej na cały ekran. Nieprzeczytane: tło `dark.6`, pasek `navy.4` po lewej, pogrubiony tytuł i kropka; ikona rodzaju w kolorach statusów | Powiadomienia |
-| Karta zadania | `Card withBorder` na `dark.6`: tytuł, 2 linie opisu, termin (po czasie `red.4`, dziś i jutro `yellow.4`), kółka osób (`navy` light, archiwum szare, żółta kropka = urlop), pasek `navy.4` po lewej przy moim zadaniu, menu „⋮” | Zadania |
-| Podgląd z prawej | `Drawer position="right"` 540 px (na telefonie cały ekran): od razu edytowalne pola, „Usuń” po lewej na dole, „Anuluj” i „Zapisz” po prawej; nowe rekordy dodaje się w oknie na środku (`Modal size="lg"`) | Zadania |
+| Karta zadania | `Card withBorder` na `dark.6`: tytuł, 2 linie opisu, termin (po czasie `red.4`, dziś i jutro `yellow.4`), kółka osób `PersonAvatar` (common: `navy` light, archiwum szare obrysowane i przygaszone, żółta kropka = urlop; „+N” = `MorePeopleAvatar`), pasek `navy.4` po lewej przy moim zadaniu, menu „⋮” | Zadania |
+| Podgląd z prawej | `SideDrawer` (common) 540 px (na telefonie cały ekran), tytuł szeryfowy, krzyżyk „Zamknij”: od razu edytowalne pola, „Usuń” po lewej na dole, „Anuluj” i „Zapisz” po prawej; nowe rekordy dodaje się w oknie na środku (`FormModal`) | Zadania |
+| Okno formularza | `FormModal` (common): pola od modułu, na dole „Anuluj” `default` i przycisk zapisu wypełniony; Enter zapisuje | Aktualizacja stepkit 0.1.46 |
 | Usunięcie na stałe | `ConfirmByNameModal` (common): pole „wpisz nazwę”, czerwony przycisk działa dopiero, gdy nazwa się zgadza | Zadania |
 | Kalendarz zespołu | `@mantine/schedule`, `ResourcesMonthView` / `ResourcesWeekView`: osoby w wierszach, dni w kolumnach; urlopy, wydarzenia i zadania jako paski; weekend i święta (`getPolishHolidays`) wyszarzone | |
 

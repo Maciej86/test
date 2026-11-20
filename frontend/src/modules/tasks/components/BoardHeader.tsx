@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import { Avatar, Button, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { initials, type BoardPerson } from '@app/shared';
+import type { BoardPerson } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { PageHeader } from '../../../common/PageHeader';
+import { MorePeopleAvatar, PersonAvatar } from '../../../common/PersonAvatar';
 
 const MAX_AVATARS = 4;
 
@@ -34,9 +35,9 @@ export const BoardHeader = ({ name, empty, openCount, overdue, people, extraActi
             <Tooltip label={t('project_people', { names: viewers.map((p) => p.name).join(', ') })} multiline w={280}>
               <Avatar.Group spacing={6}>
                 {viewers.slice(0, MAX_AVATARS).map((p) => (
-                  <Avatar key={p.id} size="sm" radius="xl" color="navy" variant="light">{initials(p.name)}</Avatar>
+                  <PersonAvatar key={p.id} name={p.name} archived={p.archived} />
                 ))}
-                {viewers.length > MAX_AVATARS && <Avatar size="sm" radius="xl" color="gray">{t('more_people', { count: viewers.length - MAX_AVATARS })}</Avatar>}
+                {viewers.length > MAX_AVATARS && <MorePeopleAvatar label={t('more_people', { count: viewers.length - MAX_AVATARS })} />}
               </Avatar.Group>
             </Tooltip>
           )}

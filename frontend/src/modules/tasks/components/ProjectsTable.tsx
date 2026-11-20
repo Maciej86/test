@@ -1,10 +1,11 @@
 import { Anchor, Avatar, Button, Card, Group, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { TABLE_MIN_WIDTH, initials, taskBoardPath, type OrderDirection, type ProjectItem } from '@app/shared';
+import { TABLE_MIN_WIDTH, taskBoardPath, type OrderDirection, type ProjectItem } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DateText } from '../../../common/DateText';
 import { OrderArrows } from '../../../common/OrderArrows';
+import { PersonAvatar } from '../../../common/PersonAvatar';
 
 export interface ProjectRowActions {
   onEdit: (project: ProjectItem) => void;
@@ -20,7 +21,7 @@ const Members = ({ p }: { p: ProjectItem }) => {
       <Group gap="xs" wrap="nowrap">
         <Avatar.Group spacing={6}>
           {p.members.slice(0, 4).map((m) => (
-            <Avatar key={m.id} size="sm" radius="xl" color={m.archived ? 'gray' : 'navy'} variant="light">{initials(m.name)}</Avatar>
+            <PersonAvatar key={m.id} name={m.name} archived={m.archived} />
           ))}
         </Avatar.Group>
         <Text size="sm" c="dimmed">{t('project_members_count', { count: p.members.length })}</Text>

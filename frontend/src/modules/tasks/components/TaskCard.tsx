@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { TASK_COLUMNS, formatDate, type BoardPerson, type BoardTask, type TaskColumn } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { dueState } from '../taskDue';
-import { PersonAvatar } from './PersonAvatar';
+import { MorePeopleAvatar } from '../../../common/PersonAvatar';
+import { AssigneeAvatar } from './AssigneeAvatar';
 
 const MAX_AVATARS = 3;
 const DUE_COLOR = { overdue: 'red.4', soon: 'yellow.4', normal: 'dimmed' } as const;
@@ -113,10 +114,10 @@ export const TaskCard = ({ task, people, meId, drag, onOpen, onMove, onFinish, o
               <Text size="xs" c="dimmed">{t('nobody')}</Text>
             ) : (
               <Avatar.Group spacing={6}>
-                {shown.map((p) => <PersonAvatar key={p.id} person={p} leave={task.leaves.find((l) => l.userId === p.id)} />)}
+                {shown.map((p) => <AssigneeAvatar key={p.id} person={p} leave={task.leaves.find((l) => l.userId === p.id)} />)}
                 {hidden.length > 0 && (
                   <Tooltip label={hidden.map((p) => p.name).join(', ')}>
-                    <Avatar size="sm" radius="xl" color="gray">{t('more_people', { count: hidden.length })}</Avatar>
+                    <MorePeopleAvatar label={t('more_people', { count: hidden.length })} />
                   </Tooltip>
                 )}
               </Avatar.Group>
