@@ -51,6 +51,15 @@ describe('useListParams', () => {
     act(() => get()[1]({ page: 2 }));
     expect(url()).toBe('?page=2&search=kowal');
   });
+
+  it('a setter kept from an earlier render (e.g. delayed search) does not undo later changes', () => {
+    const { get, url } = setup('/');
+    const stale = get()[1];
+    act(() => get()[1]({ role: 'admin' }));
+    act(() => stale({ search: 'kowal' }));
+    expect(new URLSearchParams(url()).toString()).toBe('search=kowal&role=admin');
+    expect(get()[0]).toMatchObject({ role: 'admin', search: 'kowal', page: 1 });
+  });
 });
 
 describe('useListParams without pages', () => {
@@ -70,4 +79,5 @@ describe('useListParams without pages', () => {
     act(() => result[1]({ year: 2025 }));
     expect(search).toBe('?year=2025');
   });
+
 });

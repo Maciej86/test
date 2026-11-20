@@ -92,6 +92,16 @@ describe('ActivityLogPage', () => {
     expect(router.state.location.search).toBe('?from=2026-11-20');
   });
 
+  it('changing both dates quickly: the "from" reaching the address later keeps the error on "to"', async () => {
+    const { router } = show(page([item({})]), '/admin/activity-log?from=2026-11-20&to=2026-11-25');
+    await screen.findByText('Zatwierdzenie wniosku');
+    fireEvent.change(screen.getByRole('textbox', { name: 'Od dnia' }), { target: { value: '01.01.2020' } });
+    fireEvent.change(screen.getByRole('textbox', { name: 'Do dnia' }), { target: { value: '31.12.2019' } });
+    await waitFor(() => expect(router.state.location.search).toBe('?from=2020-01-01&to=2026-11-25'));
+    expect(await screen.findByText('Data „do” nie może być wcześniejsza niż „od”.')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Do dnia' })).toHaveValue('31.12.2019');
+  });
+
   it('clicking an entry expands before → after and the open button; one open at a time', async () => {
     show(page([
       item({ id: 2 }),

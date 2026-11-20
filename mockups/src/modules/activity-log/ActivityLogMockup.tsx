@@ -183,10 +183,10 @@ export const ActivityLogMockup = () => {
           leftSection={<Search size={16} />}
           value={search}
           onChange={(e) => setSearch(e.currentTarget.value)}
-          w={{ base: '100%', sm: 280 }}
+          w={{ base: '100%', sm: 240 }}
         />
         <Select
-          w={{ base: '100%', xs: 200 }}
+          w={{ base: '100%', xs: 180 }}
           aria-label={t('area_label')}
           placeholder={t('area_all')}
           data={AREAS.map((a) => ({ value: a, label: t(`area.${a}`) }))}
@@ -195,7 +195,7 @@ export const ActivityLogMockup = () => {
           clearable
         />
         <Select
-          w={{ base: '100%', xs: 220 }}
+          w={{ base: '100%', xs: 200 }}
           aria-label={t('who_label')}
           placeholder={t('who_all')}
           data={PEOPLE}
@@ -204,8 +204,8 @@ export const ActivityLogMockup = () => {
           clearable
           searchable
         />
-        <DateField w={{ base: '100%', xs: 150 }} aria-label={t('date_from')} placeholder={t('date_from')} value={from} onChange={setFrom} />
-        <DateField w={{ base: '100%', xs: 150 }} aria-label={t('date_to')} placeholder={t('date_to')} value={to} onChange={setTo} />
+        <DateField w={{ base: '100%', xs: 140 }} aria-label={t('date_from')} placeholder={t('date_from')} value={from} onChange={setFrom} />
+        <DateField w={{ base: '100%', xs: 140 }} aria-label={t('date_to')} placeholder={t('date_to')} value={to} onChange={setTo} />
         {filtersUsed && (
           <Button variant="subtle" leftSection={<ButtonIcon action="cancel" size={14} />} onClick={() => changeState('list')}>
             {t('clear_filters')}

@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useSearchParams } from 'react-router';
 import type { z } from 'zod';
 
@@ -16,22 +17,29 @@ export const useListParams = <S extends z.ZodType<Params>>(
   defaults: Partial<z.output<S>>,
 ): [z.output<S>, (next: Partial<z.output<S>>) => void] => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const raw: Params = Object.fromEntries(searchParams);
-  const parsed = schema.safeParse(raw);
-  let params: z.output<S>;
-  if (parsed.success) {
-    params = parsed.data;
-  } else {
+  const read = (current: URLSearchParams): z.output<S> => {
+    const raw: Params = Object.fromEntries(current);
+    const parsed = schema.safeParse(raw);
+    if (parsed.success) return parsed.data;
     const bad = new Set(parsed.error.issues.map((issue) => String(issue.path[0])));
     const cleaned = schema.safeParse(Object.fromEntries(Object.entries(raw).filter(([key]) => !bad.has(key))));
-    params = cleaned.success ? cleaned.data : schema.parse({});
-  }
+    return cleaned.success ? cleaned.data : schema.parse({});
+  };
+  const params = read(searchParams);
+  // Adres z ostatniego rysowania, wspólny dla wszystkich wersji `update` (także tej zapamiętanej wcześniej).
+  const latest = useRef(searchParams);
+  latest.current = searchParams;
 
+  // Liczone od adresu w chwili zmiany, nie z chwili rysowania: spóźnione wyszukiwanie (300 ms) wysłane po wyborze
+  // innego filtra nie cofa tego wyboru.
   const update = (next: Partial<z.output<S>>) => {
+    const now = read(latest.current);
     // Lista ze stronami wraca na stronę 1; lista bez stron (np. wybór roku) nie dostaje `page` w adresie.
-    const merged: Params = { ...params, ...('page' in params ? { page: 1 } : {}), ...next };
+    const merged: Params = { ...now, ...('page' in now ? { page: 1 } : {}), ...next };
     const entries = Object.entries(merged).filter(([key, value]) => value !== undefined && (defaults as Params)[key] !== value);
-    setSearchParams(new URLSearchParams(entries.map(([key, value]) => [key, String(value)])));
+    const nextParams = new URLSearchParams(entries.map(([key, value]) => [key, String(value)]));
+    latest.current = nextParams;
+    setSearchParams(nextParams);
   };
   return [params, update];
 };

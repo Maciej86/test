@@ -48,7 +48,7 @@ z testem; podmiana w Powiadomieniach i w makiecie Historii zmian (makiety Powiad
   dniach, stronicowanie, pusta historia, brak wyników; testy → `npm run check`
 - [x] 11. Front: rozwijany wpis (jeden otwarty, tabelka „przed → po”, wartości przetłumaczone: statusy, kolumny,
   role, tak/nie, daty), „Otwórz …” z `link`, plakietki „w archiwum” i „usunięty na stałe”; testy → `npm run check`
-- [ ] 12. Strona w `pages.ts`, zgodność z makietą, widok telefonu (390 px) sprawdzony w przeglądarce
-- [ ] 13. E2E `e2e/activity-log.spec.ts` ze scenariuszy `TESTS.md` (dane z przedrostkiem `E2E `, sprzątanie
+- [x] 12. Strona w `pages.ts`, zgodność z makietą, widok telefonu (390 px) sprawdzony w przeglądarce
+- [x] 13. E2E `e2e/activity-log.spec.ts` ze scenariuszy `TESTS.md` (dane z przedrostkiem `E2E `, sprzątanie
   w `global-teardown.ts`) → `npm run test:e2e`
 - [ ] 14. Przegląd kodu całego modułu (lista kontrolna z `docs/CONVENTIONS.md`), poprawki z testem → `npm run check`
