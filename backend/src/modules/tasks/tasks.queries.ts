@@ -1,5 +1,5 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
-import type { BoardPerson, Role, TaskColumn } from '@app/shared';
+import type { BoardPerson, DashboardList, DashboardProjectCounts, DashboardTask, Role, TaskColumn } from '@app/shared';
 import type { Db } from '../../db/pool';
 import { likePattern } from '../../db/like';
 import type { Viewer } from '../../middleware/routeHelpers';
@@ -264,4 +264,74 @@ export const restoreTask = async (db: Db, id: number): Promise<void> => {
 /** Usunięcie na stałe; komentarze i przypisania znikają razem z zadaniem (CASCADE). */
 export const deleteTask = async (db: Db, id: number): Promise<void> => {
   await db.query('DELETE FROM tasks WHERE id = ?', [id]);
+};
+
+/** Pulpit administratora: liczby zadań spoza archiwum w każdym projekcie (także bez zadań), w kolejności z menu. */
+export const projectTaskCounts = async (db: Db, today: string, doneSince: Date): Promise<DashboardProjectCounts[]> => {
+  const [rows] = await db.query<RowDataPacket[]>(
+    `SELECT p.id, p.name,
+       SUM(t.column_key = 'draft') AS draft,
+       SUM(t.column_key = 'in_progress') AS in_progress,
+       SUM(t.column_key <> 'done' AND t.due_date < ?) AS overdue,
+       SUM(t.column_key = 'done' AND t.completed_at >= ?) AS done_recently
+     FROM projects p LEFT JOIN tasks t ON t.project_id = p.id AND t.archived_at IS NULL
+     GROUP BY p.id, p.name, p.position ORDER BY p.position`,
+    [today, doneSince],
+  );
+  return rows.map((r) => ({
+    id: r.id as number,
+    name: r.name as string,
+    draft: Number(r.draft ?? 0),
+    inProgress: Number(r.in_progress ?? 0),
+    overdue: Number(r.overdue ?? 0),
+    doneRecently: Number(r.done_recently ?? 0),
+  }));
+};
+
+const DASHBOARD_TASK_SQL = 'SELECT t.id, t.title, t.project_id, p.name AS project_name, t.column_key, t.due_date FROM tasks t JOIN projects p ON p.id = t.project_id';
+
+const toDashboardTask = (r: RowDataPacket): DashboardTask => ({
+  id: r.id as number,
+  title: r.title as string,
+  projectId: r.project_id as number,
+  projectName: r.project_name as string,
+  column: r.column_key as DashboardTask['column'],
+  dueDate: (r.due_date as string | null) ?? null,
+});
+
+/** Pulpit administratora: zadania po terminie ze wszystkich projektów, od najstarszego terminu, z przypisanymi osobami. */
+export const listOverdueTasks = async (db: Db, today: string, limit: number): Promise<DashboardList<DashboardTask>> => {
+  const where = "t.archived_at IS NULL AND t.column_key <> 'done' AND t.due_date < ?";
+  const [rows] = await db.query<RowDataPacket[]>(
+    `${DASHBOARD_TASK_SQL} WHERE ${where} ORDER BY t.due_date, p.position, t.position LIMIT ?`, // rule-ok: stałe z tego pliku, dane przez ?
+    [today, limit],
+  );
+  const [count] = await db.query<RowDataPacket[]>(`SELECT COUNT(*) AS total FROM tasks t WHERE ${where}`, [today]); // rule-ok: jak wyżej
+  const items = rows.map((r) => ({ ...toDashboardTask(r), assignees: [] as { name: string; archived: boolean }[] }));
+  if (items.length > 0) {
+    const [people] = await db.query<RowDataPacket[]>(
+      'SELECT ta.task_id, u.name, u.archived_at FROM task_assignees ta JOIN users u ON u.id = ta.user_id WHERE ta.task_id IN (?) ORDER BY ta.task_id, u.last_name, u.first_name',
+      [items.map((t) => t.id)],
+    );
+    for (const p of people) items.find((t) => t.id === p.task_id)?.assignees.push({ name: p.name as string, archived: p.archived_at !== null });
+  }
+  return { items, total: Number(count[0]?.total ?? 0) };
+};
+
+/**
+ * Pulpit (obie role): niezrealizowane zadania przypisane do osoby z projektów, które widzi (warunek jak
+ * `findVisibleProject`); najpierw z terminem od najwcześniejszego (po terminie są pierwsze), bez terminu na końcu.
+ */
+export const listMyOpenTasks = async (db: Db, viewer: Viewer, limit: number): Promise<DashboardList<DashboardTask>> => {
+  const from = `FROM tasks t JOIN projects p ON p.id = t.project_id JOIN task_assignees ta ON ta.task_id = t.id AND ta.user_id = ?
+    WHERE t.archived_at IS NULL AND t.column_key IN ('draft', 'in_progress')
+      AND (? = 'admin' OR EXISTS (SELECT 1 FROM project_members pm WHERE pm.project_id = t.project_id AND pm.user_id = ?))`;
+  const params = [viewer.id, viewer.role, viewer.id];
+  const [rows] = await db.query<RowDataPacket[]>(
+    `SELECT t.id, t.title, t.project_id, p.name AS project_name, t.column_key, t.due_date ${from}
+     ORDER BY t.due_date IS NULL, t.due_date, p.position, t.position LIMIT ?`, // rule-ok: stały fragment z tej funkcji, dane przez ?
+    [...params, limit],
+  );
+  const [count] = await db.query<RowDataPacket[]>(`SELECT COUNT(*) AS total ${from}`, params); // rule-ok: jak wyżej
+  return { items: rows.map(toDashboardTask), total: Number(count[0]?.total ?? 0) };
 };

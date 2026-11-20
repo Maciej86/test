@@ -64,7 +64,7 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
   `my-leave.queries.ts`; testy w `my-leave/__tests__/dashboard.queries.test.ts`: tylko własne; czekające od
   najwcześniejszego początku; najbliższy zatwierdzony z `date_to >= today` (trwający dziś też), zakończony wczoraj
   nie; odrzucony, wycofany, anulowany pomijane → `npm run check`
-- [ ] 6. Funkcje tasks (`tasks.queries.ts`, testy w `tasks/__tests__/dashboard.queries.test.ts`):
+- [x] 6. Funkcje tasks (`tasks.queries.ts`, testy w `tasks/__tests__/dashboard.queries.test.ts`):
   - `projectTaskCounts(db, today, doneSince): Promise<DashboardProjectCounts[]>`: każdy projekt (także bez zadań, same
     zera) w kolejności `position`; bez zadań z archiwum; `overdue` = `due_date < today` i kolumna ≠ `done`;
     `doneRecently` = `completed_at >= doneSince`.
@@ -74,6 +74,8 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
     `draft`/`in_progress`, bez archiwum, projekt widoczny (warunek jak `findVisibleProject`); kolejność: po terminie,
     potem termin rosnąco, `NULL` na końcu, potem `position` projektu i zadania.
   → `npm run check`
+  **Uwaga:** `listMyOpenTasks(db, viewer, limit)` bez `today`: kolejność „po terminie, potem według terminu” daje
+  samo sortowanie po terminie rosnąco (zadania po terminie mają najwcześniejsze daty).
 - [ ] 7. Usługa i trasa: `backend/src/modules/dashboard/dashboard.service.ts`, `getDashboard(viewer: Viewer):
   Promise<DashboardResponse>` (dziś = `todayIsoDate()`, zakres nieobecności dziś + 13 dni, `doneSince` =
   dziś − `TASK_HIDE_DONE_AFTER_DAYS`; pracownik: `pool` z `getMyLeaveOverview(viewer.id)?.pool ?? null`);
