@@ -163,3 +163,10 @@ export const lockProject = async (db: Db, projectId: number): Promise<string | n
 export const setFinished = async (db: Db, id: number, at: Date | null): Promise<void> => {
   await db.query('UPDATE tasks SET finished_at = ? WHERE id = ?', [at, id]);
 };
+
+/** Liczba zadań (także w archiwum), do których osoba jest przypisana: kolumna „Historia” w Archiwum. */
+export const countAssignmentsByUser = async (db: Db, userIds: number[]): Promise<Map<number, number>> => {
+  if (userIds.length === 0) return new Map();
+  const [rows] = await db.query<RowDataPacket[]>('SELECT user_id, COUNT(*) AS total FROM task_assignees WHERE user_id IN (?) GROUP BY user_id', [userIds]);
+  return new Map(rows.map((r) => [Number(r.user_id), Number(r.total)]));
+};

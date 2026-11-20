@@ -179,3 +179,10 @@ export const countRequestsByLeaveType = async (db: Db = pool): Promise<Map<numbe
   const [rows] = await db.query<RowDataPacket[]>('SELECT leave_type_id, COUNT(*) AS total FROM leave_requests GROUP BY leave_type_id');
   return new Map(rows.map((r) => [Number(r.leave_type_id), Number(r.total)]));
 };
+
+/** Liczba wniosków (wszystkie statusy) według osoby: Archiwum blokuje usunięcie konta z wnioskami. */
+export const countRequestsByUser = async (db: Db, userIds: number[]): Promise<Map<number, number>> => {
+  if (userIds.length === 0) return new Map();
+  const [rows] = await db.query<RowDataPacket[]>('SELECT user_id, COUNT(*) AS total FROM leave_requests WHERE user_id IN (?) GROUP BY user_id', [userIds]);
+  return new Map(rows.map((r) => [Number(r.user_id), Number(r.total)]));
+};

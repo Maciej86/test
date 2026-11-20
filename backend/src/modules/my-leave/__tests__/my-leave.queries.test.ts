@@ -114,3 +114,18 @@ describe('my leave queries', () => {
     expect(calls[0]![1]).toEqual([7]);
   });
 });
+
+describe('requests per person (Archiwum)', () => {
+  it('countRequestsByUser counts requests in every status per person', async () => {
+    const { db, calls } = spyDb([{ user_id: 7, total: 3 }]);
+    expect(await q.countRequestsByUser(db, [7, 8])).toEqual(new Map([[7, 3]]));
+    expect(calls[0]![0]).toMatch(/WHERE user_id IN \(\?\) GROUP BY user_id/);
+    expect(calls[0]![1]).toEqual([[7, 8]]);
+  });
+
+  it('countRequestsByUser without people does not ask the database', async () => {
+    const { db, calls } = spyDb([]);
+    expect(await q.countRequestsByUser(db, [])).toEqual(new Map());
+    expect(calls).toHaveLength(0);
+  });
+});

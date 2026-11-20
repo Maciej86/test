@@ -99,3 +99,19 @@ describe('board queries', () => {
     expect(calls.map((c) => c[1])).toEqual([[at, 7], [null, 7]]);
   });
 });
+
+describe('assignments per person (Archiwum)', () => {
+  it('countAssignmentsByUser counts tasks per person, also archived ones', async () => {
+    const { db, calls } = spyDb([{ user_id: 4, total: 2 }]);
+    expect(await q.countAssignmentsByUser(db, [4])).toEqual(new Map([[4, 2]]));
+    expect(calls[0]![0]).toMatch(/FROM task_assignees WHERE user_id IN \(\?\) GROUP BY user_id/);
+    expect(calls[0]![0]).not.toMatch(/archived_at/);
+    expect(calls[0]![1]).toEqual([[4]]);
+  });
+
+  it('countAssignmentsByUser without people does not ask the database', async () => {
+    const { db, calls } = spyDb([]);
+    expect(await q.countAssignmentsByUser(db, [])).toEqual(new Map());
+    expect(calls).toHaveLength(0);
+  });
+});

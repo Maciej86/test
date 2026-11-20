@@ -44,7 +44,7 @@ i edycję).
   `server.json`, klucze `has_leave_requests`, `not_archived`, `gone`, `confirm_label` w `archive.json`; testy
   schematów (domyślne `dir=desc`, zły `sort` → błąd, `projectId=0` → błąd, `confirmName` 142 znaki → błąd,
   `tab=foo` → employees; adresy `archiveTaskPath(5)`, `archiveEmployeesPath('a b@x.pl')` kodują znaki) → `npm run check`
-- [ ] 3. **Liczby z innych modułów**: `countRequestsByUser(db, userIds): Promise<Map<number, number>>`
+- [x] 3. **Liczby z innych modułów**: `countRequestsByUser(db, userIds): Promise<Map<number, number>>`
   (`my-leave.queries.ts`, każdy status) i `countAssignmentsByUser(db, userIds)` (`tasks.queries.ts`, także zadania
   w archiwum); testy: pusta lista bez zapytania, SQL z `?` → `npm run check`
 - [ ] 4. **Pracownicy w archiwum** (`employees.queries.ts` + `employees.service.ts`):
