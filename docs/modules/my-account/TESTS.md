@@ -32,4 +32,19 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180.
 8. Jako administrator otwórz „Historia zmian” → wpis „Zmiana własnego hasła” z nazwiskiem pracownika, bez hasła.
 
 ## Próby nadużyć
-(uzupełniane na etapie testy)
+
+Sprawdzone 2026-11-20 (testy `describe('abuse')` w `backend/src/modules/my-account/__tests__/` i na prawdziwej bazie
+przez działający serwer):
+
+- Cudze konto: numer konta w adresie (`/my-account/1`, `/my-account/1/email`) → 404; numer konta w treści żądania
+  pomijany, zmienia się tylko własne konto: przeszła
+- Podrobione pola przy zapisie e-maila (rola, imię, login, skrót hasła) → serwer bierze tylko e-mail: przeszła
+- Bez logowania → 401, z hasłem tymczasowym → 403: przeszła
+- `<script>alert(1)</script>` jako e-mail → 400 pod polem: przeszła
+- Zgadywanie obecnego hasła → po 10 nieudanych próbach w 15 min 429, licznik na konto (nie na sieć): przeszła
+- Dwa konta naraz zapisują ten sam e-mail → jedno 200, drugie 409 (prawdziwa baza): przeszła
+- Stara sesja na drugim urządzeniu po zmianie hasła → wylogowanie: przeszła (także e2e)
+- Hasło zmienione w międzyczasie (administrator ustawia hasło tymczasowe albo druga karta zmienia hasło w tej samej
+  chwili) → wcześniej ostatni zapis nadpisywał cudzą zmianę; **naprawiona**: 409 „Hasło zmieniło się w
+  międzyczasie…”, nic nie zostaje nadpisane (prawdziwa baza: 200 i 409)
+- Odpowiedź `GET /api/my-account` nie zawiera skrótu hasła: przeszła

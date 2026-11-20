@@ -24,7 +24,7 @@ export const MyAccountPage = () => {
             <Grid.Col span={{ base: 12, md: 7 }}>
               <Stack gap="md">
                 <EmailCard account={data} />
-                <PasswordCard />
+                <PasswordCard login={data.login} />
               </Stack>
             </Grid.Col>
           </Grid>

@@ -37,3 +37,9 @@ export const lockMyEmail = async (db: Db, userId: number): Promise<string | null
 export const setMyEmail = async (db: Db, userId: number, email: string | null): Promise<void> => {
   await db.query('UPDATE users SET email = ? WHERE id = ?', [email, userId]);
 };
+
+/** Skrót hasła z blokadą wiersza: zmiana hasła sprawdza, czy nikt go nie zmienił od chwili sprawdzenia obecnego. */
+export const lockPasswordHash = async (db: Db, userId: number): Promise<string | null> => {
+  const [rows] = await db.query<RowDataPacket[]>('SELECT password_hash FROM users WHERE id = ? FOR UPDATE', [userId]);
+  return (rows[0]?.password_hash as string | undefined) ?? null;
+};

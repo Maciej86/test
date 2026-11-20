@@ -30,6 +30,7 @@
   },
   "server": {
     "current_wrong": "Obecne hasło jest nieprawidłowe.",
-    "same_as_current": "Nowe hasło musi być inne niż obecne."
+    "same_as_current": "Nowe hasło musi być inne niż obecne.",
+    "password_changed_meanwhile": "Hasło zmieniło się w międzyczasie (np. administrator ustawił nowe). Odśwież stronę i spróbuj ponownie."
   }
 }

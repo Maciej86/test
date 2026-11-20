@@ -101,6 +101,14 @@ describe('MyAccountPage', () => {
     await waitFor(() => expect(error).toHaveBeenCalledWith('Za dużo prób zmiany hasła. Spróbuj ponownie za 15 minut.'));
   });
 
+  it('password form carries the login for password managers (hidden username field)', async () => {
+    show(jan);
+    await screen.findByText('Jan Kowalski');
+    const username = document.querySelector('input[autocomplete="username"]') as HTMLInputElement;
+    expect(username.value).toBe('jan.kowalski@firma.pl');
+    expect(username.closest('form')).toBe(screen.getByLabelText(/^Obecne hasło/).closest('form'));
+  });
+
   it('different repeat is caught before sending', async () => {
     const post = vi.spyOn(api, 'post');
     show(jan);

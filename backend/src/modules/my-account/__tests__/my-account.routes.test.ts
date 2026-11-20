@@ -106,6 +106,23 @@ describe('my account routes', () => {
 });
 
 describe('abuse', () => {
+  it('an account number in the address → 404 (there is no "someone else\'s account" route)', async () => {
+    expect((await as(jan).get('/my-account/1')).status).toBe(404);
+    expect((await as(jan).put('/my-account/1/email', { email: null })).status).toBe(404);
+    expect((await as(jan).post('/my-account/1/password', password)).status).toBe(404);
+  });
+
+  it('forged fields (role, name, login, password hash) are dropped; only the e-mail goes to the service', async () => {
+    await as(jan).put('/my-account/email', { email: 'jan@firma.pl', role: 'admin', name: 'Szef', login: 'szef@firma.pl', password_hash: 'x' });
+    expect(s.updateMyEmail).toHaveBeenCalledWith({ id: 2, name: 'Jan Kowalski' }, 'jan@firma.pl');
+  });
+
+  it('<script> as the e-mail → 400 under the field', async () => {
+    const r = await as(jan).put('/my-account/email', { email: '<script>alert(1)</script>' });
+    expect(r.status).toBe(400);
+    expect(r.body.error.fields).toEqual({ email: 'validation.email_invalid' });
+  });
+
   it('an account id in the body is ignored: only req.user changes', async () => {
     await as(jan).put('/my-account/email', { email: 'jan@firma.pl', id: 1, userId: 1 });
     expect(s.updateMyEmail).toHaveBeenCalledWith({ id: 2, name: 'Jan Kowalski' }, 'jan@firma.pl');

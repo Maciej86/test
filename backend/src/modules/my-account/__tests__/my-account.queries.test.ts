@@ -33,6 +33,13 @@ describe('my account queries', () => {
     expect(await q.isEmailTaken(spy([]).db, 'ewa@firma.pl', 2)).toBe(false);
   });
 
+  it('lockPasswordHash locks the row of this account', async () => {
+    const { db, calls } = spy([{ password_hash: 'h' }]);
+    expect(await q.lockPasswordHash(db, 2)).toBe('h');
+    expect(calls[0]![0]).toContain('FOR UPDATE');
+    expect(calls[0]![1]).toEqual([2]);
+  });
+
   it('lockMyEmail and setMyEmail use ? parameters', async () => {
     const { db, calls } = spy([{ email: 'stary@firma.pl' }]);
     expect(await q.lockMyEmail(db, 2)).toBe('stary@firma.pl');

@@ -14,7 +14,7 @@ import { useChangeMyPassword } from '../my-account.api';
 const EMPTY: MyAccountPasswordInput = { currentPassword: '', newPassword: '', repeatPassword: '' };
 
 /** Zmiana własnego hasła z obecnym; po zmianie pola są puste, a osoba zostaje zalogowana na tym urządzeniu. */
-export const PasswordCard = () => {
+export const PasswordCard = ({ login }: { login: string }) => {
   const { t } = useTranslation('my-account');
   const change = useChangeMyPassword();
   const form = useForm<MyAccountPasswordInput>({ initialValues: EMPTY, validate: zod4Resolver(myAccountPasswordSchema) });
@@ -41,6 +41,8 @@ export const PasswordCard = () => {
 
   return (
     <form onSubmit={submit} noValidate>
+      {/* Menedżer haseł zapisze nowe hasło przy właściwym koncie. */}
+      <input type="text" name="username" autoComplete="username" value={login} readOnly hidden />
       <InfoCard
         title={t('password')}
         actions={<Button type="submit" leftSection={<ButtonIcon action="password" />} loading={change.isPending}>{t('change_password')}</Button>}

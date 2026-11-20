@@ -5,7 +5,7 @@ const conn = { query: vi.fn() };
 vi.mock('../../../db/activityLog', async (orig) => ({ ...(await orig<object>()), logActivity: vi.fn() }));
 vi.mock('../../../db/transaction', () => ({ withTransaction: vi.fn(async (work: (c: unknown) => unknown) => work(conn)) }));
 vi.mock('../../../auth/users.queries', () => ({ findPasswordHash: vi.fn(), updatePassword: vi.fn() }));
-vi.mock('../my-account.queries', () => ({ findMyAccount: vi.fn(), isEmailTaken: vi.fn(), lockMyEmail: vi.fn(), setMyEmail: vi.fn() }));
+vi.mock('../my-account.queries', () => ({ findMyAccount: vi.fn(), isEmailTaken: vi.fn(), lockMyEmail: vi.fn(), setMyEmail: vi.fn(), lockPasswordHash: vi.fn() }));
 
 const q = await import('../my-account.queries');
 const users = await import('../../../auth/users.queries');
@@ -29,6 +29,7 @@ beforeEach(async () => {
   currentHash ||= await hashPassword('Stare-haslo1');
   vi.mocked(users.findPasswordHash).mockResolvedValue(currentHash);
   vi.mocked(users.updatePassword).mockResolvedValue(3);
+  vi.mocked(q.lockPasswordHash).mockResolvedValue(currentHash);
 });
 
 describe('my account service', () => {
@@ -98,5 +99,15 @@ describe('my account service', () => {
       changes: { password: { before: null, after: 'changed' } },
     });
     expect(JSON.stringify(vi.mocked(logActivity).mock.calls)).not.toContain(hash);
+  });
+});
+
+describe('abuse', () => {
+  it('password changed meanwhile (admin reset or another tab) → 409, nothing overwritten', async () => {
+    vi.mocked(q.lockPasswordHash).mockResolvedValue('$2b$12$innyskrotodadministratora');
+    expect(await s.changeMyPassword(jan, input)).toEqual({ error: { status: 409, message: M.passwordChangedMeanwhile } });
+    expect(q.lockPasswordHash).toHaveBeenCalledWith(conn, 2);
+    expect(users.updatePassword).not.toHaveBeenCalled();
+    expect(logActivity).not.toHaveBeenCalled();
   });
 });

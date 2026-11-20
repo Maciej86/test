@@ -52,6 +52,9 @@ export const changeMyPassword = async (actor: Actor, input: MyAccountPasswordInp
   }
   const passwordHash = await hashPassword(input.newPassword);
   return withTransaction(async (conn) => {
+    // Między sprawdzeniem a zapisem (kilkaset ms szyfrowania) administrator mógł ustawić hasło tymczasowe albo druga
+    // karta zmienić hasło: wtedy nie nadpisujemy cudzej zmiany.
+    if ((await q.lockPasswordHash(conn, actor.id)) !== currentHash) return fail(409, MY_ACCOUNT_MESSAGES.passwordChangedMeanwhile);
     const tokenVersion = await updatePassword(actor.id, passwordHash, conn);
     await logActivity(conn, { ...logOwn(actor), changes: { password: { before: null, after: 'changed' } } });
     return { tokenVersion };

@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.47
 
-**Następny krok:** Moje konto: próby nadużyć, sprawdzenie w przeglądarce, potem użytkownik przechodzi TESTS.md.
+**Następny krok:** Moje konto: użytkownik przechodzi TESTS.md i potwierdza „działa”.
 
 ## Start aplikacji
 
