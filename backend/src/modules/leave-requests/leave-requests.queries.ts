@@ -1,5 +1,5 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
-import type { LeaveRequestFilter, LeaveRequestStatus } from '@app/shared';
+import type { DashboardAbsence, DashboardList, DashboardPendingRequest, LeaveRequestFilter, LeaveRequestStatus } from '@app/shared';
 import { PAGE_SIZE } from '../../config/constants';
 import { likePattern } from '../../db/like';
 import type { Db } from '../../db/pool';
@@ -127,6 +127,41 @@ export const pendingSummary = async (db: Db): Promise<{ count: number; oldestAt:
   const [rows] = await db.query<RowDataPacket[]>('SELECT COUNT(*) AS total, MIN(created_at) AS oldest FROM leave_requests WHERE status = ?', [PENDING]);
   const oldest = rows[0]?.oldest as Date | null | undefined;
   return { count: Number(rows[0]?.total ?? 0), oldestAt: oldest ? oldest.toISOString() : null };
+};
+
+/** Pulpit administratora: wnioski czekające (każdy rok), od najwcześniejszego początku urlopu; `total` = wszystkie. */
+export const listPendingForDashboard = async (db: Db, limit: number): Promise<DashboardList<DashboardPendingRequest>> => {
+  const [rows] = await db.query<RowDataPacket[]>(
+    `SELECT r.id, u.name AS employee_name, lt.name AS leave_type_name, r.date_from, r.date_to, r.working_days, r.created_at ${FROM}
+     WHERE r.status = ? ORDER BY r.date_from ASC, r.created_at ASC, r.id ASC LIMIT ?`, // rule-ok: stała FROM z tego pliku, wartości przez ?
+    [PENDING, limit],
+  );
+  const [count] = await db.query<RowDataPacket[]>('SELECT COUNT(*) AS total FROM leave_requests WHERE status = ?', [PENDING]);
+  return {
+    items: rows.map((r) => ({
+      id: r.id as number,
+      employeeName: r.employee_name as string,
+      leaveTypeName: r.leave_type_name as string,
+      dateFrom: r.date_from as string,
+      dateTo: r.date_to as string,
+      workingDays: r.working_days as number,
+      createdAt: (r.created_at as Date).toISOString(),
+    })),
+    total: Number(count[0]?.total ?? 0),
+  };
+};
+
+/**
+ * Pulpit administratora: urlopy zatwierdzone i wnioski czekające, które mają choć jeden wspólny dzień z `from`–`to`,
+ * osób spoza archiwum. Tylko imię, daty i status (bez typu urlopu, powodu, komentarza).
+ */
+export const listAbsences = async (db: Db, from: string, to: string): Promise<DashboardAbsence[]> => {
+  const [rows] = await db.query<RowDataPacket[]>(
+    `SELECT u.name, r.date_from, r.date_to, r.status FROM leave_requests r JOIN users u ON u.id = r.user_id
+     WHERE r.status IN (?) AND r.date_from <= ? AND r.date_to >= ? AND u.archived_at IS NULL ORDER BY r.date_from, u.name`,
+    [ACTIVE, to, from],
+  );
+  return rows.map((r) => ({ name: r.name as string, dateFrom: r.date_from as string, dateTo: r.date_to as string, status: r.status as DashboardAbsence['status'] }));
 };
 
 /** Lata puli, w których są wnioski, od najnowszego. */

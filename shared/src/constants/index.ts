@@ -14,3 +14,4 @@ export * from './tasks';
 export * from './activityLog';
 export * from './archive';
 export * from './myAccount';
+export * from './dashboard';

@@ -47,7 +47,7 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
   `common.json` (`strip.weekend`, `strip.off`). Test `common/__tests__/LeaveStrip.test.tsx` (święto przekreślone
   z nazwą, kolory komórek, legenda tylko z podanych, wyróżniony dzień); `TeamStrip` przepisany na `LeaveStrip`, jego
   test bez zmian zielony → `npm run check`.
-- [ ] 4. Typy i stałe: `shared/src/constants/dashboard.ts` (`DASHBOARD_BOX_LIMIT = 5`, `DASHBOARD_ABSENCE_DAYS = 14`),
+- [x] 4. Typy i stałe: `shared/src/constants/dashboard.ts` (`DASHBOARD_BOX_LIMIT = 5`, `DASHBOARD_ABSENCE_DAYS = 14`),
   `shared/src/schemas/dashboard.ts`: `DashboardPendingRequest`, `DashboardAbsence`, `DashboardProjectCounts`,
   `DashboardTask` (`id, title, projectId, projectName, column: 'draft' | 'in_progress', dueDate, assignees?:
   { name; archived }[]`), `DashboardOwnRequest`, `AdminDashboard`, `EmployeeDashboard`,
