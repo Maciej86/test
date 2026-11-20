@@ -7,7 +7,6 @@ import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { InfoCard } from '../../common/InfoCard';
 import { PageHeader } from '../../common/PageHeader';
-import { Question, Questions } from '../../common/Question';
 import { useMockupRole } from '../../common/mockupRole';
 import { notify } from '../../common/notify';
 import { ACCOUNTS, type MockAccount } from './data';
@@ -56,7 +55,7 @@ const EmailCard = ({ account, state }: { account: MockAccount; state: State }) =
         label={t('email_address')}
         description={t('notify_hint')}
         defaultValue={state === 'errors' ? 'marta.wisniewska@firma.pl' : account.notifyEmail}
-        error={state === 'errors' ? t('email_taken') : undefined}
+        error={state === 'errors' ? t('validation:email_taken') : undefined}
         autoComplete="email"
         inputMode="email"
       />
@@ -72,9 +71,9 @@ const PasswordCard = ({ state }: { state: State }) => {
       title={t('password')}
       actions={<Button leftSection={<ButtonIcon action="password" />} onClick={() => notify.success(t('password_saved'))}>{t('change_password')}</Button>}
     >
-      <PasswordInput key={`current-${state}`} label={t('current_password')} autoComplete="current-password" defaultValue={errors ? 'stare-haslo' : ''} error={errors ? t('current_wrong') : undefined} withAsterisk />
+      <PasswordInput key={`current-${state}`} label={t('current_password')} autoComplete="current-password" defaultValue={errors ? 'stare-haslo' : ''} error={errors ? t('server.current_wrong') : undefined} withAsterisk />
       <PasswordInput key={`new-${state}`} label={t('new_password')} description={t('new_password_hint')} autoComplete="new-password" defaultValue={errors ? 'Urlop2026!' : ''} withAsterisk />
-      <PasswordInput key={`repeat-${state}`} label={t('repeat_password')} autoComplete="new-password" defaultValue={errors ? 'Urlop2025!' : ''} error={errors ? t('repeat_mismatch') : undefined} withAsterisk />
+      <PasswordInput key={`repeat-${state}`} label={t('repeat_password')} autoComplete="new-password" defaultValue={errors ? 'Urlop2025!' : ''} error={errors ? t('validation:passwords_differ') : undefined} withAsterisk />
       <Alert variant="light" color="gray" icon={<ShieldCheck size={18} />} p="xs">
         <Text size="xs">{t('other_devices_hint')}</Text>
       </Alert>
@@ -90,64 +89,6 @@ export const MyAccountMockup = () => {
 
   return (
     <Stack>
-      <Questions>
-        <Question
-          number={1}
-          about={t('notify_email')}
-          options={[
-            { id: 'a', text: 'Tylko administrator widzi to pole (dziś tylko on dostaje e-maile); e-mail pracownika zmienia administrator w Pracownikach' },
-            { id: 'b', text: 'Obie role widzą to pole, a pracownik czyta, że na razie aplikacja nie wysyła mu e-maili' },
-          ]}
-          recommended="b"
-        >
-          Czy pracownik ma widzieć pole „E-mail do powiadomień”? Dziś aplikacja wysyła e-maile tylko administratorom
-          (o nowym wniosku). Przełącz „Oglądam jako”, żeby zobaczyć obie wersje.
-        </Question>
-        <Question
-          number={2}
-          about={t('password')}
-          options={[
-            { id: 'a', text: 'Trzeba podać obecne hasło (ktoś przy cudzym, niezablokowanym komputerze nie zmieni hasła)' },
-            { id: 'b', text: 'Wystarczy nowe hasło dwa razy' },
-          ]}
-          recommended="a"
-        >
-          Czy do zmiany hasła trzeba wpisać obecne hasło?
-        </Question>
-        <Question
-          number={3}
-          about={t('password')}
-          options={[
-            { id: 'a', text: 'Na tym urządzeniu zostajesz zalogowany, na innych (np. telefon) trzeba zalogować się nowym hasłem' },
-            { id: 'b', text: 'Wylogowanie wszędzie, także tutaj; od razu logujesz się nowym hasłem' },
-          ]}
-          recommended="a"
-        >
-          Co się dzieje po zmianie hasła?
-        </Question>
-        <Question
-          number={4}
-          about="Historia zmian"
-          options={[
-            { id: 'a', text: 'Tak: „Jan Kowalski zmienił swoje hasło” / „…zmienił swój e-mail do powiadomień” (bez samego hasła)' },
-            { id: 'b', text: 'Nie, to prywatne ustawienia osoby' },
-          ]}
-          recommended="a"
-        >
-          Czy zmiana własnego hasła i e-maila ma trafiać do Historii zmian (widzi ją administrator)?
-        </Question>
-        <Question number={5} about="Zasady pól">
-          Zasady pól. Odpowiedz „ok” albo popraw pojedyncze pola:
-          <br />
-            • E-mail do powiadomień: nieobowiązkowy; prawdziwy adres, np. jan.kowalski@firma.pl; do 254 znaków; nie
-            może być taki sam jak u innej osoby (też w archiwum).<br />
-            • Obecne hasło: wymagane; musi się zgadzać.<br />
-            • Nowe hasło: wymagane; 8–72 znaki, w tym cyfra i znak specjalny (te same zasady co przy pierwszym
-            logowaniu); inne niż obecne.<br />
-            • Powtórz nowe hasło: wymagane; takie samo jak nowe.
-        </Question>
-      </Questions>
-
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">
           <Text size="sm" fw={600}>{t('mockup_state')}</Text>

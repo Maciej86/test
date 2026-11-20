@@ -15,14 +15,11 @@
   "notify_hint": "Np. jan.kowalski@firma.pl. Zostaw puste, jeśli nie chcesz dostawać e-maili.",
   "save_email": "Zapisz e-mail",
   "email_saved": "Zapisano e-mail do powiadomień",
-  "email_taken": "Ten adres ma już inna osoba.",
   "password": "Zmiana hasła",
   "current_password": "Obecne hasło",
-  "current_wrong": "Obecne hasło jest nieprawidłowe.",
   "new_password": "Nowe hasło",
   "new_password_hint": "Co najmniej 8 znaków, w tym cyfra i znak specjalny (np. ! # -)",
   "repeat_password": "Powtórz nowe hasło",
-  "repeat_mismatch": "Hasła różnią się.",
   "change_password": "Zmień hasło",
   "password_saved": "Hasło zmienione",
   "other_devices_hint": "Po zmianie hasła na innych urządzeniach trzeba będzie zalogować się ponownie.",
@@ -30,5 +27,9 @@
   "mockup_states": {
     "normal": "Zwykły",
     "errors": "Błędy w formularzach"
+  },
+  "server": {
+    "current_wrong": "Obecne hasło jest nieprawidłowe.",
+    "same_as_current": "Nowe hasło musi być inne niż obecne."
   }
 }

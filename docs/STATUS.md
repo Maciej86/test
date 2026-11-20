@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.47
 
-**Następny krok:** Moje konto: użytkownik ogląda makietę i odpowiada na pytania.
+**Następny krok:** Moje konto: plan do akceptacji.
 
 ## Start aplikacji
 
@@ -31,7 +31,7 @@
 | 10 | Zadania | tasks | zrobiony | zamknięcie | employees, notifications |
 | 11 | Historia zmian | activity-log | zrobiony | zamknięcie | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
-| 13 | Moje konto | my-account | w toku | makieta | login |
+| 13 | Moje konto | my-account | w toku | plan | login |
 | 14 | Pulpit | dashboard | czeka | makieta | my-leave, leave-requests, tasks |
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 

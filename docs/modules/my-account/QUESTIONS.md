@@ -9,28 +9,28 @@ Dziś aplikacja wysyła e-maile tylko administratorom (o nowym wniosku).
 - a) Tylko administrator widzi to pole; e-mail pracownika zmienia administrator w Pracownikach
 - b) Obie role widzą to pole, a pracownik czyta, że na razie aplikacja nie wysyła mu e-maili **(polecam)**
 
-Odpowiedź:
+Odpowiedź: b (2026-11-20)
 
 ## 2. Czy do zmiany hasła trzeba wpisać obecne hasło?
 
 - a) Tak (ktoś przy cudzym, niezablokowanym komputerze nie zmieni hasła) **(polecam)**
 - b) Nie, wystarczy nowe hasło dwa razy
 
-Odpowiedź:
+Odpowiedź: a (2026-11-20)
 
 ## 3. Co się dzieje po zmianie hasła?
 
 - a) Na tym urządzeniu zostajesz zalogowany, na innych trzeba zalogować się nowym hasłem **(polecam)**
 - b) Wylogowanie wszędzie, także tutaj
 
-Odpowiedź:
+Odpowiedź: a (2026-11-20)
 
 ## 4. Czy zmiana własnego hasła i e-maila trafia do Historii zmian?
 
 - a) Tak: „Jan Kowalski zmienił swoje hasło” / „…zmienił swój e-mail do powiadomień” (bez samego hasła) **(polecam)**
 - b) Nie, to prywatne ustawienia osoby
 
-Odpowiedź:
+Odpowiedź: a (2026-11-20)
 
 ## 5. Zasady pól
 
@@ -41,4 +41,4 @@ Odpowiedź:
 | Nowe hasło | tak | 8–72 znaki, w tym cyfra i znak specjalny (jak przy pierwszym logowaniu); inne niż obecne |
 | Powtórz nowe hasło | tak | takie samo jak nowe |
 
-Odpowiedź:
+Odpowiedź: ok (2026-11-20)
