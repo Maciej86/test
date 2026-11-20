@@ -36,12 +36,12 @@ z testem; podmiana w Powiadomieniach i w makiecie Historii zmian (makiety Powiad
 - [x] 5. Typy urlopów: dodanie, zmiana, ukrycie, przywrócenie zapisują wpis (osoba z `req.user` przez trasę do
   usługi, w tej samej transakcji); zmiana kolejności nie; testy → `npm run check`
 - [x] 6. Typy umów: to samo co w kroku 5 → `npm run check`
-- [ ] 7. `shared`: `ACTIVITY_AREAS`, `activityLogQuerySchema` (strona, szukanie ≤ 100, obszar, osoba, od/do, „do” ≥
+- [x] 7. `shared`: `ACTIVITY_AREAS`, `activityLogQuerySchema` (strona, szukanie ≤ 100, obszar, osoba, od/do, „do” ≥
   „od”, złe wartości pomijane), typy odpowiedzi, `describeActivity` (opis i kolor dla każdego obszaru i akcji,
   w tym statusy wniosków, zamknięcie roku, hasło, zakończenie zadania) + testy → `npm run check`
-- [ ] 8. Backend: zapytania listy (filtry, `LIKE ?` po nazwie, opisie i osobie, najnowsze, 50 na stronę), osób,
+- [x] 8. Backend: zapytania listy (filtry, `LIKE ?` po nazwie, opisie i osobie, najnowsze, 50 na stronę), osób,
   stanu rekordów (istnieje / w archiwum / usunięty) i imion osób ze zmian + testy → `npm run check`
-- [ ] 9. Backend: usługa (`state`, `link` dla każdego obszaru, „usunięte konto”) i trasy `GET /api/activity-log`,
+- [x] 9. Backend: usługa (`state`, `link` dla każdego obszaru, „usunięte konto”) i trasy `GET /api/activity-log`,
   `GET /api/activity-log/people`, `mountModule`, wiersze w Mapie dostępu; testy: dane, filtry, druga strona, zły
   parametr pominięty, 401, 403, brak tras zapisu (POST/PATCH/DELETE → 404) → `npm run check`
 - [ ] 10. Front: `activity-log.api.ts`, strona z `DataState`, nagłówek z liczbą, filtry w adresie, dziennik po

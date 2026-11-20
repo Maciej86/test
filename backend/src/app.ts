@@ -19,6 +19,7 @@ import { notificationsRoutes } from './modules/notifications/notifications.route
 import { myLeaveRoutes } from './modules/my-leave/my-leave.routes';
 import { leaveRequestsRoutes } from './modules/leave-requests/leave-requests.routes';
 import { tasksRoutes } from './modules/tasks/tasks.routes';
+import { activityLogRoutes } from './modules/activity-log/activity-log.routes';
 
 interface AppOptions {
   /** Dodatkowe trasy wymagające logowania (moduły dopisują się niżej; testy podają własne). */
@@ -61,6 +62,7 @@ export const createApp = (options: AppOptions = {}) => {
   mountModule(api, 'my-leave', myLeaveRoutes);
   mountModule(api, 'leave-requests', leaveRequestsRoutes);
   mountModule(api, 'tasks', tasksRoutes);
+  mountModule(api, 'activity-log', activityLogRoutes);
   // Powiadomienia: bez pozycji w menu (dzwonek w belce), więc role jawnie.
   mountModule(api, 'notifications', notificationsRoutes, ['admin', 'employee']);
   if (options.extraRoutes) api.use(options.extraRoutes);
