@@ -221,6 +221,7 @@ wymagają.
 
 ## 9. Ostatnie decyzje (archiwum)
 
+- 2026-11-20: Moduł Moje konto zrobiony (potwierdzony przez użytkownika): e-mail do powiadomień widzą obie role (pracownik z dopiskiem, że na razie nie dostaje e-maili), zmiana hasła wymaga obecnego, po zmianie inne urządzenia są wylogowane, wpisy w Historii zmian; e-mail do 190 znaków jak w Pracownikach.
 - 2026-11-19: Zadania, część 2: zbudowana (kroki 0–10), przegląd kodu z poprawkami (komunikat i odświeżenie przy komentarzu do usuniętego zadania, kolejność blokad, fragment powiadomienia bez przecinania emotikon); `npm run check` i 41 testów e2e zielone.
 - 2026-11-19: Zadania: spec części 2 zaakceptowany (`SPEC-2.md`: komentarze w podglądzie, poprawia autor, usuwa autor albo administrator, licznik na karcie, powiadomienie `task_comment` dla przypisanych); napisane `PLAN-2.md` (11 kroków) i `TESTS-2.md`.
 - 2026-11-19: Zadania, część 1 (projekty i tablice) gotowa, potwierdzona przez użytkownika („działa”).

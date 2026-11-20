@@ -1,7 +1,6 @@
 import type { ComponentType } from 'react';
 import { DashboardMockup } from './modules/dashboard/DashboardMockup';
 import { TASK_SCREENS } from './modules/tasks/navigation';
-import { MyAccountMockup } from './modules/my-account/MyAccountMockup';
 import { Done } from './common/Done';
 import type { ExtraScreen } from './Shell';
 
@@ -31,7 +30,8 @@ export const SCREENS: Record<string, ComponentType> = {
   'contract-types': () => <Done labelKey="common.nav.contract_types" />,
   'activity-log': () => <Done labelKey="common.nav.activity_log" />,
   'archive': () => <Done labelKey="common.nav.archive" />,
-  'my-account': MyAccountMockup,
+  // Moduł Moje konto zrobiony; makieta zostaje w modules/my-account/MyAccountMockup.tsx.
+  'my-account': () => <Done labelKey="common.nav.my_account" />,
 };
 
 /** Ekrany spoza menu aplikacji (np. logowanie); w makiecie mają link w menu nad „Postęp”. */

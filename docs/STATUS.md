@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.47
 
-**Następny krok:** Moje konto: użytkownik przechodzi TESTS.md i potwierdza „działa”.
+**Następny krok:** Moduł Pulpit (makieta).
 
 ## Start aplikacji
 
@@ -31,12 +31,13 @@
 | 10 | Zadania | tasks | zrobiony | zamknięcie | employees, notifications |
 | 11 | Historia zmian | activity-log | zrobiony | zamknięcie | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
-| 13 | Moje konto | my-account | w toku | testy | login |
+| 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
 | 14 | Pulpit | dashboard | czeka | makieta | my-leave, leave-requests, tasks |
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
 
+- 2026-11-20: Moduł Moje konto zrobiony (potwierdzony przez użytkownika): własne dane, e-mail do powiadomień (obie role), zmiana hasła z obecnym (limit 10 nieudanych prób na konto, inne sesje kończą się, ochrona przed nadpisaniem hasła zmienionego w międzyczasie), wpis „Zmiana własnego hasła” w Historii zmian. Wspólne klocki: `DetailRow`, `RoleBadge`, `withRepeatPassword`.
 - 2026-11-20: Poprawka: testy w przeglądarce czekają na element 10 s (było 5 s), cały test do 45 s; przy zajętym komputerze zapis z hasłem trwa kilka sekund. Aplikacja bez zmian.
 - 2026-11-20: Aktualizacja stepkit do 0.1.47: szuflady, okna formularzy i kółka osób są wspólnymi klockami (`SideDrawer`, `FormModal`, `PersonAvatar` w `common/` frontu i makiet); szczegóły wniosku mają teraz 540 px jak reszta podglądów (było szerzej), kółka osób w archiwum wszędzie szare i przygaszone; „Zamknij rok” na `ConfirmModal`.
 - 2026-11-20: Poprawka (zgłoszenie użytkownika): Archiwum przy każdym wejściu pobiera świeżą listę i liczniki (osoba przeniesiona do archiwum w Pracownikach nie była widoczna bez odświeżenia strony).
