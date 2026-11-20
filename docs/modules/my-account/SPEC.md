@@ -35,8 +35,8 @@ hasło”; przycisk „Zmień hasło”. Pod polami szara ramka: „Po zmianie h
 zalogować się ponownie.” Po udanej zmianie: dymek „Hasło zmienione”, pola się czyszczą, osoba zostaje zalogowana na tym
 urządzeniu (nowe ciasteczko sesji), inne jej sesje kończą się od razu. Błędy pod polami: złe obecne hasło „Obecne
 hasło jest nieprawidłowe.”, nowe takie samo jak obecne „Nowe hasło musi być inne niż obecne.”, powtórzenie inne
-„Hasła się różnią. Wpisz to samo hasło dwa razy.”, zasady hasła jak przy pierwszym logowaniu. Za dużo prób z złym obecnym hasłem (10 w 15 minut na
-konto, liczą się tylko nieudane): dymek „Za dużo prób zmiany hasła. Spróbuj ponownie za 15 minut.” (429).
+„Hasła się różnią. Wpisz to samo hasło dwa razy.”, zasady hasła jak przy pierwszym logowaniu. Za dużo nieudanych prób (10 w 15 minut na
+konto; liczy się każda odrzucona, także z błędem w nowym haśle): dymek „Za dużo prób zmiany hasła. Spróbuj ponownie za 15 minut.” (429).
 
 Osoba z hasłem tymczasowym nie dojdzie do tego ekranu: najpierw `/change-password` (jak dziś).
 
@@ -60,7 +60,7 @@ dla „Moich danych” (`name`, `login`, `role`, `hired_on`, `contract_type_id` 
 **Historia zmian** (odpowiedź 4a), obszar `users`, w tej samej transakcji co zmiana (`withTransaction` + `logActivity`):
 
 - e-mail: `action: 'update'`, `changes: { email: { before, after } }`, autor = osoba sama. Opis jak przy innych
-  zmianach konta („Zmiana danych konta”), wartości „przed → po” jak w Pracownikach.
+  zmianach konta („Zmiana danych pracownika”), wartości „przed → po” jak w Pracownikach.
 - hasło: `action: 'update'`, `changes: { password: { before: null, after: 'changed' } }` (bez hasła i skrótu). W
   `describeActivity` nowy opis `user_own_password` „Zmiana własnego hasła”, a w `formatChangeValue` wartość
   „zmieniono hasło” (dzisiejsze `after: 'reset'` od administratora zostaje „Ustawienie hasła tymczasowego”).

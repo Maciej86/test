@@ -75,7 +75,7 @@ Porównane ramy: `InfoCard` (common) dla trzech kart, jak w makiecie; bez szufla
   w `my-account.json`; makieta używa `DetailRow` i tych samych kluczy błędów → `npm run check`
 - [x] 7. Test e2e `e2e/my-account.spec.ts` ze scenariuszy `TESTS.md` (świeże konto tymczasowe z `addEmployee`, żeby
   zmiana hasła nie psuła stałych kont testowych) → `npm run test:e2e`
-- [ ] 8. Przegląd kodu całego modułu (lista kontrolna z `CONVENTIONS.md`), poprawki z testem → `npm run check`
+- [x] 8. Przegląd kodu całego modułu (lista kontrolna z `CONVENTIONS.md`), poprawki z testem → `npm run check`
 
 ## Na co uważać (poza testami kroków)
 
