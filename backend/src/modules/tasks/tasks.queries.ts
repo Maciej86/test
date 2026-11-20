@@ -1,6 +1,7 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 import type { BoardPerson, Role, TaskColumn } from '@app/shared';
 import type { Db } from '../../db/pool';
+import { likePattern } from '../../db/like';
 import type { Viewer } from '../../middleware/routeHelpers';
 
 /** Zadanie z bazy (bez przypisanych osób i urlopów). */
@@ -169,4 +170,98 @@ export const countAssignmentsByUser = async (db: Db, userIds: number[]): Promise
   if (userIds.length === 0) return new Map();
   const [rows] = await db.query<RowDataPacket[]>('SELECT user_id, COUNT(*) AS total FROM task_assignees WHERE user_id IN (?) GROUP BY user_id', [userIds]);
   return new Map(rows.map((r) => [Number(r.user_id), Number(r.total)]));
+};
+
+/* ---------- Archiwum (moduł Archiwum używa tych funkcji przez tasks.service.ts) ---------- */
+
+/** Zadanie z projektem i tym, kto je przeniósł do archiwum; `archived` = czy jest w archiwum. */
+export interface AnyTaskRow {
+  id: number;
+  title: string;
+  description: string | null;
+  projectId: number;
+  projectName: string;
+  column: TaskColumn;
+  dueDate: string | null;
+  archivedAt: string | null;
+  archivedByName: string | null;
+  archived: boolean;
+}
+
+const ANY_TASK_SQL = `SELECT t.id, t.title, t.description, t.project_id, p.name AS project_name, t.column_key, t.due_date, t.archived_at,
+       a.name AS archived_by_name
+     FROM tasks t JOIN projects p ON p.id = t.project_id LEFT JOIN users a ON a.id = t.archived_by`;
+
+const toAnyTask = (r: RowDataPacket): AnyTaskRow => ({
+  id: r.id as number,
+  title: r.title as string,
+  description: (r.description as string | null) ?? null,
+  projectId: r.project_id as number,
+  projectName: r.project_name as string,
+  column: r.column_key as TaskColumn,
+  dueDate: (r.due_date as string | null) ?? null,
+  archivedAt: r.archived_at ? new Date(r.archived_at as string).toISOString() : null,
+  archivedByName: (r.archived_by_name as string | null) ?? null,
+  archived: r.archived_at !== null && r.archived_at !== undefined,
+});
+
+/** Zadania w archiwum, najnowsze w archiwum na górze; szukanie po tytule, filtr projektu. */
+export const listArchivedTasks = async (
+  db: Db,
+  q: { search: string; projectId?: number; page: number; pageSize: number },
+): Promise<{ rows: AnyTaskRow[]; total: number }> => {
+  const where = ['t.archived_at IS NOT NULL'];
+  const params: unknown[] = [];
+  if (q.search) {
+    where.push('t.title LIKE ?');
+    params.push(likePattern(q.search));
+  }
+  if (q.projectId !== undefined) {
+    where.push('t.project_id = ?');
+    params.push(q.projectId);
+  }
+  const [rows] = await db.query<RowDataPacket[]>(
+    `${ANY_TASK_SQL} WHERE ${where.join(' AND ')} ORDER BY t.archived_at DESC, t.id DESC LIMIT ? OFFSET ?`, // rule-ok: stała lista kolumn, WHERE z gotowych kawałków z ?
+    [...params, q.pageSize, (q.page - 1) * q.pageSize],
+  );
+  const [count] = await db.query<RowDataPacket[]>(`SELECT COUNT(*) AS total FROM tasks t WHERE ${where.join(' AND ')}`, params); // rule-ok: WHERE z gotowych kawałków z ?
+  return { rows: rows.map(toAnyTask), total: Number(count[0]?.total ?? 0) };
+};
+
+/** Projekty, które mają zadania w archiwum (pole wyboru projektu w Archiwum). */
+export const archivedTaskProjects = async (db: Db): Promise<{ id: number; name: string }[]> => {
+  const [rows] = await db.query<RowDataPacket[]>(
+    'SELECT p.id, p.name FROM projects p WHERE EXISTS (SELECT 1 FROM tasks t WHERE t.project_id = p.id AND t.archived_at IS NOT NULL) ORDER BY p.name',
+  );
+  return rows.map((r) => ({ id: r.id as number, name: r.name as string }));
+};
+
+export const countArchivedTasks = async (db: Db): Promise<number> => {
+  const [rows] = await db.query<RowDataPacket[]>('SELECT COUNT(*) AS total FROM tasks WHERE archived_at IS NOT NULL');
+  return Number(rows[0]?.total ?? 0);
+};
+
+/** Zadanie w archiwum albo poza nim (Archiwum sprawdza stan samo); `lock` blokuje wiersz zadania. */
+export const findAnyTask = async (db: Db, id: number, opts: { lock?: boolean } = {}): Promise<AnyTaskRow | null> => {
+  const sql = `${ANY_TASK_SQL} WHERE t.id = ?`;
+  const [rows] = await db.query<RowDataPacket[]>(opts.lock ? `${sql} FOR UPDATE OF t` : sql, [id]); // rule-ok: stała lista kolumn i stałe FOR UPDATE, dane idą przez ?
+  return rows[0] ? toAnyTask(rows[0]) : null;
+};
+
+/** Przypisane osoby zadania z imieniem i znacznikiem archiwum, po nazwisku. */
+export const assigneeNames = async (db: Db, taskId: number): Promise<{ name: string; archived: boolean }[]> => {
+  const [rows] = await db.query<RowDataPacket[]>(
+    'SELECT u.name, u.archived_at FROM task_assignees ta JOIN users u ON u.id = ta.user_id WHERE ta.task_id = ? ORDER BY u.last_name, u.first_name',
+    [taskId],
+  );
+  return rows.map((r) => ({ name: r.name as string, archived: r.archived_at !== null }));
+};
+
+export const restoreTask = async (db: Db, id: number): Promise<void> => {
+  await db.query('UPDATE tasks SET archived_at = NULL, archived_by = NULL WHERE id = ?', [id]);
+};
+
+/** Usunięcie na stałe; komentarze i przypisania znikają razem z zadaniem (CASCADE). */
+export const deleteTask = async (db: Db, id: number): Promise<void> => {
+  await db.query('DELETE FROM tasks WHERE id = ?', [id]);
 };

@@ -55,7 +55,7 @@ i edycję).
   sprawdzeń: 404 → 409 `archiveFirst` → 409 `hasLeaveRequests` → 400 `confirmName` (pole) → `DELETE` → `logActivity`
   `delete`/`users`); testy na podmienionym `conn` jak w module Pracownicy, w tym każda gałąź błędu bez `DELETE`
   → `npm run check`
-- [ ] 5. **Zadania w archiwum** (`tasks.queries.ts` + `tasks.service.ts`): `listArchivedTasks(query)` (z `projects`
+- [x] 5. **Zadania w archiwum** (`tasks.queries.ts` + `tasks.service.ts`): `listArchivedTasks(query)` (z `projects`
   mającymi zadania w archiwum, szukanie po tytule, filtr `projectId`, licznik komentarzy, nazwisko przenoszącego),
   `countArchivedTasks(db)`, `getArchivedTask(id): Promise<Result<ArchivedTaskDetails>>` (aktywne → 404),
   `restoreArchivedTask(id, actor)` (`lockProject`, 404 / 409 `notArchived`, pozycja = `MAX(position)+1` kolumny
@@ -95,3 +95,4 @@ i edycję).
 
 - Krok 0: szkielety testów usług pracowników i zadań leżą na razie w `backend/src/modules/archive/__tests__/*.todo.test.ts`, bo test zasad nie przepuszcza `it.todo` w zrobionych modułach; gotowe testy trafiają do `employees/__tests__` i `tasks/__tests__`, a pliki `.todo` znikają.
 - Krok 2: klucze błędów modułu jak w innych modułach: `archive.server.has_leave_requests`, `archive.server.not_archived`, `archive.server.confirm_mismatch` (spec pisał `archive.has_leave_requests`); `ARCHIVE_TABS` w stałych. Komentarze w podglądzie: pole `commentsList` (liczba komentarzy to `comments`).
+- Krok 5: `logTask` w Zadaniach przyjmuje `Actor` (wystarczy numer i imię), żeby Archiwum mogło zapisać przywrócenie i usunięcie. Komentarz autora usuniętego na stałe ma w podglądzie szare kółko (`authorArchived`), jak na tablicy. Zadanie blokowane `FOR UPDATE OF t` (tylko wiersz zadania, MySQL 8.4).

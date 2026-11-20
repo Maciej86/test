@@ -115,3 +115,30 @@ describe('assignments per person (Archiwum)', () => {
     expect(calls).toHaveLength(0);
   });
 });
+
+describe('archived tasks queries (Archiwum)', () => {
+  it('listArchivedTasks: only archived, title LIKE ?, project filter, newest first', async () => {
+    const { db, calls } = spyDb([], [{ total: 0 }]);
+    expect(await q.listArchivedTasks(db, { search: '50%', projectId: 3, page: 2, pageSize: 25 })).toEqual({ rows: [], total: 0 });
+    expect(calls[0]![0]).toMatch(/WHERE t\.archived_at IS NOT NULL AND t\.title LIKE \? AND t\.project_id = \? ORDER BY t\.archived_at DESC, t\.id DESC LIMIT \? OFFSET \?$/);
+    expect(calls[0]![1]).toEqual(['%50\\%%', 3, 25, 25]);
+    expect(calls[1]![1]).toEqual(['%50\\%%', 3]);
+  });
+
+  it('findAnyTask: archived flag from archived_at; lock locks only the task row', async () => {
+    const row = { id: 31, title: 'T', description: null, project_id: 3, project_name: 'Biuro', column_key: 'done', due_date: null, archived_at: '2026-11-10T07:47:00Z', archived_by_name: null };
+    const { db, calls } = spyDb([row]);
+    expect(await q.findAnyTask(db, 31, { lock: true })).toMatchObject({ id: 31, projectId: 3, column: 'done', archived: true, archivedAt: '2026-11-10T07:47:00.000Z' });
+    expect(calls[0]![0]).toMatch(/WHERE t\.id = \? FOR UPDATE OF t$/);
+  });
+
+  it('restoreTask clears the archive columns; deleteTask deletes by id', async () => {
+    const { db, calls } = spyDb([]);
+    await q.restoreTask(db, 31);
+    await q.deleteTask(db, 31);
+    expect(calls).toEqual([
+      ['UPDATE tasks SET archived_at = NULL, archived_by = NULL WHERE id = ?', [31]],
+      ['DELETE FROM tasks WHERE id = ?', [31]],
+    ]);
+  });
+});

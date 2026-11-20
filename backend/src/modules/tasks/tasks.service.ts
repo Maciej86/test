@@ -1,5 +1,11 @@
 import {
+  ARCHIVE_MESSAGES,
+  SERVER_MESSAGES,
   TASK_MESSAGES as M,
+  type ArchivedTask,
+  type ArchivedTaskDetails,
+  type ArchivedTasksResponse,
+  type ArchiveTasksQuery,
   TASK_HIDE_DONE_AFTER_DAYS,
   TASK_FORM_LEAVE_DAYS,
   TASK_LEAVE_LOOKAHEAD_DAYS,
@@ -19,9 +25,10 @@ import { diffChanges, logActivity, type Changes } from '../../db/activityLog';
 import { withTransaction } from '../../db/transaction';
 import { notifyUsers } from '../notifications/notifications.service';
 import { pool } from '../../db/pool';
-import { fail, notFound, type Result, type Viewer } from '../../middleware/routeHelpers';
+import { PAGE_SIZE } from '../../config/constants';
+import { fail, notFound, type Actor, type Result, type Viewer } from '../../middleware/routeHelpers';
 import { listApprovedLeaves } from '../leave-requests/leave-requests.queries';
-import { commentCounts } from './comments.queries';
+import { commentCounts, listComments } from './comments.queries';
 import * as q from './tasks.queries';
 
 /** Do kiedy szukać urlopów przy zadaniu: termin, a bez terminu dziś + 14 dni; zrealizowane i po terminie: wcale. */
@@ -115,7 +122,7 @@ const lockTaskForWrite = async (conn: PoolConnection, taskId: number, viewer: Vi
 type LockedTask = q.TaskRow & { projectName: string };
 
 /** Wpis historii zmian zadania: tytuł i projekt zapamiętane w chwili zmiany. */
-const logTask = (conn: PoolConnection, viewer: Viewer, task: { id: number; title: string; projectName: string }, action: string, changes: Changes) =>
+const logTask = (conn: PoolConnection, viewer: Actor, task: { id: number; title: string; projectName: string }, action: string, changes: Changes) =>
   logActivity(conn, {
     userId: viewer.id,
     userName: viewer.name,
@@ -222,5 +229,76 @@ export const finishTask = async (taskId: number, finished: boolean, viewer: View
     if (Boolean(task.finishedAt) !== finished) {
       await logTask(conn, viewer, task, 'status', { finished: { before: Boolean(task.finishedAt), after: finished } });
     }
+    return { ok: true as const };
+  });
+
+/* ---------- Archiwum (moduł Archiwum używa tych funkcji) ---------- */
+
+const toArchivedTask = (t: q.AnyTaskRow, comments: number): ArchivedTask => ({
+  id: t.id,
+  title: t.title,
+  projectId: t.projectId,
+  projectName: t.projectName,
+  column: t.column,
+  dueDate: t.dueDate,
+  comments,
+  archivedAt: t.archivedAt ?? '',
+  archivedByName: t.archivedByName,
+});
+
+/** Zadania w archiwum (szukanie po tytule, filtr projektu) i projekty, które je mają. */
+export const listArchivedTasks = async (query: ArchiveTasksQuery): Promise<ArchivedTasksResponse> => {
+  const { rows, total } = await q.listArchivedTasks(pool, { search: query.search, projectId: query.projectId, page: query.page, pageSize: PAGE_SIZE });
+  const [counts, projects] = await Promise.all([commentCounts(pool, rows.map((r) => r.id)), q.archivedTaskProjects(pool)]);
+  return { items: rows.map((r) => toArchivedTask(r, counts.get(r.id) ?? 0)), total, page: query.page, pageSize: PAGE_SIZE, projects };
+};
+
+export const countArchivedTasks = (): Promise<number> => q.countArchivedTasks(pool);
+
+/** Podgląd zadania z archiwum: opis, osoby, komentarze. Zadanie spoza archiwum: 404. */
+export const getArchivedTask = async (id: number): Promise<Result<ArchivedTaskDetails>> => {
+  const task = await q.findAnyTask(pool, id);
+  if (!task?.archived) return notFound();
+  const [assignees, comments] = await Promise.all([q.assigneeNames(pool, id), listComments(pool, id)]);
+  return {
+    ...toArchivedTask(task, comments.length),
+    description: task.description,
+    assignees,
+    // Autor w archiwum albo usunięty na stałe: szare kółko (jak na tablicy).
+    commentsList: comments.map((c) => ({ id: c.id, authorName: c.authorName, authorArchived: c.authorArchived || c.authorId === null, createdAt: c.createdAt, text: c.text })),
+  };
+};
+
+/**
+ * Zadanie z archiwum do zapisu: najpierw blokada projektu (ta sama kolejność blokad co przy każdym zapisie zadań),
+ * potem zadanie przeczytane od nowa pod blokadą. Nie ma albo projekt usunięty: null.
+ */
+const lockAnyTask = async (conn: PoolConnection, id: number): Promise<q.AnyTaskRow | null> => {
+  const seen = await q.findAnyTask(conn, id);
+  if (!seen || (await q.lockProject(conn, seen.projectId)) === null) return null;
+  return q.findAnyTask(conn, id, { lock: true });
+};
+
+/** Przywrócenie zadania na koniec jego kolumny (odpowiedź 3a), z opisem, osobami i komentarzami. */
+export const restoreArchivedTask = async (id: number, actor: Actor): Promise<Result> =>
+  withTransaction(async (conn) => {
+    const task = await lockAnyTask(conn, id);
+    if (!task) return notFound();
+    if (!task.archived) return fail(409, ARCHIVE_MESSAGES.notArchived);
+    const ids = await q.columnTaskIds(conn, task.projectId, task.column);
+    await q.restoreTask(conn, id);
+    await q.setPositions(conn, [...ids, id]);
+    await logTask(conn, actor, task, 'restore', {});
+    return { ok: true as const };
+  });
+
+/** Usunięcie zadania z archiwum na stałe, razem z komentarzami. */
+export const deleteArchivedTask = async (id: number, actor: Actor): Promise<Result> =>
+  withTransaction(async (conn) => {
+    const task = await lockAnyTask(conn, id);
+    if (!task) return notFound();
+    if (!task.archived) return fail(409, SERVER_MESSAGES.archiveFirst);
+    await q.deleteTask(conn, id);
+    await logTask(conn, actor, task, 'delete', {});
     return { ok: true as const };
   });
