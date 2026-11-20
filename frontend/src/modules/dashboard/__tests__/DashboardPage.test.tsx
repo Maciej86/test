@@ -168,8 +168,42 @@ describe('DashboardPage', () => {
     expect(await screen.findByText('Nie masz przypisanych zadań w toku ani w opracowaniu.')).toBeInTheDocument();
   });
 
-  it.todo('employee: pool card with "Złóż wniosek" to /admin/my-leave; no pool → text without button');
-  it.todo('employee: my requests (pending and next approved) with empty texts');
-  it.todo('employee: no admin boxes');
-  void employee;
+  it('employee: pool card with "Złóż wniosek" to /admin/my-leave; no pool → text without button', async () => {
+    show(employee);
+    expect(await screen.findByText('Urlop w 2026')).toBeInTheDocument();
+    expect(screen.getByText('dni do wykorzystania (z 30)')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Złóż wniosek' })).toHaveAttribute('href', '/admin/my-leave');
+  });
+
+  it('employee without a pool → text, no request button', async () => {
+    show({ ...employee, pool: null });
+    expect(await screen.findByText('Pula dni nie jest jeszcze ustalona. Zapytaj administratora.')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Złóż wniosek' })).toBeNull();
+  });
+
+  it('employee: my requests (pending and next approved) with empty texts', async () => {
+    show(employee);
+    await screen.findByText('Urlop w 2026');
+    const box = card('Moje wnioski');
+    expect(box).toHaveTextContent('Wypoczynkowy, 26.11.2026 – 27.11.2026');
+    expect(within(box).getByText('Czeka na decyzję', { selector: '.mantine-Badge-label' })).toBeInTheDocument();
+    expect(box).toHaveTextContent('Wypoczynkowy, 21.12.2026 – 23.12.2026');
+    expect(within(box).getByText('3 dni')).toBeInTheDocument();
+    expect(within(box).getByRole('link', { name: 'Moje urlopy' })).toHaveAttribute('href', '/admin/my-leave');
+  });
+
+  it('employee: nothing pending and no next leave → empty texts', async () => {
+    show({ ...employee, myPending: [], nextLeave: null });
+    expect(await screen.findByText('Żaden wniosek nie czeka na decyzję.')).toBeInTheDocument();
+    expect(screen.getByText('Nie masz zaplanowanego urlopu.')).toBeInTheDocument();
+  });
+
+  it('employee: no admin boxes', async () => {
+    show(employee);
+    await screen.findByText('Urlop w 2026');
+    expect(screen.getByRole('heading', { name: 'Moje zadania' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /Wnioski do rozpatrzenia/ })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Nieobecności w najbliższych 2 tygodniach' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Stan tablic' })).toBeNull();
+  });
 });

@@ -1,5 +1,6 @@
 import {
   LEAVE_REQUESTS_MESSAGES as M,
+  MY_LEAVE_PATH,
   currentYear,
   type LeaveRequestDetails,
   type LeaveRequestListItem,
@@ -123,7 +124,7 @@ const decide = (id: number, actor: Actor, d: Decision, extraCheck?: (conn: Db, r
       type: d.type,
       userIds: [r.userId],
       params: { leaveType: r.leaveTypeName, dateFrom: r.dateFrom, dateTo: r.dateTo, ...(d.reason !== null ? { reason: d.reason } : {}) },
-      link: `/admin/my-leave?year=${r.poolYear}`,
+      link: `${MY_LEAVE_PATH}?year=${r.poolYear}`,
       actor,
     });
     return { ok: true as const };

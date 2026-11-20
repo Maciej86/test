@@ -92,10 +92,12 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
   (tabela + zadania po terminie z kółkami), `MyTasksBox` (`TaskRow` z `taskDueState`, „dziś”/„jutro”/„bez terminu”,
   „i jeszcze N zadań”, link `taskBoardPath(projectId, id)`). Testy w `DashboardPage.test.tsx` (dane z makiety, puste
   stany, linki) → `npm run check`
-- [ ] 9. Ekran pracownika: `PoolCard` z przyciskiem „Złóż wniosek” (`/admin/my-leave`), bez puli zdanie
+- [x] 9. Ekran pracownika: `PoolCard` z przyciskiem „Złóż wniosek” (`/admin/my-leave`), bez puli zdanie
   `pool.no_pool` bez przycisku; `MyRequestsBox`; `MyTasksBox` na całą szerokość. Klucze `ready` i `start_card` usunięte
   z `dashboard.json`, dopisane `pending.starts_today`, `pending.started`, `pool.no_pool`. Testy w
   `DashboardPage.test.tsx` → `npm run check`
+  **Uwaga:** nowa stała `MY_LEAVE_PATH` (shared) zamiast wpisanego adresu w nawigacji, w linku powiadomienia
+  o decyzji i na Pulpicie.
 - [ ] 10. Test e2e `e2e/dashboard.spec.ts` ze scenariuszy `TESTS.md` → `npm run test:e2e`, `npm run check`; przegląd
   kodu całego modułu.
 

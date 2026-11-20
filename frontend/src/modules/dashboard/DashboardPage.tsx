@@ -5,8 +5,10 @@ import { DataState } from '../../common/DataState';
 import { PageHeader } from '../../common/PageHeader';
 import { useDashboard } from './dashboard.api';
 import { AbsenceBox } from './components/AbsenceBox';
+import { MyRequestsBox } from './components/MyRequestsBox';
 import { MyTasksBox } from './components/MyTasksBox';
 import { PendingBox } from './components/PendingBox';
+import { PoolBox } from './components/PoolBox';
 import { ProjectsBox } from './components/ProjectsBox';
 
 const AdminDashboard = ({ data }: { data: AdminData }) => (
@@ -20,6 +22,8 @@ const AdminDashboard = ({ data }: { data: AdminData }) => (
 
 const EmployeeDashboard = ({ data }: { data: EmployeeData }) => (
   <Grid gap="md">
+    <Grid.Col span={{ base: 12, lg: 7 }}><PoolBox pool={data.pool} /></Grid.Col>
+    <Grid.Col span={{ base: 12, lg: 5 }}><MyRequestsBox pending={data.myPending} next={data.nextLeave} /></Grid.Col>
     <Grid.Col span={12}><MyTasksBox tasks={data.myTasks} today={data.today} /></Grid.Col>
   </Grid>
 );

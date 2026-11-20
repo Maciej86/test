@@ -27,3 +27,6 @@ export const MY_LEAVE_MESSAGES = {
   datesOrder: 'my-leave.validation.dates_order',
   sameYear: 'my-leave.validation.same_year',
 } as const;
+
+/** Ekran „Moje urlopy” (pozycja menu, linki z powiadomień i z Pulpitu). */
+export const MY_LEAVE_PATH = '/admin/my-leave';
