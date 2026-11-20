@@ -67,37 +67,5 @@
     "empty": "Puste archiwum",
     "no_results": "Brak wyników"
   },
-  "mockup_no_results_query": "Kowalczyk",
-  "q": {
-    "about_employees": "Pracownicy w archiwum",
-    "about_tasks": "Zadania w archiwum",
-    "about_delete": "Okno „Usuń na stałe”",
-    "about_screen": "Cały ekran",
-    "q1": "Czy da się usunąć na stałe osobę, która ma wnioski urlopowe?",
-    "q1a": "Nie: przycisk jest wyłączony z wyjaśnieniem, konto zostaje w archiwum na zawsze (historia urlopów zostaje)",
-    "q1b": "Tak: po wpisaniu imienia i nazwiska konto znika razem ze wszystkimi jego wnioskami",
-    "q1c": "Tak: konto znika, a wnioski zostają z samym imieniem i nazwiskiem (bez konta)",
-    "q2": "Jak potwierdzać usunięcie na stałe?",
-    "q2a": "Osobę: wpisanie imienia i nazwiska (jak przy usuwaniu projektu). Zadanie: zwykłe okno z liczbą komentarzy, które znikną",
-    "q2b": "Wszędzie zwykłe okno z pytaniem",
-    "q2c": "Wszędzie wpisanie nazwy (imienia i nazwiska albo tytułu zadania)",
-    "q3": "Gdzie wraca przywrócone zadanie?",
-    "q3a": "Do tej samej kolumny, w której było, na jej koniec",
-    "q3b": "Zawsze do „W opracowaniu”, na górę",
-    "q4": "Co robi kliknięcie zadania w archiwum?",
-    "q4a": "Otwiera podgląd z prawej, tylko do oglądania: opis, termin, osoby, komentarze oraz „Przywróć” i „Usuń na stałe”",
-    "q4b": "Nic: w tabeli są tylko tytuł, projekt i przyciski",
-    "q5": "Jak szukać zadań w archiwum?",
-    "q5a": "Wyszukiwarka i wybór projektu",
-    "q5b": "Tylko wyszukiwarka",
-    "q6": "Czy coś ma znikać z archiwum samo?",
-    "q6a": "Nie: znika tylko to, co administrator usunie na stałe",
-    "q6b": "Zadania usuwają się same po 12 miesiącach w archiwum (konta nigdy)",
-    "q7": "Przywracanie i usuwanie kilku rzeczy naraz?",
-    "q7a": "Nie: każdą rzecz osobno, archiwum zwykle jest małe",
-    "q7b": "Tak: pola do zaznaczania i przyciski „Przywróć zaznaczone”, „Usuń zaznaczone”",
-    "q8": "Co widać przy osobie w archiwum?",
-    "q8a": "Imię i nazwisko, login, rolę, od kiedy w archiwum i kto przeniósł, liczbę wniosków urlopowych i zadań",
-    "q8b": "Tylko imię i nazwisko, login i od kiedy w archiwum"
-  }
+  "mockup_no_results_query": "Kowalczyk"
 }

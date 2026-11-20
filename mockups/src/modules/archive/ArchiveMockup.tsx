@@ -21,33 +21,11 @@ import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { EmptyState } from '../../common/EmptyState';
 import { PageHeader } from '../../common/PageHeader';
-import { Question, Questions } from '../../common/Question';
 import { DeleteEmployeeModal, DeleteTaskModal, RestoreEmployeeModal, RestoreTaskModal, TaskPreview } from './ArchiveModals';
 import { ARCHIVED_EMPLOYEES, ARCHIVED_TASKS, PROJECTS, type ArchivedEmployee, type ArchivedTask } from './data';
 
 const STATES = ['list', 'empty', 'no_results'] as const;
 type State = (typeof STATES)[number];
-
-const QuestionsPanel = () => {
-  const { t } = useTranslation('archive');
-  const q = (n: number, about: string, ids: string[]) => (
-    <Question number={n} about={t(`q.about_${about}`)} options={ids.map((id) => ({ id, text: t(`q.q${n}${id}`) }))} recommended="a">
-      {t(`q.q${n}`)}
-    </Question>
-  );
-  return (
-    <Questions>
-      {q(1, 'employees', ['a', 'b', 'c'])}
-      {q(2, 'delete', ['a', 'b', 'c'])}
-      {q(3, 'tasks', ['a', 'b'])}
-      {q(4, 'tasks', ['a', 'b'])}
-      {q(5, 'tasks', ['a', 'b'])}
-      {q(6, 'screen', ['a', 'b'])}
-      {q(7, 'screen', ['a', 'b'])}
-      {q(8, 'employees', ['a', 'b'])}
-    </Questions>
-  );
-};
 
 /** Kiedy trafiło do archiwum i kto to zrobił. */
 const ArchivedCell = ({ at, by }: { at: string; by: string }) => {
@@ -271,8 +249,6 @@ export const ArchiveMockup = () => {
           />
         </Group>
       </Paper>
-
-      <QuestionsPanel />
 
       <PageHeader title={t('title')} subtitle={t('summary')} />
 

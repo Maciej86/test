@@ -16,7 +16,7 @@ ma. Najnowsze na górze.
 - b) Da się: po wpisaniu imienia i nazwiska konto znika razem ze wszystkimi jego wnioskami
 - c) Da się: konto znika, a wnioski zostają z samym imieniem i nazwiskiem (bez konta)
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 2. Potwierdzenie usunięcia na stałe
 
@@ -24,46 +24,46 @@ ma. Najnowsze na górze.
 - b) Wszędzie zwykłe okno z pytaniem
 - c) Wszędzie wpisanie nazwy (imienia i nazwiska albo tytułu zadania)
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 3. Gdzie wraca przywrócone zadanie
 
 - a) Do tej samej kolumny, w której było, na jej koniec **(polecam)**
 - b) Zawsze do „W opracowaniu”, na górę
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 4. Kliknięcie zadania w archiwum
 
 - a) Otwiera podgląd z prawej, tylko do oglądania: opis, termin, osoby, komentarze oraz „Przywróć” i „Usuń na stałe” **(polecam)**
 - b) Nic: w tabeli są tylko tytuł, projekt i przyciski
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 5. Szukanie zadań w archiwum
 
 - a) Wyszukiwarka i wybór projektu **(polecam)**
 - b) Tylko wyszukiwarka
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 6. Czy coś znika z archiwum samo
 
 - a) Nie: znika tylko to, co administrator usunie na stałe **(polecam)**
 - b) Zadania usuwają się same po 12 miesiącach w archiwum (konta nigdy)
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 7. Kilka rzeczy naraz
 
 - a) Nie: każdą rzecz osobno, archiwum zwykle jest małe **(polecam)**
 - b) Tak: pola do zaznaczania i przyciski „Przywróć zaznaczone”, „Usuń zaznaczone”
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 8. Co widać przy osobie w archiwum
 
 - a) Imię i nazwisko, login, rolę, od kiedy w archiwum i kto przeniósł, liczbę wniosków urlopowych i zadań **(polecam)**
 - b) Tylko imię i nazwisko, login i od kiedy w archiwum
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
