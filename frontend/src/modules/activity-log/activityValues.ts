@@ -17,7 +17,7 @@ const isEmpty = (value: unknown) => value === null || value === undefined || val
 export const formatChangeValue = (field: string, value: unknown, t: TFunction): string | null => {
   if (field === 'yearly_limit' && value === null) return t('values.no_limit');
   if (isEmpty(value)) return null;
-  if (field === 'password') return t('values.password_reset');
+  if (field === 'password') return t(value === 'changed' ? 'values.password_changed' : 'values.password_reset');
   if (field === 'status') return translateKey(t, `my-leave.status.${String(value)}`);
   if (field === 'column_key') return translateKey(t, `tasks.column.${String(value)}`);
   if (field === 'role' && isRole(value)) return translateKey(t, ROLE_LABELS[value]);

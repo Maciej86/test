@@ -184,6 +184,18 @@ export const newPassword = textInput()
   .refine((v) => /\d/.test(v) && /[^\p{L}\p{N}]/u.test(v), M.passwordRules);
 
 /**
+ * Formularz z nowym hasłem wpisanym dwa razy: dokłada do pól `newPassword` i `repeatPassword` i sprawdza, czy są
+ * takie same (błąd pod powtórzeniem). Pierwsze logowanie i „Moje konto” (z obecnym hasłem).
+ */
+export const withRepeatPassword = <T extends z.ZodRawShape>(shape: T) =>
+  z
+    .object({ ...shape, newPassword, repeatPassword: z.string({ error: M.required }).min(1, M.required) })
+    .refine((v) => (v as { newPassword: string }).newPassword === (v as { repeatPassword: string }).repeatPassword, {
+      message: 'validation.passwords_differ',
+      path: ['repeatPassword'],
+    });
+
+/**
  * Numer z adresu strony (filtr listy, np. `?leaveTypeId=3`): same cyfry bez zera na początku, jak `idParam` na serwerze,
  * więc `0x10`, `1e3` czy `007` nie stają się innym numerem. Ekran podaje też liczbę (wybór w polu).
  */

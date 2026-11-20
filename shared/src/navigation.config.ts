@@ -1,6 +1,7 @@
 import type { Role } from './constants/roles';
 import { ACTIVITY_LOG_PATH } from './constants/activityLog';
 import { CONTRACT_TYPES_PATH } from './constants/contractTypes';
+import { MY_ACCOUNT_PATH } from './constants/myAccount';
 import { EMPLOYEES_PATH } from './constants/employees';
 import { LEAVE_REQUESTS_PATH } from './constants/leaveRequests';
 import { LEAVE_TYPES_PATH } from './constants/leaveTypes';
@@ -51,5 +52,5 @@ export const NAVIGATION: NavItem[] = [
       { key: 'contract-types', path: CONTRACT_TYPES_PATH, label: 'common.nav.contract_types', icon: 'file-signature', roles: ['admin'] },
     ],
   },
-  { key: 'my-account', path: '/admin/my-account', label: 'common.nav.my_account', icon: 'user', roles: ['admin', 'employee'] },
+  { key: 'my-account', path: MY_ACCOUNT_PATH, label: 'common.nav.my_account', icon: 'user', roles: ['admin', 'employee'] },
 ];

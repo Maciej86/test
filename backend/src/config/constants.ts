@@ -5,6 +5,8 @@ export const TOKEN_TTL = '31m';
 export const TOKEN_RENEW_AFTER_MS = 60_000;
 export const AUTH_COOKIE_NAME = 'token';
 export const LOGIN_RATE_LIMIT = { windowMs: 15 * 60 * 1000, max: 10 };
+/** Zmiana własnego hasła (Moje konto): nieudane próby na konto. */
+export const PASSWORD_CHANGE_RATE_LIMIT = { windowMs: 15 * 60 * 1000, max: 10 };
 export const BCRYPT_COST = 12;
 export const PAGE_SIZE = 25;
 

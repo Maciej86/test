@@ -33,3 +33,13 @@ describe('users queries: token_version', () => {
     expect(params).toEqual(['h', 2]);
   });
 });
+
+describe('updatePassword in a transaction', () => {
+  it('uses the given connection instead of the pool', async () => {
+    vi.mocked(pool.query).mockReset();
+    const conn = { query: vi.fn().mockResolvedValueOnce([{ affectedRows: 1 }]).mockResolvedValueOnce([[{ token_version: 5 }]]) };
+    expect(await updatePassword(2, 'h', conn as never)).toBe(5);
+    expect(conn.query).toHaveBeenCalledTimes(2);
+    expect(pool.query).not.toHaveBeenCalled();
+  });
+});

@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH, type EmployeeListItem } from '@app/shared';
 import { DateText } from '../../../common/DateText';
 import { PoolMeter } from './PoolMeter';
-import { NameCell, RoleBadge, RowButtons, type RowActions } from './EmployeeRowParts';
+import { RoleBadge } from '../../../common/RoleBadge';
+import { NameCell, RowButtons, type RowActions } from './EmployeeRowParts';
 
 /** Szersza niż zwykła tabela: pasek puli, data zatrudnienia, umowa i trzy przyciski w wierszu. */
 const EMPLOYEES_TABLE_MIN_WIDTH = TABLE_MIN_WIDTH + 480;

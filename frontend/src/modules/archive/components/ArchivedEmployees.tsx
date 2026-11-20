@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { Badge, Button, Card, Group, Stack, Table, Text, Tooltip } from '@mantine/core';
+import { Button, Card, Group, Stack, Table, Text, Tooltip } from '@mantine/core';
 import { Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ROLE_LABELS, TABLE_MIN_WIDTH, translateKey, type ArchivedEmployee } from '@app/shared';
+import { TABLE_MIN_WIDTH, type ArchivedEmployee } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DataState } from '../../../common/DataState';
 import { ListPagination } from '../../../common/ListPagination';
 import { SearchField } from '../../../common/SearchField';
+import { RoleBadge } from '../../../common/RoleBadge';
 import { useEmptyLaterPage } from '../../../core/useEmptyLaterPage';
 import { useArchivedEmployees } from '../archive.api';
 import { ArchiveEmpty, ArchivedCell } from './ArchiveParts';
@@ -59,11 +60,6 @@ const History = ({ e }: { e: ArchivedEmployee }) => {
   );
 };
 
-const Role = ({ e }: { e: ArchivedEmployee }) => {
-  const { t } = useTranslation('archive');
-  return <Badge variant="light" color={e.role === 'admin' ? 'navy' : 'gray'}>{translateKey(t, ROLE_LABELS[e.role])}</Badge>;
-};
-
 const EmployeesList = ({ rows, ...actions }: Actions & { rows: ArchivedEmployee[] }) => {
   const { t } = useTranslation('archive');
   return (
@@ -83,7 +79,7 @@ const EmployeesList = ({ rows, ...actions }: Actions & { rows: ArchivedEmployee[
             {rows.map((e) => (
               <Table.Tr key={e.id}>
                 <Table.Td><Name e={e} /></Table.Td>
-                <Table.Td><Role e={e} /></Table.Td>
+                <Table.Td><RoleBadge role={e.role} /></Table.Td>
                 <Table.Td><History e={e} /></Table.Td>
                 <Table.Td><ArchivedCell at={e.archivedAt} by={e.archivedByName} /></Table.Td>
                 <Table.Td><Buttons e={e} {...actions} /></Table.Td>
@@ -98,7 +94,7 @@ const EmployeesList = ({ rows, ...actions }: Actions & { rows: ArchivedEmployee[
             <Stack gap="sm">
               <Group justify="space-between" align="flex-start" wrap="nowrap">
                 <Name e={e} />
-                <Role e={e} />
+                <RoleBadge role={e.role} />
               </Group>
               <Group justify="space-between" align="flex-start">
                 <History e={e} />

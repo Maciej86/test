@@ -1,10 +1,11 @@
-import { useState, type ReactNode } from 'react';
-import { Alert, Badge, Button, Grid, Group, Paper, PasswordInput, SegmentedControl, Stack, Text, TextInput } from '@mantine/core';
+import { useState } from 'react';
+import { Alert, Button, Grid, Group, Paper, PasswordInput, SegmentedControl, Stack, Text, TextInput } from '@mantine/core';
 import { ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ROLE_LABELS, translateKey } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
+import { DetailRow } from '../../common/DetailRow';
+import { RoleBadge } from '../../common/RoleBadge';
 import { InfoCard } from '../../common/InfoCard';
 import { PageHeader } from '../../common/PageHeader';
 import { useMockupRole } from '../../common/mockupRole';
@@ -14,14 +15,6 @@ import { ACCOUNTS, type MockAccount } from './data';
 const STATES = ['normal', 'errors'] as const;
 type State = (typeof STATES)[number];
 
-/** Wiersz kartoteki: przygaszona etykieta po lewej, wartość po prawej (na telefonie pod spodem). */
-const Row = ({ label, children }: { label: string; children: ReactNode }) => (
-  <Group gap="md" align="baseline" wrap="wrap" style={{ rowGap: 2 }}>
-    <Text size="sm" c="dimmed" w={150} style={{ flex: 'none' }}>{label}</Text>
-    <Text size="sm" component="div" style={{ flex: 1, minWidth: 180, overflowWrap: 'anywhere' }}>{children}</Text>
-  </Group>
-);
-
 /** Dane, których osoba sama nie zmienia: kto to jest i jak się loguje. */
 const ProfileCard = ({ account }: { account: MockAccount }) => {
   const { t } = useTranslation('my-account');
@@ -30,12 +23,12 @@ const ProfileCard = ({ account }: { account: MockAccount }) => {
     <InfoCard title={t('data')}>
       <Stack gap={10}>
         <Text ff="heading" fw={600} fz="xl">{account.name}</Text>
-        <Row label={t('login')}>{account.login}</Row>
-        <Row label={t('role')}>
-          <Badge variant="light" color={account.role === 'admin' ? 'navy' : 'gray'}>{translateKey(tCommon, ROLE_LABELS[account.role])}</Badge>
-        </Row>
-        <Row label={t('hired_on')}><DateText value={account.hiredOn} /></Row>
-        <Row label={t('contract_type')}>{account.contractType ?? <Text span size="sm" c="dimmed">{tCommon('empty_value')}</Text>}</Row>
+        <DetailRow label={t('login')}>{account.login}</DetailRow>
+        <DetailRow label={t('role')}>
+          <RoleBadge role={account.role} />
+        </DetailRow>
+        <DetailRow label={t('hired_on')}><DateText value={account.hiredOn} /></DetailRow>
+        <DetailRow label={t('contract_type')}>{account.contractType ?? <Text span size="sm" c="dimmed">{tCommon('empty_value')}</Text>}</DetailRow>
       </Stack>
       <Text size="xs" c="dimmed" mt="xs">{t(account.role === 'admin' ? 'readonly_hint_admin' : 'readonly_hint')}</Text>
     </InfoCard>

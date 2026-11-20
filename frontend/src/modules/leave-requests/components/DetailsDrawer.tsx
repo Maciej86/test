@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { Alert, Button, Divider, Group, Paper, Progress, Stack, Text } from '@mantine/core';
 import { Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -6,18 +5,12 @@ import type { LeaveRequestDetails } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DataState } from '../../../common/DataState';
 import { DateText } from '../../../common/DateText';
+import { DetailRow } from '../../../common/DetailRow';
 import { SideDrawer } from '../../../common/SideDrawer';
 import { LeaveDates, LeaveStatusBadge, leaveSplitText } from '../../../common/LeaveRequestParts';
 import { leaveRequestPdfUrl, type useLeaveRequest } from '../leave-requests.api';
 import { isLate, type RowActions } from './LeaveRequestsTable';
 import { TeamStrip } from './TeamStrip';
-
-const Row = ({ label, children }: { label: string; children: ReactNode }) => (
-  <Group gap="md" align="flex-start" wrap="nowrap">
-    <Text size="sm" c="dimmed" w={130} style={{ flex: 'none' }}>{label}</Text>
-    <Text size="sm" component="div" style={{ flex: 1 }}>{children}</Text>
-  </Group>
-);
 
 /** Pula roku wniosku: pasek (wykorzystane, czeka, zostało) i ile zostanie po zatwierdzeniu. */
 const PoolBox = ({ r, pool }: { r: LeaveRequestDetails; pool: NonNullable<LeaveRequestDetails['pool']> }) => {
@@ -71,12 +64,12 @@ const Content = ({ r, actions }: { r: LeaveRequestDetails; actions: Omit<RowActi
       {r.pool && <PoolBox r={r} pool={r.pool} />}
 
       <Stack gap={8}>
-        {r.comment && <Row label={t('comment')}>{r.comment}</Row>}
-        <Row label={t('submitted')}><DateText value={r.createdAt} withTime /></Row>
+        {r.comment && <DetailRow label={t('comment')}>{r.comment}</DetailRow>}
+        <DetailRow label={t('submitted')}><DateText value={r.createdAt} withTime /></DetailRow>
         {r.decidedByName && r.decidedAt && (
-          <Row label={t(`decided_${r.status}`)}>{r.decidedByName}, <DateText value={r.decidedAt} withTime /></Row>
+          <DetailRow label={t(`decided_${r.status}`)}>{r.decidedByName}, <DateText value={r.decidedAt} withTime /></DetailRow>
         )}
-        {r.decisionReason && <Row label={t('reason')}>{t('my-leave:quoted', { text: r.decisionReason })}</Row>}
+        {r.decisionReason && <DetailRow label={t('reason')}>{t('my-leave:quoted', { text: r.decisionReason })}</DetailRow>}
       </Stack>
 
       {r.status === 'pending' && (

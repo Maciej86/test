@@ -1,6 +1,6 @@
-import { Badge, Button, Group, Stack, Text, Tooltip } from '@mantine/core';
+import { Button, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { ROLE_LABELS, translateKey, type EmployeeListItem } from '@app/shared';
+import { type EmployeeListItem } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 
 /** Co można zrobić z osobą na liście (otwiera okna na ekranie listy). */
@@ -9,11 +9,6 @@ export interface RowActions {
   onPassword: (e: EmployeeListItem) => void;
   onArchive: (e: EmployeeListItem) => void;
 }
-
-export const RoleBadge = ({ role }: { role: EmployeeListItem['role'] }) => {
-  const { t } = useTranslation();
-  return <Badge variant="light" color={role === 'admin' ? 'navy' : 'gray'}>{translateKey(t, ROLE_LABELS[role])}</Badge>;
-};
 
 export const NameCell = ({ e }: { e: EmployeeListItem }) => {
   const { t } = useTranslation('employees');

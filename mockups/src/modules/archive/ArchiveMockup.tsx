@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from 'react';
 import {
-  Badge,
   Button,
   Card,
   Group,
@@ -21,6 +20,7 @@ import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { EmptyState } from '../../common/EmptyState';
 import { PageHeader } from '../../common/PageHeader';
+import { RoleBadge } from '../../common/RoleBadge';
 import { DeleteEmployeeModal, DeleteTaskModal, RestoreEmployeeModal, RestoreTaskModal, TaskPreview } from './ArchiveModals';
 import { ARCHIVED_EMPLOYEES, ARCHIVED_TASKS, PROJECTS, type ArchivedEmployee, type ArchivedTask } from './data';
 
@@ -77,11 +77,6 @@ const EmployeeHistory = ({ e }: { e: ArchivedEmployee }) => {
       {e.tasks > 0 && <Text size="sm" c="dimmed">{t('tasks', { count: e.tasks })}</Text>}
     </Stack>
   );
-};
-
-const RoleBadge = ({ role }: { role: ArchivedEmployee['role'] }) => {
-  const { t } = useTranslation('archive');
-  return <Badge variant="light" color={role === 'admin' ? 'navy' : 'gray'}>{t(`role.${role}`)}</Badge>;
 };
 
 const EmployeesList = ({ rows, ...actions }: EmployeeActions & { rows: ArchivedEmployee[] }) => {

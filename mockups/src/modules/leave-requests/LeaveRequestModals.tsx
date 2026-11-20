@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { Alert, Badge, Button, Divider, Drawer, Group, Paper, Progress, Stack, Text, Textarea } from '@mantine/core';
 import { CircleAlert, Clock } from 'lucide-react';
 import type { TFunction } from 'i18next';
@@ -7,6 +7,7 @@ import { ButtonIcon } from '../../common/ButtonIcon';
 import { ConfirmModal } from '../../common/ConfirmModal';
 import { DateText } from '../../common/DateText';
 import { notify } from '../../common/notify';
+import { DetailRow } from '../../common/DetailRow';
 import { TeamStrip } from './TeamStrip';
 import { OPEN_YEAR, POOLS, TODAY, overlapping, poolLeft, type LeaveStatus, type MockRequest } from './data';
 
@@ -41,13 +42,6 @@ export const splitText = (r: MockRequest, t: TFunction) => {
 
 /** Czekający wniosek z terminem przed dziś: można go rozpatrzyć, ale administrator powinien to widzieć. */
 export const isLate = (r: MockRequest) => r.status === 'pending' && r.from < TODAY;
-
-const Row = ({ label, children }: { label: string; children: ReactNode }) => (
-  <Group gap="md" align="flex-start" wrap="nowrap">
-    <Text size="sm" c="dimmed" w={130} style={{ flex: 'none' }}>{label}</Text>
-    <Text size="sm" component="div" style={{ flex: 1 }}>{children}</Text>
-  </Group>
-);
 
 /** Pula osoby: ile ma teraz i ile zostanie po zatwierdzeniu tego wniosku. */
 const PoolBox = ({ r }: { r: MockRequest }) => {
@@ -124,12 +118,12 @@ export const DetailsDrawer = ({ request: r, onClose, onApprove, onReject, onCanc
           {(r.status === 'pending' || r.status === 'approved') && <PoolBox r={r} />}
 
           <Stack gap={8}>
-            {r.comment && <Row label={t('comment')}>{r.comment}</Row>}
-            <Row label={t('submitted')}><DateText value={r.createdAt} withTime /></Row>
+            {r.comment && <DetailRow label={t('comment')}>{r.comment}</DetailRow>}
+            <DetailRow label={t('submitted')}><DateText value={r.createdAt} withTime /></DetailRow>
             {r.decidedBy && (
-              <Row label={t(`decided_${r.status}`)}>{r.decidedBy}, <DateText value={r.decidedAt} withTime /></Row>
+              <DetailRow label={t(`decided_${r.status}`)}>{r.decidedBy}, <DateText value={r.decidedAt} withTime /></DetailRow>
             )}
-            {r.reason && <Row label={t('reason')}>„{r.reason}”</Row>}
+            {r.reason && <DetailRow label={t('reason')}>„{r.reason}”</DetailRow>}
           </Stack>
 
           {r.status === 'pending' && (

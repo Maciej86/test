@@ -24,10 +24,6 @@
   "comments_one": "{{count}} komentarz",
   "comments_few": "{{count}} komentarze",
   "comments_many": "{{count}} komentarzy",
-  "role": {
-    "admin": "Administrator",
-    "employee": "Pracownik"
-  },
   "restore": "Przywróć",
   "delete_forever": "Usuń na stałe",
   "details": "Szczegóły",

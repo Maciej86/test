@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Badge,
   Box,
   Button,
   Card,
@@ -21,6 +20,7 @@ import { DateText } from '../../common/DateText';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { EmptyState } from '../../common/EmptyState';
 import { PageHeader } from '../../common/PageHeader';
+import { RoleBadge } from '../../common/RoleBadge';
 import { ArchiveModal, CloseYearModal, EmployeeModal, PasswordModal } from './EmployeeModals';
 import { PoolLegend, PoolMeter } from './PoolMeter';
 import { EMPLOYEES, POOL_YEAR, type MockEmployee } from './data';
@@ -33,11 +33,6 @@ interface RowActions {
   onPassword: (e: MockEmployee) => void;
   onArchive: (e: MockEmployee) => void;
 }
-
-const RoleBadge = ({ role }: { role: MockEmployee['role'] }) => {
-  const { t } = useTranslation('employees');
-  return <Badge variant="light" color={role === 'admin' ? 'navy' : 'gray'}>{t(`role.${role}`)}</Badge>;
-};
 
 const NameCell = ({ e }: { e: MockEmployee }) => {
   const { t } = useTranslation('employees');

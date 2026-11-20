@@ -23,7 +23,7 @@ test, który nie przechodzi → kod → `npm run check` → `- [x]`.
 
 Porównane ramy: `InfoCard` (common) dla trzech kart, jak w makiecie; bez szuflady i okna (formularze leżą na ekranie).
 
-- [ ] 0. Szkielet testów `it.todo` z wymagań:
+- [x] 0. Szkielet testów `it.todo` z wymagań:
   - `backend/src/modules/my-account/__tests__/my-account.routes.test.ts`: GET dane własnego konta (bez hasła i skrótu,
     nazwa typu umowy także ukrytego), 401, 403 (hasło tymczasowe); PUT email: zapis, `null` = brak, ten sam adres nie
     tworzy wpisu historii, zajęty aktywny → 409 pod `email` bez nazwiska, zajęty w archiwum → 409 tak samo, wyścig
@@ -42,15 +42,15 @@ Porównane ramy: `InfoCard` (common) dla trzech kart, jak w makiecie; bez szufla
     429 w dymku;
   - `e2e/my-account.spec.ts`: scenariusze z `TESTS.md`
   → `npm run check`
-- [ ] 1. Wydzielenie `withRepeatPassword` (`fields.ts`) + test; `newPasswordSchema` na nim (testy logowania bez
+- [x] 1. Wydzielenie `withRepeatPassword` (`fields.ts`) + test; `newPasswordSchema` na nim (testy logowania bez
   zmian zielone). Wydzielenie `DetailRow` do `frontend/src/common/` i `mockups/src/common/` + test (etykieta i treść,
   długi tekst się łamie); podmiana `Row` w `DetailsDrawer` i w makiecie Moje konto → `npm run check`
-- [ ] 2. Schematy `shared/src/schemas/myAccount.ts`: `myAccountEmailSchema` (`{ email: optionalField(email) }`),
+- [x] 2. Schematy `shared/src/schemas/myAccount.ts`: `myAccountEmailSchema` (`{ email: optionalField(email) }`),
   `myAccountPasswordSchema` (`withRepeatPassword` z `currentPassword: passwordInput`, `newPassword`,
   `repeatPassword`), typ `MyAccount` (`name, login, role, email, hiredOn, contractTypeName`), stałe
   `MY_ACCOUNT_MESSAGES` (`currentWrong: 'my-account.server.current_wrong'`, `sameAsCurrent:
   'my-account.server.same_as_current'`), eksport w `shared/src/index.ts`; testy z kroku 0 → `npm run check`
-- [ ] 3. Serwer `backend/src/modules/my-account/` (`my-account.queries.ts`, `.service.ts`, `.routes.ts`):
+- [x] 3. Serwer `backend/src/modules/my-account/` (`my-account.queries.ts`, `.service.ts`, `.routes.ts`):
   `findMyAccount(db, userId)`, `updateMyEmail(userId, email, actor)` (sprawdzenie zajętości wśród wszystkich kont
   oprócz własnego → 409 `validation.email_taken` pod `email`, bez `archivedUser`; `isDuplicateEntry(error,
   'uq_users_email')` → ten sam błąd; zapis + `logActivity` z `diffChanges` w `withTransaction`, bez wpisu przy braku
@@ -61,19 +61,19 @@ Porównane ramy: `InfoCard` (common) dla trzech kart, jak w makiecie; bez szufla
   `keyGenerator` = `req.user.id`, `skipSuccessfulRequests`, komunikat `server.too_many_password_tries`).
   `mountModule(api, 'my-account', myAccountRoutes)` w `app.ts`; wiersz w „Mapie dostępu” `SPEC-GENERAL.md`
   (jest: `/api/my-account`, dopisać trzy adresy). Testy tras z kroku 0 → `npm run check`
-- [ ] 4. Historia zmian: `describeActivity` → `user_own_password` dla `changes.password.after === 'changed'`
+- [x] 4. Historia zmian: `describeActivity` → `user_own_password` dla `changes.password.after === 'changed'`
   (przed `user_password`), `formatChangeValue('password', 'changed')` → `values.password_changed`; teksty
   `actions.user_own_password` „Zmiana własnego hasła”, `values.password_changed` „zmieniono hasło”; test w pliku
   docelowym, plik `.todo` usunięty → `npm run check`
-- [ ] 5. Front `frontend/src/modules/my-account/`: `my-account.api.ts` (`useMyAccount`, `useSaveMyEmail`,
+- [x] 5. Front `frontend/src/modules/my-account/`: `my-account.api.ts` (`useMyAccount`, `useSaveMyEmail`,
   `useChangeMyPassword`; po zapisie e-maila odświeżenie `useMyAccount`), `MyAccountPage.tsx` z
   `components/ProfileCard.tsx`, `EmailCard.tsx`, `PasswordCard.tsx` według makiety (siatka 5/7, `align="flex-start"`;
   formularze w `<form noValidate>` z `useForm` + `zod4Resolver`, błędy z serwera przez `apiErrorFields`; po zmianie
   hasła `form.reset()`, `refresh()`); wpis `'my-account': MyAccountPage` w `core/routes/pages.ts`; teksty z kroku 0 →
   `npm run check`
-- [ ] 6. Teksty i makieta: `server.too_many_password_tries` w `server.json`, `notify_hint`, wszystkie klucze używane
+- [x] 6. Teksty i makieta: `server.too_many_password_tries` w `server.json`, `notify_hint`, wszystkie klucze używane
   w `my-account.json`; makieta używa `DetailRow` i tych samych kluczy błędów → `npm run check`
-- [ ] 7. Test e2e `e2e/my-account.spec.ts` ze scenariuszy `TESTS.md` (świeże konto tymczasowe z `addEmployee`, żeby
+- [x] 7. Test e2e `e2e/my-account.spec.ts` ze scenariuszy `TESTS.md` (świeże konto tymczasowe z `addEmployee`, żeby
   zmiana hasła nie psuła stałych kont testowych) → `npm run test:e2e`
 - [ ] 8. Przegląd kodu całego modułu (lista kontrolna z `CONVENTIONS.md`), poprawki z testem → `npm run check`
 

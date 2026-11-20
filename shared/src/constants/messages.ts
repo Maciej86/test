@@ -7,6 +7,7 @@ export const SERVER_MESSAGES = {
   invalidData: 'server.invalid_data',
   dbDown: 'server.db_down',
   tooManyLogins: 'server.too_many_logins',
+  tooManyPasswordTries: 'server.too_many_password_tries',
   fileTooLarge: 'server.file_too_large',
   fileTypeNotAllowed: 'server.file_type_not_allowed',
   /** Serwer odrzuca zapytanie, bo osoba musi najpierw ustawić własne hasło (moduł Logowanie). */

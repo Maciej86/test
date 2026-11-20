@@ -13,3 +13,4 @@ export * from './leaveRequests';
 export * from './tasks';
 export * from './activityLog';
 export * from './archive';
+export * from './myAccount';

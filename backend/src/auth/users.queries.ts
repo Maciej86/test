@@ -1,6 +1,6 @@
 import type { RowDataPacket } from 'mysql2';
 import { isRole, type SessionUser } from '@app/shared';
-import { pool } from '../db/pool';
+import { pool, type Db } from '../db/pool';
 
 interface UserRow extends RowDataPacket {
   id: number;
@@ -50,13 +50,14 @@ export const findPasswordHash = async (id: number): Promise<string | null> => {
 
 /**
  * Zapisuje nowy skrót hasła, zdejmuje obowiązek zmiany hasła tymczasowego i podnosi wersję sesji (inne sesje tej
- * osoby się kończą). Zwraca nową wersję do ciasteczka osoby, która zmieniła hasło.
+ * osoby się kończą). Zwraca nową wersję do ciasteczka osoby, która zmieniła hasło. `db`: połączenie transakcji, gdy
+ * razem z hasłem zapisuje się wpis historii zmian (Moje konto).
  */
-export const updatePassword = async (id: number, passwordHash: string): Promise<number> => {
-  await pool.query(
+export const updatePassword = async (id: number, passwordHash: string, db: Db = pool): Promise<number> => {
+  await db.query(
     'UPDATE users SET password_hash = ?, must_change_password = 0, token_version = token_version + 1 WHERE id = ?',
     [passwordHash, id],
   );
-  const [rows] = await pool.query<UserRow[]>('SELECT token_version FROM users WHERE id = ?', [id]);
+  const [rows] = await db.query<UserRow[]>('SELECT token_version FROM users WHERE id = ?', [id]);
   return rows[0]?.token_version ?? 0;
 };

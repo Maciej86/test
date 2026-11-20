@@ -106,7 +106,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `/admin/activity-log`, `/api/activity-log` | admin | |
 | `/admin/archive`, `/api/archive` | admin | przywrócenie i usunięcie na stałe; adres `?tab=tasks&taskId=<id>` otwiera podgląd zadania |
 | `GET /api/archive/counts`, `GET /api/archive/employees`, `POST /api/archive/employees/:id/restore`, `DELETE /api/archive/employees/:id`, `GET /api/archive/tasks`, `GET /api/archive/tasks/:id`, `POST /api/archive/tasks/:id/restore`, `DELETE /api/archive/tasks/:id` | admin | `mountModule(api, 'archive', …)`; tylko rekordy z archiwum (aktywny: podgląd 404, usunięcie 409 `server.archive_first`); konto z wnioskami urlopowymi nie do usunięcia (409); usunięcie konta tylko z dokładnym imieniem i nazwiskiem (`confirmName`, inaczej 400) |
-| `/admin/my-account`, `/api/my-account` | admin, employee | tylko własne konto |
+| `/admin/my-account`, `GET /api/my-account`, `PUT /api/my-account/email`, `POST /api/my-account/password` | admin, employee | `mountModule(api, 'my-account', …)`; tylko własne konto (`req.user.id`, numer z treści żądania pomijany); zmiana hasła z obecnym, limit 10 nieudanych prób w 15 min na konto (429), nowe ciasteczko sesji, inne sesje kończą się |
 | `/admin/notifications`, `GET /api/notifications`, `GET /api/notifications/summary`, `POST /api/notifications/:id/read`, `POST /api/notifications/read-all` | admin, employee | `mountModule(api, 'notifications', …, ['admin', 'employee'])`; tylko własne (`req.user.id`), cudze → 404 |
 | `/api/email` | — | nie powstaje: moduł E-mail nie ma tras API (wysyłka wołana z kodu serwera) |
 

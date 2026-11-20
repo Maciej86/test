@@ -52,6 +52,8 @@ export const describeActivity = (area: ActivityArea, action: string, changes: Ch
     case 'projects':
       return basic('project', action, ['create', 'update', 'delete']);
     case 'users':
+      // Własne hasło z „Moje konto” (`changed`) albo hasło tymczasowe od administratora (`reset`).
+      if (action === 'update' && changes.password?.after === 'changed') return of('user_own_password', 'neutral');
       if (action === 'update' && changes.password) return of('user_password', 'neutral');
       if (action === 'update' && changes.role) return of('user_role', 'neutral');
       return basic('user', action, ['create', 'update', 'archive', 'restore', 'delete']);

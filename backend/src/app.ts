@@ -12,6 +12,7 @@ import { requirePasswordChanged } from './middleware/requirePasswordChanged';
 import { sameOrigin } from './middleware/sameOrigin';
 import { healthRoutes } from './modules/health/health.routes';
 import { authPublicRoutes, authRoutes } from './modules/auth/auth.routes';
+import { myAccountRoutes } from './modules/my-account/my-account.routes';
 import { employeesRoutes } from './modules/employees/employees.routes';
 import { leaveTypesRoutes } from './modules/leave-types/leave-types.routes';
 import { contractTypesRoutes } from './modules/contract-types/contract-types.routes';
@@ -65,6 +66,7 @@ export const createApp = (options: AppOptions = {}) => {
   mountModule(api, 'tasks', tasksRoutes);
   mountModule(api, 'activity-log', activityLogRoutes);
   mountModule(api, 'archive', archiveRoutes);
+  mountModule(api, 'my-account', myAccountRoutes);
   // Powiadomienia: bez pozycji w menu (dzwonek w belce), więc role jawnie.
   mountModule(api, 'notifications', notificationsRoutes, ['admin', 'employee']);
   if (options.extraRoutes) api.use(options.extraRoutes);

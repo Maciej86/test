@@ -42,6 +42,7 @@
     "user_update": "Zmiana danych pracownika",
     "user_role": "Zmiana roli",
     "user_password": "Ustawienie hasła tymczasowego",
+    "user_own_password": "Zmiana własnego hasła",
     "user_archive": "Przeniesienie konta do archiwum",
     "user_restore": "Przywrócenie konta",
     "user_delete": "Usunięcie konta na stałe",
@@ -121,6 +122,7 @@
     "yes": "tak",
     "no": "nie",
     "password_reset": "ustawiono hasło tymczasowe",
+    "password_changed": "zmieniono hasło",
     "deleted_account": "usunięte konto",
     "no_limit": "bez limitu",
     "none": "brak"

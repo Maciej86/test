@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { createI18n, translateKey } from '../../i18n';
 import {
   FIELD_MESSAGES,
+  passwordInput,
+  withRepeatPassword,
   addressNumber,
   email,
   iban,
@@ -208,5 +210,28 @@ describe('addressNumber', () => {
     expect(addressNumber.parse('3')).toBe(3);
     expect(addressNumber.parse(2026)).toBe(2026);
     for (const bad of ['0x10', '1e3', '007', '3.0', ' 3', '-1', '0', '', 'abc', 0, -2, 1.5]) expect(addressNumber.safeParse(bad).success).toBe(false);
+  });
+});
+
+describe('withRepeatPassword', () => {
+  const schema = withRepeatPassword({ currentPassword: passwordInput });
+  const ok = { currentPassword: 'stare', newPassword: 'Urlop2026!', repeatPassword: 'Urlop2026!' };
+
+  it('adds newPassword and repeatPassword to the given fields', () => {
+    expect(schema.parse(ok)).toEqual(ok);
+    expect(withRepeatPassword({}).safeParse({ newPassword: 'Urlop2026!', repeatPassword: 'Urlop2026!' }).success).toBe(true);
+  });
+
+  it('different repeat → passwords_differ under repeatPassword', () => {
+    const r = schema.safeParse({ ...ok, repeatPassword: 'Urlop2025!' });
+    expect(r.success).toBe(false);
+    expect(r.error?.issues.map((i) => [i.path.join('.'), i.message])).toEqual([['repeatPassword', 'validation.passwords_differ']]);
+  });
+
+  it('empty repeat → required; weak new password → password rules', () => {
+    const r = schema.safeParse({ ...ok, newPassword: 'krotkie', repeatPassword: '' });
+    const issues = (r.error?.issues ?? []).map((i) => [i.path.join('.'), i.message]);
+    expect(issues).toContainEqual(['newPassword', 'validation.password_rules']);
+    expect(issues).toContainEqual(['repeatPassword', 'validation.required']);
   });
 });

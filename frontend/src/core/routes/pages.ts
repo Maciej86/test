@@ -5,6 +5,7 @@ import { ChangePasswordPage } from '../../modules/login/ChangePasswordPage';
 import { EmployeesListPage } from '../../modules/employees/EmployeesListPage';
 import { LeaveTypesPage } from '../../modules/leave-types/LeaveTypesPage';
 import { ContractTypesPage } from '../../modules/contract-types/ContractTypesPage';
+import { MyAccountPage } from '../../modules/my-account/MyAccountPage';
 import { NotificationsPage } from '../../modules/notifications/NotificationsPage';
 import { MyLeavePage } from '../../modules/my-leave/MyLeavePage';
 import { LeaveRequestsPage } from '../../modules/leave-requests/LeaveRequestsPage';
@@ -22,6 +23,7 @@ export const PAGES: Pages = {
   employees: EmployeesListPage,
   'leave-types': LeaveTypesPage,
   'contract-types': ContractTypesPage,
+  'my-account': MyAccountPage,
   'my-leave': MyLeavePage,
   'leave-requests': LeaveRequestsPage,
   'activity-log': ActivityLogPage,

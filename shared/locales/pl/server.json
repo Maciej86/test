@@ -6,6 +6,7 @@
   "invalid_data": "Popraw zaznaczone pola.",
   "db_down": "Baza danych nie odpowiada. Czy Docker jest uruchomiony? (npm run db)",
   "too_many_logins": "Za dużo prób logowania. Spróbuj ponownie za 15 minut.",
+  "too_many_password_tries": "Za dużo prób zmiany hasła. Spróbuj ponownie za 15 minut.",
   "file_too_large": "Plik jest za duży.",
   "file_type_not_allowed": "Tego rodzaju pliku nie można dodać.",
   "password_change_required": "Najpierw ustaw własne hasło.",

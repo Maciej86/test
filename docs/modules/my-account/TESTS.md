@@ -26,7 +26,7 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180.
 4. Nowe hasło „krotkie” → pod polem zasady hasła. Nowe dobre, powtórzenie inne → „Hasła się różnią. Wpisz to samo
    hasło dwa razy.”
 5. Wszystko dobrze → dymek „Hasło zmienione”, pola puste, dalej jesteś zalogowany.
-6. Wyloguj się, zaloguj starym hasłem → „Zły login lub hasło”; nowym → wchodzisz.
+6. Wyloguj się, zaloguj starym hasłem → „Login lub hasło są nieprawidłowe. Sprawdź je i spróbuj ponownie.”; nowym → wchodzisz.
 7. (Dwa urządzenia) Zaloguj się na to samo konto w drugiej przeglądarce, w pierwszej zmień hasło → w drugiej przy
    następnym kliknięciu wracasz do ekranu logowania.
 8. Jako administrator otwórz „Historia zmian” → wpis „Zmiana własnego hasła” z nazwiskiem pracownika, bez hasła.

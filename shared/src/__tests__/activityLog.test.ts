@@ -40,6 +40,7 @@ describe('describeActivity', () => {
     expect(describeActivity('users', 'update', { login: { before: 'a', after: 'b' } })).toEqual({ kind: 'user_update', tone: 'neutral' });
     expect(describeActivity('users', 'update', { role: { before: 'employee', after: 'admin' }, login: { before: 'a', after: 'b' } })).toEqual({ kind: 'user_role', tone: 'neutral' });
     expect(describeActivity('users', 'update', { password: { before: null, after: 'reset' } })).toEqual({ kind: 'user_password', tone: 'neutral' });
+    expect(describeActivity('users', 'update', { password: { before: null, after: 'changed' } })).toEqual({ kind: 'user_own_password', tone: 'neutral' });
     expect(describeActivity('users', 'archive', {})).toEqual({ kind: 'user_archive', tone: 'negative' });
     expect(describeActivity('users', 'restore', {})).toEqual({ kind: 'user_restore', tone: 'positive' });
     expect(describeActivity('users', 'delete', {})).toEqual({ kind: 'user_delete', tone: 'negative' });
