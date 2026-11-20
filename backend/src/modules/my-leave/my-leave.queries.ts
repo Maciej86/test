@@ -1,5 +1,5 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
-import type { LeaveBusyRange, LeaveRequestStatus, MyLeaveRequest } from '@app/shared';
+import type { DashboardOwnRequest, LeaveBusyRange, LeaveRequestStatus, MyLeaveRequest } from '@app/shared';
 import { pool, type Db } from '../../db/pool';
 
 const PENDING: LeaveRequestStatus = 'pending';
@@ -60,6 +60,32 @@ export const listRequests = async (db: Db, userId: number, year: number): Promis
     [userId, year, PENDING],
   );
   return rows.map(toRequest);
+};
+
+const toOwn = (r: RowDataPacket): DashboardOwnRequest => ({
+  id: r.id as number,
+  leaveTypeName: r.leave_type_name as string,
+  dateFrom: r.date_from as string,
+  dateTo: r.date_to as string,
+  workingDays: r.working_days as number,
+});
+
+const OWN_COLUMNS = 'SELECT r.id, lt.name AS leave_type_name, r.date_from, r.date_to, r.working_days FROM leave_requests r JOIN leave_types lt ON lt.id = r.leave_type_id';
+
+/**
+ * Pulpit pracownika: jego wnioski czekające (od najwcześniejszego początku) i najbliższy zatwierdzony urlop, który
+ * jeszcze się nie skończył (trwający dziś też).
+ */
+export const listUpcomingOwn = async (db: Db, userId: number, today: string): Promise<{ pending: DashboardOwnRequest[]; nextApproved: DashboardOwnRequest | null }> => {
+  const [pending] = await db.query<RowDataPacket[]>(
+    `${OWN_COLUMNS} WHERE r.user_id = ? AND r.status = ? ORDER BY r.date_from, r.id`, // rule-ok: stała lista kolumn z tego pliku, dane przez ?
+    [userId, PENDING],
+  );
+  const [next] = await db.query<RowDataPacket[]>(
+    `${OWN_COLUMNS} WHERE r.user_id = ? AND r.status = ? AND r.date_to >= ? ORDER BY r.date_from, r.id LIMIT 1`, // rule-ok: jak wyżej
+    [userId, APPROVED, today],
+  );
+  return { pending: pending.map(toOwn), nextApproved: next[0] ? toOwn(next[0]) : null };
 };
 
 /** Lata, w których osoba ma wnioski, od najnowszego. */

@@ -59,7 +59,7 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
     i `pending`, zakres zahacza o `from`–`to` (także zaczęty wcześniej i kończący później), bez kont w archiwum,
     `ORDER BY date_from, name`; bez typu i komentarza w wyniku.
   → `npm run check`
-- [ ] 5. Funkcja my-leave: `listUpcomingOwn(db, userId, today): Promise<{ pending: DashboardOwnRequest[];
+- [x] 5. Funkcja my-leave: `listUpcomingOwn(db, userId, today): Promise<{ pending: DashboardOwnRequest[];
   nextApproved: DashboardOwnRequest | null }>` (`{ id, typeName, dateFrom, dateTo, workingDays }`) w
   `my-leave.queries.ts`; testy w `my-leave/__tests__/dashboard.queries.test.ts`: tylko własne; czekające od
   najwcześniejszego początku; najbliższy zatwierdzony z `date_to >= today` (trwający dziś też), zakończony wczoraj
