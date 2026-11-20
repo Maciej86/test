@@ -100,6 +100,8 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
   o decyzji i na Pulpicie.
 - [ ] 10. Test e2e `e2e/dashboard.spec.ts` ze scenariuszy `TESTS.md` → `npm run test:e2e`, `npm run check`; przegląd
   kodu całego modułu.
+  **Uwaga:** test e2e wykrył błąd: po złożeniu wniosku powrót na Pulpit pokazywał dane sprzed chwili (aplikacja
+  trzyma dane 30 s). `useDashboard` ma `staleTime: 0` (test `dashboard.api.test.tsx`), zgodnie ze specem.
 
 ## Na co uważać (bez osobnego kroku, testy w krokach)
 
