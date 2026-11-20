@@ -1,6 +1,6 @@
 # Spec: Historia zmian
 
-**Data:** 2026-11-20 · **Status:** zaakceptowany 2026-11-20
+**Data:** 2026-11-20 · **Status:** zaakceptowany 2026-11-20, moduł gotowy 2026-11-20
 **Podstawa:** `QUESTIONS.md` (odpowiedzi 1a–9a z 2026-11-20), `SPEC-GENERAL.md` („Historia zmian”, Mapa dostępu)
 
 ## Cel

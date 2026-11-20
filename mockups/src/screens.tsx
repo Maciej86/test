@@ -1,7 +1,6 @@
 import type { ComponentType } from 'react';
 import { DashboardMockup } from './modules/dashboard/DashboardMockup';
 import { TASK_SCREENS } from './modules/tasks/navigation';
-import { ActivityLogMockup } from './modules/activity-log/ActivityLogMockup';
 import { ArchiveMockup } from './modules/archive/ArchiveMockup';
 import { MyAccountMockup } from './modules/my-account/MyAccountMockup';
 import { Done } from './common/Done';
@@ -31,7 +30,7 @@ export const SCREENS: Record<string, ComponentType> = {
   'leave-types': () => <Done labelKey="common.nav.leave_types" />,
   // Moduł Typy umów zrobiony; makieta zostaje w modules/contract-types/ContractTypesMockup.tsx.
   'contract-types': () => <Done labelKey="common.nav.contract_types" />,
-  'activity-log': ActivityLogMockup,
+  'activity-log': () => <Done labelKey="common.nav.activity_log" />,
   'archive': ArchiveMockup,
   'my-account': MyAccountMockup,
 };

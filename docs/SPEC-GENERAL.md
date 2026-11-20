@@ -167,7 +167,9 @@ Wartości liczone wyłącznie przez serwer: `working_days`, podział na `days_fr
 
 Włączona. Zakres: wnioski urlopowe (złożenie, wycofanie, zatwierdzenie, odrzucenie, anulowanie), pule dni (zmiana,
 „Zamknij rok”), zadania (utworzenie, edycja, przesunięcie, przypisanie, archiwizacja, przywrócenie, usunięcie),
-pracownicy (utworzenie, zmiana roli, archiwizacja, przywrócenie). Widzi tylko administrator. Tabelę `activity_log`
+pracownicy (utworzenie, zmiana roli, archiwizacja, przywrócenie), typy urlopów i typy umów (dodanie, zmiana, ukrycie,
+przywrócenie; dopisane 2026-11-20). Każdy wpis zapamiętuje nazwę i krótki opis rekordu (`entity_name`,
+`entity_context`), więc zostaje czytelny po usunięciu rekordu. Wpisy trzymane zawsze. Widzi tylko administrator. Tabelę `activity_log`
 doda moduł Logowanie jako migrację **zaraz po** `users` (ma klucz obcy do `users`).
 
 ## 7. Moduły i kolejność
