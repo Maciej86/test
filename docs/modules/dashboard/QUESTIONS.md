@@ -11,7 +11,7 @@ Uwaga do planu: pasek nieobecności ma tę samą ramę co „Kto jeszcze ma wted
 - b) Tak, ale tylko urlopy zatwierdzone
 - c) Bez tego boksu
 
-Odpowiedź:
+Odpowiedź: a (2026-11-20, wszystkie polecane)
 
 ## 2. W jakiej kolejności pokazać wnioski czekające na decyzję?
 
@@ -21,7 +21,7 @@ Boks pokazuje 5, resztę otwiera „Wszystkie wnioski”.
   mniej **(polecam)**
 - b) Najpierw najdawniej złożony wniosek
 
-Odpowiedź:
+Odpowiedź: a (2026-11-20, wszystkie polecane)
 
 ## 3. Co administrator ma widzieć o zadaniach?
 
@@ -30,7 +30,7 @@ Tablic jest kilka (po jednej na projekt), więc liczby są osobno dla każdego p
 - a) Tabela projektów z liczbą zadań w kolumnach i po terminie, a pod nią lista zadań po terminie z osobami **(polecam)**
 - b) Sama tabela projektów z liczbami
 
-Odpowiedź:
+Odpowiedź: a (2026-11-20, wszystkie polecane)
 
 ## 4. Które zadania pokazać w boksie „Moje zadania”?
 
@@ -38,7 +38,7 @@ Odpowiedź:
   według terminu, bez terminu na końcu; 5 w boksie i „i jeszcze N zadań” **(polecam)**
 - b) Tylko zadania po terminie i z terminem w najbliższych 7 dniach
 
-Odpowiedź:
+Odpowiedź: a (2026-11-20, wszystkie polecane)
 
 ## 5. Czy administrator też ma boks „Moje zadania”?
 
@@ -47,18 +47,18 @@ Administratora też można przypisać do zadania.
 - a) Tak, administrator też widzi zadania przypisane do siebie **(polecam)**
 - b) Nie, tylko pracownik
 
-Odpowiedź:
+Odpowiedź: a (2026-11-20, wszystkie polecane)
 
 ## 6. Co się dzieje po kliknięciu zadania na Pulpicie?
 
 - a) Otwiera tablicę projektu od razu z podglądem tego zadania z prawej (mała zmiana w module Zadania) **(polecam)**
 - b) Otwiera samą tablicę projektu, zadanie trzeba znaleźć
 
-Odpowiedź:
+Odpowiedź: a (2026-11-20, wszystkie polecane)
 
 ## 7. Czy pracownik widzi, kto z zespołu będzie nieobecny?
 
 - a) Nie: pracownik widzi tylko swoje dane (pula, swoje wnioski, swoje zadania) **(polecam)**
 - b) Tak: pracownik widzi też pasek nieobecności zespołu (imiona i daty, bez rodzaju urlopu)
 
-Odpowiedź:
+Odpowiedź: a (2026-11-20, wszystkie polecane)

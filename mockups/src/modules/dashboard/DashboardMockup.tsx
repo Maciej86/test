@@ -8,7 +8,6 @@ import { DateText } from '../../common/DateText';
 import { InfoCard } from '../../common/InfoCard';
 import { PageHeader } from '../../common/PageHeader';
 import { PersonAvatar } from '../../common/PersonAvatar';
-import { Question, Questions } from '../../common/Question';
 import { useMockupRole } from '../../common/mockupRole';
 import { AbsenceStrip } from './AbsenceStrip';
 import {
@@ -287,87 +286,6 @@ export const DashboardMockup = () => {
 
   return (
     <Stack>
-      <Questions>
-        <Question
-          number={1}
-          about="Nieobecności (administrator)"
-          options={[
-            { id: 'a', text: 'Tak: urlopy zatwierdzone i czekające na decyzję, dziś i 13 kolejnych dni' },
-            { id: 'b', text: 'Tak, ale tylko urlopy zatwierdzone' },
-            { id: 'c', text: 'Bez tego boksu' },
-          ]}
-          recommended="a"
-        >
-          Czy administrator widzi na Pulpicie, kto będzie nieobecny w najbliższych 2 tygodniach?
-        </Question>
-        <Question
-          number={2}
-          about="Wnioski do rozpatrzenia"
-          options={[
-            { id: 'a', text: 'Najpierw wniosek, którego urlop zaczyna się najwcześniej; „zaczyna się za … dni” na żółto, gdy zostało 7 dni lub mniej' },
-            { id: 'b', text: 'Najpierw najdawniej złożony wniosek' },
-          ]}
-          recommended="a"
-        >
-          W jakiej kolejności pokazać wnioski czekające na decyzję? Boks pokazuje 5, resztę otwiera „Wszystkie wnioski”.
-        </Question>
-        <Question
-          number={3}
-          about="Stan tablic (administrator)"
-          options={[
-            { id: 'a', text: 'Tabela projektów z liczbą zadań w kolumnach i po terminie, a pod nią lista zadań po terminie z osobami' },
-            { id: 'b', text: 'Sama tabela projektów z liczbami' },
-          ]}
-          recommended="a"
-        >
-          Co administrator ma widzieć o zadaniach? Tablic jest kilka (po jednej na projekt), więc liczby są osobno dla każdego projektu.
-        </Question>
-        <Question
-          number={4}
-          about="Moje zadania"
-          options={[
-            { id: 'a', text: 'Zadania przypisane do mnie, jeszcze niezrealizowane, ze wszystkich moich projektów: najpierw po terminie, potem według terminu, bez terminu na końcu; 5 w boksie i „i jeszcze N zadań”' },
-            { id: 'b', text: 'Tylko zadania po terminie i z terminem w najbliższych 7 dniach' },
-          ]}
-          recommended="a"
-        >
-          Które zadania pokazać w boksie „Moje zadania”?
-        </Question>
-        <Question
-          number={5}
-          about="Moje zadania (administrator)"
-          options={[
-            { id: 'a', text: 'Tak, administrator też widzi zadania przypisane do siebie' },
-            { id: 'b', text: 'Nie, tylko pracownik' },
-          ]}
-          recommended="a"
-        >
-          Administratora też można przypisać do zadania. Czy na jego Pulpicie ma być boks „Moje zadania”?
-        </Question>
-        <Question
-          number={6}
-          about="Kliknięcie w zadanie"
-          options={[
-            { id: 'a', text: 'Otwiera tablicę projektu od razu z podglądem tego zadania z prawej (mała zmiana w module Zadania)' },
-            { id: 'b', text: 'Otwiera samą tablicę projektu, zadanie trzeba znaleźć' },
-          ]}
-          recommended="a"
-        >
-          Co się dzieje po kliknięciu zadania na Pulpicie?
-        </Question>
-        <Question
-          number={7}
-          about="Pulpit pracownika"
-          options={[
-            { id: 'a', text: 'Nie: pracownik widzi tylko swoje dane (pula, swoje wnioski, swoje zadania)' },
-            { id: 'b', text: 'Tak: pracownik widzi też pasek nieobecności zespołu (imiona i daty, bez rodzaju urlopu)' },
-          ]}
-          recommended="a"
-        >
-          Czy pracownik widzi, kto z zespołu będzie nieobecny?
-        </Question>
-      </Questions>
-
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">
           <Text size="sm" fw={600}>{t('mockup_state')}</Text>

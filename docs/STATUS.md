@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Moduł Pulpit: odpowiedzi na pytania makiety (`docs/modules/dashboard/QUESTIONS.md`).
+**Następny krok:** Moduł Pulpit: akceptacja specu (`docs/modules/dashboard/SPEC.md`), potem plan.
 
 ## Start aplikacji
 
@@ -32,7 +32,7 @@
 | 11 | Historia zmian | activity-log | zrobiony | zamknięcie | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
-| 14 | Pulpit | dashboard | w toku | pytania | my-leave, leave-requests, tasks |
+| 14 | Pulpit | dashboard | w toku | spec | my-leave, leave-requests, tasks |
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
