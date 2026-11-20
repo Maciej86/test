@@ -44,9 +44,9 @@ z testem; podmiana w Powiadomieniach i w makiecie Historii zmian (makiety Powiad
 - [x] 9. Backend: usługa (`state`, `link` dla każdego obszaru, „usunięte konto”) i trasy `GET /api/activity-log`,
   `GET /api/activity-log/people`, `mountModule`, wiersze w Mapie dostępu; testy: dane, filtry, druga strona, zły
   parametr pominięty, 401, 403, brak tras zapisu (POST/PATCH/DELETE → 404) → `npm run check`
-- [ ] 10. Front: `activity-log.api.ts`, strona z `DataState`, nagłówek z liczbą, filtry w adresie, dziennik po
+- [x] 10. Front: `activity-log.api.ts`, strona z `DataState`, nagłówek z liczbą, filtry w adresie, dziennik po
   dniach, stronicowanie, pusta historia, brak wyników; testy → `npm run check`
-- [ ] 11. Front: rozwijany wpis (jeden otwarty, tabelka „przed → po”, wartości przetłumaczone: statusy, kolumny,
+- [x] 11. Front: rozwijany wpis (jeden otwarty, tabelka „przed → po”, wartości przetłumaczone: statusy, kolumny,
   role, tak/nie, daty), „Otwórz …” z `link`, plakietki „w archiwum” i „usunięty na stałe”; testy → `npm run check`
 - [ ] 12. Strona w `pages.ts`, zgodność z makietą, widok telefonu (390 px) sprawdzony w przeglądarce
 - [ ] 13. E2E `e2e/activity-log.spec.ts` ze scenariuszy `TESTS.md` (dane z przedrostkiem `E2E `, sprzątanie

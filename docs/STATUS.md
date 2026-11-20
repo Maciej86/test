@@ -29,7 +29,7 @@
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | zrobiony | zamknięcie | my-leave |
 | 10 | Zadania | tasks | zrobiony | zamknięcie | employees, notifications |
-| 11 | Historia zmian | activity-log | w toku | implementacja (krok 10/15) | employees, my-leave, leave-requests, tasks |
+| 11 | Historia zmian | activity-log | w toku | implementacja (krok 12/15) | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
 | 13 | Moje konto | my-account | czeka | makieta | login |
 | 14 | Pulpit | dashboard | czeka | makieta | my-leave, leave-requests, tasks |

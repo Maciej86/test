@@ -42,7 +42,7 @@ const Changes = ({ entry }: { entry: MockEntry }) => {
                 <ArrowRight size={14} aria-hidden style={{ alignSelf: 'center', color: 'var(--mantine-color-dimmed)' }} />
               </>
             )}
-            <Text size="sm" fw={500}>{c.after ?? t('empty_before')}</Text>
+            <Text size="sm" fw={500}>{c.after ?? t('values.none')}</Text>
           </Group>
         </Group>
       ))}
@@ -52,23 +52,18 @@ const Changes = ({ entry }: { entry: MockEntry }) => {
 
 const OpenButton = ({ entry }: { entry: MockEntry }) => {
   const { t } = useTranslation('activity-log');
-  if (entry.deleted) {
-    return (
-      <Group gap="xs">
-        <Badge variant="light" color="gray">{t('deleted')}</Badge>
-        <Text size="xs" c="dimmed">{t('deleted_hint')}</Text>
-      </Group>
-    );
-  }
+  if (entry.deleted) return <Text size="xs" c="dimmed">{t('deleted_hint')}</Text>;
+  // Przycisk „Otwórz w archiwum” dojdzie z modułem Archiwum.
+  if (entry.archived) return <Text size="xs" c="dimmed">{t('archived_hint')}</Text>;
   return (
     <Button
       size="xs"
       variant="default"
       leftSection={<ButtonIcon action="details" size={14} />}
-      onClick={() => notify.success(entry.archived ? t('open_archive') : t(`open.${entry.area}`))}
+      onClick={() => notify.success(t(`open.${entry.area}`))}
       style={{ alignSelf: 'flex-start' }}
     >
-      {entry.archived ? t('open_archive') : t(`open.${entry.area}`)}
+      {t(`open.${entry.area}`)}
     </Button>
   );
 };
@@ -99,6 +94,7 @@ const EntryRow = ({ entry, opened, onToggle }: { entry: MockEntry; opened: boole
             <Group gap="xs" wrap="wrap">
               <Text fw={600}>{t(`actions.${entry.action}`)}</Text>
               {entry.deleted && <Badge size="sm" variant="light" color="gray">{t('deleted')}</Badge>}
+              {entry.archived && <Badge size="sm" variant="light" color="gray">{t('archived')}</Badge>}
             </Group>
             <Text size="sm">
               {entry.target}
