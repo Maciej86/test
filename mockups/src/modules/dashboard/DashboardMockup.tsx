@@ -1,79 +1,387 @@
-import { Anchor, Badge, Group, Progress, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { useState, type ReactNode } from 'react';
+import { Anchor, Badge, Box, Button, Divider, Grid, Group, Paper, Progress, SegmentedControl, Stack, Table, Text, UnstyledButton } from '@mantine/core';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { dayjs, formatDate } from '@app/shared';
+import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { InfoCard } from '../../common/InfoCard';
+import { PageHeader } from '../../common/PageHeader';
+import { PersonAvatar } from '../../common/PersonAvatar';
+import { Question, Questions } from '../../common/Question';
 import { useMockupRole } from '../../common/mockupRole';
-import { MY_POOL, MY_TASKS, PENDING_REQUESTS, TASK_COUNTS } from './data';
+import { AbsenceStrip } from './AbsenceStrip';
+import {
+  BOX_LIMIT, MY_NEXT_LEAVE, MY_PENDING, MY_POOL, MY_TASKS, OVERDUE_TASKS, PENDING_REQUESTS, PROJECT_COUNTS, TODAY,
+  type DashboardTask,
+} from './data';
 
-const AdminDashboard = () => {
-  const { t } = useTranslation('dashboard');
-  return (
-    <SimpleGrid cols={{ base: 1, md: 2 }}>
-      <InfoCard
-        title={t('pending_title', { count: PENDING_REQUESTS.length })}
-        actions={<Anchor size="sm" component={Link} to="/admin/leave-requests">{t('pending_all')}</Anchor>}
-      >
-        {PENDING_REQUESTS.map((r) => (
-          <Group key={r.id} justify="space-between" wrap="nowrap">
-            <div>
-              <Text fw={500}>{r.employee}</Text>
-              <Text size="sm" c="dimmed">
-                {r.type}, <DateText value={r.from} /> – <DateText value={r.to} />
-              </Text>
-            </div>
-            <Badge variant="light">{t('days', { count: r.days })}</Badge>
-          </Group>
-        ))}
-      </InfoCard>
-      <InfoCard title={t('tasks_title')} actions={<Anchor size="sm" component={Link} to="/admin/tasks">{t('tasks_open')}</Anchor>}>
-        <Group justify="space-between"><Text>{t('col_draft')}</Text><Text fw={600}>{TASK_COUNTS.draft}</Text></Group>
-        <Group justify="space-between"><Text>{t('col_in_progress')}</Text><Text fw={600}>{TASK_COUNTS.inProgress}</Text></Group>
-        <Group justify="space-between"><Text>{t('col_done')}</Text><Text fw={600}>{TASK_COUNTS.done}</Text></Group>
-        <Group justify="space-between"><Text c="red.7">{t('overdue')}</Text><Text fw={600} c="red.7">{TASK_COUNTS.overdue}</Text></Group>
-      </InfoCard>
-    </SimpleGrid>
-  );
+const STATES = ['normal', 'empty'] as const;
+type State = (typeof STATES)[number];
+
+/** Ile dni zostało do dnia (0 = dziś). */
+const daysUntil = (iso: string) => dayjs(iso).diff(dayjs(TODAY), 'day');
+
+/** Kolor terminu jak na karcie zadania: po czasie czerwony, dziś i jutro żółty. */
+const dueColor = (due: string | null) => {
+  if (due === null) return 'dimmed';
+  const left = daysUntil(due);
+  if (left < 0) return 'red.4';
+  if (left <= 1) return 'yellow.4';
+  return undefined;
 };
 
-const EmployeeDashboard = () => {
+/** Wiersz-link: cały wiersz klikalny, delikatne podświetlenie po najechaniu. */
+const RowLink = ({ to, children }: { to: string; children: ReactNode }) => (
+  <UnstyledButton component={Link} to={to} px="xs" py={6} mx="-xs" style={{ borderRadius: 3 }}>
+    {children}
+  </UnstyledButton>
+);
+
+const PendingBox = ({ empty }: { empty: boolean }) => {
   const { t } = useTranslation('dashboard');
-  const total = MY_POOL.annual + MY_POOL.carriedOver;
-  const left = total - MY_POOL.used;
+  const rows = empty ? [] : PENDING_REQUESTS;
   return (
-    <SimpleGrid cols={{ base: 1, md: 2 }}>
-      <InfoCard title={t('pool_title', { year: MY_POOL.year })} actions={<Anchor size="sm" component={Link} to="/admin/my-leave">{t('pool_request')}</Anchor>}>
-        <Group align="baseline" gap="xs">
-          <Text fz={40} fw={700} lh={1}>{left}</Text>
-          <Text c="dimmed">{t('pool_left', { total })}</Text>
+    <InfoCard
+      title={
+        <Group gap="xs">
+          {t('pending.title')}
+          {rows.length > 0 && <Badge variant="light" color="yellow" size="lg">{rows.length}</Badge>}
         </Group>
-        <Progress value={(MY_POOL.used / total) * 100} />
-        <Text size="sm" c="dimmed">
-          {t('pool_details', { annual: MY_POOL.annual, carried: MY_POOL.carriedOver, used: MY_POOL.used })}
-        </Text>
-      </InfoCard>
-      <InfoCard title={t('my_tasks_title')} actions={<Anchor size="sm" component={Link} to="/admin/tasks">{t('tasks_open')}</Anchor>}>
-        {MY_TASKS.map((task) => (
-          <Group key={task.id} justify="space-between" wrap="nowrap">
-            <div>
-              <Text fw={500}>{task.title}</Text>
-              <Text size="sm" c="dimmed">{task.column}</Text>
-            </div>
-            {task.due && <Text size="sm"><DateText value={task.due} /></Text>}
-          </Group>
-        ))}
-      </InfoCard>
-    </SimpleGrid>
+      }
+      actions={<Anchor size="sm" component={Link} to="/admin/leave-requests">{t('pending.all')}</Anchor>}
+    >
+      {rows.length === 0 && <Text c="dimmed">{t('pending.empty')}</Text>}
+      {rows.slice(0, BOX_LIMIT).map((r) => {
+        const startsIn = daysUntil(r.from);
+        return (
+          <RowLink key={r.id} to={`/admin/leave-requests/${r.id}`}>
+            <Group justify="space-between" wrap="nowrap" align="flex-start">
+              <Box miw={0}>
+                <Text fw={600} truncate>{r.employee}</Text>
+                <Text size="sm">
+                  {r.type}, <DateText value={r.from} /> – <DateText value={r.to} />
+                </Text>
+                <Text size="xs" c="dimmed">
+                  {t('pending.submitted', { date: formatDate(r.createdAt) })},{' '}
+                  <Text span inherit c={startsIn <= 7 ? 'yellow.4' : undefined} fw={startsIn <= 7 ? 600 : undefined}>
+                    {t('pending.starts_in', { count: startsIn })}
+                  </Text>
+                </Text>
+              </Box>
+              <Badge variant="light" color="gray" style={{ flex: 'none' }}>{t('days', { count: r.days })}</Badge>
+            </Group>
+          </RowLink>
+        );
+      })}
+    </InfoCard>
   );
 };
+
+/** Zadanie w boksie: tytuł, projekt i kolumna, termin po prawej; przy zadaniach po terminie także osoby. */
+const TaskRow = ({ task, withPeople = false }: { task: DashboardTask; withPeople?: boolean }) => {
+  const { t } = useTranslation('dashboard');
+  const left = task.due === null ? null : daysUntil(task.due);
+  return (
+    <RowLink to={`/admin/tasks/${task.projectId}?task=${task.id}`}>
+      <Group justify="space-between" wrap="nowrap" align="flex-start">
+        <Box miw={0}>
+          <Text fw={500} lineClamp={2}>{task.title}</Text>
+          <Group gap={6} mt={2}>
+            <Badge variant="outline" color="gray" size="sm">{task.project}</Badge>
+            <Text size="xs" c="dimmed">{t(`column.${task.column}`)}</Text>
+          </Group>
+        </Box>
+        <Stack gap={4} align="flex-end" style={{ flex: 'none' }}>
+          <Text size="sm" c={dueColor(task.due)} fw={left !== null && left <= 1 ? 600 : undefined}>
+            {left === null ? t('my_tasks.no_due') : left === 0 ? t('my_tasks.due_today') : left === 1 ? t('my_tasks.due_tomorrow') : <DateText value={task.due} />}
+          </Text>
+          {withPeople && (
+            <Group gap={4} wrap="nowrap">
+              {task.assignees.map((p) => <PersonAvatar key={p} name={p} tooltip={p} />)}
+            </Group>
+          )}
+        </Stack>
+      </Group>
+    </RowLink>
+  );
+};
+
+const MyTasksBox = ({ tasks }: { tasks: DashboardTask[] }) => {
+  const { t } = useTranslation('dashboard');
+  const hidden = tasks.length - BOX_LIMIT;
+  return (
+    <InfoCard title={t('my_tasks.title')}>
+      {tasks.length === 0 && <Text c="dimmed">{t('my_tasks.empty')}</Text>}
+      {tasks.slice(0, BOX_LIMIT).map((task) => <TaskRow key={task.id} task={task} />)}
+      {hidden > 0 && <Text size="sm" c="dimmed">{t('more', { count: hidden })}</Text>}
+    </InfoCard>
+  );
+};
+
+const ProjectsBox = ({ empty }: { empty: boolean }) => {
+  const { t } = useTranslation('dashboard');
+  const projects = empty ? [] : PROJECT_COUNTS;
+  const overdue = empty ? [] : OVERDUE_TASKS;
+  return (
+    <InfoCard title={t('projects.title')} actions={<Anchor size="sm" component={Link} to="/admin/tasks/projects">{t('projects.add')}</Anchor>}>
+      {projects.length === 0 ? (
+        <Text c="dimmed">{t('projects.empty')}</Text>
+      ) : (
+        <Table.ScrollContainer minWidth={480}>
+          <Table verticalSpacing="xs" highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>{t('projects.project')}</Table.Th>
+                <Table.Th ta="right">{t('projects.draft')}</Table.Th>
+                <Table.Th ta="right">{t('projects.in_progress')}</Table.Th>
+                <Table.Th ta="right">{t('projects.overdue')}</Table.Th>
+                <Table.Th ta="right">{t('projects.done_recently')}</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {projects.map((p) => (
+                <Table.Tr key={p.id}>
+                  <Table.Td><Anchor component={Link} to={`/admin/tasks/${p.id}`} fw={600}>{p.name}</Anchor></Table.Td>
+                  <Table.Td ta="right">{p.draft}</Table.Td>
+                  <Table.Td ta="right">{p.inProgress}</Table.Td>
+                  <Table.Td ta="right" c={p.overdue > 0 ? 'red.4' : 'dimmed'} fw={p.overdue > 0 ? 700 : undefined}>{p.overdue}</Table.Td>
+                  <Table.Td ta="right" c="dimmed">{p.doneRecently}</Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Table.ScrollContainer>
+      )}
+      {projects.length > 0 && (
+        <>
+          <Divider my={4} />
+          <Text fw={600} size="sm">{t('overdue.title')}</Text>
+          {overdue.length === 0 && <Text size="sm" c="dimmed">{t('overdue.empty')}</Text>}
+          {overdue.slice(0, BOX_LIMIT).map((task) => <TaskRow key={task.id} task={task} withPeople />)}
+        </>
+      )}
+    </InfoCard>
+  );
+};
+
+const AdminDashboard = ({ empty }: { empty: boolean }) => {
+  const { t } = useTranslation('dashboard');
+  return (
+    <Grid gap="md">
+      <Grid.Col span={{ base: 12, lg: 5 }}>
+        <PendingBox empty={empty} />
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, lg: 7 }}>
+        <InfoCard title={t('absence.title')}>
+          <AbsenceStrip absences={empty ? [] : undefined} />
+        </InfoCard>
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, lg: 7 }}>
+        <ProjectsBox empty={empty} />
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, lg: 5 }}>
+        <MyTasksBox tasks={empty ? [] : MY_TASKS.admin} />
+      </Grid.Col>
+    </Grid>
+  );
+};
+
+/** Ta sama karta co „Urlop w …” na ekranie Moje urlopy (w aplikacji: wspólny klocek), plus przycisk wniosku. */
+const PoolBox = () => {
+  const { t } = useTranslation('dashboard');
+  const pool = MY_POOL;
+  const total = pool.annual + pool.carried;
+  const used = pool.usedCarried + pool.usedAnnual;
+  const leftCarried = pool.carried - pool.usedCarried;
+  const left = total - used - pool.pending;
+  const parts = [
+    { key: 'used', value: used, color: 'dark.4' },
+    { key: 'pending', value: pool.pending, color: 'yellow.6' },
+    { key: 'carried', value: leftCarried, color: 'navy.3' },
+    { key: 'annual', value: left - leftCarried, color: 'navy.6' },
+  ];
+  return (
+    <InfoCard
+      title={t('pool.title', { year: pool.year })}
+      actions={
+        <Button component={Link} to="/admin/my-leave" leftSection={<ButtonIcon action="add" />}>
+          {t('pool.request')}
+        </Button>
+      }
+    >
+      <Group gap="xs" align="baseline">
+        <Text fz={40} fw={700} lh={1}>{left}</Text>
+        <Text c="dimmed">{t('pool.left', { total })}</Text>
+      </Group>
+      <Progress.Root size={12} radius="xs" aria-label={t('pool.aria', { left, total })}>
+        {parts.map((p) => <Progress.Section key={p.key} value={(p.value / total) * 100} color={p.color} />)}
+      </Progress.Root>
+      <Group gap="lg" mt={4}>
+        {parts.map((p) => (
+          <Group key={p.key} gap={6} wrap="nowrap">
+            <Box w={10} h={10} bg={p.color} style={{ borderRadius: 2 }} />
+            <Text size="sm">
+              <Text span fw={700}>{p.value}</Text> <Text span c="dimmed">{t(`pool.legend_${p.key}`, { year: pool.year - 1 })}</Text>
+            </Text>
+          </Group>
+        ))}
+      </Group>
+    </InfoCard>
+  );
+};
+
+const MyRequestsBox = ({ empty }: { empty: boolean }) => {
+  const { t } = useTranslation('dashboard');
+  const { t: tLeave } = useTranslation('my-leave');
+  const pending = empty ? [] : MY_PENDING;
+  const next = empty ? null : MY_NEXT_LEAVE;
+  return (
+    <InfoCard title={t('my_requests.title')} actions={<Anchor size="sm" component={Link} to="/admin/my-leave">{t('my_requests.all')}</Anchor>}>
+      <Text size="sm" c="dimmed">{t('my_requests.pending_title')}</Text>
+      {pending.length === 0 && <Text>{t('my_requests.no_pending')}</Text>}
+      {pending.map((r) => (
+        <Group key={r.id} justify="space-between" wrap="nowrap">
+          <Text>
+            {r.type}, <DateText value={r.from} /> – <DateText value={r.to} />
+          </Text>
+          <Badge variant="light" color="yellow" style={{ flex: 'none' }}>{tLeave('status.pending')}</Badge>
+        </Group>
+      ))}
+      <Divider my={4} />
+      <Text size="sm" c="dimmed">{t('my_requests.next_title')}</Text>
+      {next === null ? (
+        <Text>{t('my_requests.no_next')}</Text>
+      ) : (
+        <Group justify="space-between" wrap="nowrap">
+          <Text>
+            {next.type}, <DateText value={next.from} /> – <DateText value={next.to} />
+          </Text>
+          <Badge variant="light" color="green" style={{ flex: 'none' }}>{t('days', { count: next.days })}</Badge>
+        </Group>
+      )}
+    </InfoCard>
+  );
+};
+
+const EmployeeDashboard = ({ empty }: { empty: boolean }) => (
+  <Grid gap="md">
+    <Grid.Col span={{ base: 12, lg: 7 }}>
+      <PoolBox />
+    </Grid.Col>
+    <Grid.Col span={{ base: 12, lg: 5 }}>
+      <MyRequestsBox empty={empty} />
+    </Grid.Col>
+    <Grid.Col span={12}>
+      <MyTasksBox tasks={empty ? [] : MY_TASKS.employee} />
+    </Grid.Col>
+  </Grid>
+);
 
 export const DashboardMockup = () => {
   const { t } = useTranslation('dashboard');
   const role = useMockupRole();
+  const [state, setState] = useState<State>('normal');
+  const empty = state === 'empty';
+  const today = `${dayjs(TODAY).locale('pl').format('dddd')}, ${formatDate(TODAY)}`;
+
   return (
     <Stack>
-      <Title order={2}>{t('title')}</Title>
-      {role === 'admin' ? <AdminDashboard /> : <EmployeeDashboard />}
+      <Questions>
+        <Question
+          number={1}
+          about="Nieobecności (administrator)"
+          options={[
+            { id: 'a', text: 'Tak: urlopy zatwierdzone i czekające na decyzję, dziś i 13 kolejnych dni' },
+            { id: 'b', text: 'Tak, ale tylko urlopy zatwierdzone' },
+            { id: 'c', text: 'Bez tego boksu' },
+          ]}
+          recommended="a"
+        >
+          Czy administrator widzi na Pulpicie, kto będzie nieobecny w najbliższych 2 tygodniach?
+        </Question>
+        <Question
+          number={2}
+          about="Wnioski do rozpatrzenia"
+          options={[
+            { id: 'a', text: 'Najpierw wniosek, którego urlop zaczyna się najwcześniej; „zaczyna się za … dni” na żółto, gdy zostało 7 dni lub mniej' },
+            { id: 'b', text: 'Najpierw najdawniej złożony wniosek' },
+          ]}
+          recommended="a"
+        >
+          W jakiej kolejności pokazać wnioski czekające na decyzję? Boks pokazuje 5, resztę otwiera „Wszystkie wnioski”.
+        </Question>
+        <Question
+          number={3}
+          about="Stan tablic (administrator)"
+          options={[
+            { id: 'a', text: 'Tabela projektów z liczbą zadań w kolumnach i po terminie, a pod nią lista zadań po terminie z osobami' },
+            { id: 'b', text: 'Sama tabela projektów z liczbami' },
+          ]}
+          recommended="a"
+        >
+          Co administrator ma widzieć o zadaniach? Tablic jest kilka (po jednej na projekt), więc liczby są osobno dla każdego projektu.
+        </Question>
+        <Question
+          number={4}
+          about="Moje zadania"
+          options={[
+            { id: 'a', text: 'Zadania przypisane do mnie, jeszcze niezrealizowane, ze wszystkich moich projektów: najpierw po terminie, potem według terminu, bez terminu na końcu; 5 w boksie i „i jeszcze N zadań”' },
+            { id: 'b', text: 'Tylko zadania po terminie i z terminem w najbliższych 7 dniach' },
+          ]}
+          recommended="a"
+        >
+          Które zadania pokazać w boksie „Moje zadania”?
+        </Question>
+        <Question
+          number={5}
+          about="Moje zadania (administrator)"
+          options={[
+            { id: 'a', text: 'Tak, administrator też widzi zadania przypisane do siebie' },
+            { id: 'b', text: 'Nie, tylko pracownik' },
+          ]}
+          recommended="a"
+        >
+          Administratora też można przypisać do zadania. Czy na jego Pulpicie ma być boks „Moje zadania”?
+        </Question>
+        <Question
+          number={6}
+          about="Kliknięcie w zadanie"
+          options={[
+            { id: 'a', text: 'Otwiera tablicę projektu od razu z podglądem tego zadania z prawej (mała zmiana w module Zadania)' },
+            { id: 'b', text: 'Otwiera samą tablicę projektu, zadanie trzeba znaleźć' },
+          ]}
+          recommended="a"
+        >
+          Co się dzieje po kliknięciu zadania na Pulpicie?
+        </Question>
+        <Question
+          number={7}
+          about="Pulpit pracownika"
+          options={[
+            { id: 'a', text: 'Nie: pracownik widzi tylko swoje dane (pula, swoje wnioski, swoje zadania)' },
+            { id: 'b', text: 'Tak: pracownik widzi też pasek nieobecności zespołu (imiona i daty, bez rodzaju urlopu)' },
+          ]}
+          recommended="a"
+        >
+          Czy pracownik widzi, kto z zespołu będzie nieobecny?
+        </Question>
+      </Questions>
+
+      <Paper p="xs" bg="yellow.4" c="dark.9">
+        <Group gap="sm">
+          <Text size="sm" fw={600}>{t('mockup_state')}</Text>
+          <SegmentedControl
+            size="xs"
+            value={state}
+            onChange={(v) => setState(v as State)}
+            data={STATES.map((s) => ({ value: s, label: t(`mockup_states.${s}`) }))}
+          />
+        </Group>
+      </Paper>
+
+      <PageHeader title={t('title')} subtitle={t('today', { date: today })} />
+      {role === 'admin' ? <AdminDashboard empty={empty} /> : <EmployeeDashboard empty={empty} />}
     </Stack>
   );
 };
