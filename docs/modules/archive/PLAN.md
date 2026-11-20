@@ -87,7 +87,7 @@ i edycję).
   i czysty adres; testy (podgląd z adresu, przyciski w podglądzie otwierają okna, 404 → `gone`) → `npm run check`
 - [x] 11. **Zgodność z makietą i telefonem**: porównanie w przeglądarce (komputer i 390 px) z
   `mockups/src/modules/archive/`; poprawki z testem, gdy coś się różni → `npm run check`
-- [ ] 12. **E2E** `e2e/archive.spec.ts` ze scenariuszy `TESTS.md` (konta i zadania zakłada test, `e2e.tmp.*`,
+- [x] 12. **E2E** `e2e/archive.spec.ts` ze scenariuszy `TESTS.md` (konta i zadania zakłada test, `e2e.tmp.*`,
   projekty „E2E …”) → `npm run check`, `npm run test:e2e`
 - [ ] 13. **Przegląd kodu** całego modułu (lista kontrolna z `CONVENTIONS.md`), poprawki z testem → `npm run check`
 
