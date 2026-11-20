@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router';
 import type { z } from 'zod';
 
@@ -27,14 +27,19 @@ export const useListParams = <S extends z.ZodType<Params>>(
   };
   const params = read(searchParams);
   // Najnowszy adres, wspólny dla wszystkich wersji `update` (także tej zapamiętanej wcześniej). Router pokazuje
-  // wysłane adresy z opóźnieniem i po kolei, więc pojawienie się starszego z nich (albo rysowanie ze starym adresem)
-  // nie cofa nowszego, jeszcze czekającego. Inny adres (przycisk wstecz, link) to zmiana z zewnątrz.
+  // wysłane adresy z opóźnieniem i po kolei, więc pojawienie się starszego z nich nie cofa nowszego, jeszcze
+  // czekającego. Inny adres (przycisk wstecz, link) to zmiana z zewnątrz.
+  // Liczy się tylko adres naprawdę pokazany na ekranie (efekt), nie samo rysowanie: router zmienia adres w trybie
+  // przejścia, a pod obciążeniem React zaczyna rysować nowy adres, przerywa i rysuje jeszcze raz stary. Gdyby takie
+  // przerwane rysowanie się liczyło, powrót do starego adresu wyglądałby jak zmiana z zewnątrz i cofał wybór.
   const latest = useRef(searchParams);
-  const rendered = useRef(searchParams.toString());
   const pending = useRef<string[]>([]);
   const shown = searchParams.toString();
-  if (shown !== rendered.current) {
-    rendered.current = shown;
+  const committed = useRef(shown);
+  useLayoutEffect(() => {
+    // Ten sam adres pokazany ponownie (np. ekran schowany i odsłonięty) to żadna zmiana.
+    if (shown === committed.current) return;
+    committed.current = shown;
     const sentAt = pending.current.indexOf(shown);
     if (sentAt >= 0) {
       pending.current = pending.current.slice(sentAt + 1);
@@ -43,7 +48,7 @@ export const useListParams = <S extends z.ZodType<Params>>(
       pending.current = [];
       latest.current = searchParams;
     }
-  }
+  }, [shown]);
 
   // Liczone od adresu w chwili zmiany, nie z chwili rysowania: spóźnione wyszukiwanie (300 ms) wysłane po wyborze
   // innego filtra nie cofa tego wyboru.

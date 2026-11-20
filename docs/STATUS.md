@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Poprawka z `docs/FIXES.md`: niestabilny test e2e Historii zmian (filtr osoby), potem moduł Publikacja (makieta).
+**Następny krok:** Moduł Publikacja (bez makiety, według instrukcji publikacji).
 
 ## Start aplikacji
 
