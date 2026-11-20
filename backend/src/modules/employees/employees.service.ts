@@ -1,5 +1,10 @@
 import {
+  ARCHIVE_MESSAGES,
   EMPLOYEE_MESSAGES,
+  SERVER_MESSAGES,
+  type ArchivedEmployee,
+  type ArchiveEmployeesQuery,
+  type ListResponse,
   currentYear,
   type CloseYearInput,
   type CloseYearPreview,
@@ -18,7 +23,8 @@ import { withTransaction } from '../../db/transaction';
 import { isDuplicateEntry } from '../../db/errors';
 import { fail, notFound, type Actor, type Result, type ServiceError } from '../../middleware/routeHelpers';
 import { findContractType, listSelectableContractTypes } from '../contract-types/contract-types.queries';
-import { countPendingRequests, sumPoolUsage } from '../my-leave/my-leave.queries';
+import { countPendingRequests, countRequestsByUser, sumPoolUsage } from '../my-leave/my-leave.queries';
+import { countAssignmentsByUser } from '../tasks/tasks.queries';
 import { addMemberWhereAssigned } from '../tasks/projects.service';
 import * as q from './employees.queries';
 
@@ -349,3 +355,43 @@ export const listContractTypeOptions = async () => ({ items: await listSelectabl
 export const listActiveUsers = async (): Promise<{ id: number; name: string }[]> => {
   return q.listActiveUsers(pool);
 };
+
+/* ---------- Archiwum (moduł Archiwum używa tych funkcji) ---------- */
+
+/** Konta w archiwum z liczbą wniosków urlopowych i zadań (kolumna „Historia”). */
+export const listArchivedEmployees = async (query: ArchiveEmployeesQuery): Promise<ListResponse<ArchivedEmployee>> => {
+  const { rows, total } = await q.listArchivedEmployees(pool, { search: query.search, page: query.page, pageSize: PAGE_SIZE });
+  const ids = rows.map((r) => r.id);
+  const [requests, assignments] = await Promise.all([countRequestsByUser(pool, ids), countAssignmentsByUser(pool, ids)]);
+  const items = rows.map((r) => ({
+    id: r.id,
+    name: r.name,
+    login: r.login,
+    role: r.role,
+    archivedAt: r.archived_at.toISOString(),
+    archivedByName: r.archived_by_name,
+    leaveRequests: requests.get(r.id) ?? 0,
+    tasks: assignments.get(r.id) ?? 0,
+  }));
+  return { items, total, page: query.page, pageSize: PAGE_SIZE };
+};
+
+export const countArchivedEmployees = (): Promise<number> => q.countArchivedEmployees(pool);
+
+/**
+ * Usunięcie konta na stałe: tylko z archiwum, tylko bez wniosków urlopowych (odpowiedź 1a) i po wpisaniu imienia
+ * i nazwiska. Pule, powiadomienia, członkostwo i przypisania znikają razem z kontem (klucze obce).
+ */
+export const deleteArchivedEmployee = async (id: number, confirmName: string, actor: Actor): Promise<Result> =>
+  withTransaction(async (conn) => {
+    const user = await q.lockUser(conn, id);
+    if (!user) return notFound();
+    if (!user.archived_at) return fail(409, SERVER_MESSAGES.archiveFirst);
+    if (((await countRequestsByUser(conn, [id])).get(id) ?? 0) > 0) return fail(409, ARCHIVE_MESSAGES.hasLeaveRequests);
+    if (confirmName !== user.name) {
+      return fail(400, ARCHIVE_MESSAGES.confirmMismatch, { fields: { confirmName: ARCHIVE_MESSAGES.confirmMismatch } });
+    }
+    await q.deleteUser(conn, id);
+    await logActivity(conn, { userId: actor.id, userName: actor.name, entityId: id, entityName: user.name, action: 'delete', entityType: 'users', changes: {} });
+    return { ok: true as const };
+  });

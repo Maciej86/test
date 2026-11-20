@@ -84,3 +84,25 @@ describe('employees queries', () => {
     expect(params).toEqual(['employee', 'employee']);
   });
 });
+
+describe('archived accounts queries (Archiwum)', () => {
+  it('listArchivedEmployees: only archived, newest first, search with LIKE ?, name of who archived', async () => {
+    const { listArchivedEmployees } = await import('../employees.queries');
+    const db = fakeDb([[{ id: 9 }], [{ total: 1 }]]);
+    expect(await listArchivedEmployees(db, { search: 'ol_a', page: 2, pageSize: 25 })).toEqual({ rows: [{ id: 9 }], total: 1 });
+    const [sql, params] = db.query.mock.calls[0]!;
+    expect(sql).toContain('u.archived_at IS NOT NULL');
+    expect(sql).toContain('LEFT JOIN users a ON a.id = u.archived_by');
+    expect(sql).toContain('ORDER BY u.archived_at DESC, u.id DESC LIMIT ? OFFSET ?');
+    expect(params).toEqual(['%ol\\_a%', '%ol\\_a%', '%ol\\_a%', '%ol\\_a%', 25, 25]);
+  });
+
+  it('lockUser locks the account row; deleteUser deletes by id', async () => {
+    const { deleteUser, lockUser } = await import('../employees.queries');
+    const db = fakeDb([[{ id: 9 }], []]);
+    expect(await lockUser(db, 9)).toEqual({ id: 9 });
+    await deleteUser(db, 9);
+    expect(db.query.mock.calls[0]![0]).toMatch(/WHERE id = \? FOR UPDATE$/);
+    expect(db.query.mock.calls[1]).toEqual(['DELETE FROM users WHERE id = ?', [9]]);
+  });
+});

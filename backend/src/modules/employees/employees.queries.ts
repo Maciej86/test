@@ -217,3 +217,50 @@ export const listActiveUsers = async (db: Db, role?: Role): Promise<{ id: number
   );
   return rows.map((r) => ({ id: r.id as number, name: r.name as string }));
 };
+
+/* ---------- Archiwum ---------- */
+
+export interface ArchivedEmployeeRow extends RowDataPacket {
+  id: number;
+  name: string;
+  login: string;
+  role: Role;
+  archived_at: Date;
+  /** Kto przeniósł do archiwum; konto usunięte na stałe: null. */
+  archived_by_name: string | null;
+}
+
+/** Konta w archiwum, najnowsze w archiwum na górze; szukanie po imieniu, nazwisku i loginie. */
+export const listArchivedEmployees = async (db: Db, q: { search: string; page: number; pageSize: number }): Promise<{ rows: ArchivedEmployeeRow[]; total: number }> => {
+  const where = ['u.archived_at IS NOT NULL'];
+  const params: unknown[] = [];
+  if (q.search) {
+    where.push('(u.first_name LIKE ? OR u.last_name LIKE ? OR u.name LIKE ? OR u.login LIKE ?)');
+    const pattern = likePattern(q.search);
+    params.push(pattern, pattern, pattern, pattern);
+  }
+  const from = `FROM users u WHERE ${where.join(' AND ')}`;
+  const [rows] = await db.query<ArchivedEmployeeRow[]>(
+    `SELECT u.id, u.name, u.login, u.role, u.archived_at, a.name AS archived_by_name FROM users u LEFT JOIN users a ON a.id = u.archived_by WHERE ${where.join(' AND ')} ORDER BY u.archived_at DESC, u.id DESC LIMIT ? OFFSET ?`, // rule-ok: WHERE z gotowych kawałków z ?
+    [...params, q.pageSize, (q.page - 1) * q.pageSize],
+  );
+  const [count] = await db.query<RowDataPacket[]>(`SELECT COUNT(*) AS total ${from}`, params); // rule-ok: WHERE z gotowych kawałków z ?
+  return { rows, total: Number(count[0]?.total ?? 0) };
+};
+
+/** Liczba kont w archiwum (zakładka „Pracownicy” w Archiwum). */
+export const countArchivedEmployees = async (db: Db): Promise<number> => {
+  const [rows] = await db.query<RowDataPacket[]>('SELECT COUNT(*) AS total FROM users WHERE archived_at IS NOT NULL');
+  return Number(rows[0]?.total ?? 0);
+};
+
+/** Konto zablokowane do końca transakcji (usunięcie na stałe). */
+export const lockUser = async (db: Db, id: number): Promise<UserRow | null> => {
+  const [rows] = await db.query<UserRow[]>('SELECT id, name, login, role, archived_at FROM users WHERE id = ? FOR UPDATE', [id]);
+  return rows[0] ?? null;
+};
+
+/** Usunięcie konta na stałe; resztę robią klucze obce (Relacje w SPEC-GENERAL.md). */
+export const deleteUser = async (db: Db, id: number): Promise<void> => {
+  await db.query('DELETE FROM users WHERE id = ?', [id]);
+};

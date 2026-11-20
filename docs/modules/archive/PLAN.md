@@ -47,7 +47,7 @@ i edycję).
 - [x] 3. **Liczby z innych modułów**: `countRequestsByUser(db, userIds): Promise<Map<number, number>>`
   (`my-leave.queries.ts`, każdy status) i `countAssignmentsByUser(db, userIds)` (`tasks.queries.ts`, także zadania
   w archiwum); testy: pusta lista bez zapytania, SQL z `?` → `npm run check`
-- [ ] 4. **Pracownicy w archiwum** (`employees.queries.ts` + `employees.service.ts`):
+- [x] 4. **Pracownicy w archiwum** (`employees.queries.ts` + `employees.service.ts`):
   `listArchivedEmployees(query): Promise<ListResponse<ArchivedEmployee>>` (`archived_at IS NOT NULL`, szukanie po
   imieniu, nazwisku, loginie przez `LIKE ?`, `ORDER BY archived_at DESC, id DESC`, `PAGE_SIZE`, nazwisko
   przenoszącego z `LEFT JOIN users`); `countArchivedEmployees(db)`;
