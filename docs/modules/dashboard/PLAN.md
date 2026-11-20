@@ -76,12 +76,15 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
   → `npm run check`
   **Uwaga:** `listMyOpenTasks(db, viewer, limit)` bez `today`: kolejność „po terminie, potem według terminu” daje
   samo sortowanie po terminie rosnąco (zadania po terminie mają najwcześniejsze daty).
-- [ ] 7. Usługa i trasa: `backend/src/modules/dashboard/dashboard.service.ts`, `getDashboard(viewer: Viewer):
+- [x] 7. Usługa i trasa: `backend/src/modules/dashboard/dashboard.service.ts`, `getDashboard(viewer: Viewer):
   Promise<DashboardResponse>` (dziś = `todayIsoDate()`, zakres nieobecności dziś + 13 dni, `doneSince` =
   dziś − `TASK_HIDE_DONE_AFTER_DAYS`; pracownik: `pool` z `getMyLeaveOverview(viewer.id)?.pool ?? null`);
   `dashboard.routes.ts` (`GET /`), `mountModule(api, 'dashboard', dashboardRoutes)` w `app.ts`; testy usługi i tras
   z kroku 0; plik `.todo` usunięty, gdy pusty; w `SPEC-GENERAL.md` Mapa dostępu: wiersz `GET /api/dashboard` →
   `npm run check`
+  **Uwaga:** `doneSince` = teraz − 30 dni, tak samo jak na tablicy projektu (`getBoard`), żeby liczby się zgadzały.
+  Test szablonu `backend/src/__tests__/app.test.ts` podpinał zmyślony moduł „dashboard” pod `/api/dashboard`; teraz
+  pod `/api/test/dashboard` (sprawdza to samo).
 - [ ] 8. Ekran administratora: `frontend/src/modules/dashboard/dashboard.api.ts` (`useDashboard()`, klucz
   `['dashboard']`), `DashboardPage.tsx` z `DataState` i `PageHeader` („Dziś piątek, 20.11.2026”), boksy
   w `components/`: `PendingBox` (znacznik liczby, „zaczyna się …”: za N dni / jutro / dziś / „termin już się zaczął”,

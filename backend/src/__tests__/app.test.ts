@@ -124,19 +124,22 @@ describe('mountModule', () => {
     });
     const extra = express.Router();
     mountModule(extra, 'dashboard', moduleRoutes, roles);
-    return createApp({ extraRoutes: extra });
+    // Pod /api/test, bo prawdziwy moduł Pulpit ma już /api/dashboard.
+    const outer = express.Router();
+    outer.use('/test', extra);
+    return createApp({ extraRoutes: outer });
   };
 
   it('takes the roles of the navigation item (dashboard: admin and employee)', async () => {
     const user = signToken({ id: 2 }, 0);
     const admin = signToken({ id: 1 }, 0);
-    expect((await request(appWithModule()).get('/api/dashboard').set('Cookie', cookie(user))).status).toBe(200);
-    expect((await request(appWithModule()).get('/api/dashboard').set('Cookie', cookie(admin))).status).toBe(200);
+    expect((await request(appWithModule()).get('/api/test/dashboard').set('Cookie', cookie(user))).status).toBe(200);
+    expect((await request(appWithModule()).get('/api/test/dashboard').set('Cookie', cookie(admin))).status).toBe(200);
   });
 
   it('accepts explicit roles for a module without a navigation item', async () => {
     const user = signToken({ id: 2 }, 0);
-    const res = await request(appWithModule(['admin'])).get('/api/dashboard').set('Cookie', cookie(user));
+    const res = await request(appWithModule(['admin'])).get('/api/test/dashboard').set('Cookie', cookie(user));
     expect(res.status).toBe(403);
   });
 

@@ -7,6 +7,7 @@ import { env } from './env';
 import { authenticate } from './middleware/authenticate';
 import { sendError } from './middleware/errors';
 import { requireAuth } from './middleware/requireRole';
+import { dashboardRoutes } from './modules/dashboard/dashboard.routes';
 import { mountModule } from './middleware/mountModule';
 import { requirePasswordChanged } from './middleware/requirePasswordChanged';
 import { sameOrigin } from './middleware/sameOrigin';
@@ -58,6 +59,7 @@ export const createApp = (options: AppOptions = {}) => {
   api.use(requirePasswordChanged); // rule-ok: blokada dla każdego modułu przy haśle tymczasowym, nie moduł z trasami
 
   // 3. Moduły, z rolami ich pozycji w navigation.config.ts: mountModule(api, 'employees', employeesRoutes);
+  mountModule(api, 'dashboard', dashboardRoutes);
   mountModule(api, 'employees', employeesRoutes);
   mountModule(api, 'leave-types', leaveTypesRoutes);
   mountModule(api, 'contract-types', contractTypesRoutes);
