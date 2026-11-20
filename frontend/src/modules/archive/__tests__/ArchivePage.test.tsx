@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import type { ArchivedEmployee, ArchivedTasksResponse, ListResponse } from '@app/shared';
+import type { ArchivedEmployee, ArchivedTask, ArchivedTaskDetails, ArchivedTasksResponse, ListResponse } from '@app/shared';
 import { api } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
 import { renderRoutes } from '../../../test/render';
@@ -96,9 +96,97 @@ describe('ArchivePage', () => {
     await waitFor(() => expect(error).toHaveBeenCalledWith('Tej rzeczy nie ma już w archiwum. Lista została odświeżona.'));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
+});
 
-  it.todo('tasks: project filter and search in the address');
-  it.todo('tasks: clicking a row opens the read-only preview');
-  it.todo('tasks: taskId in the address opens the preview; missing task shows the gone message');
-  it.todo('tasks: restore window names the column');
+const spot: ArchivedTask = {
+  id: 31, title: 'Spotkanie z dostawcą', projectId: 3, projectName: 'Biuro', column: 'in_progress', dueDate: '2026-11-28', comments: 2,
+  archivedAt: '2026-11-10T07:47:00.000Z', archivedByName: 'Tomasz Wójcik',
+};
+const details: ArchivedTaskDetails = {
+  ...spot, description: 'Ceny na 2027', assignees: [{ name: 'Robert Kamiński', archived: true }],
+  commentsList: [{ id: 5, authorName: 'Ewa Mazurek', authorArchived: false, createdAt: '2026-11-08T09:14:00.000Z', text: 'Przesuwamy na grudzień' }],
+};
+const tasksPage: ArchivedTasksResponse = { items: [spot], total: 1, page: 1, pageSize: 25, projects: [{ id: 3, name: 'Biuro' }, { id: 4, name: 'Targi' }] };
+
+const showTasks = (path = '/admin/archive?tab=tasks', task: ArchivedTaskDetails | null = details) => {
+  const get = vi.spyOn(api, 'get').mockImplementation(async (url: string) => {
+    if (url === '/archive/counts') return { data: { employees: 0, tasks: 1 } };
+    if (url === '/archive/tasks') return { data: tasksPage };
+    if (url === '/archive/tasks/31' && task) return { data: task };
+    throw Object.assign(new Error('404'), { isAxiosError: true, response: { status: 404, data: { error: { message: 'server.not_found' } } } });
+  });
+  const view = renderRoutes([{ path: '/admin/archive', element: <ArchivePage /> }], path);
+  return { get, ...view };
+};
+
+describe('ArchivePage, tasks', () => {
+  it('tasks: rows with comments, project, column and due date', async () => {
+    showTasks();
+    const row = within(await screen.findByRole('table')).getByText('Spotkanie z dostawcą').closest('tr')!;
+    expect(within(row).getByText('2 komentarze')).toBeInTheDocument();
+    expect(within(row).getByText('Biuro')).toBeInTheDocument();
+    expect(within(row).getByText('W toku')).toBeInTheDocument();
+    expect(within(row).getByText('28.11.2026')).toBeInTheDocument();
+    expect(within(row).getByText('przeniósł(a): Tomasz Wójcik')).toBeInTheDocument();
+  });
+
+  it('tasks: project filter goes to the address and the request', async () => {
+    const { get, router } = showTasks();
+    await screen.findByRole('table');
+    fireEvent.click(screen.getByRole('combobox', { name: 'Projekt' }));
+    fireEvent.click(await screen.findByRole('option', { name: 'Targi' }));
+    await waitFor(() => expect(router.state.location.search).toContain('projectId=4'));
+    await waitFor(() => expect(get).toHaveBeenCalledWith('/archive/tasks', { params: { page: 1, search: '', projectId: 4 } }));
+  });
+
+  it('tasks: clicking a row opens the read-only preview with comments', async () => {
+    const { router } = showTasks();
+    fireEvent.click(within(await screen.findByRole('table')).getByText('Spotkanie z dostawcą'));
+    await waitFor(() => expect(router.state.location.search).toContain('taskId=31'));
+    const drawer = await screen.findByRole('dialog', { name: 'Zadanie w archiwum' });
+    expect(await within(drawer).findByText('Ceny na 2027')).toBeInTheDocument();
+    expect(within(drawer).getByText('Zadanie w archiwum można tylko obejrzeć. Żeby je zmienić, najpierw je przywróć.')).toBeInTheDocument();
+    expect(within(drawer).getByText('Robert Kamiński')).toBeInTheDocument();
+    expect(within(drawer).getByText('w archiwum')).toBeInTheDocument();
+    expect(within(drawer).getByText('Przesuwamy na grudzień')).toBeInTheDocument();
+    expect(within(drawer).queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('tasks: opening and closing the preview keeps the page of the list', async () => {
+    const { router } = showTasks('/admin/archive?tab=tasks&page=2');
+    fireEvent.click(within(await screen.findByRole('table')).getByText('Spotkanie z dostawcą'));
+    await waitFor(() => expect(router.state.location.search).toContain('taskId=31'));
+    expect(router.state.location.search).toContain('page=2');
+    fireEvent.click(within(await screen.findByRole('dialog', { name: 'Zadanie w archiwum' })).getByRole('button', { name: 'Zamknij' }));
+    await waitFor(() => expect(router.state.location.search).not.toContain('taskId'));
+    expect(router.state.location.search).toContain('page=2');
+  });
+
+  it('tasks: taskId in the address opens the preview; a missing task shows the gone message and clears the address', async () => {
+    const error = vi.spyOn(notify, 'error');
+    const { router } = showTasks('/admin/archive?tab=tasks&taskId=77');
+    await waitFor(() => expect(error).toHaveBeenCalledWith('Tej rzeczy nie ma już w archiwum. Lista została odświeżona.'));
+    await waitFor(() => expect(router.state.location.search).not.toContain('taskId'));
+  });
+
+  it('tasks: restore from the preview names the column; delete names the comments', async () => {
+    showTasks('/admin/archive?tab=tasks&taskId=31');
+    const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { ok: true } });
+    const drawer = await screen.findByRole('dialog', { name: 'Zadanie w archiwum' });
+    fireEvent.click(await within(drawer).findByRole('button', { name: 'Przywróć' }));
+    const confirm = await screen.findByRole('dialog', { name: 'Przywrócić zadanie?' });
+    expect(within(confirm).getByText('„Spotkanie z dostawcą” wróci na tablicę projektu Biuro, na koniec kolumny „W toku”.')).toBeInTheDocument();
+    fireEvent.click(within(confirm).getByRole('button', { name: 'Przywróć' }));
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/archive/tasks/31/restore'));
+  });
+
+  it('tasks: delete window names the comments that disappear', async () => {
+    showTasks();
+    const del = vi.spyOn(api, 'delete').mockResolvedValue({ data: { ok: true } });
+    fireEvent.click(within(await screen.findByRole('table')).getByRole('button', { name: 'Usuń na stałe' }));
+    const confirm = await screen.findByRole('dialog', { name: 'Usunąć zadanie na stałe?' });
+    expect(within(confirm).getByText('Razem z nim znikną 2 komentarze.')).toBeInTheDocument();
+    fireEvent.click(within(confirm).getByRole('button', { name: 'Usuń na stałe' }));
+    await waitFor(() => expect(del).toHaveBeenCalledWith('/archive/tasks/31'));
+  });
 });

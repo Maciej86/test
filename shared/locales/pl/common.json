@@ -94,5 +94,6 @@
   "date_placeholder": "DD.MM.RRRR",
   "cancel": "Anuluj",
   "move_up": "Przesuń wyżej",
-  "move_down": "Przesuń niżej"
+  "move_down": "Przesuń niżej",
+  "close": "Zamknij"
 }

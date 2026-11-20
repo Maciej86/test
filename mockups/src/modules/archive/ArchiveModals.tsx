@@ -130,7 +130,7 @@ export const TaskPreview = ({ task, onClose, onRestore, onDelete }: {
           <Button leftSection={<ButtonIcon action="restore" />} onClick={() => onRestore(task)}>{t('restore')}</Button>
         </Group>
         <Divider my="xs" />
-        <Text size="sm" fw={600}>{t('comments')}</Text>
+        <Text size="sm" fw={600}>{t('comments_title')}</Text>
         {task.comments.length === 0 && <Text size="sm" c="dimmed">{t('no_comments')}</Text>}
         {task.comments.map((c) => (
           <Stack key={c.at} gap={4}>

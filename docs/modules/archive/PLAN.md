@@ -80,7 +80,7 @@ i edycję).
   `components/EmployeeModals.tsx` (przywróć, usuń przez `ConfirmByNameModal`); błąd 404/409 → dymek `gone`,
   zamknięcie, odświeżenie; wpis w `core/routes/pages.ts` (makieta już ma wpis) ; testy komponentów (stany: lista,
   pusta, brak wyników; przycisk wyłączony przy wnioskach; okno wysyła `confirmName`; 409 → dymek `gone`) → `npm run check`
-- [ ] 10. **Zakładka Zadania i podgląd**: `components/ArchivedTasks.tsx` (wyszukiwarka, wybór projektu z
+- [x] 10. **Zakładka Zadania i podgląd**: `components/ArchivedTasks.tsx` (wyszukiwarka, wybór projektu z
   `projects`, tabela + karty, kliknięcie wiersza ustawia `taskId` w adresie), `components/TaskPreview.tsx` (szuflada
   540 px / cały ekran na telefonie, tylko do oglądania, akcje), `components/TaskModals.tsx` (przywróć z kolumną,
   usuń z liczbą komentarzy); `taskId` z adresu otwiera podgląd (link z Historii), nieistniejący → dymek `gone`
@@ -98,3 +98,4 @@ i edycję).
 - Krok 5: `logTask` w Zadaniach przyjmuje `Actor` (wystarczy numer i imię), żeby Archiwum mogło zapisać przywrócenie i usunięcie. Komentarz autora usuniętego na stałe ma w podglądzie szare kółko (`authorArchived`), jak na tablicy. Zadanie blokowane `FOR UPDATE OF t` (tylko wiersz zadania, MySQL 8.4).
 - Krok 8: akcje odświeżają też Historię zmian (`activity-log`) i robią to po sukcesie i po błędzie (`onSettled`), bo 404/409 znaczy, że ktoś już zmienił archiwum.
 - Krok 9: moduły nie importują `axios`, więc doszło `apiErrorStatus` w `core/api/client.ts` (z testem); rozpoznanie „rekordu już nie ma” w `archive/archiveErrors.ts` (404 albo 409 z kluczem „nie w archiwum”). Rola w znaczniku przez `ROLE_LABELS` (jak w Pracownikach).
+- Krok 10: otwarcie i zamknięcie podglądu przekazuje bieżącą stronę (`useListParams` przy każdej zmianie wraca na stronę 1). Szuflada podglądu ma podpisany przycisk „Zamknij” (nowy klucz `common.close`). Tekst „Komentarze” to `comments_title` (osobno od odmiany liczby `comments_*`).

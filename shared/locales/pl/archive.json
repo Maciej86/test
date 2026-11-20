@@ -53,7 +53,7 @@
   "due": "Termin",
   "assignees": "Przypisane osoby",
   "nobody": "nikt",
-  "comments": "Komentarze",
+  "comments_title": "Komentarze",
   "no_comments": "Bez komentarzy.",
   "archived_person": "w archiwum",
   "empty_employees_title": "Nikogo nie ma w archiwum",
