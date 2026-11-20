@@ -15,7 +15,9 @@ nie da się usunąć.
 
 Wygląd jak w makiecie. Nagłówek „Archiwum” z jednym zdaniem pod spodem; dwie zakładki z liczbą rzeczy:
 **Pracownicy (N)** i **Zadania (N)**. Zakładka, wyszukiwanie, projekt i strona siedzą w adresie
-(`?tab=tasks&search=…&projectId=…&page=2`), więc odświeżenie i link pokazują ten sam widok. Najnowsze w archiwum na
+(`?tab=tasks&search=…&projectId=…&page=2`), więc odświeżenie i link pokazują ten sam widok. Każde wejście na ekran
+pobiera świeżą listę i liczniki z serwera (poprawka 2026-11-20: osoba przeniesiona do archiwum w Pracownikach nie
+pojawiała się bez odświeżenia strony). Najnowsze w archiwum na
 górze, 25 na stronę (`PAGE_SIZE`), stronicowanie pod listą, gdy jest więcej niż jedna strona. Bez zaznaczania kilku
 rzeczy naraz (7a); nic nie znika samo (6a).
 

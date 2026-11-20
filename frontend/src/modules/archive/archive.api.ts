@@ -12,10 +12,17 @@ import { api } from '../../core/api/client';
 const KEY = ['archive'] as const;
 const HISTORY_KEY = ['activity-log'] as const;
 
+/**
+ * Do archiwum trafia się z innych ekranów („Do archiwum” w Pracownikach, kosz na tablicy zadań), a one nie wiedzą
+ * o liście archiwum. Dlatego Archiwum przy każdym wejściu pyta serwer, nawet gdy ma zapamiętaną listę.
+ */
+const FRESH_ON_ENTRY = { refetchOnMount: 'always' } as const;
+
 export const useArchiveCounts = () => {
   return useQuery({
     queryKey: [...KEY, 'counts'],
     queryFn: () => api.get<ArchiveCounts>('/archive/counts').then((r) => r.data),
+    ...FRESH_ON_ENTRY,
   });
 };
 
@@ -24,6 +31,7 @@ export const useArchivedEmployees = (params: { page: number; search: string }) =
     queryKey: [...KEY, 'employees', params],
     queryFn: () => api.get<ListResponse<ArchivedEmployee>>('/archive/employees', { params }).then((r) => r.data),
     placeholderData: keepPreviousData,
+    ...FRESH_ON_ENTRY,
   });
 };
 
@@ -32,6 +40,7 @@ export const useArchivedTasks = (params: { page: number; search: string; project
     queryKey: [...KEY, 'tasks', params],
     queryFn: () => api.get<ArchivedTasksResponse>('/archive/tasks', { params }).then((r) => r.data),
     placeholderData: keepPreviousData,
+    ...FRESH_ON_ENTRY,
   });
 };
 

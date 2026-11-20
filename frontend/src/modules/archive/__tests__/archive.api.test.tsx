@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { api } from '../../../core/api/client';
-import { useArchivedTasks, useDeleteEmployee, useRestoreTask } from '../archive.api';
+import { useArchiveCounts, useArchivedEmployees, useArchivedTasks, useDeleteEmployee, useRestoreTask } from '../archive.api';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -40,5 +40,17 @@ describe('archive api', () => {
     await expect(result.current.mutateAsync(31)).rejects.toThrow();
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['archive'] });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['tasks'] });
+  });
+
+  it('entering the archive always asks the server, even with a fresh cached list (archived from another screen)', async () => {
+    const get = vi.spyOn(api, 'get').mockResolvedValue({ data: { items: [], total: 0, page: 1, pageSize: 25 } });
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: 30_000 } } });
+    queryClient.setQueryData(['archive', 'employees', { page: 1, search: '' }], { items: [], total: 0, page: 1, pageSize: 25 });
+    queryClient.setQueryData(['archive', 'counts'], { employees: 0, tasks: 0 });
+    const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    renderHook(() => useArchivedEmployees({ page: 1, search: '' }), { wrapper });
+    renderHook(() => useArchiveCounts(), { wrapper });
+    await waitFor(() => expect(get).toHaveBeenCalledWith('/archive/employees', { params: { page: 1, search: '' } }));
+    await waitFor(() => expect(get).toHaveBeenCalledWith('/archive/counts'));
   });
 });
