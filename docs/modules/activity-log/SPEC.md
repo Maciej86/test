@@ -71,6 +71,13 @@ Zła wartość w adresie (np. nieznany obszar) jest pomijana, jak na innych list
   `archived_at`.
 - Osoby w zmianach (`assignee_ids`, `member_ids`, `added_member_id`) serwer zamienia na imiona i nazwiska przy
   odczycie; nieistniejące konto = „usunięte konto”.
+- **Zmiana w implementacji (2026-11-20):** `entity_context` to dane bez słów, zapisane jako JSON (np.
+  `{"project":"Marketing"}`, `{"leaveType":"Wypoczynkowy","from":"2026-12-22","to":"2026-12-31","days":6}`,
+  `{"year":2026}`, `{"role":"employee"}`), bo tekst dla człowieka nie może powstawać w kodzie serwera; zdanie
+  układa ekran z kluczy `activity-log.json` → `context`. Za długi JSON (> 255 znaków) nie jest zapisywany.
+  Doszła migracja `028_activity_log_names_fill_deleted.sql`: nazwy rekordów usuniętych przed zmianą (konta i wnioski
+  z testów) z danych w samych wpisach. Wpis bez żadnej zapamiętanej nazwy (stare wpisy usuniętych projektów
+  z testów) pokazuje numer rekordu.
 
 ## API
 

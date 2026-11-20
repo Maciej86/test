@@ -1,3 +1,4 @@
+import type { PoolConnection } from 'mysql2/promise';
 import {
   LEAVE_TYPE_MESSAGES as M,
   type LeaveTypeData,
@@ -8,9 +9,20 @@ import { pool, type Db } from '../../db/pool';
 import { swapWithNeighbour } from '../../db/ordering';
 import { withTransaction } from '../../db/transaction';
 import { isDuplicateEntry } from '../../db/errors';
-import { fail, notFound, type Result, type ServiceError } from '../../middleware/routeHelpers';
+import { diffChanges, logActivity, type Changes } from '../../db/activityLog';
+import { fail, notFound, type Actor, type Result, type ServiceError } from '../../middleware/routeHelpers';
 import { countRequestsByLeaveType } from '../my-leave/my-leave.queries';
 import * as q from './leave-types.queries';
+
+const ENTITY = 'leave_types';
+
+/** Wpis historii zmian typu (zmiana kolejności nie trafia do historii). */
+const logType = (conn: PoolConnection, actor: Actor, id: number, name: string, action: string, changes: Changes) =>
+  logActivity(conn, { userId: actor.id, userName: actor.name, action, entityType: ENTITY, entityId: id, entityName: name, changes });
+
+/** Pola typu do „przed → po” (te same nazwy z wiersza bazy i z formularza). */
+const fieldsOfData = (d: LeaveTypeData) => ({ name: d.name, deducts_pool: d.deductsPool, yearly_limit: d.yearlyLimit });
+const fieldsOfRow = (t: NonNullable<Awaited<ReturnType<typeof q.findLeaveType>>>) => ({ name: t.name, deducts_pool: Boolean(t.deducts_pool), yearly_limit: t.yearly_limit });
 
 const nameTaken = () => fail(409, M.nameTaken, { fields: { name: M.nameTaken } });
 
@@ -31,13 +43,15 @@ export const listTypes = async (): Promise<LeaveTypesListResponse> => {
 };
 
 /** Nowy typ na końcu widocznych. */
-export const createType = async (data: LeaveTypeData): Promise<Result<{ id: number }>> => {
+export const createType = async (data: LeaveTypeData, actor: Actor): Promise<Result<{ id: number }>> => {
   try {
     return await withTransaction(async (conn) => {
       const conflict = await nameConflict(conn, data.name, null);
       if (conflict) return conflict;
       const position = (await q.maxPosition(conn)) + 1;
-      return { id: await q.insertLeaveType(conn, data, position) };
+      const id = await q.insertLeaveType(conn, data, position);
+      await logType(conn, actor, id, data.name, 'create', diffChanges({}, fieldsOfData(data)));
+      return { id };
     });
   } catch (error) {
     if (isDuplicateEntry(error)) return nameTaken();
@@ -46,17 +60,22 @@ export const createType = async (data: LeaveTypeData): Promise<Result<{ id: numb
 };
 
 /** Zmiana nazwy i zasad; złożonych wniosków nie przelicza (ustalenie 2a). */
-export const updateType = async (id: number, data: LeaveTypeData): Promise<Result> => {
-  if (!(await q.findLeaveType(pool, id))) return notFound();
-  const conflict = await nameConflict(pool, data.name, id);
-  if (conflict) return conflict;
+export const updateType = async (id: number, data: LeaveTypeData, actor: Actor): Promise<Result> => {
   try {
-    await q.updateLeaveType(pool, id, data);
+    return await withTransaction(async (conn) => {
+      const before = await q.findLeaveType(conn, id);
+      if (!before) return notFound();
+      const conflict = await nameConflict(conn, data.name, id);
+      if (conflict) return conflict;
+      await q.updateLeaveType(conn, id, data);
+      const changes = diffChanges(fieldsOfRow(before), fieldsOfData(data));
+      if (Object.keys(changes).length > 0) await logType(conn, actor, id, data.name, 'update', changes);
+      return { ok: true as const };
+    });
   } catch (error) {
     if (isDuplicateEntry(error)) return nameTaken();
     throw error;
   }
-  return { ok: true };
 };
 
 /** Strzałka: zamiana pozycji z sąsiednim widocznym typem (pozycje mogą mieć luki po ukryciu). */
@@ -67,7 +86,7 @@ export const moveType = async (id: number, direction: OrderDirection): Promise<R
   });
 
 /** Ukrycie: znika z formularza nowego wniosku; zawsze zostaje co najmniej jeden widoczny typ. */
-export const hideType = async (id: number): Promise<Result> =>
+export const hideType = async (id: number, actor: Actor): Promise<Result> =>
   withTransaction(async (conn) => {
     // Najpierw blokada widocznych: drugie równoczesne „Ukryj” czeka i widzi już wynik pierwszego.
     const visible = await q.lockVisible(conn);
@@ -76,15 +95,17 @@ export const hideType = async (id: number): Promise<Result> =>
     if (type.hidden_at !== null) return fail(409, M.alreadyHidden);
     if (visible.length <= 1) return fail(409, M.lastVisible);
     await q.setHidden(conn, id);
+    await logType(conn, actor, id, type.name, 'hide', {});
     return { ok: true as const };
   });
 
 /** Przywrócenie: typ wraca na koniec widocznych. */
-export const unhideType = async (id: number): Promise<Result> =>
+export const unhideType = async (id: number, actor: Actor): Promise<Result> =>
   withTransaction(async (conn) => {
     const type = await q.findLeaveType(conn, id);
     if (!type) return notFound();
     if (type.hidden_at === null) return fail(409, M.notHidden);
     await q.setVisible(conn, id, (await q.maxPosition(conn)) + 1);
+    await logType(conn, actor, id, type.name, 'unhide', {});
     return { ok: true as const };
   });

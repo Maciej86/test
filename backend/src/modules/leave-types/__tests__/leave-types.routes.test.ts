@@ -68,7 +68,7 @@ describe('leave types routes', () => {
     const res = await as(anna).post('/leave-types', { ...body, name: ' Szkoleniowy ', position: 1 });
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ id: 6 });
-    expect(s.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null });
+    expect(s.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null }, { id: 1, name: 'Anna Nowak' });
 
     const bad = await as(anna).post('/leave-types', { name: 'S', deductsPool: true, yearlyLimit: 0 });
     expect(bad.status).toBe(400);
@@ -87,7 +87,7 @@ describe('leave types routes', () => {
   it('PUT /leave-types/:id → ok; missing → 404; bad id → 404', async () => {
     const res = await as(anna).put('/leave-types/3', body);
     expect(res.status).toBe(200);
-    expect(s.updateType).toHaveBeenCalledWith(3, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null });
+    expect(s.updateType).toHaveBeenCalledWith(3, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null }, { id: 1, name: 'Anna Nowak' });
     vi.mocked(s.updateType).mockResolvedValueOnce({ error: { status: 404, message: 'server.not_found' } });
     expect((await as(anna).put('/leave-types/99', body)).status).toBe(404);
     expect((await as(anna).put('/leave-types/abc', body)).status).toBe(404);
@@ -103,13 +103,13 @@ describe('leave types routes', () => {
 
   it('POST /leave-types/:id/hide and /unhide → ok and 409 rules', async () => {
     expect((await as(anna).post('/leave-types/3/hide')).status).toBe(200);
-    expect(s.hideType).toHaveBeenCalledWith(3);
+    expect(s.hideType).toHaveBeenCalledWith(3, { id: 1, name: 'Anna Nowak' });
     vi.mocked(s.hideType).mockResolvedValueOnce({ error: { status: 409, message: M.lastVisible } });
     const last = await as(anna).post('/leave-types/3/hide');
     expect(last.status).toBe(409);
     expect(last.body.error.message).toBe(M.lastVisible);
     expect((await as(anna).post('/leave-types/3/unhide')).status).toBe(200);
-    expect(s.unhideType).toHaveBeenCalledWith(3);
+    expect(s.unhideType).toHaveBeenCalledWith(3, { id: 1, name: 'Anna Nowak' });
     vi.mocked(s.unhideType).mockResolvedValueOnce({ error: { status: 409, message: M.notHidden } });
     expect((await as(anna).post('/leave-types/3/unhide')).status).toBe(409);
     expect((await as(jan).post('/leave-types/3/hide')).status).toBe(403);
@@ -135,9 +135,9 @@ describe('abuse', () => {
     vi.mocked(s.createType).mockResolvedValue({ id: 6 });
     const forged = { ...body, id: 1, position: 1, hidden: true, hiddenAt: '2020-01-01', requestsCount: 99 };
     await as(anna).post('/leave-types', forged);
-    expect(s.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null });
+    expect(s.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null }, { id: 1, name: 'Anna Nowak' });
     await as(anna).put('/leave-types/3', forged);
-    expect(s.updateType).toHaveBeenCalledWith(3, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null });
+    expect(s.updateType).toHaveBeenCalledWith(3, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null }, { id: 1, name: 'Anna Nowak' });
     await as(anna).post('/leave-types/3/move', { direction: 'up', position: 1 });
     expect(s.moveType).toHaveBeenCalledWith(3, 'up');
   });

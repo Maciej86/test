@@ -28,14 +28,14 @@ z testem; podmiana w Powiadomieniach i w makiecie Historii zmian (makiety Powiad
 - [x] 1. Wydzielenie `groupByDay` do `shared/src/date.ts` + test, podmiana w `NotificationsPage.tsx` i w makiecie
   Historii zmian → `npm run check`
 - [x] 2. Migracje `025_activity_log_entity_name.sql`, `026_activity_log_entity_context.sql` → `npm run migrate`
-- [ ] 3. `logActivity` z obowiązkowym `entityName` i opcjonalnym `entityContext` + test zapisu; wszystkie wywołania
+- [x] 3. `logActivity` z obowiązkowym `entityName` i opcjonalnym `entityContext` + test zapisu; wszystkie wywołania
   podają nazwę i opis: Pracownicy (osoba, pula: „rok 2026”, nowe konto: rola), Moje urlopy i Wnioski (osoba; typ,
   termin, dni), Zadania (tytuł; projekt), Projekty (nazwa); testy usług sprawdzają nazwę → `npm run check`
-- [ ] 4. Migracja `027_activity_log_names_fill.sql` (uzupełnienie starych wpisów z obecnych tabel, usunięty projekt
+- [x] 4. Migracja `027_activity_log_names_fill.sql` (uzupełnienie starych wpisów z obecnych tabel, usunięty projekt
   z `changes.name`) → `npm run migrate`, sprawdzenie w bazie, że nie został wpis z pustą nazwą
-- [ ] 5. Typy urlopów: dodanie, zmiana, ukrycie, przywrócenie zapisują wpis (osoba z `req.user` przez trasę do
+- [x] 5. Typy urlopów: dodanie, zmiana, ukrycie, przywrócenie zapisują wpis (osoba z `req.user` przez trasę do
   usługi, w tej samej transakcji); zmiana kolejności nie; testy → `npm run check`
-- [ ] 6. Typy umów: to samo co w kroku 5 → `npm run check`
+- [x] 6. Typy umów: to samo co w kroku 5 → `npm run check`
 - [ ] 7. `shared`: `ACTIVITY_AREAS`, `activityLogQuerySchema` (strona, szukanie ≤ 100, obszar, osoba, od/do, „do” ≥
   „od”, złe wartości pomijane), typy odpowiedzi, `describeActivity` (opis i kolor dla każdego obszaru i akcji,
   w tym statusy wniosków, zamknięcie roku, hasło, zakończenie zadania) + testy → `npm run check`
