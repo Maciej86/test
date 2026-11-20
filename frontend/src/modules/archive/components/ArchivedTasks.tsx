@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Card, Group, Select, Stack, Table, Text } from '@mantine/core';
+import { Button, Card, Group, Select, Stack, Table, Text, UnstyledButton } from '@mantine/core';
 import { ListTodo } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH, type ArchivePageParams, type ArchivedTask } from '@app/shared';
@@ -8,6 +8,7 @@ import { DataState } from '../../../common/DataState';
 import { DateText } from '../../../common/DateText';
 import { ListPagination } from '../../../common/ListPagination';
 import { SearchField } from '../../../common/SearchField';
+import { useEmptyLaterPage } from '../../../core/useEmptyLaterPage';
 import { useArchivedTasks } from '../archive.api';
 import { ArchiveEmpty, ArchivedCell } from './ArchiveParts';
 import { DeleteTaskModal, RestoreTaskModal } from './TaskModals';
@@ -30,11 +31,20 @@ const Buttons = ({ task, onRestore, onDelete }: Omit<Actions, 'onOpen'> & { task
   );
 };
 
-const Title = ({ task }: { task: ArchivedTask }) => {
+/** Tytuł jest przyciskiem: podgląd otwiera się też z klawiatury (Tab, Enter), nie tylko kliknięciem wiersza. */
+const Title = ({ task, onOpen }: { task: ArchivedTask; onOpen: (task: ArchivedTask) => void }) => {
   const { t } = useTranslation('archive');
   return (
-    <Stack gap={0}>
-      <Text fw={600}>{task.title}</Text>
+    <Stack gap={0} align="flex-start">
+      <UnstyledButton
+        fw={600}
+        onClick={(event) => {
+          event.stopPropagation();
+          onOpen(task);
+        }}
+      >
+        {task.title}
+      </UnstyledButton>
       {task.comments > 0 && <Text size="xs" c="dimmed">{t('comments', { count: task.comments })}</Text>}
     </Stack>
   );
@@ -68,7 +78,7 @@ const TasksList = ({ rows, onOpen, ...actions }: Actions & { rows: ArchivedTask[
           <Table.Tbody>
             {rows.map((task) => (
               <Table.Tr key={task.id} onClick={() => onOpen(task)} style={{ cursor: 'pointer' }}>
-                <Table.Td><Title task={task} /></Table.Td>
+                <Table.Td><Title task={task} onOpen={onOpen} /></Table.Td>
                 <Table.Td><Where task={task} /></Table.Td>
                 <Table.Td><Text size="sm"><DateText value={task.dueDate} /></Text></Table.Td>
                 <Table.Td><ArchivedCell at={task.archivedAt} by={task.archivedByName} /></Table.Td>
@@ -82,7 +92,7 @@ const TasksList = ({ rows, onOpen, ...actions }: Actions & { rows: ArchivedTask[
         {rows.map((task) => (
           <Card key={task.id} withBorder padding="md" onClick={() => onOpen(task)} style={{ cursor: 'pointer' }}>
             <Stack gap="sm">
-              <Title task={task} />
+              <Title task={task} onOpen={onOpen} />
               <Group justify="space-between" align="flex-start">
                 <Where task={task} />
                 <ArchivedCell at={task.archivedAt} by={task.archivedByName} />
@@ -105,6 +115,7 @@ export const ArchivedTasks = ({ params, onChange }: { params: ArchivePageParams;
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const data = list.data;
   const filtered = params.search !== '' || params.projectId !== undefined;
+  const emptyLaterPage = useEmptyLaterPage(data, params.page, () => onChange({ page: 1 }));
   // Podgląd siedzi w adresie (`taskId`); otwarcie i zamknięcie nie zmienia strony listy.
   const closePreview = () => onChange({ taskId: undefined, page: params.page });
   // Okno akcji zamyka też podgląd: po przywróceniu albo usunięciu zadania nie ma już czego oglądać.
@@ -127,7 +138,7 @@ export const ArchivedTasks = ({ params, onChange }: { params: ArchivePageParams;
         />
       </Group>
       <DataState query={list}>
-        {data && data.items.length === 0 && (filtered ? <ArchiveEmpty text={t('no_results')} /> : <ArchiveEmpty icon={ListTodo} title={t('empty_tasks_title')} text={t('empty_tasks_text')} />)}
+        {data && !emptyLaterPage && data.items.length === 0 && (filtered ? <ArchiveEmpty text={t('no_results')} /> : <ArchiveEmpty icon={ListTodo} title={t('empty_tasks_title')} text={t('empty_tasks_text')} />)}
         {data && data.items.length > 0 && (
           <>
             <TasksList

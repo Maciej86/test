@@ -29,6 +29,8 @@ describe('archive api', () => {
     expect(del).toHaveBeenCalledWith('/archive/employees/9', { data: { confirmName: 'Olga Testowa' } });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['archive'] });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['activity-log'] });
+    // Usunięta osoba znika z przypisań i projektów: tablice zadań też się odświeżają.
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['tasks'] });
   });
 
   it('restoring a task refreshes the boards too, also when the server says it is gone', async () => {

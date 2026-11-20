@@ -47,21 +47,21 @@ export const useArchivedTask = (id: number | null) => {
 
 /**
  * Akcja w archiwum: po sukcesie i po błędzie (ktoś inny już przywrócił albo usunął) odświeża archiwum, historię zmian
- * i listę, na którą rekord wraca.
+ * i listy, na które rekord wraca albo z których znika (konto: lista pracowników i tablice zadań).
  */
-const useArchiveMutation = <T,>(fn: (input: T) => Promise<unknown>, alsoRefresh: QueryKey) => {
+const useArchiveMutation = <T,>(fn: (input: T) => Promise<unknown>, alsoRefresh: QueryKey[]) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: fn,
-    onSettled: () => Promise.all([KEY, HISTORY_KEY, alsoRefresh].map((queryKey) => queryClient.invalidateQueries({ queryKey }))),
+    onSettled: () => Promise.all([KEY, HISTORY_KEY, ...alsoRefresh].map((queryKey) => queryClient.invalidateQueries({ queryKey }))),
   });
 };
 
-export const useRestoreEmployee = () => useArchiveMutation((id: number) => api.post(`/archive/employees/${id}/restore`), ['employees']);
+export const useRestoreEmployee = () => useArchiveMutation((id: number) => api.post(`/archive/employees/${id}/restore`), [['employees'], ['tasks']]);
 
 export const useDeleteEmployee = () =>
-  useArchiveMutation(({ id, confirmName }: ArchiveDeleteEmployeeInput & { id: number }) => api.delete(`/archive/employees/${id}`, { data: { confirmName } }), ['employees']);
+  useArchiveMutation(({ id, confirmName }: ArchiveDeleteEmployeeInput & { id: number }) => api.delete(`/archive/employees/${id}`, { data: { confirmName } }), [['employees'], ['tasks']]);
 
-export const useRestoreTask = () => useArchiveMutation((id: number) => api.post(`/archive/tasks/${id}/restore`), ['tasks']);
+export const useRestoreTask = () => useArchiveMutation((id: number) => api.post(`/archive/tasks/${id}/restore`), [['tasks']]);
 
-export const useDeleteTask = () => useArchiveMutation((id: number) => api.delete(`/archive/tasks/${id}`), ['tasks']);
+export const useDeleteTask = () => useArchiveMutation((id: number) => api.delete(`/archive/tasks/${id}`), [['tasks']]);

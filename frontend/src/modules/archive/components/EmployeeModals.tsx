@@ -3,26 +3,14 @@ import { useTranslation } from 'react-i18next';
 import type { ArchivedEmployee } from '@app/shared';
 import { ConfirmByNameModal } from '../../../common/ConfirmByNameModal';
 import { ConfirmModal } from '../../../common/ConfirmModal';
-import { apiErrorMessage } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
 import { useDeleteEmployee, useRestoreEmployee } from '../archive.api';
-import { isGone } from '../archiveErrors';
-
-/** Po błędzie: rekord zniknął w międzyczasie → dymek i zamknięcie okna; inny błąd → dymek, okno zostaje. */
-const useOnError = (onClose: () => void) => {
-  const { t } = useTranslation('archive');
-  return (error: unknown) => {
-    if (isGone(error)) {
-      notify.error(t('gone'));
-      onClose();
-    } else notify.error(apiErrorMessage(error, t));
-  };
-};
+import { useArchiveActionError } from '../archiveErrors';
 
 export const RestoreEmployeeModal = ({ employee, onClose }: { employee: ArchivedEmployee; onClose: () => void }) => {
   const { t } = useTranslation('archive');
   const restore = useRestoreEmployee();
-  const onError = useOnError(onClose);
+  const onError = useArchiveActionError(onClose);
   const confirm = () =>
     restore.mutate(employee.id, {
       onSuccess: () => {
@@ -41,7 +29,7 @@ export const RestoreEmployeeModal = ({ employee, onClose }: { employee: Archived
 export const DeleteEmployeeModal = ({ employee, onClose }: { employee: ArchivedEmployee; onClose: () => void }) => {
   const { t } = useTranslation('archive');
   const remove = useDeleteEmployee();
-  const onError = useOnError(onClose);
+  const onError = useArchiveActionError(onClose);
   const confirm = (confirmName: string) =>
     remove.mutate(
       { id: employee.id, confirmName },

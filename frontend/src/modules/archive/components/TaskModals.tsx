@@ -2,28 +2,16 @@ import { Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { ArchivedTask } from '@app/shared';
 import { ConfirmModal } from '../../../common/ConfirmModal';
-import { apiErrorMessage } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
 import { useDeleteTask, useRestoreTask } from '../archive.api';
-import { isGone } from '../archiveErrors';
-
-/** Po błędzie: zadania nie ma już w archiwum → dymek i zamknięcie okna; inny błąd → dymek, okno zostaje. */
-const useOnError = (onClose: () => void) => {
-  const { t } = useTranslation('archive');
-  return (error: unknown) => {
-    if (isGone(error)) {
-      notify.error(t('gone'));
-      onClose();
-    } else notify.error(apiErrorMessage(error, t));
-  };
-};
+import { useArchiveActionError } from '../archiveErrors';
 
 /** „Przywrócić zadanie?”: wraca na koniec swojej kolumny (odpowiedź 3a). */
 export const RestoreTaskModal = ({ task, onClose }: { task: ArchivedTask; onClose: () => void }) => {
   const { t } = useTranslation('archive');
   const { t: tTasks } = useTranslation('tasks');
   const restore = useRestoreTask();
-  const onError = useOnError(onClose);
+  const onError = useArchiveActionError(onClose);
   const confirm = () =>
     restore.mutate(task.id, {
       onSuccess: () => {
@@ -43,7 +31,7 @@ export const RestoreTaskModal = ({ task, onClose }: { task: ArchivedTask; onClos
 export const DeleteTaskModal = ({ task, onClose }: { task: ArchivedTask; onClose: () => void }) => {
   const { t } = useTranslation('archive');
   const remove = useDeleteTask();
-  const onError = useOnError(onClose);
+  const onError = useArchiveActionError(onClose);
   const confirm = () =>
     remove.mutate(task.id, {
       onSuccess: () => {

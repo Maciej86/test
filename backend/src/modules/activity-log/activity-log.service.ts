@@ -38,7 +38,6 @@ const withNames = (changes: Record<string, ActivityChange>, names: Map<number, s
     ),
   );
 
-/** Adres przycisku „Otwórz” dla rekordu, który jest (w archiwum i usunięty: brak). */
 /** Rekord w archiwum: przycisk „Otwórz w archiwum” (zadanie z podglądem, konto i pula z wyszukaniem po loginie). */
 const archiveLinkOf = (row: q.EntryRow, record: q.FoundRecord): string | null => {
   if (row.area === 'tasks') return archiveTaskPath(row.entityId);
@@ -46,6 +45,7 @@ const archiveLinkOf = (row: q.EntryRow, record: q.FoundRecord): string | null =>
   return null;
 };
 
+/** Adres przycisku „Otwórz” dla rekordu, który jest (w archiwum: adres w Archiwum). Usunięty rekord nie trafia tutaj. */
 const linkOf = (row: q.EntryRow, record: q.FoundRecord): string | null => {
   if (record.archived) return archiveLinkOf(row, record);
   switch (row.area) {

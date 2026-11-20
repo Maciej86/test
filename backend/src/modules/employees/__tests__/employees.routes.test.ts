@@ -16,6 +16,7 @@ vi.mock('../employees.queries', () => ({
   countEmployees: vi.fn(),
   findAccountsWithLoginOrEmail: vi.fn(),
   findUser: vi.fn(),
+  lockUser: vi.fn(),
   insertUser: vi.fn(),
   updateUser: vi.fn(),
   setTemporaryPassword: vi.fn(),
@@ -343,11 +344,11 @@ describe('employees routes', () => {
   });
 
   it('POST /employees/:id/restore: active → 409 not_archived; archived → restored with history', async () => {
-    vi.mocked(q.findUser).mockResolvedValue(janUser as never);
+    vi.mocked(q.lockUser).mockResolvedValue(janUser as never);
     let res = await as(anna).post('/employees/2/restore');
     expect(res.status).toBe(409);
     expect(res.body.error.message).toBe('employees.server.not_archived');
-    vi.mocked(q.findUser).mockResolvedValue({ ...janUser, archived_at: new Date() } as never);
+    vi.mocked(q.lockUser).mockResolvedValue({ ...janUser, archived_at: new Date() } as never);
     res = await as(anna).post('/employees/2/restore');
     expect(res.status).toBe(200);
     expect(q.setArchived).toHaveBeenCalledWith(conn, 2, null);

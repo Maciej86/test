@@ -52,11 +52,35 @@ describe('ArchivePage', () => {
     expect(await screen.findByText('Nic nie pasuje do wyszukiwania. Zmień tekst albo projekt.')).toBeInTheDocument();
   });
 
-  it('employees: delete disabled for a person with leave requests', async () => {
+  it('employees: an empty page 2 (last person restored) goes back to page 1, not to the empty state', async () => {
+    const { router } = show([], '/admin/archive?page=2');
+    await waitFor(() => expect(router.state.location.search).not.toContain('page=2'));
+  });
+
+  it('employees: delete blocked for a person with leave requests, with an explanation', async () => {
     show([olga, robert]);
     const table = await screen.findByRole('table');
-    expect(within(within(table).getByText('Robert Kamiński').closest('tr')!).getByRole('button', { name: 'Usuń na stałe' })).toBeDisabled();
-    expect(within(within(table).getByText('Olga Testowa').closest('tr')!).getByRole('button', { name: 'Usuń na stałe' })).toBeEnabled();
+    const blocked = within(within(table).getByText('Robert Kamiński').closest('tr')!).getByRole('button', { name: 'Usuń na stałe' });
+    expect(blocked).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(blocked);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    fireEvent.mouseEnter(blocked);
+    expect(await screen.findByText('Ma wnioski urlopowe, więc zostaje w archiwum: historia urlopów musi zostać.')).toBeInTheDocument();
+    expect(within(within(table).getByText('Olga Testowa').closest('tr')!).getByRole('button', { name: 'Usuń na stałe' })).not.toHaveAttribute('aria-disabled');
+  });
+
+  it('employees: another error (e.g. leave requests appeared) keeps the window open with the message', async () => {
+    show([olga]);
+    const error = vi.spyOn(notify, 'error');
+    vi.spyOn(api, 'delete').mockRejectedValue(Object.assign(new Error('409'), {
+      isAxiosError: true, response: { status: 409, data: { error: { message: 'archive.server.has_leave_requests' } } },
+    }));
+    fireEvent.click(within(await screen.findByRole('table')).getByRole('button', { name: 'Usuń na stałe' }));
+    const dialog = await screen.findByRole('dialog');
+    fireEvent.change(within(dialog).getByLabelText('Wpisz imię i nazwisko, żeby potwierdzić'), { target: { value: 'Olga Testowa' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Usuń na stałe' }));
+    await waitFor(() => expect(error).toHaveBeenCalledWith('Ta osoba ma wnioski urlopowe, więc zostaje w archiwum: historia urlopów musi zostać.'));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
   it('employees: delete window sends confirmName and shows a message', async () => {
@@ -139,6 +163,14 @@ describe('ArchivePage, tasks', () => {
     await waitFor(() => expect(get).toHaveBeenCalledWith('/archive/tasks', { params: { page: 1, search: '', projectId: 4 } }));
   });
 
+  it('tasks: the title is a button, so the preview opens from the keyboard too', async () => {
+    const { router } = showTasks();
+    const title = within(await screen.findByRole('table')).getByRole('button', { name: 'Spotkanie z dostawcą' });
+    title.focus();
+    fireEvent.click(title);
+    await waitFor(() => expect(router.state.location.search).toContain('taskId=31'));
+  });
+
   it('tasks: clicking a row opens the read-only preview with comments', async () => {
     const { router } = showTasks();
     fireEvent.click(within(await screen.findByRole('table')).getByText('Spotkanie z dostawcą'));
@@ -150,6 +182,16 @@ describe('ArchivePage, tasks', () => {
     expect(within(drawer).getByText('w archiwum')).toBeInTheDocument();
     expect(within(drawer).getByText('Przesuwamy na grudzień')).toBeInTheDocument();
     expect(within(drawer).queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('tasks: an empty page 2 goes back to page 1', async () => {
+    vi.spyOn(api, 'get').mockImplementation(async (url: string) => {
+      if (url === '/archive/counts') return { data: { employees: 0, tasks: 25 } };
+      return { data: { ...tasksPage, items: [], total: 25 } };
+    });
+    const { router } = renderRoutes([{ path: '/admin/archive', element: <ArchivePage /> }], '/admin/archive?tab=tasks&page=2');
+    await waitFor(() => expect(router.state.location.search).toBe('?tab=tasks'));
+    expect(screen.queryByText('Żadnego zadania nie ma w archiwum')).not.toBeInTheDocument();
   });
 
   it('tasks: opening and closing the preview keeps the page of the list', async () => {

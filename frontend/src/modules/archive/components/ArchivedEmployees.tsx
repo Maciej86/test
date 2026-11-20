@@ -7,6 +7,7 @@ import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DataState } from '../../../common/DataState';
 import { ListPagination } from '../../../common/ListPagination';
 import { SearchField } from '../../../common/SearchField';
+import { useEmptyLaterPage } from '../../../core/useEmptyLaterPage';
 import { useArchivedEmployees } from '../archive.api';
 import { ArchiveEmpty, ArchivedCell } from './ArchiveParts';
 import { DeleteEmployeeModal, RestoreEmployeeModal } from './EmployeeModals';
@@ -23,8 +24,17 @@ const Buttons = ({ e, onRestore, onDelete }: Actions & { e: ArchivedEmployee }) 
   return (
     <Group gap={4} justify="flex-end" wrap="nowrap">
       <Button size="xs" variant="subtle" leftSection={<ButtonIcon action="restore" size={14} />} onClick={() => onRestore(e)}>{t('restore')}</Button>
-      <Tooltip label={t('cannot_delete_with_leave')} disabled={!blocked} multiline w={260}>
-        <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="delete" size={14} />} disabled={blocked} onClick={() => onDelete(e)}>
+      {/* Wyszarzony przez data-disabled, nie disabled: wyłączony przycisk nie dostaje najechania ani dotyku, więc dymek by nie wyskoczył. */}
+      <Tooltip label={t('cannot_delete_with_leave')} disabled={!blocked} multiline w={260} events={{ hover: true, focus: true, touch: true }}>
+        <Button
+          size="xs"
+          variant="subtle"
+          color="red"
+          leftSection={<ButtonIcon action="delete" size={14} />}
+          data-disabled={blocked || undefined}
+          aria-disabled={blocked || undefined}
+          onClick={() => !blocked && onDelete(e)}
+        >
           {t('delete_forever')}
         </Button>
       </Tooltip>
@@ -112,11 +122,12 @@ export const ArchivedEmployees = ({ page, search, onChange }: { page: number; se
   const [dialog, setDialog] = useState<Dialog | null>(null);
   const close = () => setDialog(null);
   const data = list.data;
+  const emptyLaterPage = useEmptyLaterPage(data, page, () => onChange({ page: 1 }));
   return (
     <Stack>
       <SearchField label={t('search_employees')} value={search} onChange={(s) => onChange({ search: s })} w={{ base: '100%', sm: 420 }} />
       <DataState query={list}>
-        {data && data.items.length === 0 && (search ? <ArchiveEmpty text={t('no_results')} /> : <ArchiveEmpty icon={Users} title={t('empty_employees_title')} text={t('empty_employees_text')} />)}
+        {data && !emptyLaterPage && data.items.length === 0 && (search ? <ArchiveEmpty text={t('no_results')} /> : <ArchiveEmpty icon={Users} title={t('empty_employees_title')} text={t('empty_employees_text')} />)}
         {data && data.items.length > 0 && (
           <>
             <EmployeesList rows={data.items} onRestore={(employee) => setDialog({ kind: 'restore', employee })} onDelete={(employee) => setDialog({ kind: 'delete', employee })} />

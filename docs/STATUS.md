@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.44
 
-**Następny krok:** Archiwum: akceptacja planu (`docs/modules/archive/PLAN.md`, 14 kroków), potem implementacja od kroku 0.
+**Następny krok:** Archiwum: etap testy (próby nadużyć, sprawdzenie w przeglądarce, potem użytkownik przechodzi `TESTS.md`).
 
 ## Start aplikacji
 
@@ -30,13 +30,14 @@
 | 9 | Wnioski urlopowe | leave-requests | zrobiony | zamknięcie | my-leave |
 | 10 | Zadania | tasks | zrobiony | zamknięcie | employees, notifications |
 | 11 | Historia zmian | activity-log | zrobiony | zamknięcie | employees, my-leave, leave-requests, tasks |
-| 12 | Archiwum | archive | w toku | implementacja (krok 13/14, przegląd kodu) | employees, tasks |
+| 12 | Archiwum | archive | w toku | testy | employees, tasks |
 | 13 | Moje konto | my-account | czeka | makieta | login |
 | 14 | Pulpit | dashboard | czeka | makieta | my-leave, leave-requests, tasks |
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
 
+- 2026-11-20: Archiwum: zbudowane (kroki 0–13), przegląd kodu z poprawkami (blokada przy przywracaniu konta, powrót z pustej strony 2+ wspólnym hookiem, podgląd z klawiatury, dymek przy wyszarzonym „Usuń na stałe”); `npm run check` i 53 testy e2e zielone.
 - 2026-11-20: Archiwum: spec zaakceptowany; napisane `PLAN.md` (14 kroków, wydzielenie okna „usuń po wpisaniu nazwy” do `common/`) i `TESTS.md`.
 - 2026-11-20: Archiwum: odpowiedzi 1a–8a (konto z wnioskami urlopowymi nie do usunięcia, usunięcie konta po wpisaniu imienia i nazwiska, zadanie wraca na koniec swojej kolumny, podgląd zadania tylko do oglądania, wyszukiwarka i projekt, nic nie znika samo, pojedynczo, przy osobie liczba wniosków i zadań); panel pytań usunięty; napisany `SPEC.md`.
 - 2026-11-20: Archiwum: makieta (zakładki Pracownicy i Zadania, przywracanie i usuwanie na stałe w oknach, osoba z wnioskami urlopowymi bez „Usuń na stałe”, podgląd zadania tylko do oglądania z komentarzami, wyszukiwarka i projekt, telefon); 8 pytań.

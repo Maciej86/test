@@ -12,6 +12,8 @@ vi.mock('../employees.queries', () => ({
   countArchivedEmployees: vi.fn(),
   lockUser: vi.fn(),
   deleteUser: vi.fn(),
+  findUser: vi.fn(),
+  setArchived: vi.fn(),
 }));
 vi.mock('../../my-leave/my-leave.queries', () => ({ countRequestsByUser: vi.fn() }));
 vi.mock('../../tasks/tasks.queries', () => ({ countAssignmentsByUser: vi.fn() }));
@@ -22,7 +24,7 @@ const myLeave = await import('../../my-leave/my-leave.queries');
 const tasks = await import('../../tasks/tasks.queries');
 const { logActivity } = await import('../../../db/activityLog');
 const { pool } = await import('../../../db/pool');
-const { deleteArchivedEmployee, listArchivedEmployees } = await import('../employees.service');
+const { deleteArchivedEmployee, listArchivedEmployees, restoreEmployee } = await import('../employees.service');
 
 const anna = { id: 1, name: 'Anna Nowak' };
 const olga = { id: 9, name: 'Olga Testowa', login: 'olga@firma.pl', role: 'employee', archived_at: new Date('2026-11-03T08:40:00Z') };
@@ -89,5 +91,16 @@ describe('archived employees', () => {
     expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({
       userId: 1, userName: 'Anna Nowak', action: 'delete', entityType: 'users', entityId: 9, entityName: 'Olga Testowa',
     }));
+  });
+
+  it('restore: reads the account under a row lock, so a second restore or a delete in the meantime gets 409/404', async () => {
+    vi.mocked(q.lockUser).mockResolvedValueOnce(olga as never).mockResolvedValueOnce({ ...olga, archived_at: null } as never).mockResolvedValueOnce(null);
+    expect(await restoreEmployee(9, anna)).toEqual({ ok: true });
+    expect(q.lockUser).toHaveBeenCalledWith(conn, 9);
+    expect(q.setArchived).toHaveBeenCalledWith(conn, 9, null);
+    expect(await restoreEmployee(9, anna)).toMatchObject({ error: { status: 409, message: 'employees.server.not_archived' } });
+    expect(await restoreEmployee(9, anna)).toMatchObject({ error: { status: 404 } });
+    expect(q.setArchived).toHaveBeenCalledTimes(1);
+    expect(q.findUser).not.toHaveBeenCalled();
   });
 });

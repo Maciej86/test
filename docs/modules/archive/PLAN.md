@@ -89,7 +89,7 @@ i edycję).
   `mockups/src/modules/archive/`; poprawki z testem, gdy coś się różni → `npm run check`
 - [x] 12. **E2E** `e2e/archive.spec.ts` ze scenariuszy `TESTS.md` (konta i zadania zakłada test, `e2e.tmp.*`,
   projekty „E2E …”) → `npm run check`, `npm run test:e2e`
-- [ ] 13. **Przegląd kodu** całego modułu (lista kontrolna z `CONVENTIONS.md`), poprawki z testem → `npm run check`
+- [x] 13. **Przegląd kodu** całego modułu (lista kontrolna z `CONVENTIONS.md`), poprawki z testem → `npm run check`
 
 ## Uwagi
 
@@ -100,3 +100,5 @@ i edycję).
 - Krok 9: moduły nie importują `axios`, więc doszło `apiErrorStatus` w `core/api/client.ts` (z testem); rozpoznanie „rekordu już nie ma” w `archive/archiveErrors.ts` (404 albo 409 z kluczem „nie w archiwum”). Rola w znaczniku przez `ROLE_LABELS` (jak w Pracownikach).
 - Krok 10: otwarcie i zamknięcie podglądu przekazuje bieżącą stronę (`useListParams` przy każdej zmianie wraca na stronę 1). Szuflada podglądu ma podpisany przycisk „Zamknij” (nowy klucz `common.close`). Tekst „Komentarze” to `comments_title` (osobno od odmiany liczby `comments_*`).
 - Krok 11: zrzuty komputera (1400 px) i telefonu (390 px) zgodne z makietą; bez poprawek.
+- Krok 13 (przegląd, jeden recenzent): poprawione z testem: przywrócenie konta czyta wiersz pod blokadą (`lockUser`), więc drugie przywrócenie albo przywrócenie usuniętego konta daje 409/404 zamiast drugiego „sukcesu”; pusta strona 2+ wraca na stronę 1 (wspólny `core/useEmptyLaterPage`, podmieniony też w Wnioskach urlopowych); tytuł zadania jest przyciskiem (podgląd z klawiatury); „Usuń na stałe” przy osobie z wnioskami wyszarzony przez `data-disabled`, żeby dymek działał także po dotknięciu; jedna obsługa błędów okien (`useArchiveActionError`); akcje na kontach odświeżają też tablice zadań; komentarz w Historii zmian.
+- Krok 13, odłożone (drobne): usunięcie konta na stałe w tej samej chwili, w której ktoś zapisuje zadanie z tą osobą wśród przypisanych, może skończyć się błędem 500 (zakleszczenie albo klucz obcy w bazie). Wymaga dwóch jednoczesnych akcji dwóch administratorów; do sprawdzenia przy próbach nadużyć.

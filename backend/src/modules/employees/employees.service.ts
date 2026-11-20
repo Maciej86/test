@@ -275,7 +275,8 @@ export const archiveEmployee = async (id: number, actor: Actor): Promise<Result>
 /** Przywrócenie z archiwum (link „Przywróć konto” i później moduł Archiwum). */
 export const restoreEmployee = async (id: number, actor: Actor): Promise<Result> => {
   return withTransaction(async (conn) => {
-    const user = await q.findUser(conn, id);
+    // Pod blokadą wiersza: drugie przywrócenie albo usunięcie w tym samym czasie dostaje 409/404, nie drugi sukces.
+    const user = await q.lockUser(conn, id);
     if (!user) return notFound();
     if (!user.archived_at) return fail(409, EMPLOYEE_MESSAGES.notArchived);
     await q.setArchived(conn, id, null);

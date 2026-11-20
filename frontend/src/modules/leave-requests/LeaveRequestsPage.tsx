@@ -11,6 +11,7 @@ import { PageHeader } from '../../common/PageHeader';
 import { apiErrorKey } from '../../core/api/client';
 import { notify } from '../../core/notify';
 import { useCurrentSearch } from '../../core/routes/useCurrentSearch';
+import { useEmptyLaterPage } from '../../core/useEmptyLaterPage';
 import { useListParams } from '../../core/useListParams';
 import { LeaveRequestsFilters } from './components/LeaveRequestsFilters';
 import { LeaveRequestCards, LeaveRequestsTable, type RowActions } from './components/LeaveRequestsTable';
@@ -57,10 +58,7 @@ export const LeaveRequestsPage = () => {
   const data = requests.data;
   const filtered = params.status !== 'pending' || params.search !== '' || params.leaveTypeId !== undefined;
   // Ostatni wniosek ze strony 2+ rozpatrzony: pusta strona to nie „Wszystko rozpatrzone”, tylko powrót na stronę 1.
-  const emptyLaterPage = data !== undefined && data.items.length === 0 && params.page > 1;
-  useEffect(() => {
-    if (emptyLaterPage) setParams({ page: 1 });
-  }, [emptyLaterPage, setParams]);
+  const emptyLaterPage = useEmptyLaterPage(data, params.page, () => setParams({ page: 1 }));
 
   const actions: RowActions = {
     onDetails: (r) => navigate(`${LEAVE_REQUESTS_PATH}/${r.id}${currentSearch()}`),
