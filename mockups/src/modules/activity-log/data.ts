@@ -1,6 +1,6 @@
 /** Zmyślone wpisy historii zmian do makiety. Najnowsze na górze. */
 
-export const AREAS = ['leave_requests', 'leave_pools', 'tasks', 'projects', 'users'] as const;
+export const AREAS = ['leave_requests', 'leave_pools', 'tasks', 'projects', 'users', 'leave_types', 'contract_types'] as const;
 export type Area = (typeof AREAS)[number];
 
 /** Rodzaj zmiany decyduje o kolorze ikony: zatwierdzenie zielone, odrzucenie i usunięcie czerwone. */
@@ -74,6 +74,16 @@ export const ENTRIES: MockEntry[] = [
       { field: 'name', before: 'Targi Poznań 2026', after: null },
       { field: 'deleted_tasks', before: null, after: '7' },
     ],
+  },
+  {
+    id: 4065, at: '2026-11-18T16:05:00', who: 'Anna Nowak', area: 'leave_types', action: 'leave_type_update', tone: 'neutral',
+    target: 'Opieka nad dzieckiem',
+    changes: [{ field: 'name', before: 'Opieka (art. 188)', after: 'Opieka nad dzieckiem' }],
+  },
+  {
+    id: 4064, at: '2026-11-18T15:40:00', who: 'Anna Nowak', area: 'contract_types', action: 'contract_type_hide', tone: 'muted',
+    target: 'Umowa o dzieło',
+    changes: [],
   },
   {
     id: 406, at: '2026-11-18T15:22:00', who: 'Tomasz Wójcik', area: 'tasks', action: 'archive', tone: 'negative',

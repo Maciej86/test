@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Badge, Button, Collapse, Group, Paper, SegmentedControl, Select, Stack, Text, TextInput, ThemeIcon, UnstyledButton } from '@mantine/core';
-import { ArrowRight, CalendarDays, ChevronDown, FolderKanban, History, PieChart, Search, SquareKanban, UserRound, type LucideIcon } from 'lucide-react';
+import { ArrowRight, CalendarDays, ChevronDown, FileSignature, FolderKanban, History, PieChart, Search, SquareKanban, Tags, UserRound, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatRelativeDay, formatTime } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
@@ -20,6 +20,8 @@ const AREA_ICON: Record<Area, LucideIcon> = {
   tasks: SquareKanban,
   projects: FolderKanban,
   users: UserRound,
+  leave_types: Tags,
+  contract_types: FileSignature,
 };
 
 const TONE_COLOR: Record<Tone, string> = { neutral: 'navy', positive: 'green', negative: 'red', muted: 'gray' };

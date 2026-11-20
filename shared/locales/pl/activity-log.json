@@ -1,7 +1,7 @@
 {
   "title": "Historia zmian",
-  "subtitle": "Kto, kiedy i co zmienił we wnioskach, pulach dni, zadaniach, projektach i kontach",
-  "search": "Szukaj osoby, zadania lub projektu",
+  "subtitle": "Kto, kiedy i co zmienił we wnioskach, pulach dni, zadaniach, projektach, kontach i ustawieniach",
+  "search": "Szukaj osoby, zadania, projektu lub typu",
   "area_all": "Wszystkie obszary",
   "area_label": "Obszar",
   "who_all": "Wszystkie osoby",
@@ -14,7 +14,9 @@
     "leave_pools": "Pule dni",
     "tasks": "Zadania",
     "projects": "Projekty",
-    "users": "Pracownicy"
+    "users": "Pracownicy",
+    "leave_types": "Typy urlopów",
+    "contract_types": "Typy umów"
   },
   "actions": {
     "create": "Złożenie wniosku urlopowego",
@@ -38,7 +40,15 @@
     "role": "Zmiana roli",
     "password": "Ustawienie hasła tymczasowego",
     "user_archive": "Przeniesienie konta do archiwum",
-    "user_restore": "Przywrócenie konta"
+    "user_restore": "Przywrócenie konta",
+    "leave_type_create": "Nowy typ urlopu",
+    "leave_type_update": "Zmiana typu urlopu",
+    "leave_type_hide": "Ukrycie typu urlopu",
+    "leave_type_unhide": "Przywrócenie typu urlopu",
+    "contract_type_create": "Nowy typ umowy",
+    "contract_type_update": "Zmiana typu umowy",
+    "contract_type_hide": "Ukrycie typu umowy",
+    "contract_type_unhide": "Przywrócenie typu umowy"
   },
   "fields": {
     "status": "Status",
@@ -66,7 +76,9 @@
     "leave_pools": "Otwórz pracownika",
     "tasks": "Otwórz zadanie",
     "projects": "Otwórz projekt",
-    "users": "Otwórz pracownika"
+    "users": "Otwórz pracownika",
+    "leave_types": "Otwórz typy urlopów",
+    "contract_types": "Otwórz typy umów"
   },
   "open_archive": "Otwórz w archiwum",
   "deleted": "usunięty na stałe",
@@ -75,7 +87,7 @@
   "entries_count_few": "{{count}} wpisy",
   "entries_count_many": "{{count}} wpisów",
   "empty_title": "Historia jest pusta",
-  "empty": "Tu pojawi się każda zmiana we wnioskach, pulach dni, zadaniach, projektach i kontach pracowników.",
+  "empty": "Tu pojawi się każda zmiana we wnioskach, pulach dni, zadaniach, projektach, kontach pracowników i typach urlopów i umów.",
   "no_results": "Żaden wpis nie pasuje do filtrów. Zmień je albo wyczyść.",
   "mockup_state": "Pokaż stan:",
   "mockup_states": {
