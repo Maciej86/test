@@ -40,7 +40,7 @@ i edycję).
 - [x] 1. **Wydzielenie `ConfirmByNameModal`** (front `common/` + makiety `common/`): test (przycisk wyłączony, dopóki
   tekst po `trim()` ≠ `name`; `onConfirm` dostaje obcięty tekst); podmiana w `DeleteProjectModal` i w makiecie
   `archive/ArchiveModals.tsx`; wzór „Usunięcie na stałe” w `DESIGN.md` wskazuje klocek → `npm run check`
-- [ ] 2. **Shared**: `constants/archive.ts`, `schemas/archive.ts`, typy jak wyżej, `server.archive_first` w
+- [x] 2. **Shared**: `constants/archive.ts`, `schemas/archive.ts`, typy jak wyżej, `server.archive_first` w
   `server.json`, klucze `has_leave_requests`, `not_archived`, `gone`, `confirm_label` w `archive.json`; testy
   schematów (domyślne `dir=desc`, zły `sort` → błąd, `projectId=0` → błąd, `confirmName` 142 znaki → błąd,
   `tab=foo` → employees; adresy `archiveTaskPath(5)`, `archiveEmployeesPath('a b@x.pl')` kodują znaki) → `npm run check`
@@ -94,3 +94,4 @@ i edycję).
 ## Uwagi
 
 - Krok 0: szkielety testów usług pracowników i zadań leżą na razie w `backend/src/modules/archive/__tests__/*.todo.test.ts`, bo test zasad nie przepuszcza `it.todo` w zrobionych modułach; gotowe testy trafiają do `employees/__tests__` i `tasks/__tests__`, a pliki `.todo` znikają.
+- Krok 2: klucze błędów modułu jak w innych modułach: `archive.server.has_leave_requests`, `archive.server.not_archived`, `archive.server.confirm_mismatch` (spec pisał `archive.has_leave_requests`); `ARCHIVE_TABS` w stałych. Komentarze w podglądzie: pole `commentsList` (liczba komentarzy to `comments`).

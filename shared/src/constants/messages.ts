@@ -15,6 +15,8 @@ export const SERVER_MESSAGES = {
   loginFailed: 'server.login_failed',
   /** Ustawienie hasła bez obecnego działa tylko przy haśle tymczasowym (moduł Logowanie). */
   passwordNotTemporary: 'server.password_not_temporary',
+  /** Usunąć na stałe można tylko rekord z archiwum (moduł Archiwum). */
+  archiveFirst: 'server.archive_first',
 } as const;
 
 export type ServerMessage = (typeof SERVER_MESSAGES)[keyof typeof SERVER_MESSAGES];

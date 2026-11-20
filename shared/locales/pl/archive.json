@@ -67,5 +67,11 @@
     "empty": "Puste archiwum",
     "no_results": "Brak wyników"
   },
-  "mockup_no_results_query": "Kowalczyk"
+  "mockup_no_results_query": "Kowalczyk",
+  "gone": "Tej rzeczy nie ma już w archiwum. Lista została odświeżona.",
+  "server": {
+    "has_leave_requests": "Ta osoba ma wnioski urlopowe, więc zostaje w archiwum: historia urlopów musi zostać.",
+    "not_archived": "To nie jest w archiwum.",
+    "confirm_mismatch": "Wpisz dokładnie imię i nazwisko tej osoby."
+  }
 }

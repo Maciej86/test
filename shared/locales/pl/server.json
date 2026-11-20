@@ -10,5 +10,6 @@
   "file_type_not_allowed": "Tego rodzaju pliku nie można dodać.",
   "password_change_required": "Najpierw ustaw własne hasło.",
   "login_failed": "Login lub hasło są nieprawidłowe. Sprawdź je i spróbuj ponownie.",
-  "password_not_temporary": "Hasło można tu ustawić tylko zamiast tymczasowego. Zmień je w „Moim koncie”."
+  "password_not_temporary": "Hasło można tu ustawić tylko zamiast tymczasowego. Zmień je w „Moim koncie”.",
+  "archive_first": "Najpierw przenieś to do archiwum."
 }

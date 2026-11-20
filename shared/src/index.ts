@@ -19,3 +19,4 @@ export * from './schemas/myLeave';
 export * from './schemas/leaveRequests';
 export * from './schemas/tasks';
 export * from './schemas/activityLog';
+export * from './schemas/archive';
