@@ -2,9 +2,8 @@ import type { CSSProperties, HTMLAttributes, Ref } from 'react';
 import { ActionIcon, Avatar, Badge, Card, Group, Menu, Stack, Text, Tooltip } from '@mantine/core';
 import { CalendarDays, CheckCheck, EllipsisVertical, GripVertical, MessageSquare, MoveRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { TASK_COLUMNS, formatDate, type BoardPerson, type BoardTask, type TaskColumn } from '@app/shared';
+import { TASK_COLUMNS, formatDate, taskDueState, type BoardPerson, type BoardTask, type TaskColumn } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
-import { dueState } from '../taskDue';
 import { MorePeopleAvatar } from '../../../common/PersonAvatar';
 import { AssigneeAvatar } from './AssigneeAvatar';
 
@@ -35,7 +34,7 @@ export const TaskCard = ({ task, people, meId, drag, onOpen, onMove, onFinish, o
   onArchive: () => void;
 }) => {
   const { t } = useTranslation('tasks');
-  const due = dueState(task);
+  const due = taskDueState(task.dueDate, task.column);
   const done = task.column === 'done';
   const mine = task.assigneeIds.includes(meId);
   const finished = task.finishedAt !== null;

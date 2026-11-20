@@ -5,7 +5,7 @@ import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { SquareKanban, WifiOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
-import { TASK_COLUMNS, boardViewSchema, type BoardResponse, type BoardTask, type TaskColumn } from '@app/shared';
+import { TASK_COLUMNS, boardViewSchema, taskDueState, type BoardResponse, type BoardTask, type TaskColumn } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
 import { EmptyState } from '../../common/EmptyState';
@@ -24,7 +24,6 @@ import { TaskDrawer } from './components/TaskDrawer';
 import { TaskFormModal } from './components/TaskFormModal';
 import { columnTasks } from './boardMove';
 import { useBoard, useFinishTask, useMoveTask, useProjects } from './tasks.api';
-import { dueState } from './taskDue';
 
 const PROJECT_ID = /^[1-9]\d{0,9}$/;
 /** Na węższym ekranie (telefon, mały tablet) widać jedną kolumnę naraz. */
@@ -129,7 +128,7 @@ const Board = ({ projectId, data, oldDone, onOldDone }: { projectId: number; dat
         name={data.project.name}
         empty={data.tasks.length === 0}
         openCount={open.length}
-        overdue={open.filter((task) => dueState(task) === 'overdue').length}
+        overdue={open.filter((task) => taskDueState(task.dueDate, task.column) === 'overdue').length}
         people={data.people}
         extraActions={
           isAdmin && project ? (

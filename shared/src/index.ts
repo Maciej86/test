@@ -5,6 +5,7 @@ export * from './i18n';
 export * from './date';
 export * from './holidays';
 export * from './leaveRequestCheck';
+export * from './taskDue';
 export * from './number';
 export * from './activityLog';
 export * from './schemas/fields';

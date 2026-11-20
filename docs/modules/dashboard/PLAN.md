@@ -32,7 +32,7 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
     wymagania z kroków 4–6.
   - `frontend/src/modules/dashboard/__tests__/DashboardPage.test.tsx`: wymagania z kroków 8–9.
   - `e2e/dashboard.spec.ts`: scenariusze z `TESTS.md` (`test.fixme`).
-- [ ] 1. Wydzielenie terminu zadania: `taskDueState(dueDate: string | null, column: TaskColumn, today = todayIsoDate()):
+- [x] 1. Wydzielenie terminu zadania: `taskDueState(dueDate: string | null, column: TaskColumn, today = todayIsoDate()):
   'overdue' | 'soon' | 'normal' | null` w `shared/src/taskDue.ts` (eksport z `index.ts`), test w
   `shared/src/__tests__/taskDue.test.ts` (wczoraj → overdue, dziś i jutro → soon, pojutrze → normal, `done` i `null`
   → null); `TaskCard` i `TaskBoardPage` wołają nową funkcję, `dueState` znika z `tasks/taskDue.ts` → `npm run check`.
