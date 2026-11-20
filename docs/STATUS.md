@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Moduł Pulpit, testy: użytkownik przechodzi `docs/modules/dashboard/TESTS.md` i potwierdza „działa”.
+**Następny krok:** Poprawka z `docs/FIXES.md`: niestabilny test e2e Historii zmian (filtr osoby), potem moduł Publikacja (makieta).
 
 ## Start aplikacji
 
@@ -32,11 +32,12 @@
 | 11 | Historia zmian | activity-log | zrobiony | zamknięcie | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
-| 14 | Pulpit | dashboard | w toku | testy (czeka na użytkownika) | my-leave, leave-requests, tasks |
+| 14 | Pulpit | dashboard | zrobiony | zamknięcie | my-leave, leave-requests, tasks |
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
 
+- 2026-11-20: Moduł Pulpit zrobiony (potwierdzony przez użytkownika): administrator (wnioski do rozpatrzenia, nieobecności na 2 tygodnie, stan tablic z zadaniami po terminie, moje zadania), pracownik (pula, moje wnioski, moje zadania); `GET /api/dashboard`. Wspólne: `PoolCard`, `LeaveStrip`, `taskDueState`, `MY_LEAVE_PATH`.
 - 2026-11-20: Pulpit: próby nadużyć odparte, przeklikany w przeglądarce (administrator, pracownik, telefon) na tymczasowych kontach e2e.tmp (zgoda użytkownika na jednorazowe konto w lokalnej bazie); test e2e wykrył i naprawiono nieświeże dane po powrocie na Pulpit; 64 testy e2e zielone.
 - 2026-11-20: Aktualizacja stepkit do 0.1.48: strona „Postęp” w makietach widzi zmiany statusu bez ponownego uruchamiania.
 - 2026-11-20: Moduł Moje konto zrobiony (potwierdzony przez użytkownika): własne dane, e-mail do powiadomień (obie role), zmiana hasła z obecnym (limit 10 nieudanych prób na konto, inne sesje kończą się, ochrona przed nadpisaniem hasła zmienionego w międzyczasie), wpis „Zmiana własnego hasła” w Historii zmian. Wspólne klocki: `DetailRow`, `RoleBadge`, `withRepeatPassword`.

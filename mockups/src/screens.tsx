@@ -1,5 +1,4 @@
 import type { ComponentType } from 'react';
-import { DashboardMockup } from './modules/dashboard/DashboardMockup';
 import { TASK_SCREENS } from './modules/tasks/navigation';
 import { Done } from './common/Done';
 import type { ExtraScreen } from './Shell';
@@ -15,7 +14,8 @@ const TASKS_DONE: Record<string, ComponentType> = Object.fromEntries(
 );
 
 export const SCREENS: Record<string, ComponentType> = {
-  dashboard: DashboardMockup,
+  // Moduł Pulpit zrobiony; makieta zostaje w modules/dashboard/DashboardMockup.tsx.
+  dashboard: () => <Done labelKey="common.nav.dashboard" />,
   // Moduł Moje urlopy zrobiony; makieta zostaje w modules/my-leave/MyLeaveMockup.tsx.
   'my-leave': () => <Done labelKey="common.nav.my_leave" />,
   // Moduł Wnioski urlopowe zrobiony; makieta zostaje w modules/leave-requests/LeaveRequestsMockup.tsx.
