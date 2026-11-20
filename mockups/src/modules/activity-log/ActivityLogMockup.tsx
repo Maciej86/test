@@ -8,7 +8,6 @@ import { DateField } from '../../common/DateField';
 import { EmptyState } from '../../common/EmptyState';
 import { ListPagination } from '../../common/ListPagination';
 import { PageHeader } from '../../common/PageHeader';
-import { Question, Questions } from '../../common/Question';
 import { notify } from '../../common/notify';
 import { AREAS, ENTRIES, PEOPLE, TOTAL_ENTRIES, type Area, type MockEntry, type Tone } from './data';
 
@@ -174,35 +173,6 @@ export const ActivityLogMockup = () => {
 
   return (
     <Stack>
-      <Questions>
-        <Question number={1} about={t('q.about_list')} options={[{ id: 'a', text: t('q.q1a') }, { id: 'b', text: t('q.q1b') }]} recommended="a">
-          {t('q.q1')}
-        </Question>
-        <Question number={2} about={t('q.about_entry')} options={[{ id: 'a', text: t('q.q2a') }, { id: 'b', text: t('q.q2b') }, { id: 'c', text: t('q.q2c') }]} recommended="a">
-          {t('q.q2')}
-        </Question>
-        <Question number={3} about={t('q.about_filters')} options={[{ id: 'a', text: t('q.q3a') }, { id: 'b', text: t('q.q3b') }, { id: 'c', text: t('q.q3c') }]} recommended="a">
-          {t('q.q3')}
-        </Question>
-        <Question number={4} about={t('q.about_deleted')} options={[{ id: 'a', text: t('q.q4a') }, { id: 'b', text: t('q.q4b') }]} recommended="a">
-          {t('q.q4')}
-        </Question>
-        <Question number={5} about={t('q.about_list')} options={[{ id: 'a', text: t('q.q5a') }, { id: 'b', text: t('q.q5b') }, { id: 'c', text: t('q.q5c') }]} recommended="a">
-          {t('q.q5')}
-        </Question>
-        <Question number={6} about={t('q.about_scope')} options={[{ id: 'a', text: t('q.q6a') }, { id: 'b', text: t('q.q6b') }]} recommended="a">
-          {t('q.q6')}
-        </Question>
-        <Question number={7} about={t('q.about_scope')} options={[{ id: 'a', text: t('q.q7a') }, { id: 'b', text: t('q.q7b') }, { id: 'c', text: t('q.q7c') }]} recommended="a">
-          {t('q.q7')}
-        </Question>
-        <Question number={8} about={t('q.about_scope')} options={[{ id: 'a', text: t('q.q8a') }, { id: 'b', text: t('q.q8b') }]} recommended="a">
-          {t('q.q8')}
-        </Question>
-        <Question number={9} about={t('q.about_entry')} options={[{ id: 'a', text: t('q.q9a') }, { id: 'b', text: t('q.q9b') }]} recommended="a">
-          {t('q.q9')}
-        </Question>
-      </Questions>
 
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">

@@ -15,7 +15,7 @@ historii, tylko informacja „ustawiono hasło tymczasowe”.
 - a) Dziennik pogrupowany po dniach („Dzisiaj”, „Wczoraj”, data): godzina, co się stało, czego dotyczy, kto to zrobił **(polecam)**
 - b) Zwykła tabela z kolumnami Kiedy, Kto, Obszar, Co, jak lista wniosków
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 2. Kliknięcie wpisu
 
@@ -23,7 +23,7 @@ historii, tylko informacja „ustawiono hasło tymczasowe”.
 - b) Wpis się rozwija tylko z „przed → po”, bez przejścia do rekordu
 - c) Od razu przechodzi do rekordu, bez rozwijania
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 3. Filtry
 
@@ -31,7 +31,7 @@ historii, tylko informacja „ustawiono hasło tymczasowe”.
 - b) Wyszukiwarka, obszar i kto zmienił, bez dat
 - c) Tylko wyszukiwarka i obszar
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 4. Usunięty rekord
 
@@ -41,7 +41,7 @@ usuniętego na stałe w Archiwum)?
 - a) Zostają z nazwą zapamiętaną w chwili zmiany i dopiskiem „usunięty na stałe” **(polecam)**
 - b) Znikają razem z rekordem
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 5. Jak długo trzymać wpisy
 
@@ -49,14 +49,14 @@ usuniętego na stałe w Archiwum)?
 - b) 2 lata, starsze kasują się same
 - c) 1 rok, starsze kasują się same
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 6. Zmiana kolejności kart w tej samej kolumnie
 
 - a) Nie zapisuję, tylko przeniesienie do innej kolumny **(polecam)**
 - b) Zapisuję każde przeciągnięcie
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 7. Co jeszcze trafia do historii
 
@@ -66,7 +66,7 @@ Teraz historia obejmuje wnioski, pule dni, zadania, projekty i pracowników.
 - b) Typy urlopów, typy umów i komentarze do zadań
 - c) Nic więcej
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 8. Logowania
 
@@ -75,7 +75,7 @@ Zapisywać, kto i kiedy się zalogował, i nieudane próby?
 - a) Nie na start; dopiszę to do pomysłów na później **(polecam)**
 - b) Tak, jako osobny obszar „Logowania”
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
 
 ## 9. Historia w innych miejscach
 
@@ -84,4 +84,4 @@ Pokazać historię także np. w szczegółach wniosku albo w oknie pracownika?
 - a) Nie, tylko ten ekran; z innych miejsc można tu przyjść i wpisać nazwę w wyszukiwarkę **(polecam)**
 - b) Tak, w szczegółach wniosku i w oknie pracownika krótka historia tego rekordu
 
-**Odpowiedź:**
+**Odpowiedź:** a (2026-11-20, zgodnie z rekomendacją)
