@@ -61,7 +61,7 @@ i edycję).
   `restoreArchivedTask(id, actor)` (`lockProject`, 404 / 409 `notArchived`, pozycja = `MAX(position)+1` kolumny
   wśród aktywnych, `archived_at/by = NULL`, `logTask` `restore`), `deleteArchivedTask(id, actor)` (`lockProject`,
   404 / 409 `archiveFirst`, `DELETE`, `logTask` `delete`); testy na podmienionym `conn` → `npm run check`
-- [ ] 6. **Trasy** `backend/src/modules/archive/archive.routes.ts` (tabela API ze specu) +
+- [x] 6. **Trasy** `backend/src/modules/archive/archive.routes.ts` (tabela API ze specu) +
   `mountModule(api, 'archive', archiveRoutes)` w `app.ts`; `GET /counts` łączy oba liczniki; testy tras (dane,
   400 złe parametry i nazwa, 404 dla `abc`, 409, jeden 401 i jeden 403); wiersze w „Mapie dostępu” w
   `SPEC-GENERAL.md` (zamiast ogólnego `/api/archive`) i potwierdzenie RESTRICT `leave_requests.user_id` (odpowiedź 1a)

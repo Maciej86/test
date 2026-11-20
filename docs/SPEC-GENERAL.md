@@ -104,7 +104,8 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `/admin/contract-types`, `/api/contract-types` | admin | lista typów do okna pracownika: osobna trasa w `employees` |
 | `GET/POST /api/contract-types`, `PUT /api/contract-types/:id`, `POST /api/contract-types/:id/move`, `/:id/hide`, `/:id/unhide` | admin | `mountModule(api, 'contract-types', …)`; można ukryć wszystkie typy (rodzaj umowy jest nieobowiązkowy) |
 | `/admin/activity-log`, `/api/activity-log` | admin | |
-| `/admin/archive`, `/api/archive` | admin | przywrócenie i usunięcie na stałe |
+| `/admin/archive`, `/api/archive` | admin | przywrócenie i usunięcie na stałe; adres `?tab=tasks&taskId=<id>` otwiera podgląd zadania |
+| `GET /api/archive/counts`, `GET /api/archive/employees`, `POST /api/archive/employees/:id/restore`, `DELETE /api/archive/employees/:id`, `GET /api/archive/tasks`, `GET /api/archive/tasks/:id`, `POST /api/archive/tasks/:id/restore`, `DELETE /api/archive/tasks/:id` | admin | `mountModule(api, 'archive', …)`; tylko rekordy z archiwum (aktywny: podgląd 404, usunięcie 409 `server.archive_first`); konto z wnioskami urlopowymi nie do usunięcia (409); usunięcie konta tylko z dokładnym imieniem i nazwiskiem (`confirmName`, inaczej 400) |
 | `/admin/my-account`, `/api/my-account` | admin, employee | tylko własne konto |
 | `/admin/notifications`, `GET /api/notifications`, `GET /api/notifications/summary`, `POST /api/notifications/:id/read`, `POST /api/notifications/read-all` | admin, employee | `mountModule(api, 'notifications', …, ['admin', 'employee'])`; tylko własne (`req.user.id`), cudze → 404 |
 | `/api/email` | — | nie powstaje: moduł E-mail nie ma tras API (wysyłka wołana z kodu serwera) |
@@ -137,7 +138,7 @@ Wartości liczone wyłącznie przez serwer: `working_days`, podział na `days_fr
 | `users` | `users.archived_by` | SET NULL | autorstwo archiwizacji |
 | `users` | `activity_log.user_id` | SET NULL (+ `user_name` w szablonie) | historia zostaje po usunięciu osoby |
 | `users` | `leave_pools.user_id` | CASCADE | pula bez pracownika nie ma sensu |
-| `users` | `leave_requests.user_id` | RESTRICT | nie kasujemy historii urlopów bez ostrzeżenia; **[decyzja AI]**, do potwierdzenia w makiecie modułu Archiwum |
+| `users` | `leave_requests.user_id` | RESTRICT | historia urlopów zostaje: konto z wnioskami zostaje w archiwum na zawsze (Archiwum, odpowiedź 1a) |
 | `users` | `leave_requests.decided_by` | SET NULL + `decided_by_name` | autorstwo decyzji |
 | `leave_types` | `leave_requests.leave_type_id` | RESTRICT | typ użyty we wnioskach można tylko ukryć |
 | `users` | `tasks.created_by` | SET NULL + `created_by_name` | autorstwo |
