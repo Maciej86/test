@@ -95,5 +95,15 @@
   "cancel": "Anuluj",
   "move_up": "Przesuń wyżej",
   "move_down": "Przesuń niżej",
-  "close": "Zamknij"
+  "close": "Zamknij",
+  "pool": {
+    "title": "Urlop w {{year}}",
+    "left": "dni do wykorzystania (z {{total}})",
+    "aria": "Zostało {{left}} z {{total}} dni",
+    "hint": "Pula na rok: {{annual}} dni, zaległy urlop z {{prev}}: {{carried}} dni. Zaległy urlop schodzi pierwszy.",
+    "legend_used": "wykorzystane",
+    "legend_pending": "czeka na decyzję",
+    "legend_carried": "zostało z zaległego z {{year}}",
+    "legend_annual": "zostało z puli rocznej"
+  }
 }
