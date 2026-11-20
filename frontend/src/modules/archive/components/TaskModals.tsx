@@ -43,7 +43,7 @@ export const DeleteTaskModal = ({ task, onClose }: { task: ArchivedTask; onClose
   return (
     <ConfirmModal title={t('delete_task_title')} confirmLabel={t('delete_forever')} confirmAction="delete" danger loading={remove.isPending} onConfirm={confirm} onClose={onClose}>
       <Text>{t('delete_task_text', { title: task.title })}</Text>
-      {task.comments > 0 && <Text>{t('delete_task_comments', { comments: t('comments', { count: task.comments }) })}</Text>}
+      {task.comments > 0 && <Text>{t('delete_task_comments', { count: task.comments })}</Text>}
     </ConfirmModal>
   );
 };

@@ -41,7 +41,7 @@ export const DeleteEmployeeModal = ({ employee, onClose }: { employee: ArchivedE
       onClose={onClose}
     >
       <Text>{t('delete_employee_text', { name: employee.name })}</Text>
-      {employee.tasks > 0 && <Text size="sm" c="dimmed">{t('delete_employee_tasks', { tasks: t('tasks', { count: employee.tasks }) })}</Text>}
+      {employee.tasks > 0 && <Text size="sm" c="dimmed">{t('delete_employee_tasks', { count: employee.tasks })}</Text>}
     </ConfirmByNameModal>
   );
 };
@@ -74,7 +74,7 @@ export const DeleteTaskModal = ({ task, onClose }: { task: ArchivedTask; onClose
       onClose={onClose}
     >
       <Text>{t('delete_task_text', { title: task.title })}</Text>
-      {task.comments.length > 0 && <Text>{t('delete_task_comments', { comments: t('comments', { count: task.comments.length }) })}</Text>}
+      {task.comments.length > 0 && <Text>{t('delete_task_comments', { count: task.comments.length })}</Text>}
     </ConfirmModal>
   );
 };

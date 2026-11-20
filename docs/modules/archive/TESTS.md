@@ -21,8 +21,8 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180 i zalog
    można tylko obejrzeć. Kliknij „Przywróć” → okno mówi, że zadanie wróci na koniec kolumny „W toku”; potwierdź →
    dymek „Przywrócono zadanie „Test archiwum”.”. Na tablicy projektu zadanie jest na końcu kolumny „W toku”,
    z komentarzem.
-9. Usuń zadanie z tablicy jeszcze raz. W „Archiwum” kliknij „Usuń na stałe” → okno mówi, że zniknie razem z 1
-   komentarzem; potwierdź → dymek, zadania nie ma w archiwum.
+9. Usuń zadanie z tablicy jeszcze raz. W „Archiwum” kliknij „Usuń na stałe” → okno mówi „Razem z nim zniknie
+   1 komentarz.”; potwierdź → dymek, zadania nie ma w archiwum.
 10. W „Historii zmian” kliknij wpis o przeniesieniu do archiwum zadania, które jest w archiwum → przycisk „Otwórz
     w archiwum” otwiera Archiwum z podglądem tego zadania. To samo dla konta: otwiera zakładkę Pracownicy
     z wyszukaniem po loginie.
@@ -47,3 +47,9 @@ Sprawdzone 2026-11-20 na prawdziwej bazie (`e2e/archive.spec.ts`, blok `abuse`, 
 - Usunięcie konta w chwili zapisu zadania, do którego jest przypisane → bez błędu serwera; historia konta zostaje: przeszła
 - Skrypt w tytule zadania widać w podglądzie jako zwykły tekst; za długie i złe imię i nazwisko → 400; zły projekt i kolumna sortowania → 400: przeszła
 - Osoba z wnioskami urlopowymi (także wycofanymi) → „Usuń na stałe” wyszarzony, serwer 409: przeszła
+
+## Sprawdzenie w przeglądarce (Claude, 2026-11-20)
+
+Administrator: scenariusze 1–11 i 13 przeklikane (komputer i telefon 390 px), konsola bez błędów; pracownik: brak
+pozycji w menu i komunikat „Nie masz dostępu…”. Znalezione i poprawione: odmiana w oknach usuwania („zniknie 1
+komentarz”, „z przypisań do 2 zadań”). 59 testów e2e zielonych.

@@ -118,7 +118,7 @@ test('administrator filtruje, ogląda, przywraca i usuwa zadanie z archiwum', as
   await page.reload();
   await row(page, title).getByRole('button', { name: 'Usuń na stałe' }).click();
   const remove = page.getByRole('dialog', { name: 'Usunąć zadanie na stałe?' });
-  await expect(remove).toContainText('Razem z nim znikną 1 komentarz.');
+  await expect(remove).toContainText('Razem z nim zniknie 1 komentarz.');
   await remove.getByRole('button', { name: 'Usuń na stałe' }).click();
   await expect(page.getByText(`Usunięto na stałe zadanie „${title}”.`)).toBeVisible();
   await expect(row(page, title)).toHaveCount(0);

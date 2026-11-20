@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.44
 
-**Następny krok:** Archiwum: etap testy (próby nadużyć, sprawdzenie w przeglądarce, potem użytkownik przechodzi `TESTS.md`).
+**Następny krok:** Archiwum: użytkownik przechodzi `docs/modules/archive/TESTS.md` i potwierdza „działa”; potem zamknięcie modułu.
 
 ## Start aplikacji
 
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-20: Archiwum: próby nadużyć na prawdziwej bazie odparte, przeklikane w przeglądarce (administrator, pracownik, telefon); poprawiona odmiana w oknach usuwania; 59 testów e2e zielonych.
 - 2026-11-20: Archiwum: zbudowane (kroki 0–13), przegląd kodu z poprawkami (blokada przy przywracaniu konta, powrót z pustej strony 2+ wspólnym hookiem, podgląd z klawiatury, dymek przy wyszarzonym „Usuń na stałe”); `npm run check` i 53 testy e2e zielone.
 - 2026-11-20: Archiwum: spec zaakceptowany; napisane `PLAN.md` (14 kroków, wydzielenie okna „usuń po wpisaniu nazwy” do `common/`) i `TESTS.md`.
 - 2026-11-20: Archiwum: odpowiedzi 1a–8a (konto z wnioskami urlopowymi nie do usunięcia, usunięcie konta po wpisaniu imienia i nazwiska, zadanie wraca na koniec swojej kolumny, podgląd zadania tylko do oglądania, wyszukiwarka i projekt, nic nie znika samo, pojedynczo, przy osobie liczba wniosków i zadań); panel pytań usunięty; napisany `SPEC.md`.

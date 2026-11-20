@@ -90,7 +90,7 @@ describe('ArchivePage', () => {
     const table = await screen.findByRole('table');
     fireEvent.click(within(table).getByRole('button', { name: 'Usuń na stałe' }));
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText(/zniknie też z przypisań w 2 zadania/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/Zniknie też z przypisań do 2 zadań\. /)).toBeInTheDocument();
     fireEvent.change(within(dialog).getByLabelText('Wpisz imię i nazwisko, żeby potwierdzić'), { target: { value: 'Olga Testowa' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Usuń na stałe' }));
     await waitFor(() => expect(del).toHaveBeenCalledWith('/archive/employees/9', { data: { confirmName: 'Olga Testowa' } }));
@@ -230,5 +230,15 @@ describe('ArchivePage, tasks', () => {
     expect(within(confirm).getByText('Razem z nim znikną 2 komentarze.')).toBeInTheDocument();
     fireEvent.click(within(confirm).getByRole('button', { name: 'Usuń na stałe' }));
     await waitFor(() => expect(del).toHaveBeenCalledWith('/archive/tasks/31'));
+  });
+
+  it('tasks: one comment and five comments read correctly in Polish', async () => {
+    const { i18n } = await import('../../../test/render');
+    const t = i18n.getFixedT('pl', 'archive');
+    expect(t('delete_task_comments', { count: 1 })).toBe('Razem z nim zniknie 1 komentarz.');
+    expect(t('delete_task_comments', { count: 2 })).toBe('Razem z nim znikną 2 komentarze.');
+    expect(t('delete_task_comments', { count: 5 })).toBe('Razem z nim zniknie 5 komentarzy.');
+    expect(t('delete_employee_tasks', { count: 1 })).toMatch(/^Zniknie też z przypisania do 1 zadania\. /);
+    expect(t('delete_employee_tasks', { count: 5 })).toMatch(/^Zniknie też z przypisań do 5 zadań\. /);
   });
 });

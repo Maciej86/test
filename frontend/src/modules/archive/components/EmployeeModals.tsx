@@ -52,7 +52,7 @@ export const DeleteEmployeeModal = ({ employee, onClose }: { employee: ArchivedE
       onClose={onClose}
     >
       <Text>{t('delete_employee_text', { name: employee.name })}</Text>
-      {employee.tasks > 0 && <Text size="sm" c="dimmed">{t('delete_employee_tasks', { tasks: t('tasks', { count: employee.tasks }) })}</Text>}
+      {employee.tasks > 0 && <Text size="sm" c="dimmed">{t('delete_employee_tasks', { count: employee.tasks })}</Text>}
     </ConfirmByNameModal>
   );
 };
