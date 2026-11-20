@@ -31,7 +31,7 @@ i edycję).
 
 ## Kroki
 
-- [ ] 0. **Szkielet testów** (`it.todo`, po jednym na wymaganie): `backend/src/modules/archive/__tests__/archive.routes.test.ts`
+- [x] 0. **Szkielet testów** (`it.todo`, po jednym na wymaganie): `backend/src/modules/archive/__tests__/archive.routes.test.ts`
   (każdy wiersz tabeli API: sukces, 400, 404, 409; 401 i 403), `employees/__tests__/archived.service.test.ts`
   (lista, liczby, blokada wniosków, zła nazwa, wpis historii), `tasks/__tests__/archived.service.test.ts` (lista
   z filtrem projektu, podgląd 404 dla aktywnego, przywrócenie na koniec kolumny, usunięcie z komentarzami, wpisy
@@ -93,4 +93,4 @@ i edycję).
 
 ## Uwagi
 
-(odchylenia od planu w trakcie implementacji)
+- Krok 0: szkielety testów usług pracowników i zadań leżą na razie w `backend/src/modules/archive/__tests__/*.todo.test.ts`, bo test zasad nie przepuszcza `it.todo` w zrobionych modułach; gotowe testy trafiają do `employees/__tests__` i `tasks/__tests__`, a pliki `.todo` znikają.
