@@ -156,3 +156,12 @@ describe('abuse', () => {
   });
 });
 
+
+describe('records in the archive (Archiwum)', () => {
+  it('an archived record with an archive link gets „Otwórz w archiwum”', async () => {
+    show(page([item({ id: 2, area: 'tasks', action: 'archive', entityName: 'Spotkanie', state: 'archived', link: '/admin/archive?tab=tasks&taskId=8', changes: {} })]));
+    fireEvent.click(await screen.findByRole('button', { name: /Usunięcie zadania \(do archiwum\)/ }));
+    expect(screen.getByRole('link', { name: 'Otwórz w archiwum', hidden: true })).toHaveAttribute('href', '/admin/archive?tab=tasks&taskId=8');
+    expect(screen.queryByText('Rekord jest w archiwum.')).not.toBeInTheDocument();
+  });
+});

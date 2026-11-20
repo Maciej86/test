@@ -50,12 +50,12 @@ const Changes = ({ entry }: { entry: ActivityLogItem }) => {
   );
 };
 
-/** Przycisk do rekordu albo informacja, że rekordu już nie ma (archiwum: przycisk dojdzie z modułem Archiwum). */
+/** Przycisk do rekordu (rekord w archiwum: „Otwórz w archiwum”) albo informacja, że rekordu już nie ma. */
 const OpenRecord = ({ entry }: { entry: ActivityLogItem }) => {
   const { t } = useTranslation('activity-log');
   if (entry.state === 'deleted') return <Text size="xs" c="dimmed">{t('deleted_hint')}</Text>;
   // Tylko adresy w panelu (jak w Powiadomieniach); inny adres z odpowiedzi nie staje się przyciskiem.
-  if (entry.state === 'archived' || !isPanelLink(entry.link)) return <Text size="xs" c="dimmed">{t('archived_hint')}</Text>;
+  if (!isPanelLink(entry.link)) return <Text size="xs" c="dimmed">{t('archived_hint')}</Text>;
   return (
     <Button
       component={Link}
@@ -65,7 +65,7 @@ const OpenRecord = ({ entry }: { entry: ActivityLogItem }) => {
       leftSection={<ButtonIcon action="details" size={14} />}
       style={{ alignSelf: 'flex-start' }}
     >
-      {t(`open.${entry.area}`)}
+      {entry.state === 'archived' ? t('open_in_archive') : t(`open.${entry.area}`)}
     </Button>
   );
 };

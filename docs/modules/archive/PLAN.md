@@ -66,7 +66,7 @@ i edycję).
   400 złe parametry i nazwa, 404 dla `abc`, 409, jeden 401 i jeden 403); wiersze w „Mapie dostępu” w
   `SPEC-GENERAL.md` (zamiast ogólnego `/api/archive`) i potwierdzenie RESTRICT `leave_requests.user_id` (odpowiedź 1a)
   → `npm run check`
-- [ ] 7. **Historia zmian: „Otwórz w archiwum”**: `linkOf` dla rekordu w archiwum zwraca `archiveTaskPath(id)`
+- [x] 7. **Historia zmian: „Otwórz w archiwum”**: `linkOf` dla rekordu w archiwum zwraca `archiveTaskPath(id)`
   (zadanie) albo `archiveEmployeesPath(login)` (konto, pula); `OpenRecord` przy `state === 'archived'` pokazuje
   przycisk `open_in_archive` (klucz w `activity-log.json`); testy usługi i komponentu (link archiwum, przycisk, brak
   przycisku dla usuniętego) → `npm run check`

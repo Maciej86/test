@@ -137,5 +137,6 @@
   "validation": {
     "dates_order": "Data „do” nie może być wcześniejsza niż „od”."
   },
-  "with_context": ", {{context}}"
+  "with_context": ", {{context}}",
+  "open_in_archive": "Otwórz w archiwum"
 }

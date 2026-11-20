@@ -31,7 +31,7 @@ export interface ActivityChange {
   after: unknown;
 }
 
-/** Jeden wpis historii z API. `link`: adres przycisku „Otwórz” albo null (rekord w archiwum lub usunięty). */
+/** Jeden wpis historii z API. `link`: adres przycisku „Otwórz” (rekord w archiwum: adres w Archiwum) albo null (usunięty). */
 export interface ActivityLogItem {
   id: number;
   createdAt: string;

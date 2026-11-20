@@ -29,8 +29,9 @@ projektach, kontach pracowników oraz typach urlopów i umów. Historii nikt nie
   - projekt → tablica projektu,
   - pracownik i pula dni → lista pracowników z wyszukaniem po loginie (`/admin/employees?search=<login>`),
   - typ urlopu / typ umowy → ich lista w Ustawieniach.
-  - Rekord w archiwum (zadanie, konto): plakietka „w archiwum”; przycisk „Otwórz w archiwum” dojdzie z modułem
-    Archiwum (do tego czasu bez przycisku).
+  - Rekord w archiwum (zadanie, konto): plakietka „w archiwum” i przycisk „Otwórz w archiwum” (moduł Archiwum,
+    2026-11-20): zadanie → podgląd w Archiwum (`archiveTaskPath`), konto i pula → zakładka Pracownicy z wyszukaniem
+    po loginie (`archiveEmployeesPath`).
   - Rekord usunięty na stałe: plakietka „usunięty na stałe”, podpowiedź „Nazwa zapamiętana w chwili zmiany, rekordu
     już nie ma.”, bez przycisku.
 - **Pusta historia:** „Historia jest pusta” + opis. **Brak wyników filtrów:** „Żaden wpis nie pasuje do filtrów…”.

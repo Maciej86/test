@@ -77,9 +77,22 @@ describe('activity-log service', () => {
     ]);
   });
 
-  it('no link for archived and deleted records', async () => {
-    list([entry({ id: 1, area: 'users', entityId: 2 }), entry({ id: 2, area: 'projects', entityId: 9 })], [['users:2', { archived: true, login: 'jan' }]]);
-    expect((await s.getList(query)).items.map((i) => [i.state, i.link])).toEqual([['archived', null], ['deleted', null]]);
+  it('archived records link to the archive, deleted records have no link', async () => {
+    list(
+      [
+        entry({ id: 1, area: 'users', entityId: 2 }),
+        entry({ id: 2, area: 'leave_pools', entityId: 2 }),
+        entry({ id: 3, area: 'tasks', entityId: 8 }),
+        entry({ id: 4, area: 'projects', entityId: 9 }),
+      ],
+      [['users:2', { archived: true, login: 'jan k' }], ['leave_pools:2', { archived: true, login: 'jan k' }], ['tasks:8', { archived: true, projectId: 4 }]],
+    );
+    expect((await s.getList(query)).items.map((i) => [i.state, i.link])).toEqual([
+      ['archived', '/admin/archive?tab=employees&search=jan%20k'],
+      ['archived', '/admin/archive?tab=employees&search=jan%20k'],
+      ['archived', '/admin/archive?tab=tasks&taskId=8'],
+      ['deleted', null],
+    ]);
   });
 
   it('person ids in changes become names; a missing account becomes null', async () => {
