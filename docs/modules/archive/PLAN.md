@@ -37,7 +37,7 @@ i edycję).
   z filtrem projektu, podgląd 404 dla aktywnego, przywrócenie na koniec kolumny, usunięcie z komentarzami, wpisy
   historii), `frontend/src/modules/archive/__tests__/ArchivePage.test.tsx`, `e2e/archive.spec.ts` (scenariusze
   `TESTS.md`) → `npm run check`
-- [ ] 1. **Wydzielenie `ConfirmByNameModal`** (front `common/` + makiety `common/`): test (przycisk wyłączony, dopóki
+- [x] 1. **Wydzielenie `ConfirmByNameModal`** (front `common/` + makiety `common/`): test (przycisk wyłączony, dopóki
   tekst po `trim()` ≠ `name`; `onConfirm` dostaje obcięty tekst); podmiana w `DeleteProjectModal` i w makiecie
   `archive/ArchiveModals.tsx`; wzór „Usunięcie na stałe” w `DESIGN.md` wskazuje klocek → `npm run check`
 - [ ] 2. **Shared**: `constants/archive.ts`, `schemas/archive.ts`, typy jak wyżej, `server.archive_first` w

@@ -90,7 +90,7 @@ Każda kolejna sekcja to `PageSection` z tłem na całą szerokość, na zmianę
 | Dzwonek powiadomień | w belce przed menu użytkownika; czerwona liczba nieprzeczytanych (`red.8`, powyżej 99 „99+”); na komputerze okienko 420 px pod dzwonkiem, na telefonie panel z prawej na cały ekran. Nieprzeczytane: tło `dark.6`, pasek `navy.4` po lewej, pogrubiony tytuł i kropka; ikona rodzaju w kolorach statusów | Powiadomienia |
 | Karta zadania | `Card withBorder` na `dark.6`: tytuł, 2 linie opisu, termin (po czasie `red.4`, dziś i jutro `yellow.4`), kółka osób (`navy` light, archiwum szare, żółta kropka = urlop), pasek `navy.4` po lewej przy moim zadaniu, menu „⋮” | Zadania |
 | Podgląd z prawej | `Drawer position="right"` 540 px (na telefonie cały ekran): od razu edytowalne pola, „Usuń” po lewej na dole, „Anuluj” i „Zapisz” po prawej; nowe rekordy dodaje się w oknie na środku (`Modal size="lg"`) | Zadania |
-| Usunięcie na stałe | `ConfirmModal` z polem „wpisz nazwę” i `confirmDisabled`, dopóki nazwa się nie zgadza | Zadania |
+| Usunięcie na stałe | `ConfirmByNameModal` (common): pole „wpisz nazwę”, czerwony przycisk działa dopiero, gdy nazwa się zgadza | Zadania |
 | Kalendarz zespołu | `@mantine/schedule`, `ResourcesMonthView` / `ResourcesWeekView`: osoby w wierszach, dni w kolumnach; urlopy, wydarzenia i zadania jako paski; weekend i święta (`getPolishHolidays`) wyszarzone | |
 
 ## Ikony przycisków

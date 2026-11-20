@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { Text, TextInput } from '@mantine/core';
+import { Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { ProjectItem } from '@app/shared';
-import { ConfirmModal } from '../../../common/ConfirmModal';
+import { ConfirmByNameModal } from '../../../common/ConfirmByNameModal';
 import { apiErrorMessage } from '../../../core/api/client';
 import { notify } from '../../../core/notify';
 import { useDeleteProject } from '../tasks.api';
@@ -11,10 +10,9 @@ import { useDeleteProject } from '../tasks.api';
 export const DeleteProjectModal = ({ project, onClose }: { project: ProjectItem; onClose: () => void }) => {
   const { t } = useTranslation('tasks');
   const remove = useDeleteProject();
-  const [typed, setTyped] = useState('');
-  const confirm = () =>
+  const confirm = (confirmName: string) =>
     remove.mutate(
-      { id: project.id, confirmName: typed.trim() },
+      { id: project.id, confirmName },
       {
         onSuccess: () => {
           notify.success(t('project_deleted'));
@@ -24,18 +22,16 @@ export const DeleteProjectModal = ({ project, onClose }: { project: ProjectItem;
       },
     );
   return (
-    <ConfirmModal
+    <ConfirmByNameModal
       title={t('project_delete_title')}
       confirmLabel={t('project_delete')}
-      confirmAction="delete"
-      danger
+      name={project.name}
+      inputLabel={t('project_delete_confirm_label', { name: project.name })}
       loading={remove.isPending}
-      confirmDisabled={typed.trim() !== project.name}
       onConfirm={confirm}
       onClose={onClose}
     >
       <Text>{t('project_delete_text', { name: project.name, count: project.openCount + project.doneCount + project.archivedCount })}</Text>
-      <TextInput label={t('project_delete_confirm_label', { name: project.name })} value={typed} onChange={(e) => setTyped(e.currentTarget.value)} data-autofocus />
-    </ConfirmModal>
+    </ConfirmByNameModal>
   );
 };

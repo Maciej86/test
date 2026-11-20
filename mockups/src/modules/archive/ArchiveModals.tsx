@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { Alert, Avatar, Badge, Button, Divider, Drawer, Group, Stack, Text, TextInput } from '@mantine/core';
+import { Alert, Avatar, Badge, Button, Divider, Drawer, Group, Stack, Text } from '@mantine/core';
 import { Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { ConfirmByNameModal } from '../../common/ConfirmByNameModal';
 import { ConfirmModal } from '../../common/ConfirmModal';
 import { DateText } from '../../common/DateText';
 import { notify } from '../../common/notify';
@@ -31,21 +31,18 @@ export const RestoreEmployeeModal = ({ employee, onClose }: { employee: Archived
 
 export const DeleteEmployeeModal = ({ employee, onClose }: { employee: ArchivedEmployee; onClose: () => void }) => {
   const { t } = useTranslation('archive');
-  const [typed, setTyped] = useState('');
   return (
-    <ConfirmModal
+    <ConfirmByNameModal
       title={t('delete_employee_title')}
       confirmLabel={t('delete_forever')}
-      confirmAction="delete"
-      danger
-      confirmDisabled={typed.trim() !== employee.name}
+      name={employee.name}
+      inputLabel={t('type_name')}
       onConfirm={() => { notify.success(t('deleted_employee', { name: employee.name })); onClose(); }}
       onClose={onClose}
     >
       <Text>{t('delete_employee_text', { name: employee.name })}</Text>
       {employee.tasks > 0 && <Text size="sm" c="dimmed">{t('delete_employee_tasks', { tasks: t('tasks', { count: employee.tasks }) })}</Text>}
-      <TextInput label={t('type_name')} placeholder={employee.name} value={typed} onChange={(e) => setTyped(e.currentTarget.value)} data-autofocus />
-    </ConfirmModal>
+    </ConfirmByNameModal>
   );
 };
 
