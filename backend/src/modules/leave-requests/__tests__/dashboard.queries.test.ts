@@ -40,16 +40,16 @@ describe('leave requests queries for the dashboard', () => {
     expect(calls[1]![1]).toEqual(['pending']);
   });
 
-  it('listAbsences: approved and pending overlapping from–to, without archived accounts, ORDER BY date_from, name; no type or comment', async () => {
-    const { db, calls } = spyDb([{ name: 'Magdalena Lewandowska', date_from: '2026-11-18', date_to: '2026-11-27', status: 'approved' }]);
+  it('listAbsences: approved and pending overlapping from–to, without archived accounts, ORDER BY date_from, surname; no type or comment', async () => {
+    const { db, calls } = spyDb([{ user_id: 4, name: 'Magdalena Lewandowska', date_from: '2026-11-18', date_to: '2026-11-27', status: 'approved' }]);
     expect(await q.listAbsences(db, '2026-11-20', '2026-12-03')).toEqual([
-      { name: 'Magdalena Lewandowska', dateFrom: '2026-11-18', dateTo: '2026-11-27', status: 'approved' },
+      { userId: 4, name: 'Magdalena Lewandowska', dateFrom: '2026-11-18', dateTo: '2026-11-27', status: 'approved' },
     ]);
     const [sql, params] = calls[0]!;
     expect(sql).toMatch(/r\.status IN \(\?\)/);
     expect(sql).toMatch(/r\.date_from <= \? AND r\.date_to >= \?/);
     expect(sql).toMatch(/u\.archived_at IS NULL/);
-    expect(sql).toMatch(/ORDER BY r\.date_from, u\.name/);
+    expect(sql).toMatch(/ORDER BY r\.date_from, u\.last_name, u\.first_name, u\.id/);
     expect(sql).not.toMatch(/leave_type|comment|reason/);
     expect(params).toEqual([['pending', 'approved'], '2026-12-03', '2026-11-20']);
   });

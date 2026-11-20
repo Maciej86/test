@@ -323,15 +323,15 @@ export const listOverdueTasks = async (db: Db, today: string, limit: number): Pr
  * `findVisibleProject`); najpierw z terminem od najwcześniejszego (po terminie są pierwsze), bez terminu na końcu.
  */
 export const listMyOpenTasks = async (db: Db, viewer: Viewer, limit: number): Promise<DashboardList<DashboardTask>> => {
-  const from = `FROM tasks t JOIN projects p ON p.id = t.project_id JOIN task_assignees ta ON ta.task_id = t.id AND ta.user_id = ?
+  const joins = `JOIN task_assignees ta ON ta.task_id = t.id AND ta.user_id = ?
     WHERE t.archived_at IS NULL AND t.column_key IN ('draft', 'in_progress')
       AND (? = 'admin' OR EXISTS (SELECT 1 FROM project_members pm WHERE pm.project_id = t.project_id AND pm.user_id = ?))`;
   const params = [viewer.id, viewer.role, viewer.id];
   const [rows] = await db.query<RowDataPacket[]>(
-    `SELECT t.id, t.title, t.project_id, p.name AS project_name, t.column_key, t.due_date ${from}
+    `${DASHBOARD_TASK_SQL} ${joins}
      ORDER BY t.due_date IS NULL, t.due_date, p.position, t.position LIMIT ?`, // rule-ok: stały fragment z tej funkcji, dane przez ?
     [...params, limit],
   );
-  const [count] = await db.query<RowDataPacket[]>(`SELECT COUNT(*) AS total ${from}`, params); // rule-ok: jak wyżej
+  const [count] = await db.query<RowDataPacket[]>(`SELECT COUNT(*) AS total FROM tasks t ${joins}`, params); // rule-ok: jak wyżej
   return { items: rows.map(toDashboardTask), total: Number(count[0]?.total ?? 0) };
 };

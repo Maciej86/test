@@ -21,6 +21,7 @@ export interface DashboardPendingRequest {
 
 /** Nieobecność na pasku: tylko osoba, daty i status (bez typu urlopu, powodu, komentarza). */
 export interface DashboardAbsence {
+  userId: number;
   name: string;
   dateFrom: string;
   dateTo: string;

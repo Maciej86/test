@@ -22,9 +22,9 @@ const admin: AdminDashboard = {
     total: 7,
   },
   absences: [
-    { name: 'Katarzyna Wiśniewska', dateFrom: '2026-11-20', dateTo: '2026-11-20', status: 'approved' },
-    { name: 'Piotr Zieliński', dateFrom: '2026-11-20', dateTo: '2026-11-20', status: 'pending' },
-    { name: 'Magdalena Lewandowska', dateFrom: '2026-11-23', dateTo: '2026-11-27', status: 'approved' },
+    { userId: 3, name: 'Katarzyna Wiśniewska', dateFrom: '2026-11-20', dateTo: '2026-11-20', status: 'approved' },
+    { userId: 5, name: 'Piotr Zieliński', dateFrom: '2026-11-20', dateTo: '2026-11-20', status: 'pending' },
+    { userId: 4, name: 'Magdalena Lewandowska', dateFrom: '2026-11-23', dateTo: '2026-11-27', status: 'approved' },
   ],
   projects: [
     { id: 1, name: 'Marketing', draft: 3, inProgress: 2, overdue: 1, doneRecently: 5 },
@@ -110,6 +110,17 @@ describe('DashboardPage', () => {
     expect(within(rows[0]!).getAllByTestId('strip-day')).toHaveLength(14);
     expect(within(rows[1]!).getAllByTestId('strip-day')[0]).toHaveAttribute('data-mark', 'pending');
     expect(within(box).getAllByTestId('strip-header-day')[0]).toHaveAttribute('data-today', 'true');
+  });
+
+  it('admin: two people with the same name get separate rows', async () => {
+    show({ ...admin, absences: [
+      { userId: 8, name: 'Jan Nowak', dateFrom: '2026-11-20', dateTo: '2026-11-20', status: 'approved' },
+      { userId: 9, name: 'Jan Nowak', dateFrom: '2026-11-23', dateTo: '2026-11-23', status: 'pending' },
+    ] });
+    const box = await screen.findByText('Dziś nie ma: Jan Nowak');
+    const rows = within(box.closest('.mantine-Card-root') as HTMLElement).getAllByTestId('strip-row');
+    expect(rows).toHaveLength(2);
+    expect(within(rows[1]!).getAllByTestId('strip-day')[0]).toHaveAttribute('data-mark', 'none');
   });
 
   it('admin: nobody absent → empty text; nobody absent today → "Dziś wszyscy są w pracy."', async () => {

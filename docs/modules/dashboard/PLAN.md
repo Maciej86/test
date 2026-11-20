@@ -15,6 +15,9 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
   komórki, legenda; treść: dni, wiersze, podpisy, wyróżniony dzień); `TeamStrip` zostaje cienką nakładką.
   Porównane z: `TeamStrip` (leave-requests), `DayStrip` (my-leave: jeden wiersz dni bez osób, inna rama, zostaje),
   makieta `mockups/src/modules/dashboard/AbsenceStrip.tsx`.
+Boksy Pulpitu (`PendingBox`, `AbsenceBox`, `ProjectsBox`, `MyTasksBox`, `MyRequestsBox`, `PoolBox`) to treść
+w `InfoCard` (common). Porównane z: `NotificationItem` (notifications), `ActivityEntry` (activity-log) dla `RowLink`;
+`TaskCard` (tasks) dla `TaskRow` (inna rama: wiersz listy, nie karta tablicy) → osobno.
 **Osobno, bez wydzielania:** `listAbsences` i `listOverlapping` (leave-requests) mają podobny SQL, ale inne warunki
 (wszystkie osoby spoza archiwum vs. inne osoby niż wnioskodawca); kilka linii, zostają osobno.
 
@@ -98,10 +101,17 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
   `DashboardPage.test.tsx` → `npm run check`
   **Uwaga:** nowa stała `MY_LEAVE_PATH` (shared) zamiast wpisanego adresu w nawigacji, w linku powiadomienia
   o decyzji i na Pulpicie.
-- [ ] 10. Test e2e `e2e/dashboard.spec.ts` ze scenariuszy `TESTS.md` → `npm run test:e2e`, `npm run check`; przegląd
+- [x] 10. Test e2e `e2e/dashboard.spec.ts` ze scenariuszy `TESTS.md` → `npm run test:e2e`, `npm run check`; przegląd
   kodu całego modułu.
   **Uwaga:** test e2e wykrył błąd: po złożeniu wniosku powrót na Pulpit pokazywał dane sprzed chwili (aplikacja
   trzyma dane 30 s). `useDashboard` ma `staleTime: 0` (test `dashboard.api.test.tsx`), zgodnie ze specem.
+  **Przegląd kodu (2026-11-20):** bez uwag krytycznych. Poprawione: makiety Moich urlopów i szczegółów wniosku
+  pokazywały klucze zamiast tekstów po przeniesieniu do `common.json` (test `mockups/.../sharedTexts.test.tsx`);
+  nieobecności rozróżniają osoby po numerze (`userId`), kolejność po nazwisku; `listMyOpenTasks` używa wspólnej
+  listy kolumn; jeden wiersz w Mapie dostępu; „Porównane z” dla boksów. Testy e2e Moich urlopów i Pulpitu klikają
+  link w menu (na Pulpicie pracownika jest drugi link „Moje urlopy”). Zostawione świadomie: zwykły termin w „Moich
+  zadaniach” jasny, jak w makiecie (na karcie tablicy szary); nowe stany („bez puli”, „zaczyna się dziś”) tylko
+  w aplikacji.
 
 ## Na co uważać (bez osobnego kroku, testy w krokach)
 

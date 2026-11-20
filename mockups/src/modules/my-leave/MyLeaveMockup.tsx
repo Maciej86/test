@@ -35,7 +35,8 @@ const FORM_STATE: Partial<Record<State, keyof typeof FORM_EXAMPLES>> = {
  * i zostało z puli rocznej. Duża liczba to dni, o które pracownik może jeszcze wnioskować.
  */
 const PoolCard = () => {
-  const { t } = useTranslation('my-leave');
+  // Teksty karty wspólne z Pulpitem (common.json, „pool.*”).
+  const { t } = useTranslation();
   const total = POOL.annual + POOL.carried;
   const used = POOL.usedCarried + POOL.usedAnnual;
   const carriedLeft = POOL.carried - POOL.usedCarried;
@@ -50,23 +51,23 @@ const PoolCard = () => {
   ];
 
   return (
-    <InfoCard title={t('pool_title', { year: POOL.year })}>
+    <InfoCard title={t('pool.title', { year: POOL.year })}>
       <Group gap="xs" align="baseline">
         <Text fz={40} fw={700} lh={1} c={left === 0 ? 'red.4' : undefined}>{left}</Text>
-        <Text c="dimmed">{t('pool_left', { total })}</Text>
+        <Text c="dimmed">{t('pool.left', { total })}</Text>
       </Group>
-      <Progress.Root size={12} radius="xs" aria-label={t('pool_aria', { left, total })}>
+      <Progress.Root size={12} radius="xs" aria-label={t('pool.aria', { left, total })}>
         {parts.map((p) => <Progress.Section key={p.key} value={pct(p.value)} color={p.color} />)}
       </Progress.Root>
       <Group gap="lg" mt={4}>
         {parts.map((p) => (
           <Group key={p.key} gap={6} wrap="nowrap">
             <span style={{ width: 10, height: 10, borderRadius: 2, background: `var(--mantine-color-${p.color.replace('.', '-')})`, display: 'inline-block' }} />
-            <Text size="sm"><Text span fw={700}>{p.value}</Text> <Text span c="dimmed">{t(`legend_${p.key}`, { year: POOL.year - 1 })}</Text></Text>
+            <Text size="sm"><Text span fw={700}>{p.value}</Text> <Text span c="dimmed">{t(`pool.legend_${p.key}`, { year: POOL.year - 1 })}</Text></Text>
           </Group>
         ))}
       </Group>
-      <Text size="xs" c="dimmed">{t('pool_hint', { annual: POOL.annual, carried: POOL.carried, prev: POOL.year - 1 })}</Text>
+      <Text size="xs" c="dimmed">{t('pool.hint', { annual: POOL.annual, carried: POOL.carried, prev: POOL.year - 1 })}</Text>
     </InfoCard>
   );
 };

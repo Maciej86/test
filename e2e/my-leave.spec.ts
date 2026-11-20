@@ -31,7 +31,7 @@ test('pracownik składa wniosek, widzi blokady i go wycofuje; administrator dost
 
   // Pracownik: pula i złożenie wniosku.
   await logInWithOwnPassword(page, login, temporary);
-  await page.getByRole('link', { name: 'Moje urlopy' }).click();
+  await page.getByRole('navigation').getByRole('link', { name: 'Moje urlopy' }).click();
   await expect(page.getByRole('heading', { name: 'Moje urlopy' })).toBeVisible();
   await expect(page.getByText('dni do wykorzystania (z 20)')).toBeVisible();
   await expect(page.getByText('W tym roku nie masz jeszcze wniosków. Złóż pierwszy, gdy zaplanujesz urlop.')).toBeVisible();

@@ -157,11 +157,12 @@ export const listPendingForDashboard = async (db: Db, limit: number): Promise<Da
  */
 export const listAbsences = async (db: Db, from: string, to: string): Promise<DashboardAbsence[]> => {
   const [rows] = await db.query<RowDataPacket[]>(
-    `SELECT u.name, r.date_from, r.date_to, r.status FROM leave_requests r JOIN users u ON u.id = r.user_id
-     WHERE r.status IN (?) AND r.date_from <= ? AND r.date_to >= ? AND u.archived_at IS NULL ORDER BY r.date_from, u.name`,
+    `SELECT r.user_id, u.name, r.date_from, r.date_to, r.status FROM leave_requests r JOIN users u ON u.id = r.user_id
+     WHERE r.status IN (?) AND r.date_from <= ? AND r.date_to >= ? AND u.archived_at IS NULL
+     ORDER BY r.date_from, u.last_name, u.first_name, u.id`,
     [ACTIVE, to, from],
   );
-  return rows.map((r) => ({ name: r.name as string, dateFrom: r.date_from as string, dateTo: r.date_to as string, status: r.status as DashboardAbsence['status'] }));
+  return rows.map((r) => ({ userId: r.user_id as number, name: r.name as string, dateFrom: r.date_from as string, dateTo: r.date_to as string, status: r.status as DashboardAbsence['status'] }));
 };
 
 /** Lata puli, w których są wnioski, od najnowszego. */

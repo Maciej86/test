@@ -38,7 +38,7 @@ test('pracownik składa wniosek, administrator widzi go na Pulpicie i zatwierdza
   await dialog.getByRole('button', { name: 'Złóż wniosek' }).click();
   await expect(ola.getByText('Wniosek złożony. Administrator dostał powiadomienie.')).toBeVisible();
 
-  await ola.getByRole('link', { name: 'Pulpit' }).click();
+  await ola.getByRole('navigation').getByRole('link', { name: 'Pulpit' }).click();
   await expect(card(ola, 'Moje wnioski')).toContainText(`${typed(monday)} – ${typed(tuesday)}`);
   await expect(card(ola, 'Moje wnioski').locator('.mantine-Badge-label', { hasText: 'Czeka na decyzję' })).toBeVisible();
   await expect(card(ola, 'Urlop w ' + todayUtc().getUTCFullYear()).locator('[data-left]')).toHaveText('18');

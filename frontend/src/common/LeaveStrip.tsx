@@ -5,6 +5,8 @@ import { dayjs, formatDate, getHoliday, isWeekend, translateKey } from '@app/sha
 export type StripMark = 'request' | 'approved' | 'pending' | 'none';
 
 export interface StripRow {
+  /** Rozróżnia osoby o tym samym imieniu i nazwisku (domyślnie imię i nazwisko). */
+  key?: string | number;
   name: string;
   bold?: boolean;
   markOn: (iso: string) => StripMark;
@@ -96,7 +98,7 @@ export const LeaveStrip = ({ days, rows, labels, noneLabel = '', highlight }: {
             })}
           </Group>
           {rows.map((row) => (
-            <Group key={row.name} gap={3} wrap="nowrap" data-testid="strip-row" data-name={row.name}>
+            <Group key={row.key ?? row.name} gap={3} wrap="nowrap" data-testid="strip-row" data-name={row.name}>
               <Text size="sm" w={NAME_WIDTH} truncate fw={row.bold ? 600 : 400} style={{ flex: 'none' }}>{row.name}</Text>
               {days.map((iso) => {
                 const mark = row.markOn(iso);

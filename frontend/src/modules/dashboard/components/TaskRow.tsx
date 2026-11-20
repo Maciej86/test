@@ -35,7 +35,7 @@ export const TaskRow = ({ task, today, withPeople = false }: { task: DashboardTa
           <Text size="sm" c={DUE_COLOR[due]} fw={due === 'overdue' || due === 'soon' ? 600 : undefined} data-due={due}>{dueText()}</Text>
           {withPeople && task.assignees && task.assignees.length > 0 && (
             <Group gap={4} wrap="nowrap">
-              {task.assignees.map((p) => <PersonAvatar key={p.name} name={p.name} archived={p.archived} tooltip={p.name} />)}
+              {task.assignees.map((p, i) => <PersonAvatar key={`${i}-${p.name}`} name={p.name} archived={p.archived} tooltip={p.name} />)}
             </Group>
           )}
         </Stack>

@@ -39,6 +39,7 @@ const DayCell = ({ mark, off, tip }: { mark: Mark; off: boolean; tip: string }) 
  */
 export const TeamStrip = ({ request, others }: { request: MockRequest; others: MockRequest[] }) => {
   const { t } = useTranslation('leave-requests');
+  const { t: tc } = useTranslation();
   const start = dayjs(request.from);
   const length = dayjs(request.to).diff(start, 'day') + 1;
   const days = Array.from({ length }, (_, i) => start.add(i, 'day').format('YYYY-MM-DD'));
@@ -78,7 +79,7 @@ export const TeamStrip = ({ request, others }: { request: MockRequest; others: M
                   const holiday = getHoliday(iso);
                   const off = isWeekend(iso) || holiday !== null;
                   const mark: Mark = rows === null ? 'request' : markOf(rows, iso);
-                  const tip = holiday ? translateKey(t, holiday.label) : off ? t('strip_weekend') : mark === 'none' ? '' : t(`strip_${mark}`);
+                  const tip = holiday ? translateKey(t, holiday.label) : off ? tc('strip.weekend') : mark === 'none' ? '' : t(`strip_${mark}`);
                   return <DayCell key={iso} mark={mark} off={off} tip={tip} />;
                 })}
               </Group>
@@ -95,7 +96,7 @@ export const TeamStrip = ({ request, others }: { request: MockRequest; others: M
         ))}
         <Group gap={6} wrap="nowrap">
           <Box w={10} h={10} style={{ borderRadius: 2, border: '1px dashed var(--mantine-color-dark-4)' }} />
-          <Text size="xs" c="dimmed">{t('strip_off')}</Text>
+          <Text size="xs" c="dimmed">{tc('strip.off')}</Text>
         </Group>
       </Group>
       {people.length === 0 && <Text size="sm" c="dimmed">{t('strip_nobody')}</Text>}
