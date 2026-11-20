@@ -19,6 +19,8 @@ test('administrator: licznik, przejście z powiadomienia, strona z filtrem, „O
   await page.getByRole('button', { name: 'Powiadomienia, nieprzeczytane: 1' }).click();
   await page.getByRole('button', { name: 'Pokaż wszystkie' }).click();
   await expect(page).toHaveURL(/\/admin\/notifications$/);
+  // Okienko dzwonka znika z animacją (ok. 0,3 s) i do tego czasu ma te same teksty co strona.
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Powiadomienia' })).toBeVisible();
   await expect(page.getByText('Dzisiaj', { exact: true })).toBeVisible();
   // Na stronie spoza menu nic nie jest podświetlone (wcześniej „Pulpit”).

@@ -16,8 +16,23 @@ export default defineConfig({
   globalSetup: './global-setup.ts',
   globalTeardown: './global-teardown.ts',
   timeout: 30_000,
+  // Domyślnie Playwright otwiera tyle przeglądarek, ile połowa wątków procesora (tu 10). Razem z serwerami w trybie
+  // deweloperskim to zapychało komputer: kroki trwały po kilka sekund i testy przekraczały czas. 4 kończą w tym
+  // samym czasie, bez przeciążenia.
+  workers: 4,
   use: { baseURL: FRONTEND },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    // Powiadomienia liczą nieprzeczytane u wspólnego administratora e2e, a inne testy (np. nowy wniosek) dokładają
+    // mu nowych. Dlatego idą pierwsze i same, zaraz po seedzie; reszta czeka na ich koniec (gdy one nie przejdą,
+    // reszta się nie uruchamia: „did not run”).
+    { name: 'notifications', testMatch: 'notifications.spec.ts', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'chromium',
+      testIgnore: 'notifications.spec.ts',
+      dependencies: ['notifications'],
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
   webServer: [
     { command: 'npm run dev -w @app/backend', url: `http://localhost:${process.env.PORT ?? 3001}/api/health`, reuseExistingServer: !process.env.CI, cwd: '..' },
     { command: 'npm run dev -w @app/frontend', url: FRONTEND, reuseExistingServer: !process.env.CI, cwd: '..' },

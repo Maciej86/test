@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.44
 
-**Następny krok:** Poprawka z `docs/FIXES.md` (czeka): pełne testy e2e czasem nie przechodzą przy dodawaniu pracownika; potem moduł Archiwum (makieta).
+**Następny krok:** Moduł Archiwum (makieta).
 
 ## Start aplikacji
 
@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-20: Poprawka: niestabilne testy e2e. Przyczyną było przeciążenie komputera przez 10 przeglądarek naraz (serwer odpowiadał, ale za późno), a nie błąd aplikacji; teraz `workers: 4` w `e2e/playwright.config.ts` (ten sam czas, ok. 3 min). Test powiadomień idzie pierwszy i sam (projekt `notifications`), bo inne testy dokładają administratorowi e2e powiadomień, i czeka, aż okienko dzwonka zniknie. Dwa pełne przebiegi 48/48 zielone. Uwaga: kilka przebiegów e2e w ciągu 15 minut włącza blokadę „Za dużo prób logowania” (testy celowo wpisują złe hasła).
 - 2026-11-20: Moduł Historia zmian gotowy (użytkownik potwierdził testy). Wspólne `groupByDay` w shared, `useListParams` odporne na spóźnione wyszukiwanie, stałe adresów ekranów w shared.
 - 2026-11-20: Historia zmian: odpowiedzi 1a–9a (dziennik po dniach, rozwijany wpis z „Otwórz”, filtry z datami, wpisy usuniętych rekordów zostają z dopiskiem, trzymane zawsze, bez zmian kolejności w kolumnie, dochodzą typy urlopów i umów, logowania do pomysłów, historia tylko na tym ekranie).
 - 2026-11-19: Historia zmian: makieta (dziennik pogrupowany po dniach, wpis rozwija się z „przed → po” i przyciskiem „Otwórz”, filtry: wyszukiwarka, obszar, kto zmienił, daty od–do, wpis usuniętego projektu, telefon); 9 pytań.
