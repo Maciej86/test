@@ -1,18 +1,42 @@
-import { SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { Grid, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { InfoCard } from '../../common/InfoCard';
+import { dayjs, formatDate, type AdminDashboard as AdminData, type EmployeeDashboard as EmployeeData } from '@app/shared';
+import { DataState } from '../../common/DataState';
+import { PageHeader } from '../../common/PageHeader';
+import { useDashboard } from './dashboard.api';
+import { AbsenceBox } from './components/AbsenceBox';
+import { MyTasksBox } from './components/MyTasksBox';
+import { PendingBox } from './components/PendingBox';
+import { ProjectsBox } from './components/ProjectsBox';
 
-/** Pulpit: podsumowanie w boksach (InfoCard). Moduły dopisują tu swoje boksy. */
+const AdminDashboard = ({ data }: { data: AdminData }) => (
+  <Grid gap="md">
+    <Grid.Col span={{ base: 12, lg: 5 }}><PendingBox pending={data.pending} today={data.today} /></Grid.Col>
+    <Grid.Col span={{ base: 12, lg: 7 }}><AbsenceBox absences={data.absences} today={data.today} /></Grid.Col>
+    <Grid.Col span={{ base: 12, lg: 7 }}><ProjectsBox projects={data.projects} overdue={data.overdue} today={data.today} /></Grid.Col>
+    <Grid.Col span={{ base: 12, lg: 5 }}><MyTasksBox tasks={data.myTasks} today={data.today} /></Grid.Col>
+  </Grid>
+);
+
+const EmployeeDashboard = ({ data }: { data: EmployeeData }) => (
+  <Grid gap="md">
+    <Grid.Col span={12}><MyTasksBox tasks={data.myTasks} today={data.today} /></Grid.Col>
+  </Grid>
+);
+
+/** Pulpit: po zalogowaniu co jest do zrobienia; treść zależna od roli (liczy serwer). */
 export const DashboardPage = () => {
   const { t } = useTranslation('dashboard');
+  const dashboard = useDashboard();
+  const data = dashboard.data;
+  const today = data ? `${dayjs(data.today).locale('pl').format('dddd')}, ${formatDate(data.today)}` : '';
+
   return (
     <Stack>
-      <Title order={2}>{t('title')}</Title>
-      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
-        <InfoCard title={t('start_card')}>
-          <Text>{t('ready')}</Text>
-        </InfoCard>
-      </SimpleGrid>
+      <PageHeader title={t('title')} subtitle={data && t('today', { date: today })} />
+      <DataState query={dashboard}>
+        {data && (data.role === 'admin' ? <AdminDashboard data={data} /> : <EmployeeDashboard data={data} />)}
+      </DataState>
     </Stack>
   );
 };

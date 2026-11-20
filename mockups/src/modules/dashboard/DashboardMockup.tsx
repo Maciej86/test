@@ -189,6 +189,7 @@ const AdminDashboard = ({ empty }: { empty: boolean }) => {
 /** Ta sama karta co „Urlop w …” na ekranie Moje urlopy (w aplikacji: wspólny klocek), plus przycisk wniosku. */
 const PoolBox = () => {
   const { t } = useTranslation('dashboard');
+  const { t: tc } = useTranslation();
   const pool = MY_POOL;
   const total = pool.annual + pool.carried;
   const used = pool.usedCarried + pool.usedAnnual;
@@ -202,7 +203,7 @@ const PoolBox = () => {
   ];
   return (
     <InfoCard
-      title={t('pool.title', { year: pool.year })}
+      title={tc('pool.title', { year: pool.year })}
       actions={
         <Button component={Link} to="/admin/my-leave" leftSection={<ButtonIcon action="add" />}>
           {t('pool.request')}
@@ -211,9 +212,9 @@ const PoolBox = () => {
     >
       <Group gap="xs" align="baseline">
         <Text fz={40} fw={700} lh={1}>{left}</Text>
-        <Text c="dimmed">{t('pool.left', { total })}</Text>
+        <Text c="dimmed">{tc('pool.left', { total })}</Text>
       </Group>
-      <Progress.Root size={12} radius="xs" aria-label={t('pool.aria', { left, total })}>
+      <Progress.Root size={12} radius="xs" aria-label={tc('pool.aria', { left, total })}>
         {parts.map((p) => <Progress.Section key={p.key} value={(p.value / total) * 100} color={p.color} />)}
       </Progress.Root>
       <Group gap="lg" mt={4}>
@@ -221,7 +222,7 @@ const PoolBox = () => {
           <Group key={p.key} gap={6} wrap="nowrap">
             <Box w={10} h={10} bg={p.color} style={{ borderRadius: 2 }} />
             <Text size="sm">
-              <Text span fw={700}>{p.value}</Text> <Text span c="dimmed">{t(`pool.legend_${p.key}`, { year: pool.year - 1 })}</Text>
+              <Text span fw={700}>{p.value}</Text> <Text span c="dimmed">{tc(`pool.legend_${p.key}`, { year: pool.year - 1 })}</Text>
             </Text>
           </Group>
         ))}

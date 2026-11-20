@@ -1,7 +1,5 @@
 {
   "title": "Pulpit",
-  "ready": "Twoja aplikacja jest gotowa do budowy. Wróć do Claude'a i wpisz /stepkit:dalej.",
-  "start_card": "Start",
   "today": "Dziś {{date}}",
   "show_all": "Pokaż wszystkie ({{count}})",
   "more_one": "i jeszcze {{count}} zadanie",
@@ -20,6 +18,8 @@
     "starts_in_few": "zaczyna się za {{count}} dni",
     "starts_in_many": "zaczyna się za {{count}} dni",
     "starts_in_other": "zaczyna się za {{count}} dni",
+    "starts_today": "zaczyna się dziś",
+    "started": "termin już się zaczął",
     "empty": "Wszystkie wnioski są rozpatrzone. Nowy wniosek pojawi się tutaj i w dzwonku."
   },
   "absence": {
@@ -58,14 +58,8 @@
     "in_progress": "W toku"
   },
   "pool": {
-    "title": "Urlop w {{year}}",
-    "left": "dni do wykorzystania (z {{total}})",
-    "aria": "Zostało {{left}} z {{total}} dni",
-    "legend_used": "wykorzystane",
-    "legend_pending": "czeka na decyzję",
-    "legend_carried": "zostało z zaległego z {{year}}",
-    "legend_annual": "zostało z puli rocznej",
-    "request": "Złóż wniosek"
+    "request": "Złóż wniosek",
+    "no_pool": "Pula dni nie jest jeszcze ustalona. Zapytaj administratora."
   },
   "my_requests": {
     "title": "Moje wnioski",

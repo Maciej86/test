@@ -85,7 +85,7 @@ test, który nie przechodzi → kod → `npm run check` → odhaczenie.
   **Uwaga:** `doneSince` = teraz − 30 dni, tak samo jak na tablicy projektu (`getBoard`), żeby liczby się zgadzały.
   Test szablonu `backend/src/__tests__/app.test.ts` podpinał zmyślony moduł „dashboard” pod `/api/dashboard`; teraz
   pod `/api/test/dashboard` (sprawdza to samo).
-- [ ] 8. Ekran administratora: `frontend/src/modules/dashboard/dashboard.api.ts` (`useDashboard()`, klucz
+- [x] 8. Ekran administratora: `frontend/src/modules/dashboard/dashboard.api.ts` (`useDashboard()`, klucz
   `['dashboard']`), `DashboardPage.tsx` z `DataState` i `PageHeader` („Dziś piątek, 20.11.2026”), boksy
   w `components/`: `PendingBox` (znacznik liczby, „zaczyna się …”: za N dni / jutro / dziś / „termin już się zaczął”,
   żółte przy ≤ 7 dniach), `AbsenceBox` (`LeaveStrip`, „Dziś nie ma: …” tylko z zatwierdzonych), `ProjectsBox`
