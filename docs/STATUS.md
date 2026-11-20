@@ -37,6 +37,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-20: Poprawka: testy w przeglądarce czekają na element 10 s (było 5 s), cały test do 45 s; przy zajętym komputerze zapis z hasłem trwa kilka sekund. Aplikacja bez zmian.
 - 2026-11-20: Aktualizacja stepkit do 0.1.47: szuflady, okna formularzy i kółka osób są wspólnymi klockami (`SideDrawer`, `FormModal`, `PersonAvatar` w `common/` frontu i makiet); szczegóły wniosku mają teraz 540 px jak reszta podglądów (było szerzej), kółka osób w archiwum wszędzie szare i przygaszone; „Zamknij rok” na `ConfirmModal`.
 - 2026-11-20: Poprawka (zgłoszenie użytkownika): Archiwum przy każdym wejściu pobiera świeżą listę i liczniki (osoba przeniesiona do archiwum w Pracownikach nie była widoczna bez odświeżenia strony).
 - 2026-11-20: Moduł Archiwum gotowy (użytkownik potwierdził testy: „działa”). Wspólne `ConfirmByNameModal` (common) i `useEmptyLaterPage` (core), `apiErrorStatus` w kliencie API, „Otwórz w archiwum” w Historii zmian.

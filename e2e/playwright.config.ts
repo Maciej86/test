@@ -15,7 +15,11 @@ export default defineConfig({
   testDir: '.',
   globalSetup: './global-setup.ts',
   globalTeardown: './global-teardown.ts',
-  timeout: 30_000,
+  // Komputer bywa zajęty innymi programami; wtedy zapis z hasłem (szyfrowanie celowo pracochłonne) trwa kilka sekund
+  // zamiast ułamka, a przeglądarka rysuje wolniej. Domyślne 5 s na pojawienie się elementu było za krótko
+  // (sprawdzone w nagraniu 2026-11-20: zapis pracownika 3,6 s + rysowanie > 1 s).
+  timeout: 45_000,
+  expect: { timeout: 10_000 },
   // Domyślnie Playwright otwiera tyle przeglądarek, ile połowa wątków procesora (tu 10). Razem z serwerami w trybie
   // deweloperskim to zapychało komputer: kroki trwały po kilka sekund i testy przekraczały czas. 4 kończą w tym
   // samym czasie, bez przeciążenia.
