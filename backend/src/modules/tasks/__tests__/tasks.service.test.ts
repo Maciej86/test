@@ -144,7 +144,7 @@ describe('task writes', () => {
     vi.mocked(q.columnTaskIds).mockResolvedValue([11, 12]);
     vi.mocked(q.findTask).mockResolvedValue(row({ id: 7, column: 'draft' }));
     vi.mocked(q.assigneesOf).mockResolvedValue(new Map([[7, [5]]]));
-    vi.mocked(q.lockProject).mockResolvedValue(true);
+    vi.mocked(q.lockProject).mockResolvedValue('Marketing');
   });
 
   // Jedna kolejność blokad (projekt, potem zadanie i kolumny): dwa przeciągnięcia naraz czekają, zamiast się zakleszczyć.
@@ -168,7 +168,7 @@ describe('task writes', () => {
   });
 
   it('project deleted in the meantime → 404, nothing written', async () => {
-    vi.mocked(q.lockProject).mockResolvedValue(false);
+    vi.mocked(q.lockProject).mockResolvedValue(null);
     expect(await s.createTask(9, input, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
     expect(await s.moveTask(7, { column: 'done', beforeTaskId: null }, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
     expect(q.insertTask).not.toHaveBeenCalled();
@@ -196,7 +196,7 @@ describe('task writes', () => {
     expect(notifyUsers).toHaveBeenCalledWith(conn, {
       type: 'task_assigned', userIds: [5, 6], params: { task: 'Zamówić ulotki', dueDate: '2026-11-25' }, link: '/admin/tasks/9?task=40', actor: { id: 5, name: 'Jan Kowalski' },
     });
-    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'create', entityType: 'tasks', entityId: 40, userId: 5 }));
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'create', entityType: 'tasks', entityId: 40, userId: 5, entityContext: { project: 'Marketing' } }));
   });
 
   it('no due date → no dueDate parameter in the notification', async () => {
@@ -263,7 +263,8 @@ describe('task writes', () => {
     expect(q.setPositions).toHaveBeenCalledWith(conn, [21, 7]);
     expect(q.setPositions).toHaveBeenCalledWith(conn, [11, 12]);
     expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({
-      action: 'status', entityType: 'tasks', entityId: 7, changes: { column_key: { before: 'in_progress', after: 'done' } },
+      action: 'status', entityType: 'tasks', entityId: 7, entityName: 'Oferta dla hurtowni', entityContext: { project: 'Marketing' },
+      changes: { column_key: { before: 'in_progress', after: 'done' } },
     }));
   });
 
@@ -287,7 +288,7 @@ describe('task writes', () => {
   it('archive: by the actor, history archive; missing → 404', async () => {
     expect(await s.archiveTask(7, jan)).toEqual({ ok: true });
     expect(q.archiveTask).toHaveBeenCalledWith(conn, 7, 5);
-    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'archive', entityType: 'tasks', entityId: 7 }));
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'archive', entityType: 'tasks', entityId: 7, entityName: 'Oferta dla hurtowni', entityContext: { project: 'Marketing' } }));
     vi.mocked(q.findTask).mockResolvedValue(null);
     expect(await s.archiveTask(7, jan)).toEqual({ error: expect.objectContaining({ status: 404 }) });
   });
@@ -295,7 +296,7 @@ describe('task writes', () => {
   it('history: edit writes changed fields and assignees before → after', async () => {
     await s.updateTask(7, { ...input, title: 'Nowy tytuł', assigneeIds: [6] }, jan);
     expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({
-      action: 'update', entityType: 'tasks', entityId: 7,
+      action: 'update', entityType: 'tasks', entityId: 7, entityName: 'Nowy tytuł', entityContext: { project: 'Marketing' },
       changes: expect.objectContaining({ title: { before: 'Oferta dla hurtowni', after: 'Nowy tytuł' }, assignee_ids: { before: [5], after: [6] } }),
     }));
   });

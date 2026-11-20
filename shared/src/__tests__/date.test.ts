@@ -9,6 +9,7 @@ import {
   formatRelativeDay,
   parseTypedDate,
   formatTime,
+  groupByDay,
   toIsoDate,
   todayIsoDate,
 } from '../date';
@@ -111,5 +112,20 @@ describe('parseTypedDate', () => {
     expect(parseTypedDate('2024-03-01')).toBeNull();
     expect(parseTypedDate('kot')).toBeNull();
     expect(parseTypedDate('')).toBeNull();
+  });
+});
+
+describe('groupByDay', () => {
+  it('groups consecutive items with the same day label, keeping order', () => {
+    const items = [{ id: 1, d: 'a' }, { id: 2, d: 'a' }, { id: 3, d: 'b' }, { id: 4, d: 'a' }];
+    expect(groupByDay(items, (i) => i.d)).toEqual([
+      { label: 'a', items: [items[0], items[1]] },
+      { label: 'b', items: [items[2]] },
+      { label: 'a', items: [items[3]] },
+    ]);
+  });
+
+  it('empty list gives no groups', () => {
+    expect(groupByDay([], () => 'x')).toEqual([]);
   });
 });

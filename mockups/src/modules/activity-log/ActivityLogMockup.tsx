@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Badge, Button, Collapse, Group, Paper, SegmentedControl, Select, Stack, Text, TextInput, ThemeIcon, UnstyledButton } from '@mantine/core';
 import { ArrowRight, CalendarDays, ChevronDown, FileSignature, FolderKanban, History, PieChart, Search, SquareKanban, Tags, UserRound, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { formatRelativeDay, formatTime } from '@app/shared';
+import { formatRelativeDay, formatTime, groupByDay } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateField } from '../../common/DateField';
 import { EmptyState } from '../../common/EmptyState';
@@ -25,17 +25,6 @@ const AREA_ICON: Record<Area, LucideIcon> = {
 };
 
 const TONE_COLOR: Record<Tone, string> = { neutral: 'navy', positive: 'green', negative: 'red', muted: 'gray' };
-
-const groupByDay = (items: MockEntry[], label: (d: string) => string) => {
-  const groups: { label: string; items: MockEntry[] }[] = [];
-  for (const e of items) {
-    const l = label(e.at);
-    const last = groups.at(-1);
-    if (last?.label === l) last.items.push(e);
-    else groups.push({ label: l, items: [e] });
-  }
-  return groups;
-};
 
 /** „Przed → po” dla każdego zmienionego pola; stara wartość przekreślona i przygaszona. */
 const Changes = ({ entry }: { entry: MockEntry }) => {
@@ -238,7 +227,7 @@ export const ActivityLogMockup = () => {
         </Paper>
       ) : (
         <>
-          {groupByDay(rows, dayLabel).map((g) => (
+          {groupByDay(rows, (e) => dayLabel(e.at)).map((g) => (
             <Stack key={g.label} gap={6}>
               <Group justify="space-between" align="baseline">
                 <Text ff="heading" fw={600} size="lg">{g.label}</Text>

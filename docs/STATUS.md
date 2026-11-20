@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.44
 
-**Następny krok:** Moduł Historia zmian, plan: użytkownik akceptuje `docs/modules/activity-log/PLAN.md` (15 kroków, 0–14), potem implementacja od kroku 0.
+**Następny krok:** Moduł Historia zmian, implementacja według `docs/modules/activity-log/PLAN.md`.
 
 ## Start aplikacji
 
@@ -29,7 +29,7 @@
 | 8 | Moje urlopy | my-leave | zrobiony | zamknięcie | employees, leave-types, email, notifications |
 | 9 | Wnioski urlopowe | leave-requests | zrobiony | zamknięcie | my-leave |
 | 10 | Zadania | tasks | zrobiony | zamknięcie | employees, notifications |
-| 11 | Historia zmian | activity-log | w toku | plan | employees, my-leave, leave-requests, tasks |
+| 11 | Historia zmian | activity-log | w toku | implementacja (krok 0/15) | employees, my-leave, leave-requests, tasks |
 | 12 | Archiwum | archive | czeka | makieta | employees, tasks |
 | 13 | Moje konto | my-account | czeka | makieta | login |
 | 14 | Pulpit | dashboard | czeka | makieta | my-leave, leave-requests, tasks |

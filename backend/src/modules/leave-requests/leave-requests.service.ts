@@ -112,6 +112,8 @@ const decide = (id: number, actor: Actor, d: Decision, extraCheck?: (conn: Db, r
       action: 'status',
       entityType: 'leave_requests',
       entityId: id,
+      entityName: r.employeeName,
+      entityContext: { leaveType: r.leaveTypeName, from: r.dateFrom, to: r.dateTo, days: r.workingDays },
       changes: diffChanges(
         { status: d.from, ...(d.reason !== null ? { decision_reason: r.decisionReason } : {}) },
         { status: d.to, ...(d.reason !== null ? { decision_reason: d.reason } : {}) },

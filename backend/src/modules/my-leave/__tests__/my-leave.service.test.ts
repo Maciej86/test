@@ -172,6 +172,7 @@ describe('my leave service: create', () => {
     await s.createRequest(input, jan);
     expect(logActivity).toHaveBeenCalledWith(conn, {
       userId: 7, userName: 'Jan Kowalski', action: 'create', entityType: 'leave_requests', entityId: 33,
+      entityName: 'Jan Kowalski', entityContext: { leaveType: 'Wypoczynkowy', from: '2026-12-21', to: '2026-12-31', days: 7 },
       changes: {
         leave_type: { before: undefined, after: 'Wypoczynkowy' },
         date_from: { before: undefined, after: '2026-12-21' },
@@ -210,7 +211,7 @@ describe('my leave service: create', () => {
 
 describe('my leave service: withdraw', () => {
   const jan = { id: 7, name: 'Jan Kowalski' };
-  const pendingRow = { id: 21, user_id: 7, leave_type_name: 'Wypoczynkowy', date_from: '2026-11-26', date_to: '2026-11-27', status: 'pending' } as never;
+  const pendingRow = { id: 21, user_id: 7, leave_type_name: 'Wypoczynkowy', date_from: '2026-11-26', date_to: '2026-11-27', working_days: 2, status: 'pending' } as never;
 
   beforeEach(() => {
     vi.mocked(q.findOwnRequest).mockResolvedValue(pendingRow);
@@ -239,6 +240,7 @@ describe('my leave service: withdraw', () => {
     expect(q.setWithdrawn).toHaveBeenCalledWith(conn, 21, 7);
     expect(logActivity).toHaveBeenCalledWith(conn, {
       userId: 7, userName: 'Jan Kowalski', action: 'status', entityType: 'leave_requests', entityId: 21,
+      entityName: 'Jan Kowalski', entityContext: { leaveType: 'Wypoczynkowy', from: '2026-11-26', to: '2026-11-27', days: 2 },
       changes: { status: { before: 'pending', after: 'withdrawn' } },
     });
     expect(notifyAdmins).toHaveBeenCalledWith(conn, {

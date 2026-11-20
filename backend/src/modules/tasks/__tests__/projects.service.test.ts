@@ -73,7 +73,7 @@ describe('projects: create', () => {
     expect(q.insertProject).toHaveBeenCalledWith(conn, 'Marketing', 3);
     expect(q.addMembers).toHaveBeenCalledWith(conn, 9, [5, 6]);
     expect(notifyUsers).toHaveBeenCalledWith(conn, { type: 'project_added', userIds: [5, 6], params: { project: 'Marketing' }, link: '/admin/tasks/9', actor: anna });
-    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'create', entityType: 'projects', entityId: 9, userId: 1 }));
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'create', entityType: 'projects', entityId: 9, userId: 1, entityName: 'Marketing' }));
   });
 
   it('name taken → 409 with the field', async () => {
@@ -109,7 +109,7 @@ describe('projects: update', () => {
     expect(q.addMembers).toHaveBeenCalledWith(conn, 9, [7]);
     expect(notifyUsers).toHaveBeenCalledWith(conn, expect.objectContaining({ type: 'project_added', userIds: [7], params: { project: 'Marketing 2027' } }));
     expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({
-      action: 'update', entityType: 'projects', entityId: 9,
+      action: 'update', entityType: 'projects', entityId: 9, entityName: 'Marketing 2027',
       changes: { name: { before: 'Marketing', after: 'Marketing 2027' }, member_ids: { before: [5, 6], after: [6, 7] } },
     }));
   });
@@ -147,7 +147,7 @@ describe('projects: move and delete', () => {
     expect(await s.deleteProject(9, 'Marketing', anna)).toEqual({ ok: true, deletedTasks: 4 });
     expect(q.deleteProject).toHaveBeenCalledWith(conn, 9);
     expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({
-      action: 'delete', entityType: 'projects', entityId: 9, changes: { name: { before: 'Marketing', after: null }, deleted_tasks: { before: 4, after: 0 } },
+      action: 'delete', entityType: 'projects', entityId: 9, entityName: 'Marketing', changes: { name: { before: 'Marketing', after: null }, deleted_tasks: { before: 4, after: 0 } },
     }));
   });
 
@@ -165,5 +165,6 @@ describe('addMemberWhereAssigned (role change admin → employee)', () => {
     expect(q.addMembers).toHaveBeenCalledWith(conn, 3, [7]);
     expect(q.addMembers).toHaveBeenCalledWith(conn, 9, [7]);
     expect(logActivity).toHaveBeenCalledTimes(2);
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ entityId: 3, entityName: 'Montaż', changes: { added_member_id: { before: null, after: 7 } } }));
   });
 });

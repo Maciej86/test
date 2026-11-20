@@ -22,12 +22,12 @@ osób na imiona). Podpięcie `mountModule(api, 'activity-log', activityLogRoutes
 **Wydzielam:** `groupByDay` z `NotificationsPage.tsx` → `shared/src/date.ts` (parametr: pole z datą, etykieta dnia),
 z testem; podmiana w Powiadomieniach i w makiecie Historii zmian (makiety Powiadomień, modułu zrobionego, nie ruszam)
 
-- [ ] 0. Szkielet testów `it.todo`: `shared` (`activityLogQuerySchema`, `describeActivity`, `groupByDay`), backend
+- [x] 0. Szkielet testów `it.todo`: `shared` (`activityLogQuerySchema`, `describeActivity`, `groupByDay`), backend
   (`activityLog.test.ts` z `entityName`, trasy, zapytania/usługa, wpisy w Typach urlopów i umów), front (strona),
   `e2e/activity-log.spec.ts` ze scenariuszy `TESTS.md` → `npm run check`
-- [ ] 1. Wydzielenie `groupByDay` do `shared/src/date.ts` + test, podmiana w `NotificationsPage.tsx` i w makiecie
+- [x] 1. Wydzielenie `groupByDay` do `shared/src/date.ts` + test, podmiana w `NotificationsPage.tsx` i w makiecie
   Historii zmian → `npm run check`
-- [ ] 2. Migracje `025_activity_log_entity_name.sql`, `026_activity_log_entity_context.sql` → `npm run migrate`
+- [x] 2. Migracje `025_activity_log_entity_name.sql`, `026_activity_log_entity_context.sql` → `npm run migrate`
 - [ ] 3. `logActivity` z obowiązkowym `entityName` i opcjonalnym `entityContext` + test zapisu; wszystkie wywołania
   podają nazwę i opis: Pracownicy (osoba, pula: „rok 2026”, nowe konto: rola), Moje urlopy i Wnioski (osoba; typ,
   termin, dni), Zadania (tytuł; projekt), Projekty (nazwa); testy usług sprawdzają nazwę → `npm run check`

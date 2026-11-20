@@ -82,12 +82,12 @@ describe('board queries', () => {
     expect(none.calls).toHaveLength(1);
   });
 
-  it('lockProject locks the project row; missing project → false', async () => {
-    const { db, calls } = spyDb([{ id: 9 }]);
-    expect(await q.lockProject(db, 9)).toBe(true);
-    expect(calls[0]![0]).toBe('SELECT id FROM projects WHERE id = ? FOR UPDATE');
+  it('lockProject locks the project row and gives its name; missing project → null', async () => {
+    const { db, calls } = spyDb([{ id: 9, name: 'Marketing' }]);
+    expect(await q.lockProject(db, 9)).toBe('Marketing');
+    expect(calls[0]![0]).toBe('SELECT id, name FROM projects WHERE id = ? FOR UPDATE');
     const none = spyDb([]);
-    expect(await q.lockProject(none.db, 9)).toBe(false);
+    expect(await q.lockProject(none.db, 9)).toBeNull();
   });
 
   it('setFinished sets or clears finished_at', async () => {

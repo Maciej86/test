@@ -134,8 +134,8 @@ describe('employees routes', () => {
     expect(q.upsertPool).toHaveBeenCalledWith(conn, 7, 2026, 26, 0);
     expect(withTransaction).toHaveBeenCalledTimes(1);
     expect(historyOf()).toEqual([
-      expect.objectContaining({ userId: 1, userName: 'Anna Nowak', action: 'create', entityType: 'users', entityId: 7 }),
-      expect.objectContaining({ action: 'create', entityType: 'leave_pools', entityId: 7 }),
+      expect.objectContaining({ userId: 1, userName: 'Anna Nowak', action: 'create', entityType: 'users', entityId: 7, entityName: 'Jan Kowalski', entityContext: { role: 'employee' } }),
+      expect.objectContaining({ action: 'create', entityType: 'leave_pools', entityId: 7, entityName: 'Jan Kowalski', entityContext: { year: 2026 } }),
     ]);
     expect(historyOf()[0]!.changes).toMatchObject({ first_name: { before: undefined, after: 'Jan' }, last_name: { before: undefined, after: 'Kowalski' } });
     expect(historyOf()[0]!.changes).not.toHaveProperty('name');
@@ -245,7 +245,7 @@ describe('employees routes', () => {
     expect(q.upsertPool).toHaveBeenCalledWith(conn, 2, 2026, 20, 70);
     expect(historyOf()).toEqual([
       expect.objectContaining({
-        action: 'update', entityType: 'leave_pools', entityId: 2,
+        action: 'update', entityType: 'leave_pools', entityId: 2, entityName: 'Jan Kowalski', entityContext: { year: 2026 },
         changes: { annual_days: { before: 26, after: 20 }, carried_days: { before: 4, after: 70 } },
       }),
     ]);
@@ -310,7 +310,7 @@ describe('employees routes', () => {
     expect(res.status).toBe(200);
     expect(q.setTemporaryPassword).toHaveBeenCalledWith(conn, 2, 'hash(Sosna-48-Kruk!)');
     expect(historyOf()).toEqual([
-      expect.objectContaining({ action: 'update', entityType: 'users', entityId: 2, changes: { password: { before: null, after: 'reset' } } }),
+      expect.objectContaining({ action: 'update', entityType: 'users', entityId: 2, entityName: 'Jan Kowalski', changes: { password: { before: null, after: 'reset' } } }),
     ]);
     expect(JSON.stringify([res.body, historyOf()])).not.toMatch(/Sosna|hash\(/);
   });
@@ -339,7 +339,7 @@ describe('employees routes', () => {
     vi.mocked(q.findUser).mockResolvedValue(janUser as never);
     expect((await as(anna).post('/employees/2/archive')).status).toBe(200);
     expect(q.setArchived).toHaveBeenCalledWith(conn, 2, 1);
-    expect(historyOf()).toEqual([expect.objectContaining({ action: 'archive', entityType: 'users', entityId: 2 })]);
+    expect(historyOf()).toEqual([expect.objectContaining({ action: 'archive', entityType: 'users', entityId: 2, entityName: 'Jan Kowalski' })]);
   });
 
   it('POST /employees/:id/restore: active → 409 not_archived; archived → restored with history', async () => {
@@ -388,7 +388,7 @@ describe('employees routes', () => {
     // Wykorzystane dni czytane z blokadą: decyzja innego administratora w tej samej chwili jest już widoczna.
     expect(myLeave.sumPoolUsage).toHaveBeenCalledWith(conn, expect.any(Array), thisYear, { lock: true });
     expect(historyOf()).toContainEqual(expect.objectContaining({
-      action: 'update', entityType: 'leave_pools', entityId: 2,
+      action: 'update', entityType: 'leave_pools', entityId: 2, entityName: 'Jan Kowalski', entityContext: { year: thisYear },
       changes: { closed_year: { before: null, after: thisYear }, annual_days: { before: 26, after: 24 }, carried_days: { before: 4, after: 30 } },
     }));
   });

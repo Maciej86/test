@@ -3,7 +3,7 @@ import { BellOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { apiErrorMessage } from '../../core/api/client';
 import { notify } from '../../core/notify';
-import { formatRelativeDay, notificationsQuerySchema, type NotificationItem as Item, type NotificationsQuery } from '@app/shared';
+import { formatRelativeDay, groupByDay, notificationsQuerySchema, type NotificationItem as Item, type NotificationsQuery } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
 import { EmptyState } from '../../common/EmptyState';
@@ -15,18 +15,6 @@ import { useMarkAllRead, useNotificationsList } from './notifications.api';
 import { useOpenNotification } from './useOpenNotification';
 
 const LIST_DEFAULTS = { page: 1, unread: '0' } as const;
-
-/** Kolejne powiadomienia (od najnowszych) w grupach po dniach. */
-const groupByDay = (items: Item[], label: (iso: string) => string) => {
-  const groups: { label: string; items: Item[] }[] = [];
-  for (const n of items) {
-    const l = label(n.createdAt);
-    const last = groups.at(-1);
-    if (last?.label === l) last.items.push(n);
-    else groups.push({ label: l, items: [n] });
-  }
-  return groups;
-};
 
 /** Strona „Powiadomienia” (bez pozycji w menu, otwierana z dzwonka). */
 export const NotificationsPage = () => {
@@ -71,7 +59,7 @@ export const NotificationsPage = () => {
         ) : (
           data && (
             <>
-              {groupByDay(data.items, (iso) => formatRelativeDay(iso, t, now) ?? '').map((g) => (
+              {groupByDay(data.items, (n) => formatRelativeDay(n.createdAt, t, now) ?? '').map((g) => (
                 <Stack key={g.label} gap={6}>
                   <Text ff="heading" fw={600} c="dark.1">{g.label}</Text>
                   <Paper withBorder bg="dark.7" style={{ overflow: 'hidden' }}>

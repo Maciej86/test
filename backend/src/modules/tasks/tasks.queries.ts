@@ -152,11 +152,11 @@ export const archiveTask = async (db: Db, id: number, byUserId: number): Promise
 /**
  * Blokada projektu na czas zapisu zadania. Każdy zapis zadań (dodanie, zmiana, przeniesienie, archiwum) i usunięcie
  * projektu blokuje najpierw projekt, więc dwa zapisy w tym samym projekcie czekają na siebie zamiast się zakleszczyć.
- * Projekt usunięty w międzyczasie: false.
+ * Daje nazwę projektu (do historii zmian); projekt usunięty w międzyczasie: null.
  */
-export const lockProject = async (db: Db, projectId: number): Promise<boolean> => {
-  const [rows] = await db.query<RowDataPacket[]>('SELECT id FROM projects WHERE id = ? FOR UPDATE', [projectId]);
-  return rows.length > 0;
+export const lockProject = async (db: Db, projectId: number): Promise<string | null> => {
+  const [rows] = await db.query<RowDataPacket[]>('SELECT id, name FROM projects WHERE id = ? FOR UPDATE', [projectId]);
+  return rows[0] ? (rows[0].name as string) : null;
 };
 
 /** Znacznik „Zakończone”: data albo brak (cofnięcie). */

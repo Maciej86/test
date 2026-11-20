@@ -142,6 +142,9 @@ const accountOf = (u: q.UserRow): q.AccountData => ({
   contractTypeId: u.contract_type_id ?? null,
 });
 
+/** „Imię Nazwisko” tak jak kolumna `users.name` (CONCAT_WS z pominięciem pustego imienia). */
+const fullName = (d: { firstName: string; lastName: string }): string => [d.firstName, d.lastName].filter(Boolean).join(' ');
+
 const accountInput = (d: EmployeeData): q.AccountData => ({
   firstName: d.firstName,
   lastName: d.lastName,
@@ -161,9 +164,9 @@ export const createEmployee = async (input: EmployeeCreateData, actor: Actor): P
       const conflict = await findConflict(conn, input.login, input.email, null);
       if (conflict) return conflict;
       const id = await q.insertUser(conn, { ...accountInput(input), passwordHash });
-      const log = { userId: actor.id, userName: actor.name, entityId: id };
+      const log = { userId: actor.id, userName: actor.name, entityId: id, entityName: fullName(input) };
       const changes = diffChanges({}, accountFields(accountInput(input), contractType.name));
-      await logActivity(conn, { ...log, action: 'create', entityType: 'users', changes });
+      await logActivity(conn, { ...log, action: 'create', entityType: 'users', entityContext: { role: input.role }, changes });
       if (input.role === 'employee' && input.annualDays !== undefined) {
         const year = await getOpenYear(conn);
         await q.upsertPool(conn, id, year, input.annualDays, input.carriedDays);
@@ -171,6 +174,7 @@ export const createEmployee = async (input: EmployeeCreateData, actor: Actor): P
           ...log,
           action: 'create',
           entityType: 'leave_pools',
+          entityContext: { year },
           changes: diffChanges({}, { year, annual_days: input.annualDays, carried_days: input.carriedDays }),
         });
       }
@@ -201,7 +205,7 @@ export const updateEmployee = async (id: number, input: EmployeeData, actor: Act
       const conflict = await findConflict(conn, input.login, input.email, id);
       if (conflict) return conflict;
 
-      const log = { userId: actor.id, userName: actor.name, entityId: id };
+      const log = { userId: actor.id, userName: actor.name, entityId: id, entityName: fullName(input) };
       const beforeTypeName =
         before.contract_type_id === input.contractTypeId ? contractType.name : await contractTypeName(conn, before.contract_type_id);
       const accountChanges = diffChanges(accountFields(accountOf(before), beforeTypeName), accountFields(accountInput(input), contractType.name));
@@ -222,7 +226,7 @@ export const updateEmployee = async (id: number, input: EmployeeData, actor: Act
           : diffChanges({}, { year, ...after });
         if (Object.keys(poolChanges).length > 0) {
           await q.upsertPool(conn, id, year, input.annualDays, input.carriedDays);
-          await logActivity(conn, { ...log, action: pool ? 'update' : 'create', entityType: 'leave_pools', changes: poolChanges });
+          await logActivity(conn, { ...log, action: pool ? 'update' : 'create', entityType: 'leave_pools', entityContext: { year }, changes: poolChanges });
         }
       }
       return { ok: true as const };
@@ -237,11 +241,12 @@ export const updateEmployee = async (id: number, input: EmployeeData, actor: Act
 export const setEmployeePassword = async (id: number, password: string, actor: Actor): Promise<Result> => {
   const passwordHash = await hashPassword(password);
   return withTransaction(async (conn) => {
-    if (!(await findActiveEmployee(conn, id))) return notFound();
+    const user = await findActiveEmployee(conn, id);
+    if (!user) return notFound();
     await q.setTemporaryPassword(conn, id, passwordHash);
     // Samo zdarzenie, bez hasła i skrótu.
     await logActivity(conn, {
-      userId: actor.id, userName: actor.name, entityId: id, action: 'update', entityType: 'users',
+      userId: actor.id, userName: actor.name, entityId: id, entityName: user.name, action: 'update', entityType: 'users',
       changes: { password: { before: null, after: 'reset' } },
     });
     return { ok: true as const };
@@ -256,7 +261,7 @@ export const archiveEmployee = async (id: number, actor: Actor): Promise<Result>
     if (id === actor.id) return fail(409, EMPLOYEE_MESSAGES.archiveSelf);
     if (user.archived_at) return fail(409, EMPLOYEE_MESSAGES.alreadyArchived);
     await q.setArchived(conn, id, actor.id);
-    await logActivity(conn, { userId: actor.id, userName: actor.name, entityId: id, action: 'archive', entityType: 'users', changes: {} });
+    await logActivity(conn, { userId: actor.id, userName: actor.name, entityId: id, entityName: user.name, action: 'archive', entityType: 'users', changes: {} });
     return { ok: true as const };
   });
 };
@@ -268,7 +273,7 @@ export const restoreEmployee = async (id: number, actor: Actor): Promise<Result>
     if (!user) return notFound();
     if (!user.archived_at) return fail(409, EMPLOYEE_MESSAGES.notArchived);
     await q.setArchived(conn, id, null);
-    await logActivity(conn, { userId: actor.id, userName: actor.name, entityId: id, action: 'restore', entityType: 'users', changes: {} });
+    await logActivity(conn, { userId: actor.id, userName: actor.name, entityId: id, entityName: user.name, action: 'restore', entityType: 'users', changes: {} });
     return { ok: true as const };
   });
 };
@@ -313,7 +318,8 @@ export const closeYear = async (input: CloseYearInput, actor: Actor): Promise<Re
       await q.closePool(conn, p.id);
       await q.upsertPool(conn, p.user_id, year + 1, annual, carried);
       await logActivity(conn, {
-        userId: actor.id, userName: actor.name, entityId: p.user_id, action: 'update', entityType: 'leave_pools',
+        userId: actor.id, userName: actor.name, entityId: p.user_id, entityName: p.name, entityContext: { year },
+        action: 'update', entityType: 'leave_pools',
         changes: {
           closed_year: { before: null, after: year },
           ...diffChanges({ annual_days: p.annual_days, carried_days: p.carried_days }, { annual_days: annual, carried_days: carried }),

@@ -67,6 +67,7 @@ export const createProject = async (data: ProjectData, actor: Actor): Promise<Re
         action: 'create',
         entityType: ENTITY,
         entityId: id,
+        entityName: data.name,
         changes: { name: { before: null, after: data.name }, member_ids: { before: [], after: data.memberIds } },
       });
       return { id };
@@ -104,7 +105,7 @@ export const updateProject = async (id: number, data: ProjectData, actor: Actor)
         ...(removed.length > 0 || added.length > 0 ? { member_ids: { before, after } } : {}),
       };
       if (Object.keys(changes).length > 0) {
-        await logActivity(conn, { userId: actor.id, userName: actor.name, action: 'update', entityType: ENTITY, entityId: id, changes });
+        await logActivity(conn, { userId: actor.id, userName: actor.name, action: 'update', entityType: ENTITY, entityId: id, entityName: data.name, changes });
       }
       return { ok: true as const };
     });
@@ -132,6 +133,7 @@ export const deleteProject = async (id: number, confirmName: string, actor: Acto
       action: 'delete',
       entityType: ENTITY,
       entityId: id,
+      entityName: project.name,
       changes: { name: { before: project.name, after: null }, deleted_tasks: { before: deletedTasks, after: 0 } },
     });
     return { ok: true as const, deletedTasks };
@@ -151,6 +153,7 @@ export const addMemberWhereAssigned = async (conn: PoolConnection, userId: numbe
       action: 'update',
       entityType: ENTITY,
       entityId: p.id,
+      entityName: p.name,
       changes: { added_member_id: { before: null, after: userId } },
     });
   }

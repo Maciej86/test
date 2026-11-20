@@ -104,6 +104,7 @@ describe('leave requests: decisions', () => {
     expect(q.setDecision).toHaveBeenCalledWith(conn, 21, { from: 'pending', to: 'approved', actor: anna, reason: null });
     expect(logActivity).toHaveBeenCalledWith(conn, {
       userId: 1, userName: 'Anna Nowak', action: 'status', entityType: 'leave_requests', entityId: 21,
+      entityName: 'Jan Kowalski', entityContext: { leaveType: 'Wypoczynkowy', from: '2026-11-26', to: '2026-11-27', days: 2 },
       changes: { status: { before: 'pending', after: 'approved' } },
     });
     expect(notifyUsers).toHaveBeenCalledWith(conn, {

@@ -139,6 +139,8 @@ export const createRequest = async (input: LeaveRequestData, actor: Actor): Prom
       action: 'create',
       entityType: 'leave_requests',
       entityId: id,
+      entityName: actor.name,
+      entityContext: { leaveType: type.name, from: row.dateFrom, to: row.dateTo, days: row.workingDays },
       changes: diffChanges({}, {
         leave_type: type.name,
         date_from: row.dateFrom,
@@ -187,6 +189,8 @@ export const withdrawRequest = async (id: number, actor: Actor): Promise<Result>
       action: 'status',
       entityType: 'leave_requests',
       entityId: id,
+      entityName: actor.name,
+      entityContext: { leaveType: request.leave_type_name, from: request.date_from, to: request.date_to, days: request.working_days },
       changes: diffChanges({ status: request.status }, { status: 'withdrawn' }),
     });
     await notifyAdmins(conn, {

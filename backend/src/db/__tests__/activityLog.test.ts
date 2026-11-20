@@ -27,6 +27,7 @@ describe('logActivity', () => {
       action: 'update',
       entityType: 'orders',
       entityId: 7,
+      entityName: 'Zamówienie 7',
       changes: { status: { before: 'new', after: 'sent' } },
     });
     expect(query).toHaveBeenCalledTimes(1);
@@ -39,7 +40,38 @@ describe('logActivity', () => {
       'update',
       'orders',
       7,
+      'Zamówienie 7',
+      null,
       JSON.stringify({ status: { before: 'new', after: 'sent' } }),
     ]);
+  });
+});
+
+describe('logActivity entity name and context', () => {
+  it('stores entity name and context as parameters, never in the SQL text', async () => {
+    const query = vi.fn().mockResolvedValue([{}, []]);
+    const conn = { query } as unknown as PoolConnection;
+    const name = "Robert'); DROP TABLE users; --";
+    await logActivity(conn, {
+      userId: 1, userName: 'Anna', action: 'create', entityType: 'tasks', entityId: 3,
+      entityName: name, entityContext: { project: 'Marketing' }, changes: {},
+    });
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toBe(
+      'INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, entity_name, entity_context, changes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    );
+    expect(params).toEqual([1, 'Anna', 'create', 'tasks', 3, name, JSON.stringify({ project: 'Marketing' }), '{}']);
+  });
+
+  it('long name is cut to the column size (255); too long context is dropped, never cut', async () => {
+    const query = vi.fn().mockResolvedValue([{}, []]);
+    const conn = { query } as unknown as PoolConnection;
+    await logActivity(conn, {
+      userId: null, userName: 'Anna', action: 'create', entityType: 'tasks', entityId: 3,
+      entityName: 'x'.repeat(300), entityContext: { project: 'y'.repeat(300) }, changes: {},
+    });
+    const params = query.mock.calls[0][1] as unknown[];
+    expect((params[5] as string).length).toBe(255);
+    expect(params[6]).toBeNull();
   });
 });

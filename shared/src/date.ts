@@ -124,4 +124,19 @@ export const formatRelativeDay = (value: DateInput, t: TFunction, now: Date = ne
   return formatDate(value);
 };
 
+/**
+ * Kolejne wpisy listy (już ułożone od najnowszych) w grupach po dniach; `label` daje nagłówek dnia wpisu,
+ * np. `(n) => formatRelativeDay(n.createdAt, t) ?? ''`. Sąsiednie wpisy z tym samym nagłówkiem trafiają do jednej grupy.
+ */
+export const groupByDay = <T>(items: readonly T[], label: (item: T) => string): { label: string; items: T[] }[] => {
+  const groups: { label: string; items: T[] }[] = [];
+  for (const item of items) {
+    const l = label(item);
+    const last = groups.at(-1);
+    if (last?.label === l) last.items.push(item);
+    else groups.push({ label: l, items: [item] });
+  }
+  return groups;
+};
+
 export { dayjs };

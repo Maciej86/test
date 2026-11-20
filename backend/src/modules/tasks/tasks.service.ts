@@ -15,7 +15,7 @@ import {
   taskBoardPath,
 } from '@app/shared';
 import type { PoolConnection } from 'mysql2/promise';
-import { diffChanges, logActivity } from '../../db/activityLog';
+import { diffChanges, logActivity, type Changes } from '../../db/activityLog';
 import { withTransaction } from '../../db/transaction';
 import { notifyUsers } from '../notifications/notifications.service';
 import { pool } from '../../db/pool';
@@ -103,17 +103,35 @@ const notifyAssigned = (conn: PoolConnection, projectId: number, taskId: number,
  * Zadanie do zapisu: najpierw blokada projektu (jedna kolejność blokad dla wszystkich zapisów), potem zadanie
  * przeczytane od nowa pod blokadą. Niewidoczne, w archiwum albo projekt usunięty w międzyczasie: null.
  */
-const lockTaskForWrite = async (conn: PoolConnection, taskId: number, viewer: Viewer): Promise<q.TaskRow | null> => {
+const lockTaskForWrite = async (conn: PoolConnection, taskId: number, viewer: Viewer): Promise<LockedTask | null> => {
   const seen = await q.findTask(conn, taskId, viewer);
-  if (!seen || !(await q.lockProject(conn, seen.projectId))) return null;
-  return q.findTask(conn, taskId, viewer, { lock: true });
+  if (!seen) return null;
+  const projectName = await q.lockProject(conn, seen.projectId);
+  if (projectName === null) return null;
+  const task = await q.findTask(conn, taskId, viewer, { lock: true });
+  return task ? { ...task, projectName } : null;
 };
+
+type LockedTask = q.TaskRow & { projectName: string };
+
+/** Wpis historii zmian zadania: tytuł i projekt zapamiętane w chwili zmiany. */
+const logTask = (conn: PoolConnection, viewer: Viewer, task: { id: number; title: string; projectName: string }, action: string, changes: Changes) =>
+  logActivity(conn, {
+    userId: viewer.id,
+    userName: viewer.name,
+    action,
+    entityType: ENTITY,
+    entityId: task.id,
+    entityName: task.title,
+    entityContext: { project: task.projectName },
+    changes,
+  });
 
 /** Nowe zadanie na górze wybranej kolumny; przypisani dostają powiadomienie. */
 export const createTask = async (projectId: number, data: TaskData, viewer: Viewer): Promise<Result<{ id: number }>> =>
   withTransaction(async (conn) => {
     const project = await q.findVisibleProject(conn, projectId, viewer);
-    if (!project || !(await q.lockProject(conn, projectId))) return notFound();
+    if (!project || (await q.lockProject(conn, projectId)) === null) return notFound();
     if (!(await assigneesAllowed(conn, projectId, data.assigneeIds, []))) return assigneeNotAllowed();
     const columnIds = await q.columnTaskIds(conn, projectId, data.column);
     const id = await q.insertTask(conn, {
@@ -129,14 +147,8 @@ export const createTask = async (projectId: number, data: TaskData, viewer: View
     await q.setPositions(conn, [id, ...columnIds]);
     await q.setAssignees(conn, id, data.assigneeIds);
     await notifyAssigned(conn, projectId, id, data, data.assigneeIds, viewer);
-    await logActivity(conn, {
-      userId: viewer.id,
-      userName: viewer.name,
-      action: 'create',
-      entityType: ENTITY,
-      entityId: id,
-      changes: diffChanges({}, { title: data.title, due_date: data.dueDate, column_key: data.column, assignee_ids: data.assigneeIds }),
-    });
+    await logTask(conn, viewer, { id, title: data.title, projectName: project.name }, 'create',
+      diffChanges({}, { title: data.title, due_date: data.dueDate, column_key: data.column, assignee_ids: data.assigneeIds }));
     return { id };
   });
 
@@ -167,7 +179,7 @@ export const updateTask = async (taskId: number, data: TaskData, viewer: Viewer)
       { title: data.title, description: data.description, due_date: data.dueDate, column_key: data.column, assignee_ids: sameAssignees ? before : data.assigneeIds },
     );
     if (Object.keys(changes).length > 0) {
-      await logActivity(conn, { userId: viewer.id, userName: viewer.name, action: 'update', entityType: ENTITY, entityId: taskId, changes });
+      await logTask(conn, viewer, { ...task, title: data.title }, 'update', changes);
     }
     return { ok: true as const };
   });
@@ -186,14 +198,7 @@ export const moveTask = async (taskId: number, move: TaskMoveInput, viewer: View
       return { ok: true as const };
     }
     await changeColumn(conn, task, move.column, order);
-    await logActivity(conn, {
-      userId: viewer.id,
-      userName: viewer.name,
-      action: 'status',
-      entityType: ENTITY,
-      entityId: taskId,
-      changes: { column_key: { before: task.column, after: move.column } },
-    });
+    await logTask(conn, viewer, task, 'status', { column_key: { before: task.column, after: move.column } });
     return { ok: true as const };
   });
 
@@ -203,7 +208,7 @@ export const archiveTask = async (taskId: number, viewer: Viewer): Promise<Resul
     const task = await lockTaskForWrite(conn, taskId, viewer);
     if (!task) return notFound();
     await q.archiveTask(conn, taskId, viewer.id);
-    await logActivity(conn, { userId: viewer.id, userName: viewer.name, action: 'archive', entityType: ENTITY, entityId: taskId, changes: {} });
+    await logTask(conn, viewer, task, 'archive', {});
     return { ok: true as const };
   });
 
@@ -215,14 +220,7 @@ export const finishTask = async (taskId: number, finished: boolean, viewer: View
     const at = finished ? (task.finishedAt ? new Date(task.finishedAt) : new Date()) : null;
     await q.setFinished(conn, taskId, at);
     if (Boolean(task.finishedAt) !== finished) {
-      await logActivity(conn, {
-        userId: viewer.id,
-        userName: viewer.name,
-        action: 'status',
-        entityType: ENTITY,
-        entityId: taskId,
-        changes: { finished: { before: Boolean(task.finishedAt), after: finished } },
-      });
+      await logTask(conn, viewer, task, 'status', { finished: { before: Boolean(task.finishedAt), after: finished } });
     }
     return { ok: true as const };
   });
