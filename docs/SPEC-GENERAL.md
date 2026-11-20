@@ -221,6 +221,16 @@ wymagają.
 
 ## 9. Ostatnie decyzje (archiwum)
 
+- 2026-11-19: Zadania, część 2: zbudowana (kroki 0–10), przegląd kodu z poprawkami (komunikat i odświeżenie przy komentarzu do usuniętego zadania, kolejność blokad, fragment powiadomienia bez przecinania emotikon); `npm run check` i 41 testów e2e zielone.
+- 2026-11-19: Zadania: spec części 2 zaakceptowany (`SPEC-2.md`: komentarze w podglądzie, poprawia autor, usuwa autor albo administrator, licznik na karcie, powiadomienie `task_comment` dla przypisanych); napisane `PLAN-2.md` (11 kroków) i `TESTS-2.md`.
+- 2026-11-19: Zadania, część 1 (projekty i tablice) gotowa, potwierdzona przez użytkownika („działa”).
+- 2026-11-19: Aktualizacja stepkit do 0.1.44: hasło stałych kont testowych `E2E_PASSWORD` w `.env` (losowe), sprzątanie po testach w przeglądarce (`e2e/global-teardown.ts`, `npm run cleanup:e2e -w @app/backend`) także projektów „E2E …”; konta tymczasowe zostają tam, gdzie test potrzebuje świeżego pracownika (pula, wnioski, osoby w projekcie), i znikają po testach; aktualne `docs/CONVENTIONS.md` i `docs/conventions/`. Dwa przebiegi e2e (40 testów) zielone, potem w bazie tylko stałe konta testowe.
+- 2026-11-19: Zadania: znacznik „Zakończone” (prośba użytkownika): karta zostaje w kolumnie, wyszarzona, z plakietką; poprawki przeciągania zgłoszone przy testach (pętla przy nagłówku, ramka pod kursorem, kopia karty bez rozciągania i bez lotu do starej kolumny).
+- 2026-11-18: Zadania, część 1: zbudowana (kroki 0–19), przegląd kodu z poprawkami (blokada projektu przy zapisach, tablica zostaje przy nieudanym odświeżeniu, zapis tylko zmienionych pól); `npm run check` i 33 testy e2e zielone.
+- 2026-11-18: Zadania: spec części 1 zaakceptowany; napisane `PLAN-1.md` (20 kroków) i `TESTS-1.md`.
+- 2026-11-18: Zadania: podział na 2 części zaakceptowany (1. projekty i tablice, 2. komentarze); napisane `SPEC.md` i `SPEC-1.md`; zmiana roli administrator → pracownik dopisuje go do projektów z jego otwartymi zadaniami.
+- 2026-11-18: Zadania: odpowiedzi na wszystkie pytania makiety (`@dnd-kit` zatwierdzony, projekt usuwa się na stałe z zadaniami po wpisaniu nazwy, osoba usunięta z projektu znika tylko z otwartych zadań, reszta jak w rekomendacjach); panele pytań usunięte z makiety.
+- 2026-11-18: Poprawka (zgłoszenie użytkownika): tabela Wniosków urlopowych i Moich urlopów nie skacze przy zmianie zakładki i roku (`keepPreviousData`).
 - 2026-11-18: Zadania: zmiana zakresu na prośbę użytkownika: projekty jako podmenu „Zadań” (tworzy administrator, pracownik widzi tylko swoje), komentarze z powiadomieniem, dodawanie w oknie, podgląd z prawej 540 px, odświeżanie co 5 s (odpowiedź 7); makieta przerobiona, 15 otwartych pytań; wspólne `OrderArrows` w makietach.
 - 2026-11-18: Zadania: makieta tablicy (trzy kolumny z przeciąganiem, na telefonie jedna kolumna naraz, „Tylko moje zadania”, wyszukiwarka, chowanie zrealizowanych po 30 dniach), formularz w szufladzie z prawej (dodaj i edytuj, ostrzeżenie o urlopie osoby przed terminem), usunięcie do archiwum; 9 pytań.
 - 2026-11-18: Aktualizacja stepkit do 0.1.40: wspólny typ `Db` w `backend/src/db/pool.ts` zamiast kopii w modułach, nowy plik `docs/FIXES.md` na odłożone poprawki (na razie pusty: w `IDEAS.md` nie było otwartych poprawek), aktualne zasady w `docs/CONVENTIONS.md` i `docs/conventions/`.

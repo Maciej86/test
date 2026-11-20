@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.44
 
-**Następny krok:** Archiwum: użytkownik przechodzi `docs/modules/archive/TESTS.md` i potwierdza „działa”; potem zamknięcie modułu.
+**Następny krok:** Moduł Moje konto (makieta).
 
 ## Start aplikacji
 
@@ -30,13 +30,14 @@
 | 9 | Wnioski urlopowe | leave-requests | zrobiony | zamknięcie | my-leave |
 | 10 | Zadania | tasks | zrobiony | zamknięcie | employees, notifications |
 | 11 | Historia zmian | activity-log | zrobiony | zamknięcie | employees, my-leave, leave-requests, tasks |
-| 12 | Archiwum | archive | w toku | testy | employees, tasks |
+| 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | czeka | makieta | login |
 | 14 | Pulpit | dashboard | czeka | makieta | my-leave, leave-requests, tasks |
 | 15 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard |
 
 ## Ostatnie decyzje
 
+- 2026-11-20: Moduł Archiwum gotowy (użytkownik potwierdził testy: „działa”). Wspólne `ConfirmByNameModal` (common) i `useEmptyLaterPage` (core), `apiErrorStatus` w kliencie API, „Otwórz w archiwum” w Historii zmian.
 - 2026-11-20: Archiwum: próby nadużyć na prawdziwej bazie odparte, przeklikane w przeglądarce (administrator, pracownik, telefon); poprawiona odmiana w oknach usuwania; 59 testów e2e zielonych.
 - 2026-11-20: Archiwum: zbudowane (kroki 0–13), przegląd kodu z poprawkami (blokada przy przywracaniu konta, powrót z pustej strony 2+ wspólnym hookiem, podgląd z klawiatury, dymek przy wyszarzonym „Usuń na stałe”); `npm run check` i 53 testy e2e zielone.
 - 2026-11-20: Archiwum: spec zaakceptowany; napisane `PLAN.md` (14 kroków, wydzielenie okna „usuń po wpisaniu nazwy” do `common/`) i `TESTS.md`.
@@ -49,13 +50,3 @@
 - 2026-11-19: Poprawka: klik w wiersz Wniosków urlopowych zaraz po wyszukaniu gubił wyszukiwanie (router zmienia adres przed przerysowaniem ekranu); filtry czytane w chwili kliknięcia (`useCurrentSearch`).
 - 2026-11-19: Moduł Zadania zrobiony (część 2, komentarze, potwierdzona przez użytkownika: „działa”).
 - 2026-11-19: Zadania, część 2: 9 prób nadużyć (prawdziwa baza) odpartych, sprawdzenie w przeglądarce trzech ról i telefonu; `npm run check` i 43 testy e2e zielone.
-- 2026-11-19: Zadania, część 2: zbudowana (kroki 0–10), przegląd kodu z poprawkami (komunikat i odświeżenie przy komentarzu do usuniętego zadania, kolejność blokad, fragment powiadomienia bez przecinania emotikon); `npm run check` i 41 testów e2e zielone.
-- 2026-11-19: Zadania: spec części 2 zaakceptowany (`SPEC-2.md`: komentarze w podglądzie, poprawia autor, usuwa autor albo administrator, licznik na karcie, powiadomienie `task_comment` dla przypisanych); napisane `PLAN-2.md` (11 kroków) i `TESTS-2.md`.
-- 2026-11-19: Zadania, część 1 (projekty i tablice) gotowa, potwierdzona przez użytkownika („działa”).
-- 2026-11-19: Aktualizacja stepkit do 0.1.44: hasło stałych kont testowych `E2E_PASSWORD` w `.env` (losowe), sprzątanie po testach w przeglądarce (`e2e/global-teardown.ts`, `npm run cleanup:e2e -w @app/backend`) także projektów „E2E …”; konta tymczasowe zostają tam, gdzie test potrzebuje świeżego pracownika (pula, wnioski, osoby w projekcie), i znikają po testach; aktualne `docs/CONVENTIONS.md` i `docs/conventions/`. Dwa przebiegi e2e (40 testów) zielone, potem w bazie tylko stałe konta testowe.
-- 2026-11-19: Zadania: znacznik „Zakończone” (prośba użytkownika): karta zostaje w kolumnie, wyszarzona, z plakietką; poprawki przeciągania zgłoszone przy testach (pętla przy nagłówku, ramka pod kursorem, kopia karty bez rozciągania i bez lotu do starej kolumny).
-- 2026-11-18: Zadania, część 1: zbudowana (kroki 0–19), przegląd kodu z poprawkami (blokada projektu przy zapisach, tablica zostaje przy nieudanym odświeżeniu, zapis tylko zmienionych pól); `npm run check` i 33 testy e2e zielone.
-- 2026-11-18: Zadania: spec części 1 zaakceptowany; napisane `PLAN-1.md` (20 kroków) i `TESTS-1.md`.
-- 2026-11-18: Zadania: podział na 2 części zaakceptowany (1. projekty i tablice, 2. komentarze); napisane `SPEC.md` i `SPEC-1.md`; zmiana roli administrator → pracownik dopisuje go do projektów z jego otwartymi zadaniami.
-- 2026-11-18: Zadania: odpowiedzi na wszystkie pytania makiety (`@dnd-kit` zatwierdzony, projekt usuwa się na stałe z zadaniami po wpisaniu nazwy, osoba usunięta z projektu znika tylko z otwartych zadań, reszta jak w rekomendacjach); panele pytań usunięte z makiety.
-- 2026-11-18: Poprawka (zgłoszenie użytkownika): tabela Wniosków urlopowych i Moich urlopów nie skacze przy zmianie zakładki i roku (`keepPreviousData`).
