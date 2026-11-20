@@ -85,7 +85,7 @@ i edycję).
   540 px / cały ekran na telefonie, tylko do oglądania, akcje), `components/TaskModals.tsx` (przywróć z kolumną,
   usuń z liczbą komentarzy); `taskId` z adresu otwiera podgląd (link z Historii), nieistniejący → dymek `gone`
   i czysty adres; testy (podgląd z adresu, przyciski w podglądzie otwierają okna, 404 → `gone`) → `npm run check`
-- [ ] 11. **Zgodność z makietą i telefonem**: porównanie w przeglądarce (komputer i 390 px) z
+- [x] 11. **Zgodność z makietą i telefonem**: porównanie w przeglądarce (komputer i 390 px) z
   `mockups/src/modules/archive/`; poprawki z testem, gdy coś się różni → `npm run check`
 - [ ] 12. **E2E** `e2e/archive.spec.ts` ze scenariuszy `TESTS.md` (konta i zadania zakłada test, `e2e.tmp.*`,
   projekty „E2E …”) → `npm run check`, `npm run test:e2e`
@@ -99,3 +99,4 @@ i edycję).
 - Krok 8: akcje odświeżają też Historię zmian (`activity-log`) i robią to po sukcesie i po błędzie (`onSettled`), bo 404/409 znaczy, że ktoś już zmienił archiwum.
 - Krok 9: moduły nie importują `axios`, więc doszło `apiErrorStatus` w `core/api/client.ts` (z testem); rozpoznanie „rekordu już nie ma” w `archive/archiveErrors.ts` (404 albo 409 z kluczem „nie w archiwum”). Rola w znaczniku przez `ROLE_LABELS` (jak w Pracownikach).
 - Krok 10: otwarcie i zamknięcie podglądu przekazuje bieżącą stronę (`useListParams` przy każdej zmianie wraca na stronę 1). Szuflada podglądu ma podpisany przycisk „Zamknij” (nowy klucz `common.close`). Tekst „Komentarze” to `comments_title` (osobno od odmiany liczby `comments_*`).
+- Krok 11: zrzuty komputera (1400 px) i telefonu (390 px) zgodne z makietą; bez poprawek.
