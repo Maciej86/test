@@ -136,5 +136,6 @@
   "archived_hint": "Rekord jest w archiwum.",
   "validation": {
     "dates_order": "Data „do” nie może być wcześniejsza niż „od”."
-  }
+  },
+  "with_context": ", {{context}}"
 }

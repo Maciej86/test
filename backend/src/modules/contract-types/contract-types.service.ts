@@ -58,7 +58,7 @@ export const createType = async (data: ContractTypeData, actor: Actor): Promise<
 export const updateType = async (id: number, data: ContractTypeData, actor: Actor): Promise<Result> => {
   try {
     return await withTransaction(async (conn) => {
-      const before = await q.findContractType(conn, id);
+      const before = await q.findContractType(conn, id, { forUpdate: true });
       if (!before) return notFound();
       const conflict = await nameConflict(conn, data.name, id);
       if (conflict) return conflict;

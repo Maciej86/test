@@ -98,7 +98,7 @@ const EntryRow = ({ entry, opened, onToggle }: { entry: MockEntry; opened: boole
             </Group>
             <Text size="sm">
               {entry.target}
-              {entry.detail && <Text span c="dimmed">{`, ${entry.detail}`}</Text>}
+              {entry.detail && <Text span c="dimmed">{t('with_context', { context: entry.detail })}</Text>}
             </Text>
             <Text size="sm" c="dimmed" hiddenFrom="sm">{entry.who}</Text>
           </Stack>

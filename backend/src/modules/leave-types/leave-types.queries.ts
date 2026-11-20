@@ -26,8 +26,10 @@ export const listLeaveTypes = async (db: Db): Promise<LeaveTypeItem[]> => {
   return rows.map((r) => ({ ...toSelectable(r), hidden: r.hidden_at !== null, requestsCount: 0 }));
 };
 
-export const findLeaveType = async (db: Db, id: number): Promise<LeaveTypeRow | null> => {
-  const [rows] = await db.query<LeaveTypeRow[]>('SELECT id, name, deducts_pool, yearly_limit, position, hidden_at FROM leave_types WHERE id = ?', [id]);
+export const findLeaveType = async (db: Db, id: number, opts: { lock?: boolean } = {}): Promise<LeaveTypeRow | null> => {
+  const sql = 'SELECT id, name, deducts_pool, yearly_limit, position, hidden_at FROM leave_types WHERE id = ?';
+  // Z blokadą (zmiana typu): drugi równoczesny zapis czeka, więc „przed” w historii zmian jest prawdziwe.
+  const [rows] = await db.query<LeaveTypeRow[]>(opts.lock ? `${sql} FOR UPDATE` : sql, [id]); // rule-ok: dopisane tylko stałe FOR UPDATE
   return rows[0] ?? null;
 };
 

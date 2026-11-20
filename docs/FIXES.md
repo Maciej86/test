@@ -9,3 +9,4 @@ Rodzaje: `błąd` · `zmiana` · `porządki`. Statusy: `czeka` · `zrobione RRRR
 | Data | Rodzaj | Co | Moduł | Status |
 |---|---|---|---|---|
 | 2026-11-19 | błąd | Test e2e Wniosków urlopowych czasem (raz na kilka przebiegów) otwiera szczegóły wniosku bez `?search=` w adresie po kliknięciu wiersza zaraz po wyszukaniu; zbadać, czy to wyścig w aplikacji (lista zostaje na ekranie w trakcie wyszukiwania) czy w teście | leave-requests | zrobione 2026-11-19 |
+| 2026-11-20 | błąd | Pełny przebieg e2e raz (po celowym obciążeniu bazy wieloma równoległymi testami): 4 testy z dodawaniem pracownika czekały na zapis ponad 30 s („Zapisz” wyszarzony, bez błędu w logu serwera), a w innym przebiegu employees.spec trafił na `/login?reason=expired`; w 2 kolejnych pełnych przebiegach nie wróciło; zbadać przyczynę | employees | czeka |

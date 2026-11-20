@@ -25,10 +25,13 @@ export const listContractTypes = async (db: Db): Promise<ContractTypeItem[]> => 
 };
 
 /** `forShare`: w transakcji blokuje typ do końca zapisu (Pracownicy), więc równoczesne „Ukryj” poczeka. */
-export const findContractType = async (db: Db, id: number, options: { forShare?: boolean } = {}): Promise<FoundContractType | null> => {
-  const sql = options.forShare
-    ? 'SELECT id, name, position, hidden_at FROM contract_types WHERE id = ? FOR SHARE'
-    : 'SELECT id, name, position, hidden_at FROM contract_types WHERE id = ?';
+export const findContractType = async (db: Db, id: number, options: { forShare?: boolean; forUpdate?: boolean } = {}): Promise<FoundContractType | null> => {
+  // forUpdate (zmiana typu): drugi równoczesny zapis czeka, więc „przed” w historii zmian jest prawdziwe.
+  const sql = options.forUpdate
+    ? 'SELECT id, name, position, hidden_at FROM contract_types WHERE id = ? FOR UPDATE'
+    : options.forShare
+      ? 'SELECT id, name, position, hidden_at FROM contract_types WHERE id = ? FOR SHARE'
+      : 'SELECT id, name, position, hidden_at FROM contract_types WHERE id = ?';
   const [rows] = await db.query<ContractTypeRow[]>(sql, [id]);
   const r = rows[0];
   return r ? { id: r.id, name: r.name, hidden: r.hidden_at !== null } : null;

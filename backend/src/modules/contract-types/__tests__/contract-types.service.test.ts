@@ -129,6 +129,7 @@ describe('activity log', () => {
 
   it('update writes changed fields only, in a transaction; nothing changed → no entry', async () => {
     await s.updateType(4, { name: 'Kontrakt B2B' }, anna);
+    expect(q.findContractType).toHaveBeenCalledWith(conn, 4, { forUpdate: true });
     expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'update', entityType: 'contract_types', changes: { name: { before: 'B2B', after: 'Kontrakt B2B' } } }));
     vi.mocked(logActivity).mockClear();
     vi.mocked(q.findContractType).mockResolvedValue(found({ name: 'Umowa o staż' }));

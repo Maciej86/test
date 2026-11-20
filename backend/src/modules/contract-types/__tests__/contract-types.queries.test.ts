@@ -46,6 +46,13 @@ describe('contract types queries', () => {
     ]);
   });
 
+  it('findContractType with forUpdate locks the row for a rename', async () => {
+    const calls: [string, unknown][] = [];
+    const spy = { query: vi.fn(async (sql: string, params?: unknown[]) => { calls.push([sql, params]); return [[]]; }) } as unknown as Parameters<typeof q.findContractType>[0];
+    await q.findContractType(spy, 4, { forUpdate: true });
+    expect(calls[0]![0]).toBe('SELECT id, name, position, hidden_at FROM contract_types WHERE id = ? FOR UPDATE');
+  });
+
   it('findContractType with forShare locks the row against a parallel hide', async () => {
     const spy = db([]);
     await q.findContractType(spy, 4, { forShare: true });

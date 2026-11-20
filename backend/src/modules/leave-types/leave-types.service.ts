@@ -63,7 +63,7 @@ export const createType = async (data: LeaveTypeData, actor: Actor): Promise<Res
 export const updateType = async (id: number, data: LeaveTypeData, actor: Actor): Promise<Result> => {
   try {
     return await withTransaction(async (conn) => {
-      const before = await q.findLeaveType(conn, id);
+      const before = await q.findLeaveType(conn, id, { lock: true });
       if (!before) return notFound();
       const conflict = await nameConflict(conn, data.name, id);
       if (conflict) return conflict;

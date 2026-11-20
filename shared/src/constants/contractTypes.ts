@@ -11,3 +11,6 @@ export const CONTRACT_TYPE_MESSAGES = {
   alreadyHidden: 'contract-types.server.already_hidden',
   notHidden: 'contract-types.server.not_hidden',
 } as const;
+
+/** Ekran „Typy umów” (Ustawienia). */
+export const CONTRACT_TYPES_PATH = '/admin/contract-types';

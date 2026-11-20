@@ -93,7 +93,7 @@ export const ActivityEntry = ({ entry, opened, onToggle }: { entry: ActivityLogI
             </Group>
             <Text size="sm" style={{ overflowWrap: 'anywhere' }}>
               {entry.entityName || t('unnamed', { id: entry.entityId })}
-              {context && <Text span c="dimmed">{`, ${context}`}</Text>}
+              {context && <Text span c="dimmed">{t('with_context', { context })}</Text>}
             </Text>
             <Text size="sm" c="dimmed" hiddenFrom="sm">{entry.userName}</Text>
           </Stack>

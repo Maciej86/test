@@ -151,6 +151,7 @@ describe('activity log', () => {
   it('update writes changed fields only, in a transaction; nothing changed → no entry', async () => {
     vi.mocked(q.findLeaveType).mockResolvedValue(typeRow({ name: 'Szkoleniowy', deducts_pool: 1, yearly_limit: 5 }));
     await s.updateType(3, { name: 'Szkolenie', deductsPool: true, yearlyLimit: 5 }, anna);
+    expect(q.findLeaveType).toHaveBeenCalledWith(conn, 3, { lock: true });
     expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'update', entityType: 'leave_types', changes: { name: { before: 'Szkoleniowy', after: 'Szkolenie' } } }));
     vi.mocked(logActivity).mockClear();
     vi.mocked(q.findLeaveType).mockResolvedValue(typeRow({ name: 'Szkoleniowy', deducts_pool: 1, yearly_limit: null }));

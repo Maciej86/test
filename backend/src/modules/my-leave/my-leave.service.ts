@@ -1,4 +1,5 @@
 import {
+  leaveRequestPath,
   checkLeaveRequest,
   MY_LEAVE_MESSAGES as M,
   currentYear,
@@ -24,7 +25,6 @@ import { notifyAdmins } from '../notifications/notifications.service';
 import * as q from './my-leave.queries';
 
 /** Szczegóły wniosku u administratora (link w powiadomieniu; ten sam adres co w e-mailu). */
-const requestLink = (id: number) => `/admin/leave-requests/${id}`;
 
 /** Liczby puli roku otwartego: zostało = pula + zaległe − zatwierdzone − czekające (nigdy poniżej 0). */
 const poolNumbers = (row: PoolRow, usage: q.PoolUsage): MyLeaveOverview['pool'] => {
@@ -153,7 +153,7 @@ export const createRequest = async (input: LeaveRequestData, actor: Actor): Prom
     await notifyAdmins(conn, {
       type: 'leave_request_new',
       params: { employee: actor.name, leaveType: type.name, dateFrom: row.dateFrom, dateTo: row.dateTo, days: row.workingDays },
-      link: requestLink(id),
+      link: leaveRequestPath(id),
       actor,
     });
     email = {
@@ -196,7 +196,7 @@ export const withdrawRequest = async (id: number, actor: Actor): Promise<Result>
     await notifyAdmins(conn, {
       type: 'leave_request_withdrawn',
       params: { employee: actor.name, leaveType: request.leave_type_name, dateFrom: request.date_from, dateTo: request.date_to },
-      link: requestLink(id),
+      link: leaveRequestPath(id),
       actor,
     });
     return { ok: true as const };

@@ -17,3 +17,7 @@ export const LEAVE_REQUESTS_MESSAGES = {
   yearClosed: 'leave-requests.server.year_closed',
   reasonMin: 'leave-requests.validation.reason_min',
 } as const;
+
+/** Lista wniosków i szczegóły jednego wniosku (administrator). */
+export const LEAVE_REQUESTS_PATH = '/admin/leave-requests';
+export const leaveRequestPath = (id: number): string => `${LEAVE_REQUESTS_PATH}/${id}`;

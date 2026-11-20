@@ -1,8 +1,12 @@
 import {
   ACTIVITY_LOG_PAGE_SIZE,
   APP_TIME_ZONE,
+  CONTRACT_TYPES_PATH,
+  LEAVE_TYPES_PATH,
   TASKS_PATH,
   dayjs,
+  employeesSearchPath,
+  leaveRequestPath,
   taskBoardPath,
   type ActivityChange,
   type ActivityLogItem,
@@ -37,18 +41,18 @@ const linkOf = (row: q.EntryRow, record: q.FoundRecord): string | null => {
   if (record.archived) return null;
   switch (row.area) {
     case 'leave_requests':
-      return `/admin/leave-requests/${row.entityId}`;
+      return leaveRequestPath(row.entityId);
     case 'tasks':
       return record.projectId ? taskBoardPath(record.projectId, row.entityId) : TASKS_PATH;
     case 'projects':
       return taskBoardPath(row.entityId);
     case 'users':
     case 'leave_pools':
-      return `/admin/employees?search=${encodeURIComponent(record.login ?? '')}`;
+      return employeesSearchPath(record.login ?? '');
     case 'leave_types':
-      return '/admin/leave-types';
+      return LEAVE_TYPES_PATH;
     case 'contract_types':
-      return '/admin/contract-types';
+      return CONTRACT_TYPES_PATH;
     default:
       return null;
   }

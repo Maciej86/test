@@ -55,7 +55,8 @@ const whereOf = (f: EntryFilters): { sql: string; params: unknown[] } => {
   const parts: string[] = [];
   const params: unknown[] = [];
   if (f.search) {
-    parts.push('(a.entity_name LIKE ? OR a.entity_context LIKE ? OR a.user_name LIKE ?)');
+    // W opisie (JSON) tylko wartości, nie nazwy pól („from”, „year”).
+    parts.push("(a.entity_name LIKE ? OR JSON_SEARCH(a.entity_context, 'one', ?) IS NOT NULL OR a.user_name LIKE ?)");
     const like = likePattern(f.search);
     params.push(like, like, like);
   }

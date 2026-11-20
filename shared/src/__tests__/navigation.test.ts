@@ -254,3 +254,12 @@ describe('tasks navigation', () => {
     expect(rolesFor('tasks', NAVIGATION)?.sort()).toEqual(['admin', 'employee']);
   });
 });
+
+describe('screen paths', () => {
+  it('detail and search links are built from the menu paths', async () => {
+    const { leaveRequestPath, employeesSearchPath, NAVIGATION } = await import('../index');
+    expect(leaveRequestPath(21)).toBe('/admin/leave-requests/21');
+    expect(employeesSearchPath('jan@firma.pl')).toBe('/admin/employees?search=jan%40firma.pl');
+    expect(NAVIGATION.map((i) => i.path)).toEqual(expect.arrayContaining(['/admin/leave-requests', '/admin/employees', '/admin/activity-log']));
+  });
+});

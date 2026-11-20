@@ -15,3 +15,6 @@ export const LEAVE_TYPE_MESSAGES = {
   alreadyHidden: 'leave-types.server.already_hidden',
   notHidden: 'leave-types.server.not_hidden',
 } as const;
+
+/** Ekran „Typy urlopów” (Ustawienia). */
+export const LEAVE_TYPES_PATH = '/admin/leave-types';

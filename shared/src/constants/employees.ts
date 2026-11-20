@@ -29,3 +29,7 @@ export const EMPLOYEE_MESSAGES = {
   /** „Zamknij rok” przy wnioskach czekających na decyzję (moduł Moje urlopy). */
   pendingRequests: 'employees.server.pending_requests',
 } as const;
+
+/** Lista pracowników; `search` otwiera ją z wyszukaną osobą (np. login). */
+export const EMPLOYEES_PATH = '/admin/employees';
+export const employeesSearchPath = (search: string): string => `${EMPLOYEES_PATH}?search=${encodeURIComponent(search)}`;

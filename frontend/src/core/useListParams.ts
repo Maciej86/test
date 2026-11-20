@@ -26,9 +26,24 @@ export const useListParams = <S extends z.ZodType<Params>>(
     return cleaned.success ? cleaned.data : schema.parse({});
   };
   const params = read(searchParams);
-  // Adres z ostatniego rysowania, wspólny dla wszystkich wersji `update` (także tej zapamiętanej wcześniej).
+  // Najnowszy adres, wspólny dla wszystkich wersji `update` (także tej zapamiętanej wcześniej). Router pokazuje
+  // wysłane adresy z opóźnieniem i po kolei, więc pojawienie się starszego z nich (albo rysowanie ze starym adresem)
+  // nie cofa nowszego, jeszcze czekającego. Inny adres (przycisk wstecz, link) to zmiana z zewnątrz.
   const latest = useRef(searchParams);
-  latest.current = searchParams;
+  const rendered = useRef(searchParams.toString());
+  const pending = useRef<string[]>([]);
+  const shown = searchParams.toString();
+  if (shown !== rendered.current) {
+    rendered.current = shown;
+    const sentAt = pending.current.indexOf(shown);
+    if (sentAt >= 0) {
+      pending.current = pending.current.slice(sentAt + 1);
+      if (pending.current.length === 0) latest.current = searchParams;
+    } else {
+      pending.current = [];
+      latest.current = searchParams;
+    }
+  }
 
   // Liczone od adresu w chwili zmiany, nie z chwili rysowania: spóźnione wyszukiwanie (300 ms) wysłane po wyborze
   // innego filtra nie cofa tego wyboru.
@@ -39,6 +54,7 @@ export const useListParams = <S extends z.ZodType<Params>>(
     const entries = Object.entries(merged).filter(([key, value]) => value !== undefined && (defaults as Params)[key] !== value);
     const nextParams = new URLSearchParams(entries.map(([key, value]) => [key, String(value)]));
     latest.current = nextParams;
+    pending.current = [...pending.current, nextParams.toString()];
     setSearchParams(nextParams);
   };
   return [params, update];

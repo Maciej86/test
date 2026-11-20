@@ -1,4 +1,9 @@
 import type { Role } from './constants/roles';
+import { ACTIVITY_LOG_PATH } from './constants/activityLog';
+import { CONTRACT_TYPES_PATH } from './constants/contractTypes';
+import { EMPLOYEES_PATH } from './constants/employees';
+import { LEAVE_REQUESTS_PATH } from './constants/leaveRequests';
+import { LEAVE_TYPES_PATH } from './constants/leaveTypes';
 import type { AreaHome, Areas, NavItem, PublicNavItem } from './navigation';
 
 /**
@@ -20,7 +25,7 @@ export const ACCOUNT_NAVIGATION: NavItem[] = [];
 export const NAVIGATION: NavItem[] = [
   { key: 'dashboard', path: '/admin', label: 'common.nav.dashboard', icon: 'house', roles: ['admin', 'employee'] },
   { key: 'my-leave', path: '/admin/my-leave', label: 'common.nav.my_leave', icon: 'calendar-days', roles: ['employee'] },
-  { key: 'leave-requests', path: '/admin/leave-requests', label: 'common.nav.leave_requests', icon: 'calendar-check', roles: ['admin'], detailPath: true },
+  { key: 'leave-requests', path: LEAVE_REQUESTS_PATH, label: 'common.nav.leave_requests', icon: 'calendar-check', roles: ['admin'], detailPath: true },
   {
     // Grupa bez własnej strony: projekty dokłada w czasie działania useAppNavigation (frontend/src/core/routes).
     key: 'tasks',
@@ -32,8 +37,8 @@ export const NAVIGATION: NavItem[] = [
       { key: 'task-projects', path: '/admin/tasks/projects', label: 'common.nav.task_projects', icon: 'folder-cog', roles: ['admin'] },
     ],
   },
-  { key: 'employees', path: '/admin/employees', label: 'common.nav.employees', icon: 'users', roles: ['admin'] },
-  { key: 'activity-log', path: '/admin/activity-log', label: 'common.nav.activity_log', icon: 'history', roles: ['admin'] },
+  { key: 'employees', path: EMPLOYEES_PATH, label: 'common.nav.employees', icon: 'users', roles: ['admin'] },
+  { key: 'activity-log', path: ACTIVITY_LOG_PATH, label: 'common.nav.activity_log', icon: 'history', roles: ['admin'] },
   { key: 'archive', path: '/admin/archive', label: 'common.nav.archive', icon: 'archive', roles: ['admin'] },
   {
     key: 'settings',
@@ -42,8 +47,8 @@ export const NAVIGATION: NavItem[] = [
     icon: 'settings',
     roles: ['admin'],
     children: [
-      { key: 'leave-types', path: '/admin/leave-types', label: 'common.nav.leave_types', icon: 'tags', roles: ['admin'] },
-      { key: 'contract-types', path: '/admin/contract-types', label: 'common.nav.contract_types', icon: 'file-signature', roles: ['admin'] },
+      { key: 'leave-types', path: LEAVE_TYPES_PATH, label: 'common.nav.leave_types', icon: 'tags', roles: ['admin'] },
+      { key: 'contract-types', path: CONTRACT_TYPES_PATH, label: 'common.nav.contract_types', icon: 'file-signature', roles: ['admin'] },
     ],
   },
   { key: 'my-account', path: '/admin/my-account', label: 'common.nav.my_account', icon: 'user', roles: ['admin', 'employee'] },

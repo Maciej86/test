@@ -43,10 +43,10 @@ describe('activity-log queries', () => {
     expect(item!.changes).toEqual({ a: { before: 1, after: 2 } });
   });
 
-  it('listEntries: search by entity name, context and author through LIKE ?, escaped', async () => {
+  it('listEntries: search by entity name, context values (not JSON keys) and author, escaped', async () => {
     const spy = db([], [{ total: 0 }]);
     await q.listEntries(spy, { ...base, search: "50%_'; DROP" });
-    expect(sqlOf(spy)).toContain('WHERE (a.entity_name LIKE ? OR a.entity_context LIKE ? OR a.user_name LIKE ?)');
+    expect(sqlOf(spy)).toContain("WHERE (a.entity_name LIKE ? OR JSON_SEARCH(a.entity_context, 'one', ?) IS NOT NULL OR a.user_name LIKE ?)");
     expect(sqlOf(spy)).not.toContain('DROP');
     expect(paramsOf(spy).slice(0, 3)).toEqual(Array(3).fill("%50\\%\\_'; DROP%"));
     expect(paramsOf(spy, 1)).toEqual(Array(3).fill("%50\\%\\_'; DROP%"));

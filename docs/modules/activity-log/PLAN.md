@@ -51,4 +51,4 @@ z testem; podmiana w Powiadomieniach i w makiecie Historii zmian (makiety Powiad
 - [x] 12. Strona w `pages.ts`, zgodność z makietą, widok telefonu (390 px) sprawdzony w przeglądarce
 - [x] 13. E2E `e2e/activity-log.spec.ts` ze scenariuszy `TESTS.md` (dane z przedrostkiem `E2E `, sprzątanie
   w `global-teardown.ts`) → `npm run test:e2e`
-- [ ] 14. Przegląd kodu całego modułu (lista kontrolna z `docs/CONVENTIONS.md`), poprawki z testem → `npm run check`
+- [x] 14. Przegląd kodu całego modułu (lista kontrolna z `docs/CONVENTIONS.md`), poprawki z testem → `npm run check`

@@ -3,7 +3,7 @@ import { Paper, Stack } from '@mantine/core';
 import { CalendarCheck, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-import { formatDate, leaveRequestsListQuerySchema, type LeaveRequestListItem } from '@app/shared';
+import { LEAVE_REQUESTS_PATH, formatDate, leaveRequestsListQuerySchema, type LeaveRequestListItem } from '@app/shared';
 import { DataState } from '../../common/DataState';
 import { EmptyState } from '../../common/EmptyState';
 import { ListPagination } from '../../common/ListPagination';
@@ -18,7 +18,6 @@ import { ApproveModal, CancelModal, RejectModal } from './components/DecisionMod
 import { DetailsDrawer } from './components/DetailsDrawer';
 import { useLeaveRequest, useLeaveRequests } from './leave-requests.api';
 
-const LIST_PATH = '/admin/leave-requests';
 const LIST_DEFAULTS = { page: 1, search: '', sort: 'default', dir: 'asc', status: 'pending' } as const;
 
 /** Otwarte okno decyzji. */
@@ -47,12 +46,12 @@ export const LeaveRequestsPage = () => {
   const { id: rawId } = useParams();
   const id = rawId !== undefined && /^[1-9]\d{0,9}$/.test(rawId) ? Number(rawId) : null;
   const details = useLeaveRequest(id);
-  const backToList = () => navigate(`${LIST_PATH}${currentSearch()}`);
+  const backToList = () => navigate(`${LEAVE_REQUESTS_PATH}${currentSearch()}`);
   const missing = rawId !== undefined && (id === null || apiErrorKey(details.error) === 'server.not_found');
   useEffect(() => {
     if (!missing) return;
     notify.error(t('not_found'));
-    navigate(`${LIST_PATH}${currentSearch()}`, { replace: true });
+    navigate(`${LEAVE_REQUESTS_PATH}${currentSearch()}`, { replace: true });
     // Filtry czytane w chwili przejścia (currentSearch) nie są powodem efektu, więc ich tu nie ma.
   }, [missing, navigate, t]);
   const data = requests.data;
@@ -64,7 +63,7 @@ export const LeaveRequestsPage = () => {
   }, [emptyLaterPage, setParams]);
 
   const actions: RowActions = {
-    onDetails: (r) => navigate(`${LIST_PATH}/${r.id}${currentSearch()}`),
+    onDetails: (r) => navigate(`${LEAVE_REQUESTS_PATH}/${r.id}${currentSearch()}`),
     onApprove: (request) => setDialog({ kind: 'approve', request }),
     onReject: (request) => setDialog({ kind: 'reject', request }),
     onCancel: (request) => setDialog({ kind: 'cancel', request }),

@@ -7,6 +7,15 @@ const db = (rows: unknown = []) => ({ query: vi.fn().mockResolvedValue([rows]) }
 const row = (o: Record<string, unknown>) => ({ id: 1, name: 'Wypoczynkowy', deducts_pool: 1, yearly_limit: null, position: 1, hidden_at: null, ...o });
 
 describe('leave types queries', () => {
+  it('findLeaveType with lock adds FOR UPDATE (rename: true „before” in the history)', async () => {
+    const calls: string[] = [];
+    const spy = { query: vi.fn(async (sql: string) => { calls.push(sql); return [[]]; }) } as unknown as Parameters<typeof q.findLeaveType>[0];
+    await q.findLeaveType(spy, 3, { lock: true });
+    await q.findLeaveType(spy, 3);
+    expect(calls[0]).toMatch(/WHERE id = \? FOR UPDATE$/);
+    expect(calls[1]).not.toContain('FOR UPDATE');
+  });
+
   it('every query uses ? parameters', async () => {
     const calls: [string, unknown[] | undefined][] = [];
     const spy = { query: vi.fn(async (sql: string, params?: unknown[]) => { calls.push([sql, params]); return [[{ id: 3, insertId: 3, max: 2 }]]; }) } as unknown as Parameters<typeof q.findLeaveType>[0];
