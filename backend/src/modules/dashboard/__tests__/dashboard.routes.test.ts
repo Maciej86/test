@@ -58,4 +58,44 @@ describe('dashboard routes', () => {
     await as(jan).get('/dashboard?userId=1&role=admin');
     expect(s.getDashboard).toHaveBeenCalledWith({ id: 2, name: 'Jan Kowalski', role: 'employee' });
   });
+
+  describe('abuse', () => {
+    it('employee forges the role or another user in the query string, headers and body → still own dashboard', async () => {
+      const app = createApp();
+      vi.mocked(users.findActiveUserById).mockResolvedValue(jan);
+      const cookie = `${AUTH_COOKIE_NAME}=${signToken(jan, 0)}`;
+      const r = await request(app)
+        .get('/api/dashboard?role=admin&userId=1&viewer[role]=admin')
+        .set('Cookie', cookie)
+        .set('X-User-Id', '1')
+        .send({ role: 'admin', id: 1 });
+      expect(r.status).toBe(200);
+      expect(r.body.role).toBe('employee');
+      expect(s.getDashboard).toHaveBeenCalledTimes(1);
+      expect(s.getDashboard).toHaveBeenCalledWith({ id: 2, name: 'Jan Kowalski', role: 'employee' });
+    });
+
+    it('a forged or expired session cookie → 401, no data', async () => {
+      const forged = request(createApp()).get('/api/dashboard').set('Cookie', `${AUTH_COOKIE_NAME}=${signToken(anna, 0)}x`);
+      expect((await forged).status).toBe(401);
+      expect(s.getDashboard).not.toHaveBeenCalled();
+    });
+
+    it('an account moved to the archive since logging in → 401, no data', async () => {
+      vi.mocked(users.findActiveUserById).mockResolvedValue(null);
+      const r = await request(createApp()).get('/api/dashboard').set('Cookie', `${AUTH_COOKIE_NAME}=${signToken(jan, 0)}`);
+      expect(r.status).toBe(401);
+      expect(s.getDashboard).not.toHaveBeenCalled();
+    });
+
+    it('other methods on /dashboard are not open (POST/PUT/DELETE do not reach the service)', async () => {
+      vi.mocked(users.findActiveUserById).mockResolvedValue(anna);
+      const cookie = `${AUTH_COOKIE_NAME}=${signToken(anna, 0)}`;
+      for (const method of ['post', 'put', 'delete'] as const) {
+        const r = await request(createApp())[method]('/api/dashboard').set('Cookie', cookie).send({});
+        expect(r.status).toBe(404);
+      }
+      expect(s.getDashboard).not.toHaveBeenCalled();
+    });
+  });
 });

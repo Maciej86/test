@@ -217,4 +217,20 @@ describe('DashboardPage', () => {
     expect(screen.queryByRole('heading', { name: 'Nieobecności w najbliższych 2 tygodniach' })).toBeNull();
     expect(screen.queryByRole('heading', { name: 'Stan tablic' })).toBeNull();
   });
+
+  describe('abuse', () => {
+    it('<script> in a task title, project and person name is shown as plain text', async () => {
+      const evil = '<script>alert(1)</script>';
+      show({
+        ...admin,
+        pending: { items: [{ ...admin.pending.items[0]!, employeeName: evil }], total: 1 },
+        absences: [{ userId: 9, name: evil, dateFrom: '2026-11-20', dateTo: '2026-11-20', status: 'approved' }],
+        myTasks: { items: [task({ id: 3, title: evil, projectName: evil })], total: 1 },
+      });
+      await screen.findByText('Dziś piątek, 20.11.2026');
+      expect(screen.getAllByText(evil).length).toBeGreaterThanOrEqual(3);
+      expect(document.querySelector('main script, .mantine-Card-root script')).toBeNull();
+      expect(screen.getByText(`Dziś nie ma: ${evil}`)).toBeInTheDocument();
+    });
+  });
 });

@@ -31,4 +31,13 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180.
 
 ## Próby nadużyć
 
-(uzupełniane na etapie testy według `abuse.md`)
+Sprawdzone 2026-11-20 (testy `describe('abuse')` w `dashboard.routes.test.ts` i `DashboardPage.test.tsx`):
+- Pracownik dopisuje do adresu, nagłówków i treści żądania rolę administratora albo numer innej osoby → dostaje
+  tylko swój Pulpit: przeszła (nadużycie się nie udało)
+- Pracownik nie dostaje wniosków innych, nieobecności ani stanu tablic (nie ma ich w odpowiedzi serwera): przeszła
+- Zadania z projektu, z którego pracownika usunięto, nie trafiają do jego „Moich zadań” (warunek w zapytaniu): przeszła
+- Konto przeniesione do archiwum po zalogowaniu, podrobione ciasteczko sesji → 401 bez danych: przeszła
+- Hasło tymczasowe → 403 bez danych: przeszła
+- Inne metody (POST, PUT, DELETE) na adresie Pulpitu → 404: przeszła
+- `<script>alert(1)</script>` w tytule zadania, nazwie projektu i imieniu → widać jako zwykły tekst: przeszła
+- Przejścia statusów, dwa kliknięcia naraz, usuwanie: nie dotyczy (Pulpit nic nie zapisuje)
