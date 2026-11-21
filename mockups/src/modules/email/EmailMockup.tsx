@@ -1,29 +1,36 @@
 import { useState } from 'react';
 import { Box, Button, Code, Divider, Group, Paper, SegmentedControl, Stack, Text, Title } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { formatDate, formatDateTime } from '@app/shared';
-import { NEW_REQUEST_EMAIL as mail } from './data';
+import { formatDate, formatDateTime, leaveDaysText } from '@app/shared';
+import { NEW_REQUEST_EMAIL, REPORTED_EMAIL } from './data';
 
-const STATES = ['html', 'text', 'no_comment', 'mobile'] as const;
+const STATES = ['html', 'text', 'no_comment', 'reported', 'mobile'] as const;
 type State = (typeof STATES)[number];
 
 /** Teksty e-maila z tymi samymi kluczami, których użyje szablon na serwerze. */
-const useMailTexts = (withComment: boolean) => {
+const useMailTexts = (withComment: boolean, reported: boolean) => {
   const { t } = useTranslation('email');
+  const mail = reported ? REPORTED_EMAIL : NEW_REQUEST_EMAIL;
   const dateFrom = formatDate(mail.dateFrom) ?? '';
   const dateTo = formatDate(mail.dateTo) ?? '';
   const rows: [string, string][] = [
     [t('new_request.employee'), mail.employee],
     [t('new_request.leave_type'), mail.leaveType],
-    [t('new_request.working_days'), t('new_request.working_days_value', { count: mail.workingDays })],
-    [t('new_request.split'), t('new_request.split_value', { carried: mail.fromCarried, annual: mail.fromAnnual })],
-    [t('new_request.left_after'), t('new_request.left_after_value', { count: mail.leftAfter })],
-    ...(withComment ? [[t('new_request.comment'), mail.comment] as [string, string]] : []),
+    [t('new_request.days'), leaveDaysText(t, mail.workingDays, reported ? 'calendar' : 'working')],
+    // Chorobowe nie odejmuje dni z puli: bez wierszy o puli (jak w aplikacji przy takim typie).
+    ...(reported
+      ? []
+      : ([
+          [t('new_request.split'), t('new_request.split_value', { carried: mail.fromCarried, annual: mail.fromAnnual })],
+          [t('new_request.left_after'), t('new_request.left_after_value', { count: mail.leftAfter })],
+        ] as [string, string][])),
+    ...(withComment && mail.comment ? [[t('new_request.comment'), mail.comment] as [string, string]] : []),
   ];
   return {
-    subject: t('new_request.subject', { employee: mail.employee, dateFrom, dateTo }),
-    heading: t('new_request.heading'),
-    intro: t('new_request.intro', { employee: mail.employee }),
+    mail,
+    subject: t(reported ? 'new_request.subject_reported' : 'new_request.subject', { employee: mail.employee, dateFrom, dateTo }),
+    heading: t(reported ? 'new_request.heading_reported' : 'new_request.heading'),
+    intro: t(reported ? 'new_request.intro_reported' : 'new_request.intro', { employee: mail.employee }),
     datesLabel: t('new_request.dates'),
     dates: `${dateFrom} – ${dateTo}`,
     rows,
@@ -47,9 +54,9 @@ const MailHeader = ({ texts }: { texts: MailTexts }) => {
   return (
     <Stack gap={4} p="md">
       <Text ff="heading" fw={600} size="lg">{texts.subject}</Text>
-      {line(t('preview.from'), `${mail.fromName} <${mail.fromAddress}>`)}
-      {line(t('preview.to'), `${mail.toName} <${mail.toAddress}>`)}
-      {line(t('preview.sent'), formatDateTime(mail.sentAt) ?? '')}
+      {line(t('preview.from'), `${texts.mail.fromName} <${texts.mail.fromAddress}>`)}
+      {line(t('preview.to'), `${texts.mail.toName} <${texts.mail.toAddress}>`)}
+      {line(t('preview.sent'), formatDateTime(texts.mail.sentAt) ?? '')}
     </Stack>
   );
 };
@@ -59,7 +66,7 @@ const MailBody = ({ texts, narrow }: { texts: MailTexts; narrow: boolean }) => (
   <Box bg="gray.1" p={narrow ? 'xs' : { base: 'xs', sm: 'xl' }}>
     <Paper bg="white" c="dark.9" maw={560} mx="auto" radius="xs" style={{ overflow: 'hidden', border: '1px solid var(--mantine-color-gray-3)' }}>
       <Box bg="navy.8" px="lg" py="sm">
-        <Text ff="heading" fw={600} c="white">{mail.fromName}</Text>
+        <Text ff="heading" fw={600} c="white">{texts.mail.fromName}</Text>
       </Box>
       <Stack gap="md" p={narrow ? 'md' : 'lg'}>
         <Title order={2} c="dark.9" fz={24}>{texts.heading}</Title>
@@ -101,7 +108,7 @@ const MailText = ({ texts }: { texts: MailTexts }) => {
     `${texts.datesLabel}: ${texts.dates}`,
     ...texts.rows.map(([label, value]) => `${label}: ${value}`),
     '',
-    `${texts.button}: ${mail.link}`,
+    `${texts.button}: ${texts.mail.link}`,
     '',
     '--',
     texts.footer,
@@ -117,7 +124,7 @@ const MailText = ({ texts }: { texts: MailTexts }) => {
 export const EmailMockup = () => {
   const { t } = useTranslation('email');
   const [state, setState] = useState<State>('html');
-  const texts = useMailTexts(state !== 'no_comment');
+  const texts = useMailTexts(state !== 'no_comment', state === 'reported');
 
   return (
     <Stack>

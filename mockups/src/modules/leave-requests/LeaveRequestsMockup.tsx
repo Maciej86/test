@@ -83,10 +83,12 @@ const PoolCell = ({ r }: { r: MockRequest }) => {
 };
 
 const StatusCell = ({ r }: { r: MockRequest }) => {
+  const { t } = useTranslation('leave-requests');
   return (
     <Stack gap={4} align="flex-start">
       <LeaveStatusBadge status={r.status} />
       {r.decidedBy && <Text size="xs" c="dimmed">{r.decidedBy}, <DateText value={r.decidedAt?.slice(0, 10)} /></Text>}
+      {r.auto && r.status === 'approved' && <Text size="xs" c="dimmed">{t('my-leave:approved_auto')}</Text>}
       {r.reason && <Text size="xs" maw={240} lineClamp={2}>„{r.reason}”</Text>}
     </Stack>
   );
@@ -122,7 +124,7 @@ const RequestsTable = ({ rows, ...actions }: RowActions & { rows: MockRequest[] 
               </Table.Td>
               <Table.Td>{r.type}</Table.Td>
               <Table.Td>
-                <Text fw={600}>{r.days}</Text>
+                <Text fw={600}>{leaveDaysText(t, r.days, r.dayCount)}</Text>
                 <Text size="xs" c="dimmed">{splitText(r, t)}</Text>
               </Table.Td>
               <Table.Td><PoolCell r={r} /></Table.Td>
@@ -149,7 +151,7 @@ const RequestCards = ({ rows, ...actions }: RowActions & { rows: MockRequest[] }
               <Stack gap={0}>
                 <Text fw={600}>{r.employee}</Text>
                 <Text size="sm"><LeaveDates from={r.from} to={r.to} /></Text>
-                <Text size="sm" c="dimmed">{r.type}, {leaveDaysText(t, r.days)}</Text>
+                <Text size="sm" c="dimmed">{r.type}, {leaveDaysText(t, r.days, r.dayCount)}</Text>
               </Stack>
               <LeaveStatusBadge status={r.status} />
             </Group>

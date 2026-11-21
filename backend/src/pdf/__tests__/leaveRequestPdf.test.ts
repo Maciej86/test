@@ -45,17 +45,17 @@ describe('buildLeaveRequestPdf', () => {
     expect(t).toContain('Pracownik Jan Kowalski');
     expect(t).toContain('Typ urlopu Wypoczynkowy');
     expect(t).toContain('Termin 21.12.2026 – 31.12.2026');
-    expect(t).toContain('Dni robocze 7 dni roboczych (2 z zaległego, 5 z puli 2026)');
+    expect(t).toContain('Dni 7 dni roboczych (2 z zaległego, 5 z puli 2026)');
   });
 
   it('one-day request shows a single date', () => {
     const t = text({ dateTo: '2026-12-21', workingDays: 1, daysFromCarried: 0, daysFromAnnual: 1 });
-    expect(t).toContain('Termin 21.12.2026 Dni robocze 1 dzień roboczy (1 z puli 2026)');
+    expect(t).toContain('Termin 21.12.2026 Dni 1 dzień roboczy (1 z puli 2026)');
   });
 
   it('type that does not deduct days has no split', () => {
     const t = text({ deductsPool: false, daysFromCarried: 0, daysFromAnnual: 0 });
-    expect(t).toContain('Dni robocze 7 dni roboczych Komentarz');
+    expect(t).toContain('Dni 7 dni roboczych Komentarz');
   });
 
   it('comment only when present', () => {

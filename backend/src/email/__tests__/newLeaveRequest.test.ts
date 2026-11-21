@@ -27,7 +27,7 @@ describe('newLeaveRequestEmail', () => {
       expect(body).toContain('Jan Kowalski prosi o urlop. Wniosek czeka na Twoją decyzję.');
       expect(body).toContain('Wypoczynkowy');
       expect(body).toContain('08.02.2027 – 12.02.2027');
-      expect(body).toMatch(/Dni robocze(<[^>]+>|:\s|\s)+5/);
+      expect(body).toMatch(/Dni(<[^>]+>|:\s|\s)+5 dni roboczych/);
       expect(body).toContain('3 z zaległego, 2 z puli rocznej');
       expect(body).toContain('24 dni');
       expect(body).toContain('Komentarz');
@@ -49,7 +49,7 @@ describe('newLeaveRequestEmail', () => {
     for (const body of [html, text]) {
       expect(body).not.toContain('Z puli');
       expect(body).not.toContain('Zostanie po zatwierdzeniu');
-      expect(body).toContain('Dni robocze');
+      expect(body).toContain('5 dni roboczych');
     }
   });
 

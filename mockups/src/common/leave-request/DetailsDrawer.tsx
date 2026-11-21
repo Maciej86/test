@@ -22,6 +22,8 @@ export interface LeaveRequestView {
   comment?: string;
   createdAt: string;
   decided?: { by: string; at: string };
+  /** Zatwierdzony bez decyzji (typ bez zatwierdzania): chwila zgłoszenia zamiast osoby. */
+  autoApproved?: boolean;
   reason?: string;
   /** `note`: zdanie pod paskiem przy czekającym (np. „Po zatwierdzeniu zostanie 15 dni…”). */
   pool?: { year: number; used: number; pending: number; left: number; total: number; carried: number; note?: string };
@@ -93,6 +95,7 @@ export const DetailsDrawer = ({ request: r, strip, onClose, onApprove, onReject,
             {r.comment && <DetailRow label={t('comment')}>{r.comment}</DetailRow>}
             <DetailRow label={t('submitted')}><DateText value={r.createdAt} withTime /></DetailRow>
             {r.decided && <DetailRow label={t(`decided_${r.status}`)}>{r.decided.by}, <DateText value={r.decided.at} withTime /></DetailRow>}
+            {r.autoApproved && r.status === 'approved' && <Text size="sm" c="dimmed">{t('approved_auto')}</Text>}
             {r.reason && <DetailRow label={t('reason')}>{t('my-leave:quoted', { text: r.reason })}</DetailRow>}
           </Stack>
 

@@ -1,3 +1,4 @@
+import type { LeaveDayCount } from '@app/shared';
 /**
  * Zmyślone dane makiety modułu Wnioski urlopowe. Ogląda je Anna Nowak (administrator), „dziś” = 17.11.2026.
  * Liczby zgadzają się z makietami Pracowników i Moich urlopów (Jan Kowalski: pula 26, zaległe 4, wykorzystane 9,
@@ -46,6 +47,9 @@ export interface MockRequest {
   decidedAt?: string;
   /** Powód odrzucenia albo anulowania. */
   reason?: string;
+  /** Sposób liczenia dni wniosku (brak = robocze) i zatwierdzenie bez decyzji (typ bez zatwierdzania). */
+  dayCount?: LeaveDayCount;
+  auto?: boolean;
 }
 
 export const REQUESTS: MockRequest[] = [
@@ -54,6 +58,7 @@ export const REQUESTS: MockRequest[] = [
   { id: 21, employee: 'Jan Kowalski', type: 'Wypoczynkowy', deducts: true, from: '2026-11-26', to: '2026-11-27', days: 2, fromCarried: 0, fromAnnual: 2, status: 'pending', createdAt: '2026-11-16 09:12', comment: 'Wyjazd rodzinny, wracam w poniedziałek.' },
   { id: 19, employee: 'Katarzyna Wiśniewska', type: 'Na żądanie', deducts: true, from: '2026-11-13', to: '2026-11-13', days: 1, fromCarried: 0, fromAnnual: 1, status: 'pending', createdAt: '2026-11-13 06:48' },
   // Rozpatrzone
+  { id: 25, employee: 'Tomasz Wójcik', type: 'Chorobowe', deducts: false, from: '2026-11-16', to: '2026-11-22', days: 7, fromCarried: 0, fromAnnual: 0, status: 'approved', createdAt: '2026-11-16 07:20', dayCount: 'calendar', auto: true },
   { id: 23, employee: 'Tomasz Wójcik', type: 'Wypoczynkowy', deducts: true, from: '2026-12-21', to: '2026-12-22', days: 2, fromCarried: 2, fromAnnual: 0, status: 'approved', createdAt: '2026-11-04 12:30', decidedBy: 'Anna Nowak', decidedAt: '2026-11-04 15:10' },
   { id: 22, employee: 'Magdalena Lewandowska', type: 'Wypoczynkowy', deducts: true, from: '2026-11-23', to: '2026-11-27', days: 5, fromCarried: 0, fromAnnual: 5, status: 'approved', createdAt: '2026-11-02 10:15', decidedBy: 'Anna Nowak', decidedAt: '2026-11-03 08:40' },
   { id: 20, employee: 'Magdalena Lewandowska', type: 'Wypoczynkowy', deducts: true, from: '2026-12-28', to: '2026-12-31', days: 4, fromCarried: 0, fromAnnual: 4, status: 'approved', createdAt: '2026-10-28 09:00', decidedBy: 'Anna Nowak', decidedAt: '2026-10-28 11:20' },

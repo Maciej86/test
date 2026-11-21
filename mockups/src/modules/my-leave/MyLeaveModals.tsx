@@ -2,20 +2,20 @@ import { useState, type ReactNode } from 'react';
 import { Alert, Badge, Button, Divider, Grid, Group, Modal, Paper, Select, SimpleGrid, Stack, Text, Textarea, Title } from '@mantine/core';
 import { AlertTriangle, CalendarRange, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { countWorkingDays, dayjs, leaveDaysText } from '@app/shared';
+import { countWorkingDays, dayjs, leaveDaysText, type LeaveDayCount } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { ConfirmModal } from '../../common/ConfirmModal';
 import { DateField } from '../../common/DateField';
 import { DateText } from '../../common/DateText';
 import { notify } from '../../common/notify';
 import { DayStrip } from './DayStrip';
-import { LEAVE_TYPES, MY_REQUESTS, POOL, type MockRequest } from './data';
+import { BACKDATE_DAYS, LEAVE_TYPES, MY_REQUESTS, POOL, TODAY, type MockRequest } from './data';
 
 export const COMMENT_MAX = 500;
 
 type Check =
   | { kind: 'empty' }
-  | { kind: 'ok'; days: number; fromCarried: number; fromAnnual: number; leftAfter: number | null }
+  | { kind: 'ok'; days: number; dayCount: LeaveDayCount; fromCarried: number; fromAnnual: number; leftAfter: number | null }
   | { kind: 'no_days' }
   | { kind: 'not_enough'; days: number; left: number }
   | { kind: 'limit'; days: number; limit: number; used: number; type: string }
@@ -33,19 +33,19 @@ const checkRequest = (typeId: string | null, from: string | null, to: string | n
   const overlap = MY_REQUESTS.find((r) => (r.status === 'pending' || r.status === 'approved') && r.from <= to && r.to >= from);
   if (overlap) return { kind: 'overlap', request: overlap };
 
-  const days = countWorkingDays(from, to);
+  const days = type.dayCount === 'calendar' ? dayjs(to).diff(dayjs(from), 'day') + 1 : countWorkingDays(from, to);
   if (days === 0) return { kind: 'no_days' };
 
   if (type.limit !== null && type.usedOfLimit + days > type.limit) {
     return { kind: 'limit', days, limit: type.limit, used: type.usedOfLimit, type: type.name };
   }
-  if (!type.deducts) return { kind: 'ok', days, fromCarried: 0, fromAnnual: 0, leftAfter: null };
+  if (!type.deducts) return { kind: 'ok', days, dayCount: type.dayCount, fromCarried: 0, fromAnnual: 0, leftAfter: null };
 
   const carriedLeft = POOL.carried - POOL.usedCarried;
   const left = POOL.annual + POOL.carried - POOL.usedCarried - POOL.usedAnnual - POOL.pending;
   if (days > left) return { kind: 'not_enough', days, left };
   const fromCarried = Math.min(days, carriedLeft);
-  return { kind: 'ok', days, fromCarried, fromAnnual: days - fromCarried, leftAfter: left - days };
+  return { kind: 'ok', days, dayCount: type.dayCount, fromCarried, fromAnnual: days - fromCarried, leftAfter: left - days };
 };
 
 /** Ramka pod terminem: ile dni, skąd się wezmą, albo co blokuje złożenie i jak to naprawić. */
@@ -56,7 +56,7 @@ const CheckBox = ({ check }: { check: Check }) => {
       return <Text size="sm" c="dimmed">{t('check_empty')}</Text>;
     case 'ok':
       return (
-        <Alert color="navy" variant="light" icon={<CalendarRange size={18} />} title={leaveDaysText(t, check.days)}>
+        <Alert color="navy" variant="light" icon={<CalendarRange size={18} />} title={leaveDaysText(t, check.days, check.dayCount)}>
           {check.leftAfter === null
             ? t('check_no_pool')
             : [
@@ -114,10 +114,14 @@ export const RequestModal = ({ initial, onClose }: {
     : [
         type.deducts ? t('type_deducts') : t('type_not_deducts'),
         type.limit !== null ? t('type_limit', { used: type.usedOfLimit, limit: type.limit, year: POOL.year }) : null,
+        type.dayCount === 'calendar' ? t('type_calendar_days') : null,
+        type.approval ? null : t('type_no_approval', { days: BACKDATE_DAYS }),
       ].filter(Boolean).join(t('check_and'));
+  // Typ bez zatwierdzania (np. chorobowe) może zaczynać się kilka dni wstecz; reszta od dziś.
+  const earliest = dayjs(TODAY).subtract(type && !type.approval ? BACKDATE_DAYS : 0, 'day').toDate();
 
   const submit = () => {
-    notify.success(t('submitted'));
+    notify.success(type && !type.approval ? t('reported') : t('submitted'));
     onClose();
   };
 
@@ -142,7 +146,7 @@ export const RequestModal = ({ initial, onClose }: {
                 setFrom(v);
                 if (v && (!to || to < v)) setTo(v);
               }}
-              minDate={new Date('2026-11-17')}
+              minDate={earliest}
               required
             />
           </Grid.Col>
@@ -151,14 +155,14 @@ export const RequestModal = ({ initial, onClose }: {
               label={t('field_to')}
               value={to}
               onChange={setTo}
-              minDate={from ? new Date(from) : new Date('2026-11-17')}
+              minDate={from ? new Date(from) : earliest}
               error={check.kind === 'order' ? t('error_order') : undefined}
               required
             />
           </Grid.Col>
         </Grid>
 
-        {from && to && check.kind !== 'order' && <DayStrip from={from} to={to} />}
+        {from && to && check.kind !== 'order' && <DayStrip from={from} to={to} dayCount={type?.dayCount ?? 'working'} />}
         <CheckBox check={check} />
 
         <Textarea
@@ -172,7 +176,7 @@ export const RequestModal = ({ initial, onClose }: {
         />
         <Group justify="flex-end">
           <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
-          <Button leftSection={<ButtonIcon action="send" />} disabled={check.kind !== 'ok'} onClick={submit}>{t('submit')}</Button>
+          <Button leftSection={<ButtonIcon action="send" />} disabled={check.kind !== 'ok'} onClick={submit}>{type && !type.approval ? t('submit_report') : t('submit')}</Button>
         </Group>
       </Stack>
     </Modal>
@@ -189,14 +193,16 @@ export const WithdrawModal = ({ request, onClose }: { request: MockRequest | nul
       confirmAction="cancel"
       cancelLabel={t('keep')}
       danger
-      onConfirm={() => { notify.success(t('withdrawn_done')); onClose(); }}
+      onConfirm={() => { notify.success(request.auto ? t('withdrawn_done_no_pool') : t('withdrawn_done')); onClose(); }}
       onClose={onClose}
     >
       <Text>
         {request.type}, <DateText value={request.from} /> – <DateText value={request.to} />{' '}
-        ({leaveDaysText(t, request.days)}).
+        ({leaveDaysText(t, request.days, request.dayCount)}).
       </Text>
-      <Text size="sm" c="dimmed">{t('withdraw_text', { count: request.fromCarried + request.fromAnnual })}</Text>
+      <Text size="sm" c="dimmed">
+        {request.auto ? t('withdraw_text_auto') : t('withdraw_text', { count: request.fromCarried + request.fromAnnual })}
+      </Text>
     </ConfirmModal>
   );
 };

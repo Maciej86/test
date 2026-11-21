@@ -1,4 +1,4 @@
-import type { MyLeaveOverview } from '@app/shared';
+import type { LeaveDayCount, MyLeaveOverview } from '@app/shared';
 
 /**
  * Zmyślone dane makiety modułu Moje urlopy. Ogląda je Jan Kowalski (pracownik), „dziś” = 17.11.2026.
@@ -7,6 +7,8 @@ import type { MyLeaveOverview } from '@app/shared';
 export type LeaveStatus = 'pending' | 'approved' | 'rejected' | 'withdrawn' | 'cancelled';
 
 export const TODAY = '2026-11-17';
+/** Typ bez zatwierdzania może zaczynać się tyle dni wstecz (w aplikacji `NO_APPROVAL_BACKDATE_DAYS`). */
+export const BACKDATE_DAYS = 7;
 
 /** Pula na rok otwarty (jeszcze niezamknięty przez administratora). */
 export const POOL = { year: 2026, annual: 26, carried: 4, usedCarried: 4, usedAnnual: 5, pending: 2 };
@@ -31,15 +33,19 @@ export interface MockLeaveType {
   /** Roczny limit dni na osobę (null = bez limitu) i ile z niego już zajęte (czekające + zatwierdzone). */
   limit: number | null;
   usedOfLimit: number;
+  /** Jak liczyć dni i czy wniosek czeka na decyzję (część 2 Kalendarza). */
+  dayCount: LeaveDayCount;
+  approval: boolean;
 }
 
 /** Widoczne typy w kolejności z ekranu Typy urlopów. */
 export const LEAVE_TYPES: MockLeaveType[] = [
-  { id: 1, name: 'Wypoczynkowy', deducts: true, limit: null, usedOfLimit: 0 },
-  { id: 2, name: 'Na żądanie', deducts: true, limit: 4, usedOfLimit: 1 },
-  { id: 3, name: 'Okolicznościowy', deducts: false, limit: null, usedOfLimit: 0 },
-  { id: 4, name: 'Bezpłatny', deducts: false, limit: null, usedOfLimit: 0 },
-  { id: 5, name: 'Opieka nad dzieckiem', deducts: false, limit: 2, usedOfLimit: 0 },
+  { id: 1, name: 'Wypoczynkowy', deducts: true, limit: null, usedOfLimit: 0, dayCount: 'working', approval: true },
+  { id: 2, name: 'Na żądanie', deducts: true, limit: 4, usedOfLimit: 1, dayCount: 'working', approval: true },
+  { id: 3, name: 'Okolicznościowy', deducts: false, limit: null, usedOfLimit: 0, dayCount: 'working', approval: true },
+  { id: 4, name: 'Bezpłatny', deducts: false, limit: null, usedOfLimit: 0, dayCount: 'working', approval: true },
+  { id: 5, name: 'Opieka nad dzieckiem', deducts: false, limit: 2, usedOfLimit: 0, dayCount: 'working', approval: true },
+  { id: 7, name: 'Chorobowe', deducts: false, limit: null, usedOfLimit: 0, dayCount: 'calendar', approval: false },
 ];
 
 export interface MockRequest {
@@ -58,9 +64,15 @@ export interface MockRequest {
   decidedBy?: string;
   decidedAt?: string;
   reason?: string;
+  /** Sposób liczenia zapamiętany we wniosku (brak = robocze) i czy zatwierdzony bez decyzji (typ bez zatwierdzania). */
+  dayCount?: LeaveDayCount;
+  auto?: boolean;
+  /** Czy pracownik może jeszcze wycofać (liczy serwer). */
+  canWithdraw?: boolean;
 }
 
 export const MY_REQUESTS: MockRequest[] = [
+  { id: 22, type: 'Chorobowe', from: '2026-11-13', to: '2026-11-19', days: 7, fromCarried: 0, fromAnnual: 0, status: 'approved', createdAt: '2026-11-17 07:15', dayCount: 'calendar', auto: true, canWithdraw: true, decidedAt: '2026-11-17 07:15' },
   { id: 21, type: 'Wypoczynkowy', from: '2026-11-26', to: '2026-11-27', days: 2, fromCarried: 0, fromAnnual: 2, status: 'pending', createdAt: '2026-11-16 09:12', comment: 'Wyjazd rodzinny, wracam w poniedziałek.' },
   { id: 18, type: 'Na żądanie', from: '2026-10-09', to: '2026-10-09', days: 1, fromCarried: 0, fromAnnual: 1, status: 'approved', createdAt: '2026-10-09 07:40', decidedBy: 'Anna Nowak', decidedAt: '2026-10-09 08:05' },
   { id: 15, type: 'Wypoczynkowy', from: '2026-08-03', to: '2026-08-14', days: 10, fromCarried: 0, fromAnnual: 10, status: 'rejected', createdAt: '2026-06-22 14:30', decidedBy: 'Anna Nowak', decidedAt: '2026-06-23 10:15', reason: 'W tym terminie inwentaryzacja, proszę o inny termin.' },
@@ -81,4 +93,5 @@ export const FORM_EXAMPLES = {
   limit: { typeId: '2', from: '2026-11-18', to: '2026-11-23', comment: '' },
   overlap: { typeId: '1', from: '2026-11-27', to: '2026-11-27', comment: '' },
   next_year: { typeId: '1', from: '2027-01-11', to: '2027-01-15', comment: '' },
+  sick: { typeId: '7', from: '2026-11-20', to: '2026-11-24', comment: '' },
 } as const;

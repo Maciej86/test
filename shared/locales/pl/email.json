@@ -1,13 +1,15 @@
 {
   "new_request": {
     "subject": "Nowy wniosek urlopowy: {{employee}}, {{dateFrom}}–{{dateTo}}",
+    "subject_reported": "Zgłoszona nieobecność: {{employee}}, {{dateFrom}}–{{dateTo}}",
     "heading": "Nowy wniosek urlopowy",
+    "heading_reported": "Zgłoszona nieobecność",
     "intro": "{{employee}} prosi o urlop. Wniosek czeka na Twoją decyzję.",
+    "intro_reported": "{{employee}} zgłosił(a) nieobecność. Jest już zatwierdzona, nie wymaga Twojej decyzji.",
     "employee": "Pracownik",
     "leave_type": "Typ urlopu",
     "dates": "Termin",
-    "working_days": "Dni robocze",
-    "working_days_value": "{{count}}",
+    "days": "Dni",
     "split": "Z puli",
     "split_value": "{{carried}} z zaległego, {{annual}} z puli rocznej",
     "left_after": "Zostanie po zatwierdzeniu",
@@ -22,13 +24,14 @@
   },
   "preview": {
     "title": "Podgląd e-maila",
-    "summary": "Jedyny e-mail aplikacji: nowy wniosek urlopowy, do każdego administratora z e-mailem do powiadomień.",
+    "summary": "E-maile aplikacji: nowy wniosek urlopowy i zgłoszona nieobecność (typ bez zatwierdzania), do każdego administratora z e-mailem do powiadomień.",
     "state": "Pokaż:",
     "states": {
       "html": "E-mail",
       "text": "Wersja tekstowa",
       "no_comment": "Wniosek bez komentarza",
-      "mobile": "Na telefonie"
+      "mobile": "Na telefonie",
+      "reported": "Zgłoszona nieobecność (chorobowe)"
     },
     "from": "Od",
     "to": "Do",

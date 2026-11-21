@@ -46,7 +46,7 @@ describe('RequestModal', () => {
     show();
     expect(screen.getByDisplayValue('Wypoczynkowy')).toBeInTheDocument();
     expect(screen.getByText('Odejmuje dni z puli')).toBeInTheDocument();
-    expect(screen.getByText('Wybierz termin, a policzę dni robocze (bez weekendów i świąt).')).toBeInTheDocument();
+    expect(screen.getByText('Wybierz termin, a policzę dni wniosku.')).toBeInTheDocument();
     expect(submitButton()).toBeDisabled();
   });
 

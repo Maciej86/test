@@ -29,7 +29,7 @@ usunięte.
 - [x] 1. Wydzielenie `leaveDaysText` (lista „Wydzielam”) + test w `shared/src/__tests__/leaveDays.test.ts` (1, 2, 5,
   22 dni roboczych; 1, 7, 14 dni kalendarzowych; brak `dayCount` = robocze), podmiana wszystkich kopii we froncie,
   w PDF i w makietach, usunięcie starych kluczy → `npx tsc -p mockups`, `npm run check`
-- [ ] 2. Makiety: Moje urlopy (okno wniosku: podpowiedzi typu kalendarzowego i bez zatwierdzania, „Od” 7 dni wstecz,
+- [x] 2. Makiety: Moje urlopy (okno wniosku: podpowiedzi typu kalendarzowego i bez zatwierdzania, „Od” 7 dni wstecz,
   pasek dni, przycisk „Zgłoś”, dymek; tabela: kolumna „Dni”, „Wycofaj” przy zatwierdzonym automatycznie; nowy typ
   „Chorobowe” w danych), Wnioski urlopowe i wspólny `LeaveRequestDrawer` („Zatwierdzony automatycznie (typ bez
   zatwierdzania)”), Typy urlopów (nowe teksty podpowiedzi i ostrzeżenia), E-mail (stan „Zgłoszona nieobecność”) →

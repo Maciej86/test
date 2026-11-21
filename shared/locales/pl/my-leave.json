@@ -9,7 +9,7 @@
   "year": "Rok",
   "col_dates": "Termin",
   "col_type": "Typ urlopu",
-  "col_days": "Dni robocze",
+  "col_days": "Dni",
   "col_status": "Status",
   "col_created": "Złożony",
   "split_carried": "{{count}} z zaległego",
@@ -35,12 +35,15 @@
   "field_comment_hint": "Nieobowiązkowy, np. powód albo kontakt w razie pilnej sprawy.",
   "type_deducts": "Odejmuje dni z puli",
   "type_not_deducts": "Nie odejmuje dni z puli",
+  "type_calendar_days": "Liczone w dniach kalendarzowych: weekendy i święta też się liczą",
+  "type_no_approval": "Nie czeka na decyzję: od razu jest zatwierdzony, a administrator dostaje powiadomienie. Możesz zacząć do {{days}} dni wstecz",
   "type_limit": "w {{year}} wykorzystano {{used}} z {{limit}} dni",
   "error_order": "Data „Do” nie może być wcześniejsza niż „Od”.",
   "strip_aria": "Dni wybranego terminu",
   "strip_working": "Dzień roboczy, liczy się do wniosku",
+  "strip_counted": "Liczy się do wniosku (dni kalendarzowe)",
   "strip_weekend": "Weekend, nie liczy się",
-  "check_empty": "Wybierz termin, a policzę dni robocze (bez weekendów i świąt).",
+  "check_empty": "Wybierz termin, a policzę dni wniosku.",
   "check_and": ", ",
   "check_from_carried": "{{count}} z zaległego urlopu",
   "check_from_annual": "{{count}} z puli na {{year}}",
@@ -62,13 +65,16 @@
   "check_past_date": "Wniosek składasz od dziś. Zmień datę „Od”.",
   "cancel": "Anuluj",
   "submit": "Złóż wniosek",
+  "submit_report": "Zgłoś",
   "submitted": "Wniosek złożony. Administrator dostał powiadomienie.",
+  "reported": "Zgłoszono. Administrator dostał powiadomienie.",
   "withdraw_title": "Wycofać wniosek?",
   "withdraw_text_one": "Administrator nie będzie go już rozpatrywał, a zarezerwowany dzień wróci do puli. Wycofanego wniosku nie da się przywrócić.",
   "withdraw_text_few": "Administrator nie będzie go już rozpatrywał, a {{count}} zarezerwowane dni wrócą do puli. Wycofanego wniosku nie da się przywrócić.",
   "withdraw_text_many": "Administrator nie będzie go już rozpatrywał, a {{count}} zarezerwowanych dni wróci do puli. Wycofanego wniosku nie da się przywrócić.",
   "withdraw_text_other": "Administrator nie będzie go już rozpatrywał, a zarezerwowane dni wrócą do puli. Wycofanego wniosku nie da się przywrócić.",
   "withdraw_text_no_pool": "Administrator nie będzie go już rozpatrywał. Wycofanego wniosku nie da się przywrócić.",
+  "withdraw_text_auto": "Nieobecność zniknie z kalendarza, a administrator dostanie powiadomienie. Wycofanego wniosku nie da się przywrócić.",
   "keep": "Zostaw",
   "withdrawn_done": "Wniosek wycofany. Dni wróciły do puli.",
   "withdrawn_done_no_pool": "Wniosek wycofany.",
@@ -99,7 +105,9 @@
     "form_overlap": "Termin zajęty",
     "form_next_year": "Wniosek na przyszły rok",
     "withdraw": "Wycofanie",
-    "print": "Wydruk"
+    "print": "Wydruk",
+    "form_sick": "Okno: chorobowe (bez zatwierdzania)",
+    "withdraw_sick": "Wycofanie chorobowego"
   },
   "server": {
     "no_pool": "Nie masz jeszcze puli dni urlopu. Poproś administratora o jej ustawienie.",
@@ -117,5 +125,6 @@
     "past_date": "Data „Od” nie może być wcześniejsza niż dziś.",
     "dates_order": "Data „Do” nie może być wcześniejsza niż „Od”.",
     "same_year": "Obie daty muszą być w tym samym roku. Urlop na przełomie lat złóż jako dwa wnioski."
-  }
+  },
+  "approved_auto": "zatwierdzony automatycznie"
 }

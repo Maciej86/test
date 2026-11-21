@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Alert, Text, Textarea } from '@mantine/core';
 import { CircleAlert, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { LEAVE_DECISION_REASON_MAX, leaveDaysText } from '@app/shared';
+import { LEAVE_DECISION_REASON_MAX, leaveDaysText, type LeaveDayCount } from '@app/shared';
 import { ConfirmModal } from '../ConfirmModal';
 import { LeaveDates } from '../LeaveRequestParts';
 import { notify } from '../notify';
@@ -17,6 +17,7 @@ export interface DecisionRequest {
   from: string;
   to: string;
   days: number;
+  dayCount?: LeaveDayCount;
   /** Ile dni wniosek zarezerwował w puli (typ bez odejmowania: 0). */
   reserved: number;
   /** Czekający z terminem przed dziś. */
@@ -38,7 +39,7 @@ const Summary = ({ r }: { r: DecisionRequest }) => {
   const { t } = useTranslation('leave-requests');
   return (
     <Text>
-      {r.employee}: {r.type}, <LeaveDates from={r.from} to={r.to} /> ({leaveDaysText(t, r.days)}).
+      {r.employee}: {r.type}, <LeaveDates from={r.from} to={r.to} /> ({leaveDaysText(t, r.days, r.dayCount)}).
     </Text>
   );
 };

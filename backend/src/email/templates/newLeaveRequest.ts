@@ -1,4 +1,4 @@
-import { createI18n, formatDate, formatNumber } from '@app/shared';
+import { createI18n, formatDate, formatNumber, leaveDaysText } from '@app/shared';
 import { env } from '../../env';
 import { escapeHtml } from '../escapeHtml';
 import { EMAIL_COLORS as c, FONT_SERIF, emailLayout } from '../layout';
@@ -34,7 +34,7 @@ export const newLeaveRequestEmail = (data: NewLeaveRequestEmailData): { subject:
   const rows: [string, string][] = [
     [k('employee'), data.employeeName],
     [k('leave_type'), data.leaveTypeName],
-    [k('working_days'), k('working_days_value', { count: whole(data.workingDays) })],
+    [k('days'), leaveDaysText(t, data.workingDays)],
     ...(data.leftAfter === null
       ? []
       : ([

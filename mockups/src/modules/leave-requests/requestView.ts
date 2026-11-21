@@ -22,11 +22,12 @@ export const toView = (r: MockRequest, t: TFunction): LeaveRequestView => {
     status: r.status,
     from: r.from,
     to: r.to,
-    typeLine: `${r.type}, ${leaveDaysText(t, r.days)} (${splitText(r, t)})`,
+    typeLine: `${r.type}, ${leaveDaysText(t, r.days, r.dayCount)} (${splitText(r, t)})`,
     late: isLate(r),
     comment: r.comment,
     createdAt: r.createdAt,
     decided: r.decidedBy && r.decidedAt ? { by: r.decidedBy, at: r.decidedAt } : undefined,
+    autoApproved: r.auto,
     reason: r.reason,
     pool: pool && active
       ? {
@@ -51,6 +52,7 @@ export const toDecision = (r: MockRequest): DecisionRequest => {
     from: r.from,
     to: r.to,
     days: r.days,
+    dayCount: r.dayCount,
     reserved: r.deducts ? r.fromCarried + r.fromAnnual : 0,
     late: isLate(r),
     started: r.from <= TODAY,

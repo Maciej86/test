@@ -13,7 +13,7 @@ import { PoolCard } from '../../common/PoolCard';
 import { PrintPreview, RequestModal, WithdrawModal } from './MyLeaveModals';
 import { FORM_EXAMPLES, LEAVE_TYPES, MY_REQUESTS, POOL, POOL_VIEW, REQUEST_YEARS, type MockRequest } from './data';
 
-const STATES = ['list', 'empty', 'form_ok', 'form_not_enough', 'form_limit', 'form_overlap', 'form_next_year', 'withdraw', 'print'] as const;
+const STATES = ['list', 'empty', 'form_ok', 'form_not_enough', 'form_limit', 'form_overlap', 'form_next_year', 'form_sick', 'withdraw', 'withdraw_sick', 'print'] as const;
 type State = (typeof STATES)[number];
 const FORM_STATE: Partial<Record<State, keyof typeof FORM_EXAMPLES>> = {
   form_ok: 'ok',
@@ -21,6 +21,7 @@ const FORM_STATE: Partial<Record<State, keyof typeof FORM_EXAMPLES>> = {
   form_limit: 'limit',
   form_overlap: 'overlap',
   form_next_year: 'next_year',
+  form_sick: 'sick',
 };
 
 /** Typy z rocznym limitem: ile dni już zajęte w tym roku (czekające i zatwierdzone). */
@@ -47,7 +48,7 @@ const DaysCell = ({ r }: { r: MockRequest }) => {
   const deducted = r.fromCarried + r.fromAnnual;
   return (
     <Stack gap={0}>
-      <Text fw={600}>{r.days}</Text>
+      <Text fw={600}>{leaveDaysText(t, r.days, r.dayCount)}</Text>
       {r.status === 'pending' || r.status === 'approved' ? (
         <Text size="xs" c="dimmed">
           {deducted === 0
@@ -65,6 +66,7 @@ const DaysCell = ({ r }: { r: MockRequest }) => {
 };
 
 const StatusCell = ({ r }: { r: MockRequest }) => {
+  const { t } = useTranslation('my-leave');
   return (
     <Stack gap={4} align="flex-start">
       <LeaveStatusBadge status={r.status} />
@@ -73,6 +75,7 @@ const StatusCell = ({ r }: { r: MockRequest }) => {
           {r.decidedBy}, <DateText value={r.decidedAt} />
         </Text>
       )}
+      {r.auto && r.status === 'approved' && <Text size="xs" c="dimmed">{t('approved_auto')}</Text>}
       {r.reason && <Text size="xs" maw={280}>„{r.reason}”</Text>}
     </Stack>
   );
@@ -85,11 +88,15 @@ interface RowActions {
 
 const Actions = ({ r, onWithdraw, onPrint }: RowActions & { r: MockRequest }) => {
   const { t } = useTranslation('my-leave');
-  if (r.status === 'pending') {
-    return <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="cancel" size={14} />} onClick={() => onWithdraw(r)}>{t('withdraw')}</Button>;
-  }
+  const withdraw = <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="cancel" size={14} />} onClick={() => onWithdraw(r)}>{t('withdraw')}</Button>;
+  if (r.status === 'pending') return withdraw;
   if (r.status === 'approved') {
-    return <Button size="xs" variant="subtle" leftSection={<ButtonIcon action="print" size={14} />} onClick={() => onPrint(r)}>{t('print')}</Button>;
+    return (
+      <Group gap={4} justify="flex-end" wrap="nowrap">
+        {r.auto && r.canWithdraw && withdraw}
+        <Button size="xs" variant="subtle" leftSection={<ButtonIcon action="print" size={14} />} onClick={() => onPrint(r)}>{t('print')}</Button>
+      </Group>
+    );
   }
   return null;
 };
@@ -144,7 +151,7 @@ const RequestCards = ({ rows, ...actions }: RowActions & { rows: MockRequest[] }
                 <Text fw={600}>
                   <LeaveDates from={r.from} to={r.to} />
                 </Text>
-                <Text size="sm" c="dimmed">{r.type}, {leaveDaysText(t, r.days)}</Text>
+                <Text size="sm" c="dimmed">{r.type}, {leaveDaysText(t, r.days, r.dayCount)}</Text>
               </Stack>
               <LeaveStatusBadge status={r.status} />
             </Group>
@@ -191,7 +198,8 @@ export const MyLeaveMockup = () => {
     const example = FORM_STATE[s];
     if (example) setForm({ key: s, initial: FORM_EXAMPLES[example] });
     if (s === 'withdraw') setWithdraw(MY_REQUESTS.find((r) => r.status === 'pending')!);
-    if (s === 'print') setPrint(MY_REQUESTS.find((r) => r.status === 'approved' && r.days > 1)!);
+    if (s === 'withdraw_sick') setWithdraw(MY_REQUESTS.find((r) => r.auto)!);
+    if (s === 'print') setPrint(MY_REQUESTS.find((r) => r.status === 'approved' && !r.auto && r.days > 1)!);
   };
 
   const rows = state === 'empty' ? [] : sortRequests(MY_REQUESTS.filter((r) => r.from.startsWith(year ?? '')));
