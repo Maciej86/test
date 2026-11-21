@@ -83,7 +83,7 @@ usunięte.
 - [x] 12. Dokumenty: `SPEC-GENERAL.md` (słownik „Dni wniosku”, tabele `leave_types`/`leave_requests`, zasady
   powiadomień i e-maili: „Zgłoszona nieobecność”), `DESIGN.md` bez zmian; `README.md` bez zmian (nowych poleceń
   nie ma) → `npm run check`
-- [ ] 13. Test e2e w `e2e/calendar.spec.ts` ze scenariuszy `TESTS-2.md` (tymczasowy pracownik, typ „Chorobowe”:
+- [x] 13. Test e2e w `e2e/calendar.spec.ts` ze scenariuszy `TESTS-2.md` (tymczasowy pracownik, typ „Chorobowe”:
   zgłoszenie 2 dni wstecz, status „Zatwierdzony”, powiadomienie u administratora, ciągły pasek w kalendarzu,
   wycofanie; typ kalendarzowy z zatwierdzaniem: liczba dni z weekendem) → `npm run test:e2e`
 - [ ] 14. Przegląd kodu całej części (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testem,
