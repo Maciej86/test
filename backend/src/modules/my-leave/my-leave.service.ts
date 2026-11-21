@@ -3,6 +3,7 @@ import {
   canWithdrawRequest,
   checkLeaveRequest,
   MY_LEAVE_MESSAGES as M,
+  NO_APPROVAL_BACKDATE_DAYS,
   currentYear,
   todayIsoDate,
   type LeaveRequestCheck,
@@ -78,10 +79,14 @@ export const listMyRequests = async (userId: number, year?: number): Promise<MyL
 type Refusal = Exclude<LeaveRequestCheck, { kind: 'ok' }>;
 
 /** Powód odmowy → błąd dla ekranu: „Od” przed dziś przy polu, reszta 409 z danymi do komunikatu w ramce okna. */
-const refusal = (check: Refusal, leaveType: string): { error: ServiceError } => {
+const refusal = (check: Refusal, type: { name: string; requiresApproval: boolean }): { error: ServiceError } => {
+  const leaveType = type.name;
   switch (check.kind) {
     case 'past_date':
-      return fail(400, M.pastDate, { fields: { dateFrom: M.pastDate } });
+      // Typ bez zatwierdzania może zaczynać się kilka dni wstecz: komunikat mówi, ile.
+      return type.requiresApproval
+        ? fail(400, M.pastDate, { fields: { dateFrom: M.pastDate } })
+        : fail(400, M.pastDateBackdate, { fields: { dateFrom: M.pastDateBackdate }, days: NO_APPROVAL_BACKDATE_DAYS });
     case 'pool_not_ready':
       return fail(409, M.poolNotReady, { year: check.year, openYear: check.openYear });
     case 'year_closed':
@@ -127,7 +132,7 @@ export const createRequest = async (input: LeaveRequestData, actor: Actor): Prom
       { type: { ...type, usedOfLimit: typeUsage.get(type.id) ?? 0 }, dateFrom: input.dateFrom, dateTo: input.dateTo, today },
       { poolYear: open.year, annualDays: open.annual_days, carriedDays: open.carried_days, ...usage, busy },
     );
-    if (check.kind !== 'ok') return refusal(check, type.name);
+    if (check.kind !== 'ok') return refusal(check, type);
 
     const row: q.NewRequestRow = {
       userId: actor.id,

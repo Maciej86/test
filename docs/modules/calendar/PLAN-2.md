@@ -120,3 +120,8 @@ usunięte.
   klucza tłumaczeń; próba nadużycia z podrobionymi `dayCount` i `autoApproved`; przykład „Zgłoszona nieobecność”
   w `npm run notifications:test`. Zapisane w `SPEC-2.md`: limit po zmianie liczenia dni. Migracja 033 ma w jednym
   `ALTER TABLE` nową kolumnę i sam komentarz starej (już zastosowana, zostaje).
+- Przegląd przed oddaniem: poprawione makiety (powiadomienia z liczbą dni i „Zgłoszona nieobecność”, wydruk i Pulpit
+  ze sposobem liczenia, wydruk z „Zatwierdzony automatycznie”), usunięty nieużywany komunikat `not_pending`, serwer
+  przy dacie za wcześnie dla typu bez zatwierdzania mówi „najwcześniej 7 dni przed dziś”, spec Powiadomień z nowym
+  rodzajem. Przy sprawdzaniu w przeglądarce: podpowiedzi pod typem urlopu każda w osobnej linii (były sklejone
+  przecinkami).

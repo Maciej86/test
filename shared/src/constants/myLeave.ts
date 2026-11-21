@@ -23,11 +23,11 @@ export const MY_LEAVE_MESSAGES = {
   overlap: 'my-leave.server.overlap',
   notEnoughDays: 'my-leave.server.not_enough_days',
   limitExceeded: 'my-leave.server.limit_exceeded',
-  notPending: 'my-leave.server.not_pending',
   cannotWithdraw: 'my-leave.server.cannot_withdraw',
   notApproved: 'my-leave.server.not_approved',
   typeUnavailable: 'my-leave.server.type_unavailable',
   pastDate: 'my-leave.validation.past_date',
+  pastDateBackdate: 'my-leave.validation.past_date_backdate',
   datesOrder: 'my-leave.validation.dates_order',
   sameYear: 'my-leave.validation.same_year',
 } as const;

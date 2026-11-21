@@ -242,7 +242,7 @@ describe('my leave service: create', () => {
     vi.mocked(leaveTypes.findSelectableLeaveType).mockResolvedValue(sick);
     expect(await s.createRequest({ leaveTypeId: 7, dateFrom: '2026-11-10', dateTo: '2026-11-18', comment: null }, jan)).toMatchObject(saved);
     expect(await s.createRequest({ leaveTypeId: 7, dateFrom: '2026-11-09', dateTo: '2026-11-18', comment: null }, jan)).toEqual({
-      error: { status: 400, message: M.pastDate, fields: { dateFrom: M.pastDate } },
+      error: { status: 400, message: M.pastDateBackdate, fields: { dateFrom: M.pastDateBackdate }, days: 7 },
     });
   });
 

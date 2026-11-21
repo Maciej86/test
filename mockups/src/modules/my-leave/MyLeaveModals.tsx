@@ -109,14 +109,17 @@ export const RequestModal = ({ initial, onClose }: {
 
   const type = LEAVE_TYPES.find((lt) => String(lt.id) === typeId);
   const check = checkRequest(typeId, from, to);
-  const typeHint = !type
-    ? undefined
-    : [
+  // Pula i limit w jednej linii; sposób liczenia i brak zatwierdzania to osobne zdania, każde w swojej linii.
+  const typeHint = !type ? undefined : (
+    <>
+      {[
         type.deducts ? t('type_deducts') : t('type_not_deducts'),
         type.limit !== null ? t('type_limit', { used: type.usedOfLimit, limit: type.limit, year: POOL.year }) : null,
-        type.dayCount === 'calendar' ? t('type_calendar_days') : null,
-        type.approval ? null : t('type_no_approval', { days: BACKDATE_DAYS }),
-      ].filter(Boolean).join(t('check_and'));
+      ].filter(Boolean).join(t('check_and'))}
+      {type.dayCount === 'calendar' && <><br />{t('type_calendar_days')}</>}
+      {!type.approval && <><br />{t('type_no_approval', { days: BACKDATE_DAYS })}</>}
+    </>
+  );
   // Typ bez zatwierdzania (np. chorobowe) może zaczynać się kilka dni wstecz; reszta od dziś.
   const earliest = dayjs(TODAY).subtract(type && !type.approval ? BACKDATE_DAYS : 0, 'day').toDate();
 
@@ -243,7 +246,7 @@ export const PrintPreview = ({ request, onClose }: { request: MockRequest | null
                 <PaperRow label={t('field_type')}>{request.type}</PaperRow>
                 <PaperRow label={t('col_dates')}><DateText value={request.from} /> – <DateText value={request.to} /></PaperRow>
                 <PaperRow label={t('col_days')}>
-                  {leaveDaysText(t, request.days)}
+                  {leaveDaysText(t, request.days, request.dayCount)}
                   {request.fromCarried + request.fromAnnual > 0 && (
                     <> ({[
                       request.fromCarried > 0 ? t('split_carried', { count: request.fromCarried }) : null,
@@ -253,7 +256,7 @@ export const PrintPreview = ({ request, onClose }: { request: MockRequest | null
                 </PaperRow>
                 {request.comment && <PaperRow label={t('field_comment_short')}>{request.comment}</PaperRow>}
                 <PaperRow label={t('print_decision')}>
-                  {t('print_approved_by', { name: request.decidedBy })} <DateText value={request.decidedAt?.slice(0, 10)} />
+                  {request.auto ? t('print_approved_auto') : t('print_approved_by', { name: request.decidedBy })} <DateText value={request.decidedAt?.slice(0, 10)} />
                 </PaperRow>
               </Stack>
               <Divider color="gray.4" />

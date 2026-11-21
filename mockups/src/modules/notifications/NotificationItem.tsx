@@ -1,13 +1,15 @@
 import { Box, Group, Stack, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
-import { Ban, Check, FilePlus2, SquareKanban, Undo2, X, type LucideIcon } from 'lucide-react';
+import { Ban, Check, FilePlus2, SquareKanban, Thermometer, Undo2, X, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { formatRelativeDateTime, formatTime } from '@app/shared';
+import { formatRelativeDateTime, formatTime, leaveDaysText } from '@app/shared';
 import type { MockNotification, NotificationType } from './data';
 
 /** Ikona i kolor rodzaju powiadomienia: te same kolory co statusy wniosków (docs/DESIGN.md, „Statusy”). */
 const TYPE_LOOK: Record<NotificationType, { icon: LucideIcon; color: string }> = {
   leave_request_new: { icon: FilePlus2, color: 'yellow' },
+  // Już zatwierdzona (typ bez zatwierdzania): zieleń jak status „zatwierdzony”.
+  leave_absence_reported: { icon: Thermometer, color: 'green' },
   leave_request_withdrawn: { icon: Undo2, color: 'gray' },
   leave_approved: { icon: Check, color: 'green' },
   leave_rejected: { icon: X, color: 'red' },
@@ -23,7 +25,11 @@ export const useWhen = () => {
 
 export const notificationTexts = (n: MockNotification, t: TFunction<'notifications'>) => {
   const detailKey = n.type === 'task_assigned' && !n.params.dueDate ? 'detail_no_due' : 'detail';
-  return { title: t(`types.${n.type}.title`, n.params), detail: t(`types.${n.type}.${detailKey}`, n.params) };
+  // Liczba dni z jednostką (jak w aplikacji); bez sposobu liczenia = dni robocze.
+  const params = typeof n.params.days === 'number'
+    ? { ...n.params, daysText: leaveDaysText(t, n.params.days, n.params.dayCount === 'calendar' ? 'calendar' : 'working') }
+    : n.params;
+  return { title: t(`types.${n.type}.title`, params), detail: t(`types.${n.type}.${detailKey}`, params) };
 };
 
 /**

@@ -106,6 +106,9 @@ describe('RequestModal', () => {
     await chooseType('Chorobowe');
     expect(screen.getByText(/Liczone w dniach kalendarzowych: weekendy i święta też się liczą/)).toBeInTheDocument();
     expect(screen.getByText(/Możesz zacząć do 7 dni wstecz/)).toBeInTheDocument();
+    // Każda podpowiedź w osobnej linii, nie sklejona przecinkiem z poprzednią.
+    expect(screen.queryByText(/puli, Liczone/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Liczone w dniach kalendarzowych/).closest('p')!.querySelectorAll('br')).toHaveLength(2);
     setDates('10.11.2026', '16.11.2026');
     expect(await screen.findByText('7 dni kalendarzowych')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Złóż wniosek' })).not.toBeInTheDocument();

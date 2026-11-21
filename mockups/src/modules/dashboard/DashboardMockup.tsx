@@ -70,7 +70,7 @@ const PendingBox = ({ empty }: { empty: boolean }) => {
                   </Text>
                 </Text>
               </Box>
-              <Badge variant="light" color="gray" style={{ flex: 'none' }}>{leaveDaysText(t, r.days)}</Badge>
+              <Badge variant="light" color="gray" style={{ flex: 'none' }}>{leaveDaysText(t, r.days, r.dayCount)}</Badge>
             </Group>
           </RowLink>
         );
@@ -227,7 +227,7 @@ const MyRequestsBox = ({ empty }: { empty: boolean }) => {
           <Text>
             {next.type}, <LeaveDates from={next.from} to={next.to} />
           </Text>
-          <Badge variant="light" color="green" style={{ flex: 'none' }}>{leaveDaysText(t, next.days)}</Badge>
+          <Badge variant="light" color="green" style={{ flex: 'none' }}>{leaveDaysText(t, next.days, next.dayCount)}</Badge>
         </Group>
       )}
     </InfoCard>

@@ -112,7 +112,7 @@ describe('my leave routes', () => {
     expect((await as(jan).post('/my-leave/requests/1e3/withdraw')).status).toBe(404);
     expect(s.withdrawRequest).toHaveBeenCalledTimes(1);
 
-    vi.mocked(s.withdrawRequest).mockResolvedValue({ error: { status: 409, message: M.notPending } });
+    vi.mocked(s.withdrawRequest).mockResolvedValue({ error: { status: 409, message: M.cannotWithdraw } });
     expect((await as(jan).post('/my-leave/requests/21/withdraw')).status).toBe(409);
   });
 });

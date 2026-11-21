@@ -56,7 +56,8 @@ Stałe w `shared/src/constants/notifications.ts`: `NOTIFICATION_TYPES`. Treść 
 
 | Rodzaj (`type`) | Dostaje | Tytuł | Szczegóły | Parametry | Adres |
 |---|---|---|---|---|---|
-| `leave_request_new` | każdy aktywny admin | Nowy wniosek: {pracownik} | {typ}, {od} – {do}, dni robocze: {dni} | `employee`, `leaveType`, `dateFrom`, `dateTo`, `days` | `/admin/leave-requests` (dokładny adres ustali moduł Wnioski) |
+| `leave_request_new` | każdy aktywny admin | Nowy wniosek: {pracownik} | {typ}, {od} – {do}, {dni z jednostką, np. „5 dni roboczych”} (zmiana 2026-11-21, Kalendarz cz. 2) | `employee`, `leaveType`, `dateFrom`, `dateTo`, `days`, `dayCount` (brak = robocze) | `/admin/leave-requests` (dokładny adres ustali moduł Wnioski) |
+| `leave_absence_reported` | każdy aktywny admin | Zgłoszona nieobecność: {pracownik} | {typ}, {od} – {do}, {dni z jednostką} (typ bez zatwierdzania, np. chorobowe; dodane 2026-11-21) | jw. | `/admin/leave-requests/:id` |
 | `leave_request_withdrawn` | każdy aktywny admin | Wniosek wycofany: {pracownik} | {typ}, {od} – {do} | `employee`, `leaveType`, `dateFrom`, `dateTo` | jw. |
 | `leave_approved` | pracownik wniosku | Urlop zatwierdzony | {typ}, {od} – {do} | `leaveType`, `dateFrom`, `dateTo` | `/admin/my-leave` |
 | `leave_rejected` | pracownik wniosku | Urlop odrzucony | {typ}, {od} – {do}. Powód: {powód} | jw. + `reason` | jw. |

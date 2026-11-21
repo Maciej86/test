@@ -78,16 +78,19 @@ export const RequestModal = ({
             },
           );
 
-  const typeHint = type
-    ? [
+  // Pula i limit w jednej linii; sposób liczenia i brak zatwierdzania to osobne zdania, każde w swojej linii.
+  const typeHint = type ? (
+    <>
+      {[
         type.deductsPool ? t('type_deducts') : t('type_not_deducts'),
         type.yearlyLimit !== null ? t('type_limit', { used: type.usedOfLimit, limit: type.yearlyLimit, year: pool.year }) : null,
-        type.dayCount === 'calendar' ? t('type_calendar_days') : null,
-        type.requiresApproval ? null : t('type_no_approval', { days: NO_APPROVAL_BACKDATE_DAYS }),
       ]
         .filter(Boolean)
-        .join(t('check_and'))
-    : undefined;
+        .join(t('check_and'))}
+      {type.dayCount === 'calendar' && <><br />{t('type_calendar_days')}</>}
+      {!type.requiresApproval && <><br />{t('type_no_approval', { days: NO_APPROVAL_BACKDATE_DAYS })}</>}
+    </>
+  ) : undefined;
 
   // Typ bez zatwierdzania (np. chorobowe) może zaczynać się kilka dni wstecz; reszta od dziś (ta sama zasada co serwer).
   const earliest = type ? earliestLeaveStart(type, today) : today;

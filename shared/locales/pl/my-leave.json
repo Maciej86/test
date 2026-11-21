@@ -35,8 +35,8 @@
   "field_comment_hint": "Nieobowiązkowy, np. powód albo kontakt w razie pilnej sprawy.",
   "type_deducts": "Odejmuje dni z puli",
   "type_not_deducts": "Nie odejmuje dni z puli",
-  "type_calendar_days": "Liczone w dniach kalendarzowych: weekendy i święta też się liczą",
-  "type_no_approval": "Nie czeka na decyzję: od razu jest zatwierdzony, a administrator dostaje powiadomienie. Możesz zacząć do {{days}} dni wstecz",
+  "type_calendar_days": "Liczone w dniach kalendarzowych: weekendy i święta też się liczą.",
+  "type_no_approval": "Nie czeka na decyzję: od razu jest zatwierdzony, a administrator dostaje powiadomienie. Możesz zacząć do {{days}} dni wstecz.",
   "type_limit": "w {{year}} wykorzystano {{used}} z {{limit}} dni",
   "error_order": "Data „Do” nie może być wcześniejsza niż „Od”.",
   "strip_aria": "Dni wybranego terminu",
@@ -125,12 +125,12 @@
     "overlap": "Ten termin jest już we wniosku. Zmień termin albo wycofaj tamten wniosek.",
     "not_enough_days": "Za mało dni: wniosek ma {{days}}, a możesz wykorzystać jeszcze {{left}}.",
     "limit_exceeded": "Przekroczony limit: {{leaveType}}. Limit to {{limit}} dni, wykorzystano już {{used}}, a wniosek ma {{days}}.",
-    "not_pending": "Tego wniosku nie można już wycofać, bo nie czeka na decyzję. Odśwież stronę.",
     "not_approved": "Wydrukować można tylko zatwierdzony wniosek.",
     "cannot_withdraw": "Tego wniosku nie możesz już wycofać. Odśwież listę; w razie pomyłki napisz do administratora."
   },
   "validation": {
     "past_date": "Data „Od” nie może być wcześniejsza niż dziś.",
+    "past_date_backdate": "Ten typ może zaczynać się najwcześniej {{days}} dni przed dziś.",
     "dates_order": "Data „Do” nie może być wcześniejsza niż „Od”.",
     "same_year": "Obie daty muszą być w tym samym roku. Urlop na przełomie lat złóż jako dwa wnioski."
   },

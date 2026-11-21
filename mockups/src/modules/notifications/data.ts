@@ -3,6 +3,7 @@ import type { Role } from '@app/shared';
 
 export type NotificationType =
   | 'leave_request_new'
+  | 'leave_absence_reported'
   | 'leave_request_withdrawn'
   | 'leave_approved'
   | 'leave_rejected'
@@ -26,8 +27,9 @@ const MINUTE = 60_000;
 const ago = (minutes: number): Date => new Date(Date.now() - minutes * MINUTE);
 const DAY = 24 * 60;
 
-/** Administrator: nowe i wycofane wnioski (spec ogólny, „Zasady wspólne”). */
+/** Administrator: nowe i wycofane wnioski oraz zgłoszone nieobecności (spec ogólny, „Zasady wspólne”). */
 const ADMIN: MockNotification[] = [
+  { id: 7, type: 'leave_absence_reported', params: { employee: 'Tomasz Wójcik', leaveType: 'Chorobowe', dateFrom: '16.11.2026', dateTo: '22.11.2026', days: 7, dayCount: 'calendar' }, actor: 'Tomasz Wójcik', link: '/admin/leave-requests', createdAt: ago(5), read: false },
   { id: 1, type: 'leave_request_new', params: { employee: 'Jan Kowalski', leaveType: 'Wypoczynkowy', dateFrom: '08.02.2027', dateTo: '12.02.2027', days: 5 }, actor: 'Jan Kowalski', link: '/admin/leave-requests', createdAt: ago(12), read: false },
   { id: 2, type: 'leave_request_new', params: { employee: 'Katarzyna Wiśniewska', leaveType: 'Na żądanie', dateFrom: '18.11.2026', dateTo: '18.11.2026', days: 1 }, actor: 'Katarzyna Wiśniewska', link: '/admin/leave-requests', createdAt: ago(95), read: false },
   { id: 3, type: 'leave_request_withdrawn', params: { employee: 'Piotr Zieliński', leaveType: 'Wypoczynkowy', dateFrom: '23.12.2026', dateTo: '31.12.2026' }, actor: 'Piotr Zieliński', link: '/admin/leave-requests', createdAt: ago(DAY + 140), read: false },

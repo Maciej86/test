@@ -1,4 +1,4 @@
-import type { MyLeaveOverview } from '@app/shared';
+import type { LeaveDayCount, MyLeaveOverview } from '@app/shared';
 /**
  * Zmyślone dane makiety Pulpitu. „Dziś” = piątek 20.11.2026. Osoby i projekty jak w makietach Zadań i Wniosków
  * urlopowych; administrator to Anna Nowak, pracownik Jan Kowalski (projekty Marketing i Produkcja).
@@ -21,14 +21,16 @@ export interface PendingRequest {
   from: string;
   to: string;
   days: number;
+  /** Sposób liczenia dni wniosku (jak w aplikacji). */
+  dayCount: LeaveDayCount;
   createdAt: string;
 }
 
 /** Wnioski czekające na decyzję, od najbliższego terminu urlopu. */
 export const PENDING_REQUESTS: PendingRequest[] = [
-  { id: 21, employee: 'Jan Kowalski', type: 'Wypoczynkowy', from: '2026-11-26', to: '2026-11-27', days: 2, createdAt: '2026-11-16 09:12' },
-  { id: 22, employee: 'Piotr Zieliński', type: 'Okolicznościowy', from: '2026-11-27', to: '2026-11-30', days: 2, createdAt: '2026-11-17 14:03' },
-  { id: 24, employee: 'Katarzyna Wiśniewska', type: 'Wypoczynkowy', from: '2026-12-21', to: '2026-12-31', days: 7, createdAt: '2026-11-19 08:47' },
+  { id: 21, employee: 'Jan Kowalski', type: 'Wypoczynkowy', from: '2026-11-26', to: '2026-11-27', days: 2, dayCount: 'working', createdAt: '2026-11-16 09:12' },
+  { id: 22, employee: 'Piotr Zieliński', type: 'Okolicznościowy', from: '2026-11-27', to: '2026-11-30', days: 2, dayCount: 'working', createdAt: '2026-11-17 14:03' },
+  { id: 24, employee: 'Katarzyna Wiśniewska', type: 'Wypoczynkowy', from: '2026-12-21', to: '2026-12-31', days: 7, dayCount: 'working', createdAt: '2026-11-19 08:47' },
 ];
 
 export type AbsenceStatus = 'approved' | 'pending';
@@ -97,4 +99,4 @@ export const MY_POOL: MyLeaveOverview['pool'] = {
 
 /** Wnioski Jana: czekające i najbliższy zatwierdzony urlop. */
 export const MY_PENDING = [{ id: 21, type: 'Wypoczynkowy', from: '2026-11-26', to: '2026-11-27', days: 2 }];
-export const MY_NEXT_LEAVE = { id: 19, type: 'Wypoczynkowy', from: '2026-12-21', to: '2026-12-23', days: 3 };
+export const MY_NEXT_LEAVE = { id: 19, type: 'Wypoczynkowy', from: '2026-12-21', to: '2026-12-23', days: 3, dayCount: 'working' as LeaveDayCount };

@@ -268,7 +268,7 @@ describe('MyLeavePage', () => {
     const config = { url: '/my-leave/requests/9/withdraw', headers: new AxiosHeaders() };
     mockApi({ items: [request({ id: 9, leaveTypeName: 'Okolicznościowy', deductsPool: false, daysFromAnnual: 0, comment: 'Ślub siostry.' })] });
     vi.spyOn(api, 'post').mockRejectedValue(
-      new AxiosError('fail', 'ERR', config, undefined, { status: 409, statusText: 'x', headers: {}, config, data: { error: { message: 'my-leave.server.not_pending' } } }),
+      new AxiosError('fail', 'ERR', config, undefined, { status: 409, statusText: 'x', headers: {}, config, data: { error: { message: 'my-leave.server.cannot_withdraw' } } }),
     );
     const error = vi.spyOn(notify, 'error');
     show();
@@ -276,7 +276,7 @@ describe('MyLeavePage', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Wycofać wniosek?' });
     expect(within(dialog).queryByText(/puli/)).not.toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole('button', { name: 'Wycofaj' }));
-    await waitFor(() => expect(error).toHaveBeenCalledWith('Tego wniosku nie można już wycofać, bo nie czeka na decyzję. Odśwież stronę.'));
+    await waitFor(() => expect(error).toHaveBeenCalledWith('Tego wniosku nie możesz już wycofać. Odśwież listę; w razie pomyłki napisz do administratora.'));
     expect(screen.getByRole('dialog', { name: 'Wycofać wniosek?' })).toBeInTheDocument();
   });
 });
