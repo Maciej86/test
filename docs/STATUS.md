@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Kalendarz, część 1: użytkownik przechodzi `docs/modules/calendar/TESTS-1.md` i potwierdza „działa”; potem część 2 (spec).
+**Następny krok:** Kalendarz, część 2 (liczenie dni i zatwierdzanie): napisać `SPEC-2.md` według „Część 2 w skrócie” w `SPEC.md`, potwierdzić z użytkownikiem 7 dni wstecz dla typu bez zatwierdzania.
 
 ## Start aplikacji
 
@@ -33,11 +33,12 @@
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
 | 14 | Pulpit | dashboard | zrobiony | zamknięcie | my-leave, leave-requests, tasks |
-| 15 | Kalendarz | calendar | w toku | testy, część 1/2 | leave-types, my-leave, leave-requests |
+| 15 | Kalendarz | calendar | w toku | spec, część 2/2 | leave-types, my-leave, leave-requests |
 | 16 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard, calendar |
 
 ## Ostatnie decyzje
 
+- 2026-11-21: Kalendarz, część 1 potwierdzona przez użytkownika („działa”). Następna: część 2.
 - 2026-11-21: Kalendarz, część 1 zbudowana (kroki 0–11): ekran, `GET /api/calendar`, kolor typu urlopu (migracje 029–030), wspólne szczegóły wniosku z decyzjami (common, core), „Otwórz kalendarz” i „Pokaż w kalendarzu”. Przegląd kodu z poprawkami („Dziś nie ma” zawsze o dziś, odświeżanie, odmiana), próby nadużyć odparte, przegląd przed oddaniem z poprawkami (teksty części 1 w Typach urlopów, makiety bez kopii), sprawdzone w przeglądarce, 66 testów e2e zielonych. Testy ekranów na połowie rdzeni.
 - 2026-11-21: Kalendarz: podział na 2 części i `SPEC-1.md` zaakceptowane (1. kalendarz i kolor typu, 2. liczenie dni i zatwierdzanie); napisane `PLAN-1.md` i `TESTS-1.md`.
 - 2026-11-21: Kalendarz: odpowiedzi 1a–8a (decyzje w panelu kalendarza, wszyscy aktywni pracownicy, kolor typu w ustawieniach, typ bez zatwierdzania od razu zatwierdzony z powiadomieniem i e-mailem, pracownik wycofuje do pierwszego dnia, dni kalendarzowe wszędzie, przyciski do kalendarza na Pulpicie i w szczegółach wniosku, administrator nie dodaje nieobecności); pionowa kreska między dniami; panel pytań usunięty.
