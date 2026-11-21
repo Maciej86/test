@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Anchor, Badge, Box, Button, Divider, Grid, Group, Paper, Progress, SegmentedControl, Stack, Table, Text, UnstyledButton } from '@mantine/core';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { dayjs, formatDate } from '@app/shared';
+import { CALENDAR_PATH, dayjs, formatDate } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { InfoCard } from '../../common/InfoCard';
@@ -172,7 +172,10 @@ const AdminDashboard = ({ empty }: { empty: boolean }) => {
         <PendingBox empty={empty} />
       </Grid.Col>
       <Grid.Col span={{ base: 12, lg: 7 }}>
-        <InfoCard title={t('absence.title')}>
+        <InfoCard
+          title={t('absence.title')}
+          actions={<Button component={Link} to={CALENDAR_PATH} variant="default" leftSection={<ButtonIcon action="calendar" />}>{t('absence.open_calendar')}</Button>}
+        >
           <AbsenceStrip absences={empty ? [] : undefined} />
         </InfoCard>
       </Grid.Col>

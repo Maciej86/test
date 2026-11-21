@@ -47,9 +47,9 @@ Każda część ma `SPEC-<n>.md`, `PLAN-<n>.md`, `TESTS-<n>.md` w tym folderze. 
 - **Siatka:** kolumny dni rozciągają się na całą szerokość, pionowa kreska między dniami, mocniejsza na granicy
   miesiąca; weekendy i święta ciemniejsze (święto z nazwą w dymku nad numerem dnia); dzisiejszy dzień podkreślony.
   Na wąskim ekranie siatka przewija się w bok, kolumna z osobami zostaje.
-- **Panel szczegółów (1a):** klik w pasek otwiera `SideDrawer`: osoba, typ, termin, dni, status, komentarz, daty;
-  „Otwórz wniosek” (szczegóły we Wnioskach urlopowych); przy czekającym „Zatwierdź” i „Odrzuć”, te same okna
-  i te same trasy co we Wnioskach urlopowych. Po decyzji kalendarz odświeża się.
+- **Panel szczegółów (1a):** klik w pasek otwiera te same szczegóły wniosku co we Wnioskach urlopowych (wspólny
+  klocek; zmiana zaakceptowana przy planie: bez osobnego „Otwórz wniosek”): przy czekającym „Zatwierdź” i „Odrzuć”,
+  te same okna i trasy co we Wnioskach urlopowych. Po decyzji kalendarz odświeża się.
 - **Pusty dzień (8a):** klik nic nie robi; administrator nie dodaje nieobecności.
 - **Wyjątek od `CONVENTIONS.md` („Kalendarze”):** własna siatka zamiast `@mantine/schedule` (biblioteka pokazuje jeden
   miesiąc i nie przerywa pasków). Zapisany w `SPEC-GENERAL.md` (moduł 15). `DESIGN.md`: wzorzec „Kalendarz zespołu”
@@ -71,8 +71,8 @@ Nowych tabel i relacji nie ma. Kalendarz tylko czyta.
 
 | Z modułem | Co ten moduł pokazuje stamtąd / co tamten pokazuje stąd | Funkcja | Pola widoczne dla roli |
 |---|---|---|---|
-| employees | wiersze kalendarza | zapytanie w `calendar.queries.ts` po `users` (rola, archiwum) | id, imię i nazwisko (aplikacja nie ma stanowisk, więc pod nazwiskiem nic; makieta poprawiona) |
-| my-leave / leave-requests | paski | zapytanie po `leave_requests` + `leave_types` w `calendar.queries.ts` | typ, kolor, daty, dni, status, komentarz, daty złożenia i decyzji |
+| employees | wiersze kalendarza | `listActiveUsers(db, 'employee')` w `employees.queries.ts` | id, imię i nazwisko (aplikacja nie ma stanowisk, więc pod nazwiskiem nic; makieta poprawiona) |
+| my-leave / leave-requests | paski i „Dziś nie ma” | `listCalendarAbsences(db, userIds, from, to)` w `leave-requests.queries.ts` | typ, kolor, daty, dni, status |
 | leave-requests | „Zatwierdź” / „Odrzuć” w panelu, „Pokaż w kalendarzu” w szczegółach wniosku | trasy `POST /api/leave-requests/:id/approve` i `/reject` (są), hooki z modułu przez wspólny klocek (plan) | — |
 | leave-types | kolor typu (cz. 1), liczenie dni i zatwierdzanie (cz. 2) | formularz i lista typów | admin |
 | dashboard | przycisk „Otwórz kalendarz” przy boksie „Nieobecności na 2 tygodnie” | link `CALENDAR_PATH` | admin |
@@ -88,6 +88,10 @@ Nowych tabel i relacji nie ma. Kalendarz tylko czyta.
   administratorzy dostają powiadomienie (nowy rodzaj, np. „Tomasz Wójcik zgłosił chorobowe 16–22.11.2026”) i e-mail.
 - Pomyłki (5a): pracownik wycofuje taki wniosek do końca pierwszego dnia (`date_from ≥ dziś`), potem tylko
   administrator anuluje z powodem (jak zatwierdzony urlop).
+- Teksty Typów urlopów do zmiany w części 2 (w części 1 zostają stare, bo ustawień jeszcze nie ma): podpowiedź
+  „Odejmuje dni z puli” → „dni wniosku zmniejszają pulę…”, podpowiedź limitu → „Ile dni w roku może wziąć jedna
+  osoba, liczonych jak wyżej (robocze albo kalendarzowe)…”, ostrzeżenie przy edycji → „Zmiana liczenia dni,
+  zatwierdzania, „Odejmuje dni z puli” i limitu dotyczy tylko nowych wniosków…”.
 - **Do potwierdzenia przy specu części 2:** zwolnienie lekarskie bywa wystawiane z datą wsteczną (do 3 dni), a dziś
   wniosek nie może zaczynać się przed dniem złożenia. Propozycja **[decyzja AI]**: typ bez zatwierdzania może
   zaczynać się do 7 dni wstecz.

@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Kalendarz, część 1: testy (próby nadużyć, przeglądarka, przegląd przed oddaniem, potem użytkownik przechodzi `TESTS-1.md`).
+**Następny krok:** Kalendarz, część 1: użytkownik przechodzi `docs/modules/calendar/TESTS-1.md` i potwierdza „działa”; potem część 2 (spec).
 
 ## Start aplikacji
 
@@ -38,6 +38,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-21: Kalendarz, część 1 zbudowana (kroki 0–11): ekran, `GET /api/calendar`, kolor typu urlopu (migracje 029–030), wspólne szczegóły wniosku z decyzjami (common, core), „Otwórz kalendarz” i „Pokaż w kalendarzu”. Przegląd kodu z poprawkami („Dziś nie ma” zawsze o dziś, odświeżanie, odmiana), próby nadużyć odparte, przegląd przed oddaniem z poprawkami (teksty części 1 w Typach urlopów, makiety bez kopii), sprawdzone w przeglądarce, 66 testów e2e zielonych. Testy ekranów na połowie rdzeni.
 - 2026-11-21: Kalendarz: podział na 2 części i `SPEC-1.md` zaakceptowane (1. kalendarz i kolor typu, 2. liczenie dni i zatwierdzanie); napisane `PLAN-1.md` i `TESTS-1.md`.
 - 2026-11-21: Kalendarz: odpowiedzi 1a–8a (decyzje w panelu kalendarza, wszyscy aktywni pracownicy, kolor typu w ustawieniach, typ bez zatwierdzania od razu zatwierdzony z powiadomieniem i e-mailem, pracownik wycofuje do pierwszego dnia, dni kalendarzowe wszędzie, przyciski do kalendarza na Pulpicie i w szczegółach wniosku, administrator nie dodaje nieobecności); pionowa kreska między dniami; panel pytań usunięty.
 - 2026-11-21: Kalendarz, zmiany od użytkownika: typ urlopu dostaje „Liczenie dni” (robocze / kalendarzowe, np. ojcowski 14 dni kalendarzowych) i „Wymaga zatwierdzenia” (chorobowe nie wymaga: wystawił lekarz albo nie); kalendarz pokazuje dziś + 60 dni na całą szerokość ekranu, opis na środku paska, urlop w dniach roboczych przerwany w weekendy i święta. Własna siatka zamiast `@mantine/schedule` (pokazuje tylko jeden miesiąc i nie przerywa pasków; biblioteka odinstalowana). Makieta Typów urlopów wraca do czasu zamknięcia Kalendarza; 8 pytań.

@@ -37,6 +37,7 @@
   "reject": "Odrzuć",
   "pdf": "PDF",
   "show_in_calendar": "Pokaż w kalendarzu",
+  "show_in_calendar_mockup": "W aplikacji otworzy się Kalendarz od pierwszego dnia tego wniosku",
   "pdf_mockup": "W aplikacji otworzy się PDF wniosku w nowej karcie (ten sam dokument co w „Moich urlopach”).",
   "cancel_leave": "Anuluj urlop",
   "details": "Szczegóły",

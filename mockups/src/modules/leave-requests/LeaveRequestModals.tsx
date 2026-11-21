@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Badge, Button, Divider, Drawer, Group, Paper, Progress, Stack, Text, Textarea } from '@mantine/core';
+import { Alert, Stack, Text, Textarea } from '@mantine/core';
 import { CircleAlert, Clock } from 'lucide-react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -7,18 +7,10 @@ import { ButtonIcon } from '../../common/ButtonIcon';
 import { ConfirmModal } from '../../common/ConfirmModal';
 import { DateText } from '../../common/DateText';
 import { notify } from '../../common/notify';
-import { DetailRow } from '../../common/DetailRow';
-import { TeamStrip } from './TeamStrip';
-import { OPEN_YEAR, POOLS, TODAY, overlapping, poolLeft, type LeaveStatus, type MockRequest } from './data';
+import type { LeaveRequestView } from '../../common/LeaveRequestDrawer';
+import { OPEN_YEAR, POOLS, TODAY, overlapping, poolLeft, type MockRequest } from './data';
 
-/** Kolory statusów z księgi wyglądu (DESIGN.md, „Statusy”). */
-export const STATUS_COLOR: Record<LeaveStatus, string> = {
-  pending: 'yellow',
-  approved: 'green',
-  rejected: 'red',
-  withdrawn: 'gray',
-  cancelled: 'red',
-};
+export { LEAVE_STATUS_COLOR as STATUS_COLOR } from '../../common/LeaveRequestDrawer';
 
 export const REASON_MIN = 3;
 export const REASON_MAX = 500;
@@ -43,113 +35,34 @@ export const splitText = (r: MockRequest, t: TFunction) => {
 /** Czekający wniosek z terminem przed dziś: można go rozpatrzyć, ale administrator powinien to widzieć. */
 export const isLate = (r: MockRequest) => r.status === 'pending' && r.from < TODAY;
 
-/** Pula osoby: ile ma teraz i ile zostanie po zatwierdzeniu tego wniosku. */
-const PoolBox = ({ r }: { r: MockRequest }) => {
-  const { t } = useTranslation('leave-requests');
-  const pool = POOLS[r.employee]!;
-  const total = pool.annual + pool.carried;
-  const left = poolLeft(pool);
-  const pct = (d: number) => (d / total) * 100;
-  return (
-    <Paper withBorder p="md" bg="var(--app-panel-background)">
-      <Stack gap={6}>
-        <Group justify="space-between" align="baseline">
-          <Text size="sm" fw={600}>{t('pool_title', { year: OPEN_YEAR })}</Text>
-          <Text size="sm"><Text span fw={700} fz="lg">{left}</Text> <Text span c="dimmed">{t('pool_of', { total })}</Text></Text>
-        </Group>
-        <Progress.Root size={8} radius="xs" aria-label={t('pool_aria', { left, total })}>
-          <Progress.Section value={pct(pool.used)} color="dark.4" />
-          <Progress.Section value={pct(pool.pending)} color="yellow.6" />
-          <Progress.Section value={pct(left)} color="navy.6" />
-        </Progress.Root>
-        <Text size="xs" c="dimmed">{t('pool_line', { used: pool.used, pending: pool.pending, carried: pool.carried })}</Text>
-        {r.status === 'pending' && r.deducts && <Text size="sm">{t('pool_after_approve', { count: left })}</Text>}
-        {r.status === 'pending' && !r.deducts && <Text size="sm">{t('pool_no_deduct')}</Text>}
-      </Stack>
-    </Paper>
-  );
-};
-
-interface DetailsProps {
-  request: MockRequest | null;
-  onClose: () => void;
-  onApprove: (r: MockRequest) => void;
-  onReject: (r: MockRequest) => void;
-  onCancel: (r: MockRequest) => void;
-}
-
-/**
- * Szczegóły wniosku z prawej strony (na telefonie na cały ekran). Otwiera je kliknięcie wiersza, link z e-maila
- * i z powiadomienia (adres `/admin/leave-requests/24`). Tu administrator decyduje.
- */
-export const DetailsDrawer = ({ request: r, onClose, onApprove, onReject, onCancel }: DetailsProps) => {
-  const { t } = useTranslation('leave-requests');
-  const others = r ? overlapping(r) : [];
-  return (
-    <Drawer
-      opened={r !== null}
-      onClose={onClose}
-      position="right"
-      size="xl"
-      title={r && <Text span ff="heading" fz="h3" fw={600}>{t('details_title', { id: r.id })}</Text>}
-    >
-      {r && (
-        <Stack gap="lg">
-          <Stack gap={4}>
-            <Group justify="space-between" align="flex-start">
-              <Text fw={700} fz="xl">{r.employee}</Text>
-              <Badge color={STATUS_COLOR[r.status]} variant="light">{t(`status.${r.status}`)}</Badge>
-            </Group>
-            <Text fz="lg"><Term r={r} /></Text>
-            <Text c="dimmed">{r.type}, {t('days', { count: r.days })} ({splitText(r, t)})</Text>
-          </Stack>
-
-          {isLate(r) && (
-            <Alert color="yellow" variant="light" icon={<Clock size={18} />}>{t('late_hint')}</Alert>
-          )}
-
-          {(r.status === 'pending' || r.status === 'approved') && (
-            <Stack gap="xs">
-              <Text fw={600}>{t('strip_title')}</Text>
-              <TeamStrip request={r} others={others} />
-            </Stack>
-          )}
-
-          {(r.status === 'pending' || r.status === 'approved') && <PoolBox r={r} />}
-
-          <Stack gap={8}>
-            {r.comment && <DetailRow label={t('comment')}>{r.comment}</DetailRow>}
-            <DetailRow label={t('submitted')}><DateText value={r.createdAt} withTime /></DetailRow>
-            {r.decidedBy && (
-              <DetailRow label={t(`decided_${r.status}`)}>{r.decidedBy}, <DateText value={r.decidedAt} withTime /></DetailRow>
-            )}
-            {r.reason && <DetailRow label={t('reason')}>„{r.reason}”</DetailRow>}
-          </Stack>
-
-          {r.status === 'pending' && (
-            <>
-              <Divider />
-              <Group justify="flex-end">
-                <Button variant="default" color="red" leftSection={<ButtonIcon action="cancel" />} onClick={() => onReject(r)}>{t('reject')}</Button>
-                <Button color="green" leftSection={<ButtonIcon action="confirm" />} onClick={() => onApprove(r)}>
-                  {t('approve')}
-                </Button>
-              </Group>
-            </>
-          )}
-          {r.status === 'approved' && (
-            <>
-              <Divider />
-              <Group justify="flex-end">
-                <Button variant="subtle" color="red" leftSection={<ButtonIcon action="cancel" />} onClick={() => onCancel(r)}>{t('cancel_leave')}</Button>
-                <Button variant="default" leftSection={<ButtonIcon action="print" />} onClick={() => notify.success(t('pdf_mockup'))}>{t('pdf')}</Button>
-              </Group>
-            </>
-          )}
-        </Stack>
-      )}
-    </Drawer>
-  );
+/** Wniosek makiety w postaci wspólnego panelu szczegółów (`common/LeaveRequestDrawer`). */
+export const toView = (r: MockRequest, t: TFunction): LeaveRequestView => {
+  const pool = POOLS[r.employee];
+  const active = r.status === 'pending' || r.status === 'approved';
+  return {
+    id: r.id,
+    employee: r.employee,
+    status: r.status,
+    from: r.from,
+    to: r.to,
+    typeLine: `${r.type}, ${t('days', { count: r.days })} (${splitText(r, t)})`,
+    late: isLate(r),
+    comment: r.comment,
+    createdAt: r.createdAt,
+    decided: r.decidedBy && r.decidedAt ? { by: r.decidedBy, at: r.decidedAt } : undefined,
+    reason: r.reason,
+    pool: pool && active
+      ? {
+          year: OPEN_YEAR,
+          used: pool.used,
+          pending: pool.pending,
+          left: poolLeft(pool),
+          total: pool.annual + pool.carried,
+          carried: pool.carried,
+          note: r.deducts ? t('pool_after_approve', { count: poolLeft(pool) }) : t('pool_no_deduct'),
+        }
+      : undefined,
+  };
 };
 
 /** Powód decyzji: wymagany, 3–500 znaków; błąd pod polem dopiero po kliknięciu przycisku. */

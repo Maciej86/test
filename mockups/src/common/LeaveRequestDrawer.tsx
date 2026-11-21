@@ -21,10 +21,12 @@ export interface LeaveRequestView {
   createdAt: string;
   decided?: { by: string; at: string };
   reason?: string;
-  pool?: { year: number; used: number; pending: number; left: number; total: number; carried: number };
+  /** `note`: zdanie pod paskiem przy czekającym (np. „Po zatwierdzeniu zostanie 15 dni…”). */
+  pool?: { year: number; used: number; pending: number; left: number; total: number; carried: number; note?: string };
 }
 
-const STATUS_COLOR: Record<LeaveRequestView['status'], string> = {
+/** Kolory statusów z księgi wyglądu (DESIGN.md, „Statusy”). */
+export const LEAVE_STATUS_COLOR: Record<LeaveRequestView['status'], string> = {
   pending: 'yellow',
   approved: 'green',
   rejected: 'red',
@@ -48,6 +50,7 @@ const PoolBox = ({ r, pool }: { r: LeaveRequestView; pool: NonNullable<LeaveRequ
           <Progress.Section value={pct(pool.left)} color="navy.6" />
         </Progress.Root>
         <Text size="xs" c="dimmed">{t(r.status === 'approved' ? 'pool_line_approved' : 'pool_line', { used: pool.used, pending: pool.pending, carried: pool.carried })}</Text>
+        {r.status === 'pending' && pool.note && <Text size="sm">{pool.note}</Text>}
       </Stack>
     </Paper>
   );
@@ -77,7 +80,7 @@ export const LeaveRequestDrawer = ({ request: r, strip, onClose, onApprove, onRe
           <Stack gap={4}>
             <Group justify="space-between" align="flex-start">
               <Text fw={700} fz="xl">{r.employee}</Text>
-              <Badge color={STATUS_COLOR[r.status]} variant="light">{t(`status.${r.status}`)}</Badge>
+              <Badge color={LEAVE_STATUS_COLOR[r.status]} variant="light">{t(`status.${r.status}`)}</Badge>
             </Group>
             <Text fz="lg"><DateText value={r.from} />{r.to !== r.from && <> – <DateText value={r.to} /></>}</Text>
             <Text c="dimmed">{r.typeLine}</Text>

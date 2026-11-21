@@ -11,8 +11,8 @@
 panel: `DetailsDrawer`, `DecisionModals` (Zatwierdź, Odrzuć, Anuluj), `TeamStrip` i `isLate` →
 `frontend/src/common/leave-request/`; hooki `useLeaveRequest`, `useApproveRequest`, `useRejectRequest`,
 `useCancelRequest` i `leaveRequestPdfUrl` → `frontend/src/core/leaveRequestDecisions.ts` (decyzja odświeża też
-kalendarz i Pulpit). W makietach: ten sam panel → `mockups/src/common/LeaveRequestDrawer.tsx` dla makiety Kalendarza
-(makiety zrobionego modułu Wnioski urlopowe nie ruszam).
+kalendarz i Pulpit). W makietach: ten sam panel → `mockups/src/common/LeaveRequestDrawer.tsx`, używany w makiecie Kalendarza i (po
+przeglądzie przed oddaniem) w makiecie Wniosków urlopowych zamiast jej kopii.
 
 **Uwaga (odchylenie od makiety, do pokazania użytkownikowi):** panel po kliknięciu paska to pełne szczegóły wniosku
 z Wniosków urlopowych (pula osoby, „Kto jeszcze ma wtedy wolne”, „Zatwierdź” / „Odrzuć” przy czekającym, „Anuluj
@@ -23,7 +23,7 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
   `backend/src/modules/calendar/__tests__/calendar.routes.test.ts` (dane, zakres `from` + 60, domyślnie dziś, zła
   data → 400, tylko `pending`/`approved` nachodzące na zakres, osoby bez archiwum i bez administratorów, 401, 403),
   `shared/src/schemas/__tests__/calendar.test.ts` (`from`: brak, poprawna, `2026-02-30`, `1999-12-31`, `2100-01-01`),
-  `shared/src/__tests__/calendarSegments.test.ts` (podział paska), `frontend/src/modules/calendar/__tests__/*`
+  `shared/src/__tests__/calendar.test.ts` (podział paska), `frontend/src/modules/calendar/__tests__/*`
   (ekran, siatka, filtry, „Dziś nie ma”, puste stany), `e2e/calendar.spec.ts`; testy dopisków do zrobionych modułów
   w `backend/src/modules/calendar/__tests__/leave-types.todo.test.ts` i
   `frontend/src/modules/calendar/__tests__/done-modules.todo.test.tsx` (miejsca docelowe w pierwszej linii)
@@ -45,8 +45,8 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
   Porównane z: `ColorSwatch` nieużywany dotąd w `frontend/src` i `mockups/src` (poza makietami Kalendarza i Typów)
   → nowy klocek `common/ColorSwatchPicker.tsx` (front i makiety) z `value`, `onChange`, `colors` → `npm run check`
 - [x] 6. Backend kalendarza: `calendarQuerySchema` (`from: optionalField(isoDate)` w zakresie 2000–2099) + testy;
-  `listCalendarAbsences(db, from, to)` w `leave-requests.queries.ts` (typ, kolor, status, daty, dni, komentarz,
-  daty złożenia i decyzji; tylko `pending`/`approved`, osoby bez archiwum) + test w docelowym pliku leave-requests;
+  `listCalendarAbsences(db, userIds, from, to)` w `leave-requests.queries.ts` (typ, kolor, status, daty, dni; tylko
+  `pending`/`approved` podanych osób) + test w docelowym pliku leave-requests;
   `calendar.service.ts` (zakres, dziś, osoby z `listActiveUsers(db, 'employee')`, wnioski tylko tych osób),
   `calendar.routes.ts` z `validateQuery`, `mountModule(api, 'calendar', calendarRoutes)`; wiersz w „Mapie dostępu”
   `SPEC-GENERAL.md`; testy tras (dane, 400, 401, 403) → `npm run check`
@@ -83,3 +83,14 @@ Jeden recenzent, lista kontrolna z `CONVENTIONS.md`. Wynik: „z poprawkami”, 
 - Zostawione świadomie: urlop, którego widoczna część to sam weekend na brzegu zakresu, liczy się w podsumowaniu bez
   paska (rzadkie); opis paska dla czytnika ekranu bez dat (dymek i szczegóły je pokazują); nazwy miesięcy z `dayjs`
   jak w `LeaveStrip` (nie ma wspólnego formatu „miesiąc rok”).
+
+## Przegląd przed oddaniem (2026-11-21)
+
+Świeży recenzent: zgodne ze specem i makietą. Poprawione: okno Typów urlopów miało już teksty części 2 (przywrócone
+teksty części 1, nowe zapisane w `SPEC.md`, „Część 2 w skrócie”); makieta Pulpitu dostała „Otwórz kalendarz”,
+makieta Wniosków urlopowych używa wspólnego `LeaveRequestDrawer` (z „Pokaż w kalendarzu”) zamiast kopii; legendy
+w makietach przez `LegendItem`; makieta Kalendarza używa `calendarDays`, `calendarSegments`, `isWorkingDay`
+z `@app/shared`, a makieta Typów urlopów `LEAVE_TYPE_COLORS`; zdania w `SPEC.md`, `PLAN-1.md`, `TESTS-1.md`
+zgodne z kodem. Pliki szkieletu `*.todo.test.ts(x)` z kroku 0 zostały usunięte po przeniesieniu testów do plików
+docelowych. Klucze `leave-types.json` części 2 (`col_day_count`, `day_count*`, `approval_*`, `field_day_count`,
+`field_approval*`) używa makieta Typów urlopów (zaakceptowana makieta całego modułu).

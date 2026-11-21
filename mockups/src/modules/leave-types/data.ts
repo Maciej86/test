@@ -17,7 +17,7 @@ export interface MockLeaveType {
 }
 
 /** Kolory do wyboru dla typu (bez żółtego i czerwonego: to kolory statusów). */
-export const TYPE_COLORS = ['green', 'teal', 'cyan', 'navy', 'grape', 'orange'];
+export { LEAVE_TYPE_COLORS as TYPE_COLORS } from '@app/shared';
 
 /** Pięć typów na start (z wywiadu) i jeden ukryty, żeby było widać, jak wygląda ukryty typ. */
 export const LEAVE_TYPES: MockLeaveType[] = [

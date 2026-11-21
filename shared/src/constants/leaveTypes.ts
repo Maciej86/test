@@ -17,7 +17,6 @@ export type LeaveDayCount = (typeof LEAVE_DAY_COUNTS)[number];
 /** Kolor nowego typu. */
 export const LEAVE_TYPE_DEFAULT_COLOR: LeaveTypeColor = 'green';
 
-
 /** Klucze błędów serwera modułu (teksty w shared/locales/pl/leave-types.json, sekcja server). */
 export const LEAVE_TYPE_MESSAGES = {
   nameTaken: 'leave-types.server.name_taken',

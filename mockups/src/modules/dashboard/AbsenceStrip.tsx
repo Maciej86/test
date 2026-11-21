@@ -1,6 +1,7 @@
 import { Box, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { dayjs, getHoliday, isWeekend, translateKey } from '@app/shared';
+import { LegendItem } from '../../common/LegendItem';
 import { ABSENCE_DAYS, ABSENCES, TODAY, type AbsenceStatus } from './data';
 
 const CELL = 30;
@@ -78,16 +79,8 @@ export const AbsenceStrip = ({ absences = ABSENCES }: { absences?: typeof ABSENC
         </Stack>
       </Box>
       <Group gap="md">
-        {(['approved', 'pending'] as const).map((s) => (
-          <Group key={s} gap={6} wrap="nowrap">
-            <Box w={10} h={10} style={{ borderRadius: 2, background: CELL_BG[s] }} />
-            <Text size="xs" c="dimmed">{t(`absence.${s}`)}</Text>
-          </Group>
-        ))}
-        <Group gap={6} wrap="nowrap">
-          <Box w={10} h={10} style={{ borderRadius: 2, border: '1px dashed var(--mantine-color-dark-4)' }} />
-          <Text size="xs" c="dimmed">{t('absence.off')}</Text>
-        </Group>
+        {(['approved', 'pending'] as const).map((s) => <LegendItem key={s} label={t(`absence.${s}`)} swatch={{ background: CELL_BG[s] }} />)}
+        <LegendItem label={t('absence.off')} swatch={{ border: '1px dashed var(--mantine-color-dark-4)' }} />
       </Group>
     </Stack>
   );

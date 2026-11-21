@@ -3,7 +3,7 @@ import { ActionIcon, Button, Chip, Group, Paper, SegmentedControl, Stack, Text, 
 import { useMediaQuery } from '@mantine/hooks';
 import { CalendarDays, ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { dayjs, formatDate } from '@app/shared';
+import { calendarDays, dayjs, formatDate } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { ColorMark } from '../../common/ColorSwatchPicker';
 import { LegendItem } from '../../common/LegendItem';
@@ -86,7 +86,7 @@ export const CalendarMockup = () => {
     if (s === 'details_sick') setOpen(ABSENCES.find((a) => a.id === 22)!);
   };
 
-  const days = Array.from({ length: RANGE_DAYS }, (_, i) => dayjs(start).add(i, 'day').format('YYYY-MM-DD'));
+  const days = calendarDays(start, RANGE_DAYS);
   const end = days[days.length - 1]!;
   const people = EMPLOYEES.filter((e) => e.name.toLowerCase().includes(search.trim().toLowerCase()));
   const inRange = ABSENCES.filter((a) => a.from <= end && a.to >= start);
@@ -94,7 +94,7 @@ export const CalendarMockup = () => {
   const offToday = ABSENCES.filter((a) => a.from <= TODAY && a.to >= TODAY).map((a) => {
     const name = employeeOf(a.employeeId).name;
     const type = typeOf(a.typeId).name.toLowerCase();
-    return a.status === 'pending' ? `${name} (${type}, ${t('pending_short')})` : `${name} (${type})`;
+    return t(a.status === 'pending' ? 'person_absence_pending' : 'person_absence', { name, type });
   });
   const shift = (step: number) => setStart(dayjs(start).add(step, 'day').format('YYYY-MM-DD'));
 

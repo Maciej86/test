@@ -9,8 +9,10 @@ import { EmptyState } from '../../common/EmptyState';
 import { ListPagination } from '../../common/ListPagination';
 import { notify } from '../../common/notify';
 import { PageHeader } from '../../common/PageHeader';
-import { ApproveModal, CancelModal, DetailsDrawer, RejectModal, STATUS_COLOR, Term, isLate, splitText } from './LeaveRequestModals';
-import { LEAVE_TYPES, POOLS, REQUESTS, YEARS, poolLeft, type MockRequest } from './data';
+import { LeaveRequestDrawer } from '../../common/LeaveRequestDrawer';
+import { ApproveModal, CancelModal, RejectModal, STATUS_COLOR, Term, isLate, splitText, toView } from './LeaveRequestModals';
+import { TeamStrip } from './TeamStrip';
+import { LEAVE_TYPES, POOLS, REQUESTS, YEARS, overlapping, poolLeft, type MockRequest } from './data';
 
 const STATES = ['list', 'approve', 'details', 'details_late', 'details_approved', 'reject', 'reject_error', 'cancel', 'cancel_started', 'already_decided', 'empty'] as const;
 type State = (typeof STATES)[number];
@@ -268,12 +270,15 @@ export const LeaveRequestsMockup = () => {
         </>
       )}
 
-      <DetailsDrawer
-        request={details}
+      <LeaveRequestDrawer
+        request={details && toView(details, t)}
+        strip={details && <TeamStrip request={details} others={overlapping(details)} />}
         onClose={() => setDetails(null)}
-        onApprove={setApprove}
-        onReject={(r) => setReject({ r, error: false })}
-        onCancel={setCancel}
+        onApprove={() => details && setApprove(details)}
+        onReject={() => details && setReject({ r: details, error: false })}
+        onCancel={() => details && setCancel(details)}
+        onPdf={() => notify.success(t('pdf_mockup'))}
+        onShowInCalendar={() => notify.success(t('show_in_calendar_mockup'))}
       />
       {approve && <ApproveModal key={approve.id} request={approve} onClose={() => { setApprove(null); setDetails(null); }} />}
       {reject && <RejectModal key={`${reject.r.id}-${reject.error}`} request={reject.r} showError={reject.error} onClose={() => setReject(null)} />}

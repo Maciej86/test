@@ -1,6 +1,7 @@
 import { Box, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { dayjs, getHoliday, isWeekend, translateKey } from '@app/shared';
+import { LegendItem } from '../../common/LegendItem';
 import type { MockRequest } from './data';
 
 /** Dłuższy termin pokazuje tylko listę osób (pasek byłby nieczytelny). */
@@ -88,16 +89,8 @@ export const TeamStrip = ({ request, others }: { request: MockRequest; others: M
         </Stack>
       </Box>
       <Group gap="md">
-        {(['request', 'approved', 'pending'] as const).map((m) => (
-          <Group key={m} gap={6} wrap="nowrap">
-            <Box w={10} h={10} style={{ borderRadius: 2, background: CELL_BG[m] }} />
-            <Text size="xs" c="dimmed">{t(`strip_${m}`)}</Text>
-          </Group>
-        ))}
-        <Group gap={6} wrap="nowrap">
-          <Box w={10} h={10} style={{ borderRadius: 2, border: '1px dashed var(--mantine-color-dark-4)' }} />
-          <Text size="xs" c="dimmed">{tc('strip.off')}</Text>
-        </Group>
+        {(['request', 'approved', 'pending'] as const).map((m) => <LegendItem key={m} label={t(`strip_${m}`)} swatch={{ background: CELL_BG[m] }} />)}
+        <LegendItem label={tc('strip.off')} swatch={{ border: '1px dashed var(--mantine-color-dark-4)' }} />
       </Group>
       {people.length === 0 && <Text size="sm" c="dimmed">{t('strip_nobody')}</Text>}
     </Stack>

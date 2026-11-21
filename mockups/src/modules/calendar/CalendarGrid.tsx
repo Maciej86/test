@@ -1,33 +1,10 @@
 import { Box, Group, Stack, Text, Tooltip, UnstyledButton } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { dayjs, getHoliday, isWeekend, translateKey } from '@app/shared';
+import { calendarSegments, dayjs, getHoliday, isWorkingDay, translateKey } from '@app/shared';
 import { PersonAvatar } from '../../common/PersonAvatar';
 import { typeOf, type MockAbsence, type MockEmployee } from './data';
 
-const isOff = (iso: string) => isWeekend(iso) || getHoliday(iso) !== null;
-
-/** Kawałek paska: kolejne dni w jednej linii. Urlop w dniach roboczych pęka na weekendy i święta. */
-interface Segment {
-  absence: MockAbsence;
-  start: number;
-  end: number;
-  /** Przerwa w środku nieobecności (weekend, święto) dla typu liczonego w dniach roboczych. */
-  bridge: boolean;
-}
-
-const segmentsOf = (absence: MockAbsence, days: string[]): Segment[] => {
-  const calendar = typeOf(absence.typeId).dayCount === 'calendar';
-  const result: Segment[] = [];
-  days.forEach((iso, i) => {
-    if (iso < absence.from || iso > absence.to) return;
-    const bridge = !calendar && isOff(iso);
-    const last = result[result.length - 1];
-    if (last && last.end === i - 1 && last.bridge === bridge) last.end = i;
-    else result.push({ absence, start: i, end: i, bridge });
-  });
-  // Przerwa na początku albo końcu widocznego zakresu nic nie łączy.
-  return result.filter((s, idx) => !(s.bridge && (idx === 0 || idx === result.length - 1)));
-};
+const isOff = (iso: string) => !isWorkingDay(iso);
 
 const BAR_H = 26;
 
@@ -114,7 +91,9 @@ export const CalendarGrid = ({ days, people, absences, today, phone, onOpen }: {
         {/* Wiersze osób */}
         {people.map((p, r) => {
           const row = r + 3;
-          const segments = absences.filter((a) => a.employeeId === p.id).flatMap((a) => segmentsOf(a, days));
+          const segments = absences
+            .filter((a) => a.employeeId === p.id)
+            .flatMap((a) => calendarSegments(a.from, a.to, days, typeOf(a.typeId).dayCount).map((seg) => ({ ...seg, absence: a })));
           return [
             <Group key={`label-${p.id}`} gap="xs" wrap="nowrap" px="sm" style={{ ...sticky, gridColumn: 1, gridRow: row, borderBottom: line, borderRight: line, minHeight: 46 }}>
               {!phone && <PersonAvatar name={p.name} />}
