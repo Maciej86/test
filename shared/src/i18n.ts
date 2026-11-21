@@ -15,13 +15,14 @@ import archive from '../locales/pl/archive.json';
 import myAccount from '../locales/pl/my-account.json';
 import login from '../locales/pl/login.json';
 import notifications from '../locales/pl/notifications.json';
+import calendar from '../locales/pl/calendar.json';
 
 /**
  * Teksty aplikacji. Każdy moduł ma własny plik locales/pl/<module>.json, dopisany tutaj.
  * Nowy język: skopiuj locales/pl do np. locales/en i dopisz go tutaj.
  */
 export const resources = {
-  pl: { common, server, validation, email, dashboard, 'my-leave': myLeave, 'leave-requests': leaveRequests, tasks, employees, 'leave-types': leaveTypes, 'contract-types': contractTypes, 'activity-log': activityLog, archive, 'my-account': myAccount, login, notifications },
+  pl: { common, server, validation, email, dashboard, 'my-leave': myLeave, 'leave-requests': leaveRequests, tasks, employees, 'leave-types': leaveTypes, 'contract-types': contractTypes, 'activity-log': activityLog, archive, 'my-account': myAccount, login, notifications, calendar },
 } as const;
 
 export type Language = keyof typeof resources;

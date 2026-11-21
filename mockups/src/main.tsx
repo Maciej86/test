@@ -6,6 +6,7 @@ import { createI18n } from '@app/shared';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
+import '@mantine/schedule/styles.css';
 import '@app/shared/theme.css';
 import './appearance/variants.css';
 import { ThemeVariantProvider } from './appearance/ThemeVariants';

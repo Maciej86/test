@@ -1,0 +1,63 @@
+{
+  "title": "Kalendarz",
+  "summary": "{{month}}: {{count}} nieobecności, {{pending}} czeka na decyzję",
+  "summary_none": "{{month}}: nikt nie ma urlopu ani chorobowego",
+  "today_off": "Dziś nie ma: {{names}}",
+  "today_all": "Dziś wszyscy są w pracy",
+  "search": "Szukaj osoby",
+  "show": "Pokaż",
+  "kind": {
+    "leave_approved": "Urlop zatwierdzony",
+    "leave_pending": "Urlop do zatwierdzenia",
+    "sick_approved": "Chorobowe",
+    "sick_pending": "Chorobowe do zatwierdzenia"
+  },
+  "off_day": "Weekend albo święto",
+  "status_label": "Status",
+  "status": {
+    "approved": "Zatwierdzony",
+    "pending": "Czeka na decyzję"
+  },
+  "pending_short": "czeka",
+  "sick_short": "chorobowe",
+  "details_title": "Nieobecność",
+  "type": "Typ",
+  "term": "Termin",
+  "days": "Dni robocze",
+  "days_value_one": "{{count}} dzień",
+  "days_value_few": "{{count}} dni",
+  "days_value_many": "{{count}} dni",
+  "comment": "Komentarz pracownika",
+  "created_at": "Złożony",
+  "decided_at": "Zatwierdzony",
+  "approve": "Zatwierdź",
+  "reject": "Odrzuć",
+  "open_request": "Otwórz wniosek",
+  "approved_toast": "Zatwierdzono wniosek: {{name}}",
+  "reject_mockup": "W aplikacji otworzy się okno „Odrzuć” z polem na powód, to samo co we Wnioskach urlopowych",
+  "open_mockup": "W aplikacji otworzą się szczegóły wniosku nr {{id}} we Wnioskach urlopowych",
+  "no_match": "Nikt o takim imieniu lub nazwisku nie pracuje w firmie.",
+  "empty_title": "Nie ma jeszcze pracowników",
+  "empty_text": "Kalendarz pokaże urlopy i chorobowe, gdy dodasz pierwszą osobę w Pracownikach.",
+  "empty_action": "Przejdź do Pracowników",
+  "labels": {
+    "today": "Dziś",
+    "next": "Następny miesiąc",
+    "previous": "Poprzedni miesiąc",
+    "month": "Miesiąc",
+    "selectMonth": "Wybierz miesiąc",
+    "selectYear": "Wybierz rok",
+    "more": "Więcej",
+    "noEvents": "Brak nieobecności",
+    "resources": "Pracownicy"
+  },
+  "mockup_state": "Stan makiety:",
+  "mockup_states": {
+    "month": "Listopad",
+    "december": "Grudzień ze świętami",
+    "details_pending": "Kliknięty wniosek do zatwierdzenia",
+    "details_approved": "Kliknięte chorobowe",
+    "search": "Wyszukiwanie",
+    "empty": "Brak pracowników"
+  }
+}

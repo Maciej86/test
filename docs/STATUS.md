@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Moduł Kalendarz (makieta).
+**Następny krok:** Kalendarz: odpowiedzi na 7 pytań w makiecie (http://localhost:5181/admin/calendar), potem spec.
 
 ## Start aplikacji
 
@@ -33,11 +33,12 @@
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
 | 14 | Pulpit | dashboard | zrobiony | zamknięcie | my-leave, leave-requests, tasks |
-| 15 | Kalendarz | calendar | czeka | makieta | leave-types, my-leave, leave-requests |
+| 15 | Kalendarz | calendar | w toku | pytania | leave-types, my-leave, leave-requests |
 | 16 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard, calendar |
 
 ## Ostatnie decyzje
 
+- 2026-11-21: Kalendarz: makieta (miesiąc: osoby w wierszach, dni w kolumnach na `@mantine/schedule` 9.8.0; paski urlopu i chorobowego, filtry rodzajów jako legenda, wyszukiwarka, „Dziś nie ma: …”, weekendy i święta przyciemnione, szczegóły w panelu z prawej z „Zatwierdź” / „Odrzuć”, telefon przewija się do dziś); 7 pytań.
 - 2026-11-21: Nowy moduł Kalendarz (zgłoszenie użytkownika) przed Publikacją: tylko administrator; pracownicy w kolumnie po lewej, dni po prawej; widać urlop do zatwierdzenia, zatwierdzony i chorobowe. Chorobowe zgłasza pracownik jak wniosek (typ urlopu, który nie zmniejsza puli), administrator zatwierdza (odpowiedzi 1a 2b 3a). Publikacja jest teraz modułem 16.
 - 2026-11-20: Moduł Pulpit zrobiony (potwierdzony przez użytkownika): administrator (wnioski do rozpatrzenia, nieobecności na 2 tygodnie, stan tablic z zadaniami po terminie, moje zadania), pracownik (pula, moje wnioski, moje zadania); `GET /api/dashboard`. Wspólne: `PoolCard`, `LeaveStrip`, `taskDueState`, `MY_LEAVE_PATH`.
 - 2026-11-20: Pulpit: próby nadużyć odparte, przeklikany w przeglądarce (administrator, pracownik, telefon) na tymczasowych kontach e2e.tmp (zgoda użytkownika na jednorazowe konto w lokalnej bazie); test e2e wykrył i naprawiono nieświeże dane po powrocie na Pulpit; 64 testy e2e zielone.

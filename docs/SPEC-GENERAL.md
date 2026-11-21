@@ -191,7 +191,8 @@ doda moduł Logowanie jako migrację **zaraz po** `users` (ma klucz obcy do `use
 | 12 | Archiwum | archive | employees, tasks | — | wspólny ekran przywracania i usuwania na stałe |
 | 13 | Moje konto | my-account | login | — | zmiana własnego hasła i e-maila do powiadomień |
 | 14 | Pulpit | dashboard | my-leave, leave-requests, tasks | — | zbiera liczby z urlopów i zadań, więc na końcu |
-| 15 | Publikacja | deploy | wszystkie moduły | — | zawsze ostatni: OVH, domena, strona przerwy technicznej |
+| 15 | Kalendarz | calendar | leave-types, my-leave, leave-requests | — | dodany 2026-11-21 na prośbę użytkownika: nieobecności całego zespołu w jednym widoku (tylko administrator), także chorobowe zgłaszane jak wniosek |
+| 16 | Publikacja | deploy | wszystkie moduły | — | zawsze ostatni: OVH, domena, strona przerwy technicznej |
 
 [decyzja AI] Urlopy (najważniejsze na start) zaczynają się od modułu 7, a nie zaraz po Logowaniu, bo wniosek potrzebuje
 pracowników z pulami, typów urlopów, e-maila i powiadomień. Moduły 3–6 są małe i budują tylko to, czego urlopy
@@ -218,6 +219,7 @@ wymagają.
 | `nodemailer` | e-mail | email | lista zatwierdzona |
 | `pdfmake` | PDF wniosku urlopowego | my-leave | lista zatwierdzona |
 | `@dnd-kit` | przeciąganie kart na tablicy zadań, także palcem na telefonie | tasks | zgoda użytkownika 2026-11-18 (odpowiedź 8) |
+| `@mantine/schedule` | kalendarz zespołu (osoby w wierszach, dni w kolumnach) | calendar | lista zatwierdzona (`CONVENTIONS.md`, „Kalendarze”) |
 
 ## 9. Ostatnie decyzje (archiwum)
 

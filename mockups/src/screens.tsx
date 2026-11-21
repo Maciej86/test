@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import { TASK_SCREENS } from './modules/tasks/navigation';
 import { Done } from './common/Done';
 import type { ExtraScreen } from './Shell';
+import { CalendarMockup } from './modules/calendar/CalendarMockup';
 
 export type { ExtraScreen };
 
@@ -20,6 +21,7 @@ export const SCREENS: Record<string, ComponentType> = {
   'my-leave': () => <Done labelKey="common.nav.my_leave" />,
   // Moduł Wnioski urlopowe zrobiony; makieta zostaje w modules/leave-requests/LeaveRequestsMockup.tsx.
   'leave-requests': () => <Done labelKey="common.nav.leave_requests" />,
+  calendar: CalendarMockup,
   // Moduł Zadania zrobiony; makieta zostaje w modules/tasks/ (projekty w menu dokłada withTaskProjects).
   ...TASKS_DONE,
   // Moduł Pracownicy zrobiony; makieta zostaje w modules/employees/EmployeesMockup.tsx.

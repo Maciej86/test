@@ -89,3 +89,15 @@
   --mantine-color-red-filled: var(--mantine-color-red-8);
   --mantine-color-red-filled-hover: var(--mantine-color-red-9);
 }
+
+/* Kalendarz zespołu (@mantine/schedule, ResourcesMonthView): szersza kolumna z osobami, weekendy ciemniejsze niż dni
+   pracy (święta dokłada ekran jako tło w tym samym kolorze). */
+.mantine-ResourcesMonthView-resourcesMonthView {
+  --resources-month-view-resource-label-width: calc(12rem * var(--mantine-scale));
+}
+.mantine-ResourcesMonthView-resourcesMonthViewCell[data-weekend] {
+  background: var(--mantine-color-dark-8);
+}
+.mantine-ResourcesMonthView-resourcesMonthViewDayLabel[data-weekend] {
+  color: var(--mantine-color-dimmed);
+}
