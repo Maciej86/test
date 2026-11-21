@@ -20,6 +20,7 @@ import { contractTypesRoutes } from './modules/contract-types/contract-types.rou
 import { notificationsRoutes } from './modules/notifications/notifications.routes';
 import { myLeaveRoutes } from './modules/my-leave/my-leave.routes';
 import { leaveRequestsRoutes } from './modules/leave-requests/leave-requests.routes';
+import { calendarRoutes } from './modules/calendar/calendar.routes';
 import { tasksRoutes } from './modules/tasks/tasks.routes';
 import { activityLogRoutes } from './modules/activity-log/activity-log.routes';
 import { archiveRoutes } from './modules/archive/archive.routes';
@@ -65,6 +66,7 @@ export const createApp = (options: AppOptions = {}) => {
   mountModule(api, 'contract-types', contractTypesRoutes);
   mountModule(api, 'my-leave', myLeaveRoutes);
   mountModule(api, 'leave-requests', leaveRequestsRoutes);
+  mountModule(api, 'calendar', calendarRoutes);
   mountModule(api, 'tasks', tasksRoutes);
   mountModule(api, 'activity-log', activityLogRoutes);
   mountModule(api, 'archive', archiveRoutes);

@@ -104,7 +104,8 @@ describe('abuse', () => {
       expect((await as(jan).post(`/tasks/${at}/finish`, { finished: true })).status).toBe(404);
     }
     for (const fn of [s.createTask, s.updateTask, s.moveTask, s.archiveTask, s.finishTask]) expect(fn).not.toHaveBeenCalled();
-  });
+    // 35 zapytań, każde z nową aplikacją: przy pełnym `npm run check` na zajętym komputerze trwa ponad domyślne 5 s.
+  }, 20_000);
 
   it('author, completion date and position from the body are ignored', async () => {
     await as(jan).post('/tasks/projects/9/tasks', { ...task, createdBy: 1, createdByName: 'Anna', position: 1, completedAt: '2020-01-01' });

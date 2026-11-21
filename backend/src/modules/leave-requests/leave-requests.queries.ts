@@ -1,5 +1,5 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
-import type { DashboardAbsence, DashboardList, DashboardPendingRequest, LeaveRequestFilter, LeaveRequestStatus } from '@app/shared';
+import type { CalendarAbsence, DashboardAbsence, DashboardList, DashboardPendingRequest, LeaveRequestFilter, LeaveRequestStatus } from '@app/shared';
 import { PAGE_SIZE } from '../../config/constants';
 import { likePattern } from '../../db/like';
 import type { Db } from '../../db/pool';
@@ -163,6 +163,31 @@ export const listAbsences = async (db: Db, from: string, to: string): Promise<Da
     [ACTIVE, to, from],
   );
   return rows.map((r) => ({ userId: r.user_id as number, name: r.name as string, dateFrom: r.date_from as string, dateTo: r.date_to as string, status: r.status as DashboardAbsence['status'] }));
+};
+
+/**
+ * Dla modułu Kalendarz: wnioski czekające i zatwierdzone tych osób, które mają choć jeden dzień w zakresie, z nazwą
+ * i kolorem typu (bez komentarza i powodów: szczegóły kalendarz pobiera trasą wniosku).
+ */
+export const listCalendarAbsences = async (db: Db, userIds: number[], from: string, to: string): Promise<CalendarAbsence[]> => {
+  if (userIds.length === 0) return [];
+  const [rows] = await db.query<RowDataPacket[]>(
+    `SELECT r.id, r.user_id, lt.name AS leave_type_name, lt.color, r.status, r.date_from, r.date_to, r.working_days
+     FROM leave_requests r JOIN leave_types lt ON lt.id = r.leave_type_id
+     WHERE r.status IN (?) AND r.user_id IN (?) AND r.date_from <= ? AND r.date_to >= ?
+     ORDER BY r.date_from, r.id`,
+    [ACTIVE, userIds, to, from],
+  );
+  return rows.map((r) => ({
+    id: r.id as number,
+    userId: r.user_id as number,
+    leaveTypeName: r.leave_type_name as string,
+    color: r.color as CalendarAbsence['color'],
+    status: r.status as CalendarAbsence['status'],
+    dateFrom: r.date_from as string,
+    dateTo: r.date_to as string,
+    days: r.working_days as number,
+  }));
 };
 
 /** Lata puli, w których są wnioski, od najnowszego. */

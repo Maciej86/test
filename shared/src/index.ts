@@ -23,3 +23,4 @@ export * from './schemas/activityLog';
 export * from './schemas/archive';
 export * from './schemas/myAccount';
 export * from './schemas/dashboard';
+export * from './schemas/calendar';

@@ -44,7 +44,7 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
   (6 kwadratów, wybrany z ptaszkiem, nowy = zielony) + testy (wybór koloru wysyła `color`, kwadracik w wierszu).
   Porównane z: `ColorSwatch` nieużywany dotąd w `frontend/src` i `mockups/src` (poza makietami Kalendarza i Typów)
   → nowy klocek `common/ColorSwatchPicker.tsx` (front i makiety) z `value`, `onChange`, `colors` → `npm run check`
-- [ ] 6. Backend kalendarza: `calendarQuerySchema` (`from: optionalField(isoDate)` w zakresie 2000–2099) + testy;
+- [x] 6. Backend kalendarza: `calendarQuerySchema` (`from: optionalField(isoDate)` w zakresie 2000–2099) + testy;
   `listCalendarAbsences(db, from, to)` w `leave-requests.queries.ts` (typ, kolor, status, daty, dni, komentarz,
   daty złożenia i decyzji; tylko `pending`/`approved`, osoby bez archiwum) + test w docelowym pliku leave-requests;
   `calendar.service.ts` (zakres, dziś, osoby z `listActiveUsers(db, 'employee')`, wnioski tylko tych osób),
