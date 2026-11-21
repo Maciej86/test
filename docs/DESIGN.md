@@ -90,9 +90,10 @@ Każda kolejna sekcja to `PageSection` z tłem na całą szerokość, na zmianę
 | Dzwonek powiadomień | w belce przed menu użytkownika; czerwona liczba nieprzeczytanych (`red.8`, powyżej 99 „99+”); na komputerze okienko 420 px pod dzwonkiem, na telefonie panel z prawej na cały ekran. Nieprzeczytane: tło `dark.6`, pasek `navy.4` po lewej, pogrubiony tytuł i kropka; ikona rodzaju w kolorach statusów | Powiadomienia |
 | Karta zadania | `Card withBorder` na `dark.6`: tytuł, 2 linie opisu, termin (po czasie `red.4`, dziś i jutro `yellow.4`), kółka osób `PersonAvatar` (common: `navy` light, archiwum szare obrysowane i przygaszone, żółta kropka = urlop; „+N” = `MorePeopleAvatar`), pasek `navy.4` po lewej przy moim zadaniu, menu „⋮” | Zadania |
 | Podgląd z prawej | `SideDrawer` (common) 540 px (na telefonie cały ekran), tytuł szeryfowy, krzyżyk „Zamknij”: od razu edytowalne pola, „Usuń” po lewej na dole, „Anuluj” i „Zapisz” po prawej; nowe rekordy dodaje się w oknie na środku (`FormModal`) | Zadania |
+| Wybór koloru | `ColorSwatchPicker` (common): 6 kwadratów 30 px, wybrany z ptaszkiem i jasną obwódką; mały kwadracik koloru przy nazwie: `ColorMark` | Kalendarz |
 | Okno formularza | `FormModal` (common): pola od modułu, na dole „Anuluj” `default` i przycisk zapisu wypełniony; Enter zapisuje | Aktualizacja stepkit 0.1.46 |
 | Usunięcie na stałe | `ConfirmByNameModal` (common): pole „wpisz nazwę”, czerwony przycisk działa dopiero, gdy nazwa się zgadza | Zadania |
-| Kalendarz zespołu | `@mantine/schedule`, `ResourcesMonthView` / `ResourcesWeekView`: osoby w wierszach, dni w kolumnach; urlopy, wydarzenia i zadania jako paski; weekend i święta (`getPolishHolidays`) wyszarzone | |
+| Kalendarz zespołu | własna siatka CSS (moduł Kalendarz, `CalendarGrid`): osoby w wierszach (kolumna przyklejona po lewej), dziś + 60 dni w kolumnach rozciągniętych na całą szerokość, nad nimi nazwy miesięcy; pionowa kreska `dark.5` między dniami, `dark.3` na granicy miesiąca; weekend i święto na tle `dark.8` (święto z nazwą w dymku), dziś podkreślony `navy.4`. Pasek w kolorze typu urlopu (odcień 8, biały napis na środku); czekający: jasny odcień (`light`) z przerywaną ramką i dopiskiem „(czeka)”. Urlop w dniach roboczych pęka na weekendy i święta, kawałki łączy cienka linia (odcień 5, 60%). Filtry kolorów (`Chip` z `ColorMark`) są zarazem legendą | Kalendarz |
 
 ## Ikony przycisków
 
@@ -125,6 +126,8 @@ Ta sama akcja ma w całej aplikacji tę samą ikonę (`ButtonIcon` w `common/`, 
 | Oznacz jako zakończone / cofnij zakończenie (zadanie) | `CircleCheck` / `RotateCcw` |
 
 ## Historia zmian wyglądu
+
+- 2026-11-21: Kalendarz zespołu jako własna siatka (dziś + 60 dni) zamiast `@mantine/schedule`, kolor typu urlopu do wyboru (`ColorSwatchPicker`).
 
 - 2026-11-14: wybrany „Nocny granat, cały ciemny” (z 4 wariantów: granat klasyczny, atrament, nocny granat z jasną
   treścią, nocny cały ciemny). Użytkownikowi podobała się ciemna rama, ale chciał ciemną także treść. Zmienia ustalenie

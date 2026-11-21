@@ -66,7 +66,7 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
 - [x] 9. Powiązania: Pulpit, boks „Nieobecności na 2 tygodnie” → przycisk „Otwórz kalendarz” (`CALENDAR_PATH`);
   szczegóły wniosku (wspólny panel, poza kalendarzem) → „Pokaż w kalendarzu” (`/admin/calendar?from=<od>`) przy
   czekającym i zatwierdzonym + testy w plikach docelowych (dashboard, common/leave-request) → `npm run check`
-- [ ] 10. `DESIGN.md`: wzorzec „Kalendarz zespołu” opisuje własną siatkę (dziś + 60 dni, kolor typu, czeka = jasny
+- [x] 10. `DESIGN.md`: wzorzec „Kalendarz zespołu” opisuje własną siatkę (dziś + 60 dni, kolor typu, czeka = jasny
   z przerywaną ramką, przerwy w dniach roboczych, kreski między dniami); `SPEC-GENERAL.md` „Mapa dostępu” sprawdzona;
   `TESTS-1.md` uzupełniony → `npm run check`
 - [ ] 11. Test e2e `e2e/calendar.spec.ts` ze scenariuszy `TESTS-1.md` (administrator: kalendarz, wniosek e2e

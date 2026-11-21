@@ -16,7 +16,7 @@ wychodzenia z kalendarza. Typ urlopu dostaje kolor, którym kalendarz go rysuje.
 - Nagłówek „Kalendarz”, pod nim „Widoczne dni: <N> nieobecności, <M> czeka na decyzję”.
 - Zdanie „Dziś nie ma: Jan Kowalski (wypoczynkowy), Ewa Mazur (na żądanie, czeka)” albo „Dziś wszyscy są w pracy”.
 - Wyszukiwarka „Szukaj osoby” (filtruje wiersze po imieniu i nazwisku, bez wielkości liter i bez wysyłania do
-  serwera **[decyzja AI]**: kilkanaście osób). Przyciski-filtry po jednym na kolor (podpis: nazwy typów w tym kolorze,
+  serwera **[decyzja AI]**: kilkanaście osób). Przyciski-filtry po jednym na kolor typów widocznych w zakresie (podpis: nazwy typów w tym kolorze,
   np. „Wypoczynkowy, Na żądanie”); wyłączony chowa paski tych typów. Przyciski są zarazem legendą.
 - Pasek nad siatką: strzałka „30 dni wcześniej”, zakres „17.11.2026 – 16.01.2027”, strzałka „30 dni później”,
   po prawej „Dziś” (wyszarzony, gdy zakres zaczyna się dziś). Początek zakresu jest w adresie (`?from=`); brak albo
@@ -25,9 +25,9 @@ wychodzenia z kalendarza. Typ urlopu dostaje kolor, którym kalendarz go rysuje.
   telefonie bez kółka, węższa).
 - Pod siatką legenda: „Jasny pasek z przerywaną ramką: czeka na decyzję”, „Weekend albo święto”, „Cienka linia:
   przerwa w urlopie liczonym w dniach roboczych”.
-- Klik w pasek (także Enter na pasku): panel z prawej „Nieobecność” jak w makiecie. „Otwórz wniosek” prowadzi do
-  `/admin/leave-requests/:id`. Przy czekającym: „Odrzuć” (okno z powodem jak we Wnioskach) i „Zatwierdź” (okno
-  potwierdzenia jak we Wnioskach). Po decyzji: dymek, panel się zamyka, kalendarz i listy wniosków się odświeżają.
+- Klik w pasek (także Enter na pasku): z prawej te same szczegóły wniosku co we Wnioskach urlopowych (wspólny klocek,
+  zmiana zaakceptowana przy planie 2026-11-21: pula, „Kto jeszcze ma wtedy wolne”, przy czekającym „Odrzuć”
+  i „Zatwierdź”, przy zatwierdzonym „Anuluj urlop” i „PDF”; bez „Otwórz wniosek”). Po decyzji: dymek, panel się zamyka, kalendarz i listy wniosków się odświeżają.
   Wniosek rozpatrzony w międzyczasie: ten sam komunikat 409 co we Wnioskach (`already_decided`).
 - Stany: ładowanie i błąd przez `DataState`; brak aktywnych pracowników → „Nie ma jeszcze pracowników” z przyciskiem
   „Przejdź do Pracowników”; wyszukiwanie bez wyników → „Nikt o takim imieniu lub nazwisku nie pracuje w firmie.”
@@ -67,7 +67,7 @@ Historia zmian: zmiana koloru jest zwykłą zmianą typu urlopu (wpis z polem `c
 
 | Metoda i adres | Kto | Dane wejściowe (schemat) | Odpowiedź | Błędy |
 |---|---|---|---|---|
-| `GET /api/calendar?from=RRRR-MM-DD` | admin | `calendarQuerySchema` (`from` nieobowiązkowe) | `{ from, to, today, people: [{ id, name }], absences: [{ id, userId, leaveTypeName, color, status, dateFrom, dateTo, days, comment, createdAt, decidedAt }] }` | 400 zła data, 401, 403 |
+| `GET /api/calendar?from=RRRR-MM-DD` | admin | `calendarQuerySchema` (`from` nieobowiązkowe) | `{ from, to, today, people: [{ id, name }], absences: [{ id, userId, leaveTypeName, color, status, dateFrom, dateTo, days }] }` (komentarz i daty decyzji pokazują szczegóły wniosku z `GET /api/leave-requests/:id`) | 400 zła data, 401, 403 |
 | `POST /api/leave-types`, `PUT /api/leave-types/:id` (zmiana) | admin | schemat typu z polem `color` | jak dziś | 400 kolor spoza listy |
 
 Wartości liczone przez serwer: `to = from + 60 dni`, `today` (strefa aplikacji), lista osób (rola `employee`, bez
