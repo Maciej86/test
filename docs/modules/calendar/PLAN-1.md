@@ -54,7 +54,7 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
   robocze: kawałki bez weekendów i świąt, przerwy jako „linia”, przerwa na brzegu zakresu pomijana; dni
   kalendarzowe: jeden kawałek; przycięcie do zakresu) + testy (urlop przez weekend, przez Wigilię i święta,
   zaczyna się przed zakresem, kończy po nim, jeden dzień) → `npm run check`
-- [ ] 8. Ekran Kalendarz: `calendar.api.ts` (`useCalendar(from)`), `CalendarPage.tsx` (nagłówek z podsumowaniem,
+- [x] 8. Ekran Kalendarz: `calendar.api.ts` (`useCalendar(from)`), `CalendarPage.tsx` (nagłówek z podsumowaniem,
   „Dziś nie ma”, wyszukiwarka, filtry kolorów, pasek zakresu ze strzałkami i „Dziś”, `?from=` w adresie, legenda,
   puste stany), `components/CalendarGrid.tsx` (siatka z makiety: miesiące, dni, kreski, weekendy i święta z nazwą
   w dymku, dziś, kolumna osób przyklejona, paski z opisem na środku i dymkiem, klik i Enter otwierają wspólny panel

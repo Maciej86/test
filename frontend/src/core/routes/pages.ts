@@ -9,6 +9,7 @@ import { MyAccountPage } from '../../modules/my-account/MyAccountPage';
 import { NotificationsPage } from '../../modules/notifications/NotificationsPage';
 import { MyLeavePage } from '../../modules/my-leave/MyLeavePage';
 import { LeaveRequestsPage } from '../../modules/leave-requests/LeaveRequestsPage';
+import { CalendarPage } from '../../modules/calendar/CalendarPage';
 import { ProjectsPage } from '../../modules/tasks/ProjectsPage';
 import { TaskBoardPage } from '../../modules/tasks/TaskBoardPage';
 import { TasksHomePage } from '../../modules/tasks/TasksHomePage';
@@ -26,6 +27,7 @@ export const PAGES: Pages = {
   'my-account': MyAccountPage,
   'my-leave': MyLeavePage,
   'leave-requests': LeaveRequestsPage,
+  calendar: CalendarPage,
   'activity-log': ActivityLogPage,
   archive: ArchivePage,
   // Bez pozycji w menu: adres w buildAppRoutes (TASKS_PATH; tablicę i listę projektów dopisuje moduł Zadania).
