@@ -120,7 +120,6 @@ export const CalendarGrid = ({ days, people, absences, today, phone, onOpen }: {
               {!phone && <PersonAvatar name={p.name} />}
               <Stack gap={0} style={{ minWidth: 0 }}>
                 <Text size="sm" fw={500} truncate>{p.name}</Text>
-                {!phone && <Text size="xs" c="dimmed" truncate>{p.position}</Text>}
               </Stack>
             </Group>,
             ...days.map((iso, i) => (

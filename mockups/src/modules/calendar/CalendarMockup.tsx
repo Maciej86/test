@@ -33,10 +33,7 @@ const AbsenceDrawer = ({ absence, onClose }: { absence: MockAbsence; onClose: ()
       <Stack gap="lg">
         <Group gap="sm">
           <PersonAvatar name={person.name} />
-          <Stack gap={0}>
-            <Text fw={600}>{person.name}</Text>
-            <Text size="sm" c="dimmed">{person.position}</Text>
-          </Stack>
+          <Text fw={600}>{person.name}</Text>
         </Group>
         <Stack gap="xs">
           <DetailRow label={t('type')}>

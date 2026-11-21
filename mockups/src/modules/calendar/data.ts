@@ -32,7 +32,6 @@ export const TYPES: MockType[] = [
 export interface MockEmployee {
   id: number;
   name: string;
-  position: string;
 }
 
 export interface MockAbsence {
@@ -51,15 +50,15 @@ export interface MockAbsence {
 
 /** Aktywni pracownicy, alfabetycznie po nazwisku (osoby z archiwum nie mają wiersza). */
 export const EMPLOYEES: MockEmployee[] = [
-  { id: 8, name: 'Paweł Dąbrowski', position: 'Magazynier' },
-  { id: 9, name: 'Agnieszka Kamińska', position: 'Księgowa' },
-  { id: 2, name: 'Jan Kowalski', position: 'Specjalista ds. sprzedaży' },
-  { id: 5, name: 'Magdalena Lewandowska', position: 'Kierownik biura' },
-  { id: 7, name: 'Marek Nowicki', position: 'Kierowca' },
-  { id: 10, name: 'Joanna Szymańska', position: 'Asystentka zarządu' },
-  { id: 3, name: 'Katarzyna Wiśniewska', position: 'Księgowa' },
-  { id: 6, name: 'Tomasz Wójcik', position: 'Informatyk' },
-  { id: 4, name: 'Piotr Zieliński', position: 'Handlowiec' },
+  { id: 8, name: 'Paweł Dąbrowski' },
+  { id: 9, name: 'Agnieszka Kamińska' },
+  { id: 2, name: 'Jan Kowalski' },
+  { id: 5, name: 'Magdalena Lewandowska' },
+  { id: 7, name: 'Marek Nowicki' },
+  { id: 10, name: 'Joanna Szymańska' },
+  { id: 3, name: 'Katarzyna Wiśniewska' },
+  { id: 6, name: 'Tomasz Wójcik' },
+  { id: 4, name: 'Piotr Zieliński' },
 ];
 
 export const ABSENCES: MockAbsence[] = [

@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Kalendarz: spec (podział na części) do akceptacji.
+**Następny krok:** Kalendarz: akceptacja podziału na 2 części i `SPEC-1.md`, potem plan części 1.
 
 ## Start aplikacji
 
@@ -33,7 +33,7 @@
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
 | 14 | Pulpit | dashboard | zrobiony | zamknięcie | my-leave, leave-requests, tasks |
-| 15 | Kalendarz | calendar | w toku | spec | leave-types, my-leave, leave-requests |
+| 15 | Kalendarz | calendar | w toku | spec, część 1/2 | leave-types, my-leave, leave-requests |
 | 16 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard, calendar |
 
 ## Ostatnie decyzje
