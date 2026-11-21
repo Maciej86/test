@@ -120,6 +120,7 @@ Ta sama akcja ma w całej aplikacji tę samą ikonę (`ButtonIcon` w `common/`, 
 | Zaloguj / wyloguj | `LogIn` / `LogOut` |
 | Ustaw hasło | `KeyRound` (klucz) |
 | Zamknij rok | `CalendarCheck` |
+| Otwórz kalendarz, pokaż w kalendarzu | `CalendarRange` (jak pozycja „Kalendarz” w menu) |
 | Ukryj (np. typ urlopu) / przywróć ukryty | `EyeOff` / `Undo2` |
 | Oznacz jako zakończone / cofnij zakończenie (zadanie) | `CircleCheck` / `RotateCcw` |
 

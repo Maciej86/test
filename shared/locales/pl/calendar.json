@@ -5,26 +5,9 @@
   "today_all": "Dziś wszyscy są w pracy",
   "search": "Szukaj osoby",
   "off_day": "Weekend albo święto",
-  "status_label": "Status",
-  "status": {
-    "approved": "Zatwierdzony",
-    "pending": "Czeka na decyzję",
-    "reported": "Zgłoszone, bez zatwierdzania"
-  },
   "pending_short": "czeka",
-  "details_title": "Nieobecność",
-  "type": "Typ",
-  "term": "Termin",
-  "days": "Dni",
-  "comment": "Komentarz pracownika",
-  "created_at": "Złożony",
-  "decided_at": "Zatwierdzony",
-  "approve": "Zatwierdź",
-  "reject": "Odrzuć",
-  "open_request": "Otwórz wniosek",
   "approved_toast": "Zatwierdzono wniosek: {{name}}",
   "reject_mockup": "W aplikacji otworzy się okno „Odrzuć” z polem na powód, to samo co we Wnioskach urlopowych",
-  "open_mockup": "W aplikacji otworzą się szczegóły wniosku nr {{id}} we Wnioskach urlopowych",
   "no_match": "Nikt o takim imieniu lub nazwisku nie pracuje w firmie.",
   "empty_title": "Nie ma jeszcze pracowników",
   "empty_text": "Kalendarz pokaże urlopy i chorobowe, gdy dodasz pierwszą osobę w Pracownikach.",
@@ -34,7 +17,7 @@
     "range": "Od dziś",
     "later": "30 dni później",
     "details_pending": "Kliknięty wniosek do zatwierdzenia",
-    "details_sick": "Kliknięte chorobowe",
+    "details_sick": "Kliknięty zatwierdzony urlop",
     "search": "Wyszukiwanie",
     "empty": "Brak pracowników"
   },
@@ -54,5 +37,7 @@
   "days_value_working_many": "{{count}} dni roboczych",
   "days_value_calendar_one": "{{count}} dzień kalendarzowy",
   "days_value_calendar_few": "{{count}} dni kalendarzowe",
-  "days_value_calendar_many": "{{count}} dni kalendarzowych"
+  "days_value_calendar_many": "{{count}} dni kalendarzowych",
+  "cancel_mockup": "W aplikacji otworzy się okno „Anuluj urlop” z polem na powód, to samo co we Wnioskach urlopowych",
+  "pdf_mockup": "W aplikacji otworzy się PDF wniosku w nowej karcie"
 }

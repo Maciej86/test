@@ -5,13 +5,12 @@ import { CircleAlert, Clock } from 'lucide-react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { LEAVE_DECISION_REASON_MAX, LEAVE_REQUESTS_MESSAGES, leaveDecisionReasonSchema, todayIsoDate, translateKey, type LeaveDecisionReasonInput, type LeaveRequestListItem } from '@app/shared';
-import { ConfirmModal } from '../../../common/ConfirmModal';
-import { LeaveDates } from '../../../common/LeaveRequestParts';
-import { apiErrorBody, apiErrorFields, apiErrorKey, apiErrorMessage } from '../../../core/api/client';
-import { fieldError } from '../../../core/fieldError';
-import { notify } from '../../../core/notify';
-import { useApproveRequest, useCancelRequest, useLeaveRequest, useRejectRequest } from '../leave-requests.api';
-import { isLate } from './LeaveRequestsTable';
+import { ConfirmModal } from '../ConfirmModal';
+import { LeaveDates } from '../LeaveRequestParts';
+import { apiErrorBody, apiErrorFields, apiErrorKey, apiErrorMessage } from '../../core/api/client';
+import { fieldError } from '../../core/fieldError';
+import { isLate, useApproveRequest, useCancelRequest, useLeaveRequest, useRejectRequest } from '../../core/leaveRequestDecisions';
+import { notify } from '../../core/notify';
 
 interface ModalProps {
   request: LeaveRequestListItem;
@@ -164,4 +163,15 @@ export const CancelModal = ({ request: r, ...props }: ModalProps) => {
       <ReasonField label={t('cancel_reason')} hint={t('cancel_hint')} reason={reason} />
     </ConfirmModal>
   );
+};
+
+/** Otwarte okno decyzji. */
+export type DecisionDialog = { kind: 'approve' | 'reject' | 'cancel'; request: LeaveRequestListItem };
+
+const WINDOWS = { approve: ApproveModal, reject: RejectModal, cancel: CancelModal };
+
+/** Okno wybranej decyzji (Wnioski urlopowe: z wiersza i ze szczegółów; Kalendarz: ze szczegółów). */
+export const DecisionWindow = ({ dialog, onClose, onDone }: { dialog: DecisionDialog; onClose: () => void; onDone: () => void }) => {
+  const Window = WINDOWS[dialog.kind];
+  return <Window request={dialog.request} onClose={onClose} onDone={onDone} />;
 };

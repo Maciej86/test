@@ -1,17 +1,15 @@
 import { useState } from 'react';
-import { ActionIcon, Badge, Box, Button, Chip, ColorSwatch, Group, Paper, SegmentedControl, Stack, Text, TextInput, useMantineTheme } from '@mantine/core';
+import { ActionIcon, Box, Button, Chip, ColorSwatch, Group, Paper, SegmentedControl, Stack, Text, TextInput, useMantineTheme } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { CalendarDays, ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { dayjs, formatDate } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
-import { DetailRow } from '../../common/DetailRow';
 import { EmptyState } from '../../common/EmptyState';
 import { notify } from '../../common/notify';
 import { PageHeader } from '../../common/PageHeader';
-import { PersonAvatar } from '../../common/PersonAvatar';
-import { SideDrawer } from '../../common/SideDrawer';
+import { LeaveRequestDrawer, type LeaveRequestView } from '../../common/LeaveRequestDrawer';
 import { CalendarGrid } from './CalendarGrid';
 import { ABSENCES, EMPLOYEES, RANGE_DAYS, RANGE_STEP, TODAY, TYPES, employeeOf, typeOf, type MockAbsence } from './data';
 
@@ -22,59 +20,48 @@ type State = (typeof STATES)[number];
 const LEGEND = TYPES.filter((tp, i) => TYPES.findIndex((o) => o.color === tp.color) === i);
 const typesOfColor = (color: string) => TYPES.filter((tp) => tp.color === color).map((tp) => tp.name).join(', ');
 
-/** Szczegóły klikniętej nieobecności, z decyzją przy wniosku, który czeka. */
-const AbsenceDrawer = ({ absence, onClose }: { absence: MockAbsence; onClose: () => void }) => {
-  const { t } = useTranslation('calendar');
-  const person = employeeOf(absence.employeeId);
-  const type = typeOf(absence.typeId);
-  const status = absence.status === 'pending' ? 'pending' : type.approval ? 'approved' : 'reported';
+/** Kto jeszcze ma wolne w terminie wniosku (zatwierdzone i czekające innych osób). */
+const OthersList = ({ absence }: { absence: MockAbsence }) => {
+  const { t } = useTranslation('leave-requests');
+  const others = ABSENCES.filter((o) => o.employeeId !== absence.employeeId && o.from <= absence.to && o.to >= absence.from);
+  if (others.length === 0) return <Text size="sm" c="dimmed">{t('strip_nobody')}</Text>;
   return (
-    <SideDrawer title={t('details_title')} onClose={onClose}>
-      <Stack gap="lg">
-        <Group gap="sm">
-          <PersonAvatar name={person.name} />
-          <Text fw={600}>{person.name}</Text>
-        </Group>
-        <Stack gap="xs">
-          <DetailRow label={t('type')}>
-            <Group gap={6}><ColorSwatch color={`var(--mantine-color-${type.color}-8)`} size={12} radius={2} />{type.name}</Group>
-          </DetailRow>
-          <DetailRow label={t('term')}>
-            <DateText value={absence.from} />
-            {absence.to !== absence.from && <> – <DateText value={absence.to} /></>}
-          </DetailRow>
-          <DetailRow label={t('days')}>{t(`days_value_${type.dayCount}`, { count: absence.days })}</DetailRow>
-          <DetailRow label={t('status_label')}>
-            <Badge variant="light" color={status === 'pending' ? 'yellow' : 'green'}>{t(`status.${status}`)}</Badge>
-          </DetailRow>
-          {absence.comment && <DetailRow label={t('comment')}>{absence.comment}</DetailRow>}
-          <DetailRow label={t('created_at')}><DateText value={absence.createdAt} withTime /></DetailRow>
-          {absence.decidedAt && <DetailRow label={t('decided_at')}><DateText value={absence.decidedAt} withTime /></DetailRow>}
-        </Stack>
-        <Group justify="space-between">
-          <Button variant="default" leftSection={<ButtonIcon action="details" size={16} />} onClick={() => notify.success(t('open_mockup', { id: absence.id }))}>
-            {t('open_request')}
-          </Button>
-          {absence.status === 'pending' && (
-            <Group gap="xs">
-              <Button variant="subtle" color="red" leftSection={<ButtonIcon action="cancel" size={16} />} onClick={() => notify.success(t('reject_mockup'))}>
-                {t('reject')}
-              </Button>
-              <Button
-                color="green"
-                leftSection={<ButtonIcon action="confirm" size={16} />}
-                onClick={() => {
-                  notify.success(t('approved_toast', { name: person.name }));
-                  onClose();
-                }}
-              >
-                {t('approve')}
-              </Button>
-            </Group>
-          )}
-        </Group>
-      </Stack>
-    </SideDrawer>
+    <Stack gap={2}>
+      {others.map((o) => (
+        <Text key={o.id} size="sm">
+          {employeeOf(o.employeeId).name}: <DateText value={o.from} /> – <DateText value={o.to} />
+          {o.status === 'pending' && <Text span c="dimmed"> ({t('status.pending').toLowerCase()})</Text>}
+        </Text>
+      ))}
+    </Stack>
+  );
+};
+
+/** Klik w pasek: te same szczegóły wniosku co we Wnioskach urlopowych (wspólny klocek), bez „Pokaż w kalendarzu”. */
+const AbsenceDrawer = ({ absence, onClose }: { absence: MockAbsence | null; onClose: () => void }) => {
+  const { t } = useTranslation('calendar');
+  const view: LeaveRequestView | null = absence && {
+    id: absence.id,
+    employee: employeeOf(absence.employeeId).name,
+    status: absence.status,
+    from: absence.from,
+    to: absence.to,
+    typeLine: `${typeOf(absence.typeId).name}, ${t(`days_value_${typeOf(absence.typeId).dayCount}`, { count: absence.days })}`,
+    late: absence.status === 'pending' && absence.from < TODAY,
+    comment: absence.comment,
+    createdAt: absence.createdAt,
+    decided: absence.decidedAt ? { by: 'Anna Nowak', at: absence.decidedAt } : undefined,
+  };
+  return (
+    <LeaveRequestDrawer
+      request={view}
+      strip={absence && <OthersList absence={absence} />}
+      onClose={onClose}
+      onApprove={() => { notify.success(t('approved_toast', { name: view?.employee })); onClose(); }}
+      onReject={() => notify.success(t('reject_mockup'))}
+      onCancel={() => notify.success(t('cancel_mockup'))}
+      onPdf={() => notify.success(t('pdf_mockup'))}
+    />
   );
 };
 
@@ -94,7 +81,7 @@ export const CalendarMockup = () => {
     setSearch(s === 'search' ? 'kow' : '');
     setStart(s === 'later' ? dayjs(TODAY).add(RANGE_STEP, 'day').format('YYYY-MM-DD') : TODAY);
     if (s === 'details_pending') setOpen(ABSENCES.find((a) => a.id === 29)!);
-    if (s === 'details_sick') setOpen(ABSENCES.find((a) => a.id === 25)!);
+    if (s === 'details_sick') setOpen(ABSENCES.find((a) => a.id === 22)!);
   };
 
   const days = Array.from({ length: RANGE_DAYS }, (_, i) => dayjs(start).add(i, 'day').format('YYYY-MM-DD'));
@@ -205,7 +192,7 @@ export const CalendarMockup = () => {
         </>
       )}
 
-      {open && <AbsenceDrawer absence={open} onClose={() => setOpen(null)} />}
+      <AbsenceDrawer absence={open} onClose={() => setOpen(null)} />
     </Stack>
   );
 };

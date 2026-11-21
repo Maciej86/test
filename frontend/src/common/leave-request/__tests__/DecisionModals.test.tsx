@@ -1,8 +1,8 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { api } from '../../../../core/api/client';
-import { notify } from '../../../../core/notify';
-import { apiError, details, requestItem } from '../../../../test/leaveRequestFixtures';
-import { renderWithProviders } from '../../../../test/render';
+import { api } from '../../../core/api/client';
+import { notify } from '../../../core/notify';
+import { apiError, details, requestItem } from '../../../test/leaveRequestFixtures';
+import { renderWithProviders } from '../../../test/render';
 import { ApproveModal, CancelModal, RejectModal } from '../DecisionModals';
 
 const tomasz = { employeeName: 'Tomasz Wójcik', dateFrom: '2026-11-26', dateTo: '2026-11-27', status: 'approved' as const };

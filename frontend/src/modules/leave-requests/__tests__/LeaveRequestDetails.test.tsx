@@ -1,10 +1,10 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import type { LeaveRequestDetails } from '@app/shared';
-import { api } from '../../../../core/api/client';
-import { notify } from '../../../../core/notify';
-import { apiError, details, list } from '../../../../test/leaveRequestFixtures';
-import { renderRoutes } from '../../../../test/render';
-import { LeaveRequestsPage } from '../../LeaveRequestsPage';
+import { api } from '../../../core/api/client';
+import { notify } from '../../../core/notify';
+import { apiError, details, list } from '../../../test/leaveRequestFixtures';
+import { renderRoutes } from '../../../test/render';
+import { LeaveRequestsPage } from '../LeaveRequestsPage';
 
 const show = (path: string, detailsOf: (id: string) => LeaveRequestDetails | Error) => {
   vi.spyOn(api, 'get').mockImplementation(async (url: string) => {

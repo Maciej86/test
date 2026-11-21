@@ -1,8 +1,8 @@
 import { List, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { dayjs, type LeaveRequestDetails } from '@app/shared';
-import { LeaveDates } from '../../../common/LeaveRequestParts';
-import { LeaveStrip, type StripMark } from '../../../common/LeaveStrip';
+import { LeaveDates } from '../LeaveRequestParts';
+import { LeaveStrip, type StripMark } from '../LeaveStrip';
 
 /** Dłuższy termin pokazuje listę osób zamiast paska (31 kolumn mieści się jeszcze na ekranie z przewijaniem). */
 const MAX_DAYS = 31;

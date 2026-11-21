@@ -19,7 +19,7 @@ z Wniosków urlopowych (pula osoby, „Kto jeszcze ma wtedy wolne”, „Zatwier
 urlop” i „PDF” przy zatwierdzonym), a nie uproszczony panel z makiety. Przycisk „Otwórz wniosek” odpada, bo panel
 pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwie.
 
-- [ ] 0. Szkielet testów `it.todo` z wymagań `SPEC-1.md` i `TESTS-1.md`:
+- [x] 0. Szkielet testów `it.todo` z wymagań `SPEC-1.md` i `TESTS-1.md`:
   `backend/src/modules/calendar/__tests__/calendar.routes.test.ts` (dane, zakres `from` + 60, domyślnie dziś, zła
   data → 400, tylko `pending`/`approved` nachodzące na zakres, osoby bez archiwum i bez administratorów, 401, 403),
   `shared/src/schemas/__tests__/calendar.test.ts` (`from`: brak, poprawna, `2026-02-30`, `1999-12-31`, `2100-01-01`),
@@ -28,12 +28,12 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
   w `backend/src/modules/calendar/__tests__/leave-types.todo.test.ts` i
   `frontend/src/modules/calendar/__tests__/done-modules.todo.test.tsx` (miejsca docelowe w pierwszej linii)
   → `npm run check`
-- [ ] 1. Wydzielenie szczegółów wniosku z decyzjami (lista „Wydzielam”) + testy przeniesione razem z kodem, Wnioski
+- [x] 1. Wydzielenie szczegółów wniosku z decyzjami (lista „Wydzielam”) + testy przeniesione razem z kodem, Wnioski
   urlopowe korzystają ze wspólnych; `useDecision` odświeża `['leave-requests']`, `['employees']`, `['calendar']`,
   `['dashboard']`; nowy parametr `showInCalendar` (przycisk „Pokaż w kalendarzu”, krok 9).
   Porównane z: `DetailsDrawer` (leave-requests), `SideDrawer` (common), szczegóły zadania (tasks) → rama zostaje
   `SideDrawer`, wspólna jest cała treść szczegółów wniosku → `npm run check`
-- [ ] 2. Makiety: `mockups/src/common/LeaveRequestDrawer.tsx` (treść jak `DetailsDrawer` z makiety Wniosków), makieta
+- [x] 2. Makiety: `mockups/src/common/LeaveRequestDrawer.tsx` (treść jak `DetailsDrawer` z makiety Wniosków), makieta
   Kalendarza używa go zamiast własnego panelu → `npx tsc -p mockups`, `npm run check`
 - [ ] 3. Kolor typu urlopu: `LEAVE_TYPE_COLORS` w `shared/src/constants/leaveTypes.ts`, pole `color` w schemacie typu
   (`z.enum`) + testy schematu (każdy z 6, `yellow` → błąd, brak → błąd) → `npm run check`

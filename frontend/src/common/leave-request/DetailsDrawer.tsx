@@ -2,14 +2,13 @@ import { Alert, Button, Divider, Group, Paper, Progress, Stack, Text } from '@ma
 import { Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { LeaveRequestDetails } from '@app/shared';
-import { ButtonIcon } from '../../../common/ButtonIcon';
-import { DataState } from '../../../common/DataState';
-import { DateText } from '../../../common/DateText';
-import { DetailRow } from '../../../common/DetailRow';
-import { SideDrawer } from '../../../common/SideDrawer';
-import { LeaveDates, LeaveStatusBadge, leaveSplitText } from '../../../common/LeaveRequestParts';
-import { leaveRequestPdfUrl, type useLeaveRequest } from '../leave-requests.api';
-import { isLate, type RowActions } from './LeaveRequestsTable';
+import { ButtonIcon } from '../ButtonIcon';
+import { DataState } from '../DataState';
+import { DateText } from '../DateText';
+import { DetailRow } from '../DetailRow';
+import { SideDrawer } from '../SideDrawer';
+import { LeaveDates, LeaveStatusBadge, leaveSplitText } from '../LeaveRequestParts';
+import { isLate, leaveRequestPdfUrl, type LeaveRequestActions, type useLeaveRequest } from '../../core/leaveRequestDecisions';
 import { TeamStrip } from './TeamStrip';
 
 /** Pula roku wniosku: pasek (wykorzystane, czeka, zostało) i ile zostanie po zatwierdzeniu. */
@@ -36,7 +35,7 @@ const PoolBox = ({ r, pool }: { r: LeaveRequestDetails; pool: NonNullable<LeaveR
   );
 };
 
-const Content = ({ r, actions }: { r: LeaveRequestDetails; actions: Omit<RowActions, 'onDetails'> }) => {
+const Content = ({ r, actions }: { r: LeaveRequestDetails; actions: LeaveRequestActions }) => {
   const { t } = useTranslation('leave-requests');
   const active = r.status === 'pending' || r.status === 'approved';
   return (
@@ -100,9 +99,9 @@ const Content = ({ r, actions }: { r: LeaveRequestDetails; actions: Omit<RowActi
 
 /**
  * Szczegóły wniosku z prawej (na telefonie na cały ekran). Otwiera je adres `/admin/leave-requests/:id`: klik
- * w wiersz, link z e-maila i z dzwonka. Tu administrator decyduje.
+ * w wiersz, link z e-maila i z dzwonka; w Kalendarzu klik w pasek. Tu administrator decyduje.
  */
-export const DetailsDrawer = ({ id, details, onClose, ...actions }: Omit<RowActions, 'onDetails'> & {
+export const DetailsDrawer = ({ id, details, onClose, ...actions }: LeaveRequestActions & {
   id: number | null;
   details: ReturnType<typeof useLeaveRequest>;
   onClose: () => void;

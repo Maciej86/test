@@ -1,5 +1,5 @@
 import { screen, within } from '@testing-library/react';
-import { renderWithProviders } from '../../../../test/render';
+import { renderWithProviders } from '../../../test/render';
 import { TeamStrip } from '../TeamStrip';
 
 const piotr = { employeeName: 'Piotr Zieliński', dateFrom: '2026-12-21', dateTo: '2026-12-24' };

@@ -1,20 +1,14 @@
 import type { MouseEvent } from 'react';
 import { Badge, Button, Card, Group, Stack, Table, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { TABLE_MIN_WIDTH, todayIsoDate, type LeaveRequestListItem } from '@app/shared';
+import { TABLE_MIN_WIDTH, type LeaveRequestListItem } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DateText } from '../../../common/DateText';
 import { LeaveDates, LeaveStatusBadge, leaveSplitText } from '../../../common/LeaveRequestParts';
-import { leaveRequestPdfUrl } from '../leave-requests.api';
+import { isLate, leaveRequestPdfUrl, type LeaveRequestActions } from '../../../core/leaveRequestDecisions';
 
-/** Czekający wniosek, którego termin już się zaczął albo minął (6a: można go rozpatrzyć, ale warto to widzieć). */
-export const isLate = (r: Pick<LeaveRequestListItem, 'status' | 'dateFrom'>) => r.status === 'pending' && r.dateFrom < todayIsoDate();
-
-export interface RowActions {
+export interface RowActions extends LeaveRequestActions {
   onDetails: (r: LeaveRequestListItem) => void;
-  onApprove: (r: LeaveRequestListItem) => void;
-  onReject: (r: LeaveRequestListItem) => void;
-  onCancel: (r: LeaveRequestListItem) => void;
 }
 
 /** Klik w przycisk nie otwiera przy okazji szczegółów (klik w cały wiersz). */

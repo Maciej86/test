@@ -3,7 +3,7 @@ import { Paper, Stack } from '@mantine/core';
 import { CalendarCheck, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-import { LEAVE_REQUESTS_PATH, formatDate, leaveRequestsListQuerySchema, type LeaveRequestListItem } from '@app/shared';
+import { LEAVE_REQUESTS_PATH, formatDate, leaveRequestsListQuerySchema } from '@app/shared';
 import { DataState } from '../../common/DataState';
 import { EmptyState } from '../../common/EmptyState';
 import { ListPagination } from '../../common/ListPagination';
@@ -15,21 +15,12 @@ import { useEmptyLaterPage } from '../../core/useEmptyLaterPage';
 import { useListParams } from '../../core/useListParams';
 import { LeaveRequestsFilters } from './components/LeaveRequestsFilters';
 import { LeaveRequestCards, LeaveRequestsTable, type RowActions } from './components/LeaveRequestsTable';
-import { ApproveModal, CancelModal, RejectModal } from './components/DecisionModals';
-import { DetailsDrawer } from './components/DetailsDrawer';
-import { useLeaveRequest, useLeaveRequests } from './leave-requests.api';
+import { DecisionWindow, type DecisionDialog } from '../../common/leave-request/DecisionModals';
+import { DetailsDrawer } from '../../common/leave-request/DetailsDrawer';
+import { useLeaveRequest } from '../../core/leaveRequestDecisions';
+import { useLeaveRequests } from './leave-requests.api';
 
 const LIST_DEFAULTS = { page: 1, search: '', sort: 'default', dir: 'asc', status: 'pending' } as const;
-
-/** Otwarte okno decyzji. */
-export type DecisionDialog = { kind: 'approve' | 'reject' | 'cancel'; request: LeaveRequestListItem };
-
-const WINDOWS = { approve: ApproveModal, reject: RejectModal, cancel: CancelModal };
-
-const DecisionWindow = ({ dialog, onClose, onDone }: { dialog: DecisionDialog; onClose: () => void; onDone: () => void }) => {
-  const Window = WINDOWS[dialog.kind];
-  return <Window request={dialog.request} onClose={onClose} onDone={onDone} />;
-};
 
 /**
  * „Wnioski urlopowe” (administrator): lista z zakładkami i filtrami w adresie. Adres `/admin/leave-requests/:id`
