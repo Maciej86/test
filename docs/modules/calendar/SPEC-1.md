@@ -1,6 +1,6 @@
 # Spec: Kalendarz, część 1: Kalendarz
 
-**Data:** 2026-11-21 · **Status:** do akceptacji
+**Data:** 2026-11-21 · **Status:** zaakceptowany przez użytkownika 2026-11-21
 **Podstawa:** `SPEC.md` (ogólny), `QUESTIONS.md`, makieta `mockups/src/modules/calendar/` (siatka `CalendarGrid.tsx`),
 makieta Typów urlopów (tylko kolor)
 

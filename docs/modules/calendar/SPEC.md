@@ -1,6 +1,6 @@
 # Spec: Kalendarz (ogólny)
 
-**Data:** 2026-11-21 · **Status:** do akceptacji
+**Data:** 2026-11-21 · **Status:** zaakceptowany przez użytkownika 2026-11-21
 **Podstawa:** `QUESTIONS.md` (zgłoszenie 1a 2b 3a, uwagi do makiety, odpowiedzi 1a–8a z 2026-11-21), `SPEC-GENERAL.md`,
 makiety `mockups/src/modules/calendar/` i `mockups/src/modules/leave-types/`, speki Typów urlopów, Moich urlopów
 i Wniosków urlopowych („Powiązania”)
