@@ -80,7 +80,7 @@ usunięte.
   jednostką (stare powiadomienia bez `dayCount` = robocze). Testy: approve/reject automatycznego → 409
   `already_decided`, cancel → ok i dni wracają, pasek kalendarzowy ciągły przez weekend, PDF z nowym wierszem →
   `npm run check`
-- [ ] 12. Dokumenty: `SPEC-GENERAL.md` (słownik „Dni wniosku”, tabele `leave_types`/`leave_requests`, zasady
+- [x] 12. Dokumenty: `SPEC-GENERAL.md` (słownik „Dni wniosku”, tabele `leave_types`/`leave_requests`, zasady
   powiadomień i e-maili: „Zgłoszona nieobecność”), `DESIGN.md` bez zmian; `README.md` bez zmian (nowych poleceń
   nie ma) → `npm run check`
 - [ ] 13. Test e2e w `e2e/calendar.spec.ts` ze scenariuszy `TESTS-2.md` (tymczasowy pracownik, typ „Chorobowe”:

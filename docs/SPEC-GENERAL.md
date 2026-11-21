@@ -20,8 +20,10 @@ zmniejszy się o właściwą liczbę dni roboczych (najpierw z zaległego urlopu
 | E-mail do powiadomień | nieobowiązkowy prawdziwy adres; tylko na niego idą e-maile |
 | Pula | liczba dni urlopu pracownika na dany rok |
 | Zaległy urlop | dni niewykorzystane w poprzednim roku, przeniesione przy „Zamknij rok”; wykorzystywane najpierw |
-| Typ urlopu | np. wypoczynkowy, na żądanie; ma ustawienie „odejmuje dni z puli” i opcjonalny roczny limit |
+| Typ urlopu | np. wypoczynkowy, na żądanie, chorobowe; ma ustawienia „odejmuje dni z puli”, opcjonalny roczny limit, kolor w kalendarzu, liczenie dni (robocze / kalendarzowe) i „wymaga zatwierdzenia” (zmiana 2026-11-21) |
 | Dni robocze | dni od–do bez sobót, niedziel i świąt (`getPolishHolidays` z `shared/src/holidays.ts`) |
+| Dni wniosku | liczba dni wniosku liczona sposobem typu z chwili złożenia: robocze albo kalendarzowe (wszystkie dni); kolumna `working_days` (zmiana 2026-11-21) |
+| Typ bez zatwierdzania | np. chorobowe: wniosek od razu zatwierdzony (`auto_approved`), może zaczynać się do 7 dni wstecz; pracownik wycofuje go do pierwszego dnia albo w dniu złożenia, potem tylko administrator anuluje (zmiana 2026-11-21) |
 | Kolumna zadania | W opracowaniu, W toku, Zrealizowane |
 | Projekt | np. Marketing, Produkcja, Montaż; własna tablica zadań; tworzy go administrator i wybiera pracowników, którzy go widzą (zmiana 2026-11-18) |
 
@@ -37,7 +39,7 @@ odwiedzających i bez części „konto”. `/` przekierowuje na `/login` albo n
 | Logowanie, „Moje konto” (własne hasło, e-mail do powiadomień) | ✓ | ✓ |
 | Pulpit | ✓ (wnioski do rozpatrzenia, stan tablicy) | ✓ (pozostałe dni, moje zadania) |
 | Złożenie wniosku urlopowego, lista własnych wniosków | — | ✓ |
-| Wycofanie własnego wniosku w statusie „oczekuje” | — | ✓ |
+| Wycofanie własnego wniosku w statusie „oczekuje” (oraz zatwierdzonego automatycznie, do pierwszego dnia albo w dniu złożenia; zmiana 2026-11-21) | — | ✓ |
 | Lista wszystkich wniosków, zatwierdzenie, odrzucenie z powodem | ✓ | — |
 | Anulowanie zatwierdzonego urlopu (dni wracają do puli) | ✓ | — |
 | Wydruk / PDF wniosku zatwierdzonego | ✓ | ✓ (własny) |
@@ -87,7 +89,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `/change-password`, `POST /api/auth/change-password` | zalogowany | tylko z hasłem tymczasowym (inaczej 409); z hasłem tymczasowym każda inna trasa za logowaniem daje 403 `server.password_change_required` |
 | `/admin`, `GET /api/dashboard` | admin, employee | `mountModule(api, 'dashboard', …)`; rola i osoba tylko z `req.user`; pracownik dostaje wyłącznie własną pulę, wnioski i zadania (bez wniosków innych, nieobecności i stanu tablic) |
 | `/admin/my-leave`, `/api/my-leave` | employee | tylko własne wnioski i pule (`req.user.id`) |
-| `GET /api/my-leave/overview`, `GET/POST /api/my-leave/requests`, `POST /api/my-leave/requests/:id/withdraw` | employee | `mountModule(api, 'my-leave', …)`; każde zapytanie z `req.user.id`, cudzy wniosek → 404; administrator 403 |
+| `GET /api/my-leave/overview`, `GET/POST /api/my-leave/requests`, `POST /api/my-leave/requests/:id/withdraw` | employee | `mountModule(api, 'my-leave', …)`; każde zapytanie z `req.user.id`, cudzy wniosek → 404; administrator 403; wycofanie, gdy już nie wolno → 409 `cannot_withdraw` |
 | `GET /api/my-leave/requests/:id/pdf` | employee | tylko własny (cudzy → 404) i tylko zatwierdzony (inaczej 409); PDF `inline`, `no-store` |
 | `/admin/leave-requests`, `/admin/leave-requests/:id`, `/api/leave-requests` | admin | adres `/:id` otwiera szczegóły wniosku (link z e-maila i z dzwonka) |
 | `GET /api/leave-requests`, `GET /api/leave-requests/:id`, `POST /api/leave-requests/:id/approve`, `/:id/reject`, `/:id/cancel`, `GET /api/leave-requests/:id/pdf` | admin | `mountModule(api, 'leave-requests', …)`; kto decyduje = `req.user`; nieistniejący → 404; decyzja na rozpatrzonym → 409 `already_decided`; anulowanie w zamkniętym roku → 409 `year_closed`; PDF tylko zatwierdzonego (inaczej 409) |
@@ -119,9 +121,9 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 |---|---|
 | `users` | `name`, `login` (unikalny, małe litery), `email` NULL (unikalny, gdy podany), `password_hash`, `role`, `archived_at`, `archived_by` |
 | `activity_log` | z szablonu (`backend/src/db/sql/activity_log.sql`) |
-| `leave_types` | `name` (unikalna), `deducts_pool` BOOLEAN, `yearly_limit` INT NULL, `hidden_at` NULL |
+| `leave_types` | `name` (unikalna), `deducts_pool` BOOLEAN, `yearly_limit` INT NULL, `color`, `day_count` (`working`/`calendar`), `requires_approval` BOOLEAN, `hidden_at` NULL |
 | `leave_pools` | `user_id`, `year`, `annual_days`, `carried_days`, `closed_at` NULL; unikalne (`user_id`, `year`) |
-| `leave_requests` | `user_id`, `leave_type_id`, `date_from`, `date_to`, `working_days`, `days_from_carried`, `days_from_annual`, `pool_year`, `comment` NULL, `status`, `reject_reason` NULL, `decided_by` NULL, `decided_by_name` NULL, `decided_at` NULL |
+| `leave_requests` | `user_id`, `leave_type_id`, `date_from`, `date_to`, `day_count`, `working_days` (dni wniosku), `days_from_carried`, `days_from_annual`, `pool_year`, `comment` NULL, `status`, `auto_approved`, `decision_reason` NULL, `decided_by` NULL, `decided_by_name` NULL, `decided_at` NULL |
 | `projects` | `name` (unikalna), `position` (zmiana 2026-11-18; bez archiwum: projekt usuwa się na stałe) |
 | `project_members` | `project_id`, `user_id`; klucz główny (`project_id`, `user_id`) |
 | `tasks` | `project_id`, `title`, `description` NULL, `due_date` NULL, `column_key` (`draft`/`in_progress`/`done`), `position`, `completed_at` NULL, `created_by` NULL, `created_by_name`, `archived_at`, `archived_by` |
@@ -129,7 +131,7 @@ Wszystko, czego tu nie ma jako publiczne, wymaga logowania (tak działa szablon)
 | `task_assignees` | `task_id`, `user_id`; klucz główny (`task_id`, `user_id`) |
 | `notifications` | `user_id`, `type`, `params` JSON, `link` NULL, `read_at` NULL |
 
-Wartości liczone wyłącznie przez serwer: `working_days`, podział na `days_from_carried` i `days_from_annual`,
+Wartości liczone wyłącznie przez serwer: `day_count` (z typu), `working_days`, `auto_approved`, czy wolno wycofać, podział na `days_from_carried` i `days_from_annual`,
 `status` po akcji, `position` po przeciągnięciu, `completed_at`, autor i daty.
 
 ### Relacje
@@ -207,8 +209,9 @@ wymagają.
   archiwum); strona „nie znaleziono” i przerwa techniczna (strona przerwy w module Publikacja).
 - **Dodatki w modułach:** pulpit z liczbami (dashboard), ustawienia własnego konta (my-account), eksport wniosku do
   PDF i wydruk (my-leave, leave-requests), wylogowanie po bezczynności (login).
-- E-maile tylko na `users.email`, nigdy na `login`. Jedyny e-mail: nowy wniosek → administratorzy z adresem.
-- Powiadomienia w aplikacji: administrator o nowym i wycofanym wniosku; pracownik o zatwierdzeniu, odrzuceniu,
+- E-maile tylko na `users.email`, nigdy na `login`. Jedyny e-mail: nowy wniosek → administratorzy z adresem; przy typie bez
+  zatwierdzania w wersji „Zgłoszona nieobecność” (zmiana 2026-11-21).
+- Powiadomienia w aplikacji: administrator o nowym i wycofanym wniosku oraz o zgłoszonej nieobecności (typ bez zatwierdzania, zmiana 2026-11-21); pracownik o zatwierdzeniu, odrzuceniu,
   anulowaniu swojego urlopu i o przypisaniu do zadania; przypisane osoby o nowym komentarzu do zadania (zmiana
   2026-11-18).
 - Brak plików i zestawień na start (pomysły w `docs/IDEAS.md`).
