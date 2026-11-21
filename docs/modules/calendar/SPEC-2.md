@@ -22,6 +22,9 @@ pokazuje ciągły pasek przez weekend; urlop wypoczynkowy liczy się i wygląda 
 - **Dni wniosku:** kolumna `working_days` zostaje i znaczy „dni wniosku” liczone sposobem wniosku (komentarz
   w migracji). Robocze: `countWorkingDays`; kalendarzowe: wszystkie dni od–do. Z tej liczby korzystają bez zmian
   limit typu, pula (gdy typ odejmuje dni), pasek dni, wydruk, e-mail, listy i Kalendarz.
+- **Limit typu po zmianie liczenia dni [decyzja AI, z przeglądu kodu]:** limit sumuje dni wniosków tego typu
+  w roku tak, jak każdy wniosek je policzył przy złożeniu. Gdy administrator w połowie roku zmieni typ z roboczych na
+  kalendarzowe, stare wnioski liczą się dalej w dniach roboczych, a nowe w kalendarzowych; nie przeliczamy starych.
 - **Wymaga zatwierdzenia = tak:** wszystko jak dziś (`pending`, decyzja administratora).
 - **Wymaga zatwierdzenia = nie (4a):** serwer zapisuje wniosek od razu jako `approved` z `auto_approved = 1`,
   `decided_at` = chwila złożenia, `decided_by` i `decided_by_name` puste. Te same blokady co zawsze (nakładanie się

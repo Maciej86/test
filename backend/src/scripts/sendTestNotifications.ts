@@ -10,7 +10,8 @@ import { notifyUsers } from '../modules/notifications/notifications.service';
 // modułu Powiadomienia), żeby zobaczyć dzwonek, zanim powiadomienia zaczną tworzyć urlopy i zadania. Nie na serwerze.
 
 const SAMPLES: { role: 'admin' | 'employee'; type: NotificationType; link: string; params: Record<string, string | number> }[] = [
-  { role: 'admin', type: 'leave_request_new', link: '/admin/leave-requests', params: { employee: 'Jan Kowalski', leaveType: 'Wypoczynkowy', dateFrom: '2027-02-08', dateTo: '2027-02-12', days: 5 } },
+  { role: 'admin', type: 'leave_request_new', link: '/admin/leave-requests', params: { employee: 'Jan Kowalski', leaveType: 'Wypoczynkowy', dateFrom: '2027-02-08', dateTo: '2027-02-12', days: 5, dayCount: 'working' } },
+  { role: 'admin', type: 'leave_absence_reported', link: '/admin/leave-requests', params: { employee: 'Tomasz Wójcik', leaveType: 'Chorobowe', dateFrom: '2026-11-16', dateTo: '2026-11-22', days: 7, dayCount: 'calendar' } },
   { role: 'admin', type: 'leave_request_withdrawn', link: '/admin/leave-requests', params: { employee: 'Piotr Zieliński', leaveType: 'Wypoczynkowy', dateFrom: '2026-12-23', dateTo: '2026-12-31' } },
   { role: 'employee', type: 'leave_approved', link: '/admin/my-leave', params: { leaveType: 'Wypoczynkowy', dateFrom: '2027-02-08', dateTo: '2027-02-12' } },
   { role: 'employee', type: 'leave_rejected', link: '/admin/my-leave', params: { leaveType: 'Na żądanie', dateFrom: '2026-12-04', dateTo: '2026-12-04', reason: 'tego dnia audyt klienta, potrzebna cała ekipa' } },

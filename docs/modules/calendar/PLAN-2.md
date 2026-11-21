@@ -86,7 +86,7 @@ usunięte.
 - [x] 13. Test e2e w `e2e/calendar.spec.ts` ze scenariuszy `TESTS-2.md` (tymczasowy pracownik, typ „Chorobowe”:
   zgłoszenie 2 dni wstecz, status „Zatwierdzony”, powiadomienie u administratora, ciągły pasek w kalendarzu,
   wycofanie; typ kalendarzowy z zatwierdzaniem: liczba dni z weekendem) → `npm run test:e2e`
-- [ ] 14. Przegląd kodu całej części (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testem,
+- [x] 14. Przegląd kodu całej części (jeden recenzent, lista kontrolna z `CONVENTIONS.md`), poprawki z testem,
   żadnego `it.todo` → `npm run check`
 
 ## Na co uważać (przegląd)
@@ -115,3 +115,8 @@ usunięte.
 - PDF wniosku zatwierdzonego automatycznie: w „Decyzja” jest „Zatwierdzony automatycznie (typ bez zatwierdzania)”
   i chwila zgłoszenia.
 - Dymek w kalendarzu pokazuje tylko typ (jak w części 1); liczba dni z jednostką jest w panelu szczegółów.
+- Przegląd kodu (krok 14): bez błędów krytycznych. Poprawione: okno wycofania wniosku zatwierdzonego automatycznie
+  mówi, że dni wracają do puli, gdy typ je odejmuje (aplikacja i makieta); tekst dymka święta w pasku dni z jednego
+  klucza tłumaczeń; próba nadużycia z podrobionymi `dayCount` i `autoApproved`; przykład „Zgłoszona nieobecność”
+  w `npm run notifications:test`. Zapisane w `SPEC-2.md`: limit po zmianie liczenia dni. Migracja 033 ma w jednym
+  `ALTER TABLE` nową kolumnę i sam komentarz starej (już zastosowana, zostaje).

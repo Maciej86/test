@@ -186,11 +186,12 @@ describe('abuse', () => {
     expect(s.withdrawRequest).toHaveBeenCalledWith(21, { id: 7, name: 'Jan Kowalski' });
   });
 
-  it('forged computed fields never reach the service (status, days, split, pool year, decision)', async () => {
+  it('forged computed fields never reach the service (status, days, split, pool year, decision, day count, auto approval)', async () => {
     vi.mocked(s.createRequest).mockResolvedValue({ id: 33 } as never);
     await as(jan).post('/my-leave/requests', {
       ...body, userId: 1, status: 'approved', workingDays: 0, daysFromCarried: 99, daysFromAnnual: 0, poolYear: 2030,
       decidedBy: 1, decidedByName: 'Ktoś', decidedAt: '2026-01-01', createdAt: '2000-01-01',
+      dayCount: 'calendar', autoApproved: true, requiresApproval: false, canWithdraw: true,
     });
     expect(s.createRequest).toHaveBeenCalledWith(body, { id: 7, name: 'Jan Kowalski' });
   });

@@ -26,6 +26,7 @@ describe('sendTestNotifications', () => {
     const calls = vi.mocked(s.notifyUsers).mock.calls.map(([, input]) => [input.type, input.userIds, input.link]);
     expect(calls).toEqual([
       ['leave_request_new', [1, 3], '/admin/leave-requests'],
+      ['leave_absence_reported', [1, 3], '/admin/leave-requests'],
       ['leave_request_withdrawn', [1, 3], '/admin/leave-requests'],
       ['leave_approved', [2], '/admin/my-leave'],
       ['leave_rejected', [2], '/admin/my-leave'],

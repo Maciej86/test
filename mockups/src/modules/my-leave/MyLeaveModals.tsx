@@ -193,7 +193,7 @@ export const WithdrawModal = ({ request, onClose }: { request: MockRequest | nul
       confirmAction="cancel"
       cancelLabel={t('keep')}
       danger
-      onConfirm={() => { notify.success(request.auto ? t('withdrawn_done_no_pool') : t('withdrawn_done')); onClose(); }}
+      onConfirm={() => { notify.success(request.fromCarried + request.fromAnnual > 0 ? t('withdrawn_done') : t('withdrawn_done_no_pool')); onClose(); }}
       onClose={onClose}
     >
       <Text>
@@ -201,7 +201,9 @@ export const WithdrawModal = ({ request, onClose }: { request: MockRequest | nul
         ({leaveDaysText(t, request.days, request.dayCount)}).
       </Text>
       <Text size="sm" c="dimmed">
-        {request.auto ? t('withdraw_text_auto') : t('withdraw_text', { count: request.fromCarried + request.fromAnnual })}
+        {request.auto
+          ? request.fromCarried + request.fromAnnual > 0 ? t('withdraw_text_auto_pool', { count: request.fromCarried + request.fromAnnual }) : t('withdraw_text_auto')
+          : t('withdraw_text', { count: request.fromCarried + request.fromAnnual })}
       </Text>
     </ConfirmModal>
   );

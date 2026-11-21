@@ -14,7 +14,7 @@ describe('DayStrip', () => {
 
   it('calendar days: weekend and holiday count too (not crossed out), holiday name stays in the tip', () => {
     renderWithProviders(<DayStrip from="2026-12-24" to="2026-12-27" dayCount="calendar" />);
-    expect(screen.getByLabelText('24.12.2026: Wigilia Bożego Narodzenia. Liczy się do wniosku (dni kalendarzowe)')).toHaveAttribute('data-off', 'false');
+    expect(screen.getByLabelText('24.12.2026: Wigilia Bożego Narodzenia, liczy się do wniosku (dni kalendarzowe)')).toHaveAttribute('data-off', 'false');
     expect(screen.getByLabelText('27.12.2026: Liczy się do wniosku (dni kalendarzowe)')).toHaveAttribute('data-off', 'false');
   });
 

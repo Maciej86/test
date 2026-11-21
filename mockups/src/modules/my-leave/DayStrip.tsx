@@ -26,7 +26,7 @@ export const DayStrip = ({ from, to, dayCount }: { from: string; to: string; day
         const free = holiday !== null || isWeekend(iso);
         const off = free && dayCount === 'working';
         const tip = dayCount === 'calendar'
-          ? (holiday ? `${translateKey(t, holiday.label)}. ` : '') + t('strip_counted')
+          ? holiday ? t('strip_counted_holiday', { holiday: translateKey(t, holiday.label) }) : t('strip_counted')
           : holiday ? translateKey(t, holiday.label) : off ? t('strip_weekend') : t('strip_working');
         return (
           <Tooltip key={iso} label={tip}>

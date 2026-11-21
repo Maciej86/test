@@ -161,6 +161,18 @@ describe('MyLeavePage', () => {
     await waitFor(() => expect(success).toHaveBeenCalledWith('Wniosek wycofany.'));
   });
 
+  it('withdraw of an automatically approved request that took days from the pool: says the days return', async () => {
+    const auto = request({ id: 32, leaveTypeName: 'Wypoczynkowy', status: 'approved', daysFromAnnual: 2, dayCount: 'working', autoApproved: true, canWithdraw: true });
+    mockApi({ items: [auto] });
+    vi.spyOn(api, 'post').mockResolvedValue({ data: { ok: true } });
+    const success = vi.spyOn(notify, 'success');
+    show();
+    fireEvent.click(within(await table()).getByRole('button', { name: 'Wycofaj' }));
+    expect(await screen.findByText('Nieobecność zniknie z kalendarza, a 2 dni wrócą do puli. Administrator dostanie powiadomienie. Wycofanego wniosku nie da się przywrócić.')).toBeInTheDocument();
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Wycofaj' }));
+    await waitFor(() => expect(success).toHaveBeenCalledWith('Wniosek wycofany. Dni wróciły do puli.'));
+  });
+
   it('cancelled request shows who cancelled and the reason (decisionReason)', async () => {
     mockApi({ items: [request({ id: 4, leaveTypeName: 'Typ D', status: 'cancelled', decidedByName: 'Anna Nowak', decidedAt: '2026-02-10T14:20:00.000Z', decisionReason: 'Przesunięty na marzec.' })] });
     show();
