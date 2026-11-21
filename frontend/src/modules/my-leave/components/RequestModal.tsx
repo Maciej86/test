@@ -6,7 +6,9 @@ import { AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   checkLeaveRequest,
+  earliestLeaveStart,
   LEAVE_REQUEST_COMMENT_MAX,
+  NO_APPROVAL_BACKDATE_DAYS,
   leaveRequestSchema,
   todayIsoDate,
   translateKey,
@@ -80,10 +82,16 @@ export const RequestModal = ({
     ? [
         type.deductsPool ? t('type_deducts') : t('type_not_deducts'),
         type.yearlyLimit !== null ? t('type_limit', { used: type.usedOfLimit, limit: type.yearlyLimit, year: pool.year }) : null,
+        type.dayCount === 'calendar' ? t('type_calendar_days') : null,
+        type.requiresApproval ? null : t('type_no_approval', { days: NO_APPROVAL_BACKDATE_DAYS }),
       ]
         .filter(Boolean)
         .join(t('check_and'))
     : undefined;
+
+  // Typ bez zatwierdzania (np. chorobowe) może zaczynać się kilka dni wstecz; reszta od dziś (ta sama zasada co serwer).
+  const earliest = type ? earliestLeaveStart(type, today) : today;
+  const reportOnly = type !== undefined && !type.requiresApproval;
 
   const setDateFrom = (value: string | null) => {
     form.setFieldValue('dateFrom', value);
@@ -94,7 +102,7 @@ export const RequestModal = ({
     // Po sprawdzeniu schematem obie daty są już wypełnione.
     create.mutate({ ...values, dateFrom: values.dateFrom ?? '', dateTo: values.dateTo ?? '' }, {
       onSuccess: (saved) => {
-        notify.success(t('submitted'));
+        notify.success(reportOnly ? t('reported') : t('submitted'));
         onSubmitted?.(saved);
         onClose();
       },
@@ -108,7 +116,7 @@ export const RequestModal = ({
   });
 
   return (
-    <FormModal title={t('new_request')} size="lg" submitLabel={t('submit')} submitAction="send" submitDisabled={check.kind !== 'ok'} loading={create.isPending} onSubmit={submit} onClose={onClose}>
+    <FormModal title={t('new_request')} size="lg" submitLabel={reportOnly ? t('submit_report') : t('submit')} submitAction="send" submitDisabled={check.kind !== 'ok'} loading={create.isPending} onSubmit={submit} onClose={onClose}>
       <Select
         label={t('field_type')}
         data={overview.types.map((lt) => ({ value: String(lt.id), label: lt.name }))}
@@ -124,7 +132,7 @@ export const RequestModal = ({
             label={t('field_from')}
             value={dateFrom}
             onChange={setDateFrom}
-            minDate={today}
+            minDate={earliest}
             error={fieldError(t, form.errors.dateFrom)}
             required
           />
@@ -134,18 +142,18 @@ export const RequestModal = ({
             label={t('field_to')}
             value={dateTo}
             onChange={(v) => form.setFieldValue('dateTo', v)}
-            minDate={dateFrom ?? today}
+            minDate={dateFrom ?? earliest}
             error={check.kind === 'order' ? t('error_order') : fieldError(t, form.errors.dateTo)}
             required
           />
         </Grid.Col>
       </Grid>
 
-      {dateFrom && dateTo && check.kind !== 'order' && <DayStrip from={dateFrom} to={dateTo} />}
+      {dateFrom && dateTo && check.kind !== 'order' && <DayStrip from={dateFrom} to={dateTo} dayCount={type?.dayCount ?? 'working'} />}
       {serverError ? (
         <Alert color="red" variant="light" icon={<AlertTriangle size={18} />}>{serverError}</Alert>
       ) : (
-        <RequestCheck check={check} poolYear={pool.year} typeName={type?.name ?? ''} />
+        <RequestCheck check={check} poolYear={pool.year} typeName={type?.name ?? ''} reportOnly={reportOnly} />
       )}
 
       <Textarea

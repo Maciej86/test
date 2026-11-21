@@ -1,5 +1,5 @@
 import type { RowDataPacket } from 'mysql2';
-import type { LeaveRequestStatus } from '@app/shared';
+import type { LeaveDayCount, LeaveRequestStatus } from '@app/shared';
 import type { Db } from '../db/pool';
 import type { LeaveRequestPdfData } from './leaveRequestPdf';
 
@@ -21,11 +21,13 @@ export interface PdfRequestRow extends RowDataPacket {
   decided_by_name: string | null;
   decided_at: Date | null;
   created_at: Date;
+  day_count: LeaveDayCount;
+  auto_approved: number | boolean;
 }
 
 const PDF_COLUMNS = `SELECT r.id, u.name AS employee_name, lt.name AS leave_type_name, lt.deducts_pool, r.date_from, r.date_to,
   r.working_days, r.days_from_carried, r.days_from_annual, r.pool_year, r.comment, r.status, r.decided_by_name, r.decided_at,
-  r.created_at
+  r.created_at, r.day_count, r.auto_approved
   FROM leave_requests r JOIN leave_types lt ON lt.id = r.leave_type_id JOIN users u ON u.id = r.user_id`;
 
 /** Wniosek z imieniem i nazwiskiem osoby; z `userId` tylko jej własny (cudzy → null). */
@@ -53,4 +55,6 @@ export const toPdfData = (row: PdfRequestRow): LeaveRequestPdfData => ({
   comment: row.comment,
   decidedByName: row.decided_by_name,
   decidedAt: row.decided_at ? row.decided_at.toISOString() : null,
+  dayCount: row.day_count,
+  autoApproved: Boolean(row.auto_approved),
 });

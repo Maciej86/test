@@ -25,7 +25,7 @@ export const MyRequestsBox = ({ pending, next }: { pending: EmployeeDashboard['m
       ) : (
         <Group justify="space-between" wrap="nowrap">
           <Text>{next.leaveTypeName}, <LeaveDates from={next.dateFrom} to={next.dateTo} /></Text>
-          <Badge variant="light" color="green" style={{ flex: 'none' }}>{leaveDaysText(t, next.workingDays)}</Badge>
+          <Badge variant="light" color="green" style={{ flex: 'none' }}>{leaveDaysText(t, next.workingDays, next.dayCount)}</Badge>
         </Group>
       )}
     </InfoCard>

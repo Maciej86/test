@@ -1,4 +1,4 @@
-import { createI18n, formatDate, leaveDaysText } from '@app/shared';
+import { createI18n, formatDate, leaveDaysText, type LeaveDayCount } from '@app/shared';
 import { theme } from '@app/shared/theme';
 
 // Dokument „Wniosek o urlop” (moduł Moje urlopy, część 2; użyje go też moduł Wnioski urlopowe). Jasny jak papier,
@@ -21,6 +21,9 @@ export interface LeaveRequestPdfData {
   comment: string | null;
   decidedByName: string | null;
   decidedAt: string | null;
+  /** Sposób liczenia dni wniosku i zatwierdzenie bez decyzji (typ bez zatwierdzania). */
+  dayCount: LeaveDayCount;
+  autoApproved: boolean;
 }
 
 const color = (name: string, shade: number): string => theme.colors?.[name]?.[shade] ?? '';
@@ -44,7 +47,7 @@ const termText = (d: LeaveRequestPdfData): string =>
   d.dateFrom === d.dateTo ? (formatDate(d.dateFrom) ?? '') : `${formatDate(d.dateFrom)} – ${formatDate(d.dateTo)}`;
 
 const daysText = (d: LeaveRequestPdfData): string => {
-  const days = leaveDaysText(i18n.t, d.workingDays);
+  const days = leaveDaysText(i18n.t, d.workingDays, d.dayCount);
   if (!d.deductsPool || d.daysFromCarried + d.daysFromAnnual === 0) return days;
   const parts = [
     d.daysFromCarried > 0 ? t('split_carried', { count: d.daysFromCarried }) : null,
@@ -70,7 +73,9 @@ export const buildLeaveRequestPdf = (d: LeaveRequestPdfData): object => {
     [t('col_days'), daysText(d)],
   ];
   if (d.comment) rows.push([t('field_comment_short'), d.comment]);
-  const decidedBy = d.decidedByName ? t('print_approved_by', { name: d.decidedByName }) : t('print_approved');
+  const decidedBy = d.autoApproved
+    ? t('print_approved_auto')
+    : d.decidedByName ? t('print_approved_by', { name: d.decidedByName }) : t('print_approved');
   rows.push([t('print_decision'), `${decidedBy} ${formatDate(d.decidedAt) ?? ''}`.trim()]);
 
   return {

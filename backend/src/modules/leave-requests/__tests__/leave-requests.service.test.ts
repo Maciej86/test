@@ -146,6 +146,20 @@ describe('leave requests: decisions', () => {
     expect(notifyUsers).not.toHaveBeenCalled();
   });
 
+  it('approved automatically (type without approval): approve and reject → 409 already_decided without a person', async () => {
+    const auto = item({ status: 'approved', autoApproved: true, dayCount: 'calendar', decidedByName: null });
+    vi.mocked(q.findRequest).mockResolvedValue(auto);
+    expect(await s.approveRequest(21, anna)).toEqual({ error: { status: 409, message: M.alreadyDecided, current: 'approved', decidedByName: null } });
+    expect(await s.rejectRequest(21, 'Powód.', anna)).toEqual({ error: { status: 409, message: M.alreadyDecided, current: 'approved', decidedByName: null } });
+    expect(q.setDecision).not.toHaveBeenCalled();
+  });
+
+  it('approved automatically: the administrator can cancel it with a reason (days return, employee notified)', async () => {
+    vi.mocked(q.findRequest).mockResolvedValue(item({ status: 'approved', autoApproved: true, dayCount: 'calendar', decidedByName: null }));
+    expect(await s.cancelRequest(21, 'Pomyłka w datach.', anna)).toEqual({ ok: true });
+    expect(q.setDecision).toHaveBeenCalledWith(conn, 21, { from: 'approved', to: 'cancelled', actor: anna, reason: 'Pomyłka w datach.' });
+  });
+
   it('cancel of a request that is not approved → 409 not_approved; closed pool year → 409 year_closed', async () => {
     vi.mocked(q.findRequest).mockResolvedValue(item({ status: 'pending' }));
     expect(await s.cancelRequest(21, 'Powód.', anna)).toEqual({ error: { status: 409, message: M.notApproved } });

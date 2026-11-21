@@ -8,6 +8,7 @@ const people = [{ id: 2, name: 'Jan Kowalski' }, { id: 5, name: 'Magdalena Lewan
 const absences: CalendarAbsence[] = [
   { id: 21, userId: 2, leaveTypeName: 'Wypoczynkowy', color: 'green', status: 'pending', dateFrom: '2026-11-26', dateTo: '2026-11-27', days: 2, dayCount: 'working' },
   { id: 20, userId: 5, leaveTypeName: 'Wypoczynkowy', color: 'green', status: 'approved', dateFrom: '2026-11-20', dateTo: '2026-11-24', days: 3, dayCount: 'working' },
+  { id: 25, userId: 2, leaveTypeName: 'Chorobowe', color: 'grape', status: 'approved', dateFrom: '2026-12-04', dateTo: '2026-12-10', days: 7, dayCount: 'calendar' },
 ];
 
 const show = () => {
@@ -39,6 +40,13 @@ describe('CalendarGrid', () => {
     const row = screen.getAllByTestId('calendar-row')[1]!;
     expect(within(row).getAllByRole('button', { name: 'Magdalena Lewandowska: Wypoczynkowy' })).toHaveLength(2);
     expect(within(row).getAllByTestId('calendar-bridge')).toHaveLength(1);
+  });
+
+  it('calendar days leave (sick leave) over a weekend → one continuous bar, no bridge', () => {
+    show();
+    const row = screen.getAllByTestId('calendar-row')[0]!;
+    expect(within(row).getAllByRole('button', { name: 'Jan Kowalski: Chorobowe' })).toHaveLength(1);
+    expect(within(row).queryAllByTestId('calendar-bridge')).toHaveLength(0);
   });
 
   it('weekend and holiday days are marked off; holiday has its name', () => {

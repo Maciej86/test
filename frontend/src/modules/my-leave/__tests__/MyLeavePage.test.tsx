@@ -20,7 +20,7 @@ const overview: MyLeaveOverview = {
 const request = (o: Partial<MyLeaveRequest>): MyLeaveRequest => ({
   id: 21, leaveTypeName: 'Wypoczynkowy', deductsPool: true, dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2,
   daysFromCarried: 0, daysFromAnnual: 2, poolYear: 2026, comment: 'Wyjazd rodzinny.', status: 'pending', decisionReason: null,
-  decidedByName: null, decidedAt: null, createdAt: '2026-11-16T08:12:00.000Z', dayCount: 'working', autoApproved: false, canWithdraw: true, ...o,
+  decidedByName: null, decidedAt: null, createdAt: '2026-11-16T08:12:00.000Z', dayCount: 'working', autoApproved: false, canWithdraw: (o.status ?? 'pending') === 'pending', ...o,
 });
 
 const requests = [
@@ -130,6 +130,35 @@ describe('MyLeavePage', () => {
     expect(within(rows[3]!).getByText('4 z zaległego, 2 z puli 2026')).toBeInTheDocument();
     expect(within(rows[4]!).getByText('nie odejmuje z puli')).toBeInTheDocument();
     expect(within(await table()).getAllByRole('button', { name: 'Wycofaj' })).toHaveLength(1);
+  });
+
+  it('sick leave (calendar days, approved automatically): "7 dni kalendarzowych", no person, Wycofaj while the server allows it', async () => {
+    const sick = request({
+      id: 30, leaveTypeName: 'Chorobowe', deductsPool: false, dateFrom: '2026-11-13', dateTo: '2026-11-19', workingDays: 7, daysFromAnnual: 0,
+      comment: null, status: 'approved', decidedAt: '2026-11-17T06:15:00.000Z', dayCount: 'calendar', autoApproved: true, canWithdraw: true,
+    });
+    const late = request({ ...sick, id: 31, dateFrom: '2026-10-01', dateTo: '2026-10-03', workingDays: 3, canWithdraw: false });
+    mockApi({ items: [sick, late] });
+    show();
+    expect(within(await table()).getByRole('columnheader', { name: 'Dni' })).toBeInTheDocument();
+    const [first, second] = within(await table()).getAllByRole('row').slice(1);
+    expect(within(first!).getByText('7 dni kalendarzowych')).toBeInTheDocument();
+    expect(within(first!).getByText('zatwierdzony automatycznie')).toBeInTheDocument();
+    expect(within(first!).getByRole('button', { name: 'Wycofaj' })).toBeInTheDocument();
+    expect(within(first!).getByRole('link', { name: 'PDF' })).toBeInTheDocument();
+    expect(within(second!).queryByRole('button', { name: 'Wycofaj' })).not.toBeInTheDocument();
+  });
+
+  it('withdraw of an automatically approved request: sentence about the calendar, toast without pool', async () => {
+    const sick = request({ id: 30, leaveTypeName: 'Chorobowe', deductsPool: false, daysFromAnnual: 0, status: 'approved', dayCount: 'calendar', autoApproved: true, canWithdraw: true });
+    mockApi({ items: [sick] });
+    vi.spyOn(api, 'post').mockResolvedValue({ data: { ok: true } });
+    const success = vi.spyOn(notify, 'success');
+    show();
+    fireEvent.click(within(await table()).getByRole('button', { name: 'Wycofaj' }));
+    expect(await screen.findByText('Nieobecność zniknie z kalendarza, a administrator dostanie powiadomienie. Wycofanego wniosku nie da się przywrócić.')).toBeInTheDocument();
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Wycofaj' }));
+    await waitFor(() => expect(success).toHaveBeenCalledWith('Wniosek wycofany.'));
   });
 
   it('cancelled request shows who cancelled and the reason (decisionReason)', async () => {

@@ -27,7 +27,7 @@ const Summary = ({ r }: { r: LeaveRequestListItem }) => {
   const { t } = useTranslation('leave-requests');
   return (
     <Text>
-      {r.employeeName}: {r.leaveTypeName}, <LeaveDates from={r.dateFrom} to={r.dateTo} /> ({leaveDaysText(t, r.workingDays)}).
+      {r.employeeName}: {r.leaveTypeName}, <LeaveDates from={r.dateFrom} to={r.dateTo} /> ({leaveDaysText(t, r.workingDays, r.dayCount)}).
     </Text>
   );
 };

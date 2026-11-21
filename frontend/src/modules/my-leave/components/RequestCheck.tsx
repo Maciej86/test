@@ -1,4 +1,4 @@
-import { leaveDaysText } from '@app/shared';
+import { NO_APPROVAL_BACKDATE_DAYS, leaveDaysText } from '@app/shared';
 import type { ReactNode } from 'react';
 import { Alert, Text } from '@mantine/core';
 import { AlertTriangle, CalendarRange, Info } from 'lucide-react';
@@ -20,8 +20,11 @@ const Blocked = ({ title, children, warning = false }: { title: string; children
   </Alert>
 );
 
-/** Ramka pod terminem: ile dni i skąd się wezmą, albo co blokuje złożenie i jak to naprawić. */
-export const RequestCheck = ({ check, poolYear, typeName }: { check: RequestCheckState; poolYear: number; typeName: string }) => {
+/**
+ * Ramka pod terminem: ile dni i skąd się wezmą, albo co blokuje złożenie i jak to naprawić. `reportOnly`: typ bez
+ * zatwierdzania (np. chorobowe), który może zaczynać się kilka dni wstecz.
+ */
+export const RequestCheck = ({ check, poolYear, typeName, reportOnly = false }: { check: RequestCheckState; poolYear: number; typeName: string; reportOnly?: boolean }) => {
   const { t } = useTranslation('my-leave');
   switch (check.kind) {
     case 'empty':
@@ -30,7 +33,7 @@ export const RequestCheck = ({ check, poolYear, typeName }: { check: RequestChec
       return null;
     case 'ok':
       return (
-        <Alert color="navy" variant="light" icon={<CalendarRange size={18} />} title={leaveDaysText(t, check.workingDays)}>
+        <Alert color="navy" variant="light" icon={<CalendarRange size={18} />} title={leaveDaysText(t, check.workingDays, check.dayCount)}>
           {check.leftAfter === null
             ? t('check_no_pool')
             : [
@@ -42,7 +45,11 @@ export const RequestCheck = ({ check, poolYear, typeName }: { check: RequestChec
         </Alert>
       );
     case 'past_date':
-      return <Blocked title={t('check_past_date_title')}>{t('check_past_date')}</Blocked>;
+      return (
+        <Blocked title={t('check_past_date_title')}>
+          {reportOnly ? t('check_past_date_backdate', { days: NO_APPROVAL_BACKDATE_DAYS }) : t('check_past_date')}
+        </Blocked>
+      );
     case 'pool_not_ready':
       return (
         <Blocked warning title={t('check_other_year_title', { year: check.year })}>

@@ -12,6 +12,7 @@ const row = {
   id: 21, employee_name: 'Jan Kowalski', leave_type_name: 'Wypoczynkowy', deducts_pool: 1, date_from: '2026-12-21', date_to: '2026-12-31',
   working_days: 7, days_from_carried: 2, days_from_annual: 5, pool_year: 2026, comment: null, status: 'approved',
   decided_by_name: 'Anna Nowak', decided_at: new Date('2026-12-02T09:00:00Z'), created_at: new Date('2026-11-17T09:00:00Z'),
+  day_count: 'calendar', auto_approved: 1,
 } as unknown as PdfRequestRow;
 
 describe('leave request PDF data', () => {
@@ -35,7 +36,7 @@ describe('leave request PDF data', () => {
     expect(toPdfData(row)).toEqual({
       id: 21, createdAt: '2026-11-17T09:00:00.000Z', employeeName: 'Jan Kowalski', leaveTypeName: 'Wypoczynkowy', deductsPool: true,
       dateFrom: '2026-12-21', dateTo: '2026-12-31', workingDays: 7, daysFromCarried: 2, daysFromAnnual: 5, poolYear: 2026,
-      comment: null, decidedByName: 'Anna Nowak', decidedAt: '2026-12-02T09:00:00.000Z',
+      comment: null, decidedByName: 'Anna Nowak', decidedAt: '2026-12-02T09:00:00.000Z', dayCount: 'calendar', autoApproved: true,
     });
   });
 });

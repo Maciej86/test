@@ -83,6 +83,7 @@ const Status = ({ r }: { r: LeaveRequestListItem }) => {
     <Stack gap={4} align="flex-start">
       <LeaveStatusBadge status={r.status} />
       {r.decidedByName && r.decidedAt && <Text size="xs" c="dimmed">{r.decidedByName}, <DateText value={r.decidedAt} /></Text>}
+      {r.autoApproved && r.status === 'approved' && <Text size="xs" c="dimmed">{t('my-leave:approved_auto')}</Text>}
       {r.decisionReason && <Text size="xs" maw={240} lineClamp={2}>{t('my-leave:quoted', { text: r.decisionReason })}</Text>}
     </Stack>
   );
@@ -124,7 +125,7 @@ export const LeaveRequestsTable = ({ rows, ...actions }: RowActions & { rows: Le
               </Table.Td>
               <Table.Td>{r.leaveTypeName}</Table.Td>
               <Table.Td>
-                <Text fw={600}>{r.workingDays}</Text>
+                <Text fw={600}>{leaveDaysText(t, r.workingDays, r.dayCount)}</Text>
                 <Text size="xs" c="dimmed">{leaveSplitText(t, r)}</Text>
               </Table.Td>
               <Table.Td><PoolLeft r={r} /></Table.Td>
@@ -151,7 +152,7 @@ export const LeaveRequestCards = ({ rows, ...actions }: RowActions & { rows: Lea
               <Stack gap={0}>
                 <Employee r={r} />
                 <Text size="sm"><LeaveDates from={r.dateFrom} to={r.dateTo} /></Text>
-                <Text size="sm" c="dimmed">{r.leaveTypeName}, {leaveDaysText(t, r.workingDays)}</Text>
+                <Text size="sm" c="dimmed">{r.leaveTypeName}, {leaveDaysText(t, r.workingDays, r.dayCount)}</Text>
               </Stack>
               <LeaveStatusBadge status={r.status} />
             </Group>

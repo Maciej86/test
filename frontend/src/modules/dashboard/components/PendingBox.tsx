@@ -43,7 +43,7 @@ export const PendingBox = ({ pending, today }: { pending: AdminDashboard['pendin
                   <Text span inherit c={soon ? 'yellow.4' : undefined} fw={soon ? 600 : undefined} data-soon={soon}>{startsText(left)}</Text>
                 </Text>
               </Box>
-              <Badge variant="light" color="gray" style={{ flex: 'none' }}>{leaveDaysText(t, r.workingDays)}</Badge>
+              <Badge variant="light" color="gray" style={{ flex: 'none' }}>{leaveDaysText(t, r.workingDays, r.dayCount)}</Badge>
             </Group>
           </RowLink>
         );

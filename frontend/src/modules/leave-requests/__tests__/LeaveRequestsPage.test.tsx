@@ -55,6 +55,15 @@ describe('LeaveRequestsPage', () => {
     expect(router.state.location.search).toBe('?status=approved&year=2025');
   });
 
+  it('sick leave approved automatically: days with the unit and "zatwierdzony automatycznie"', async () => {
+    show(list([requestItem({ id: 25, employeeName: 'Tomasz Wójcik', leaveTypeName: 'Chorobowe', status: 'approved', workingDays: 7, dayCount: 'calendar', autoApproved: true, canCancel: true })], { years: [2026] }), '/admin/leave-requests?status=all');
+    const table = await screen.findByRole('table');
+    expect(within(table).getByRole('columnheader', { name: 'Dni' })).toBeInTheDocument();
+    const row = within(table).getByText('Tomasz Wójcik').closest('tr')!;
+    expect(within(row).getByText('7 dni kalendarzowych')).toBeInTheDocument();
+    expect(within(row).getByText('zatwierdzony automatycznie')).toBeInTheDocument();
+  });
+
   it('shows "termin już minął", "w archiwum" and "Anuluj urlop" only when canCancel', async () => {
     show(list([
       requestItem({ id: 19, employeeName: 'Katarzyna Wiśniewska', dateFrom: '2020-01-10', dateTo: '2020-01-10' }),

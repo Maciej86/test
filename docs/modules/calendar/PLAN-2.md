@@ -70,11 +70,11 @@ usunięte.
   nie. `withdrawRequest` używa jej pod blokadą wiersza (warunek także w `UPDATE`: dwa wycofania naraz → jedno),
   komunikat 409 „Tego wniosku nie możesz już wycofać”; lista wniosków zwraca `canWithdraw`. Testy: każdy przypadek
   z tabeli, dwa naraz, cudzy → 404 → `npm run check`
-- [ ] 10. Moje urlopy, ekran: okno wniosku (podpowiedzi typu, `DateField` „Od” z `minDate = earliestLeaveStart`,
+- [x] 10. Moje urlopy, ekran: okno wniosku (podpowiedzi typu, `DateField` „Od” z `minDate = earliestLeaveStart`,
   pasek dni: przy kalendarzowym każdy dzień się liczy, wynik z `leaveDaysText`, przycisk „Zgłoś” i dymek
   „Zgłoszono. Administrator dostał powiadomienie.” przy typie bez zatwierdzania), tabela: kolumna „Dni”, „Wycofaj”
   według `canWithdraw`. Testy ekranu → `npm run check`
-- [ ] 11. Wnioski urlopowe, Kalendarz, Pulpit, PDF, powiadomienia: zapytania zwracają `day_count`, `auto_approved`;
+- [x] 11. Wnioski urlopowe, Kalendarz, Pulpit, PDF, powiadomienia: zapytania zwracają `day_count`, `auto_approved`;
   szczegóły wniosku (common) i PDF: „Zatwierdzony automatycznie (typ bez zatwierdzania)” zamiast osoby; Kalendarz
   rysuje `calendarSegments(…, a.dayCount)`; tekst powiadomień `leave_absence_reported` i `leave_request_new` z
   jednostką (stare powiadomienia bez `dayCount` = robocze). Testy: approve/reject automatycznego → 409
@@ -110,3 +110,8 @@ usunięte.
   i `auto_approved` tylko przy zatwierdzeniu automatycznym (zwykły wniosek bez zmian).
 - Wycofanie zwraca nowy komunikat `cannot_withdraw` („Tego wniosku nie możesz już wycofać…”) zamiast `not_pending`.
 - Ikona powiadomienia „Zgłoszona nieobecność”: termometr, zielona (wniosek jest już zatwierdzony).
+- Pole „Od” w oknie wniosku nie pozwala wpisać dnia sprzed najwcześniejszej daty, a gdy serwer mimo to odmówi,
+  ramka przy typie bez zatwierdzania mówi „Ten typ możesz zacząć najwcześniej 7 dni przed dziś”.
+- PDF wniosku zatwierdzonego automatycznie: w „Decyzja” jest „Zatwierdzony automatycznie (typ bez zatwierdzania)”
+  i chwila zgłoszenia.
+- Dymek w kalendarzu pokazuje tylko typ (jak w części 1); liczba dni z jednostką jest w panelu szczegółów.

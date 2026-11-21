@@ -16,6 +16,7 @@ const StatusCell = ({ r }: { r: MyLeaveRequest }) => {
           {r.decidedByName}, <DateText value={r.decidedAt} />
         </Text>
       )}
+      {r.autoApproved && r.status === 'approved' && <Text size="xs" c="dimmed">{t('approved_auto')}</Text>}
       {r.decisionReason && <Text size="xs" maw={280}>{t('quoted', { text: r.decisionReason })}</Text>}
     </Stack>
   );
@@ -25,20 +26,23 @@ export interface RowActions {
   onWithdraw: (r: MyLeaveRequest) => void;
 }
 
+/** „Wycofaj”, gdy serwer pozwala (`canWithdraw`: czekający albo zatwierdzony automatycznie przed pierwszym dniem), „PDF” przy zatwierdzonym. */
 const Actions = ({ r, onWithdraw }: RowActions & { r: MyLeaveRequest }) => {
   const { t } = useTranslation('my-leave');
-  if (r.status === 'approved') {
-    return (
-      <Button component="a" href={myLeavePdfUrl(r.id)} target="_blank" rel="noopener" size="xs" variant="subtle" leftSection={<ButtonIcon action="print" size={14} />}>
-        {t('print')}
-      </Button>
-    );
-  }
-  if (r.status !== 'pending') return null;
+  if (!r.canWithdraw && r.status !== 'approved') return null;
   return (
-    <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="cancel" size={14} />} onClick={() => onWithdraw(r)}>
-      {t('withdraw')}
-    </Button>
+    <Group gap={4} justify="flex-end" wrap="nowrap">
+      {r.canWithdraw && (
+        <Button size="xs" variant="subtle" color="red" leftSection={<ButtonIcon action="cancel" size={14} />} onClick={() => onWithdraw(r)}>
+          {t('withdraw')}
+        </Button>
+      )}
+      {r.status === 'approved' && (
+        <Button component="a" href={myLeavePdfUrl(r.id)} target="_blank" rel="noopener" size="xs" variant="subtle" leftSection={<ButtonIcon action="print" size={14} />}>
+          {t('print')}
+        </Button>
+      )}
+    </Group>
   );
 };
 
@@ -67,7 +71,7 @@ export const RequestsTable = ({ rows, onWithdraw }: RowActions & { rows: MyLeave
               </Table.Td>
               <Table.Td>{r.leaveTypeName}</Table.Td>
               <Table.Td>
-                <Text fw={600}>{r.workingDays}</Text>
+                <Text fw={600}>{leaveDaysText(t, r.workingDays, r.dayCount)}</Text>
                 <Text size="xs" c="dimmed">{leaveSplitText(t, r)}</Text>
               </Table.Td>
               <Table.Td><StatusCell r={r} /></Table.Td>
@@ -92,7 +96,7 @@ export const RequestCards = ({ rows, onWithdraw }: RowActions & { rows: MyLeaveR
             <Group justify="space-between" align="flex-start" wrap="nowrap">
               <Stack gap={0}>
                 <Text fw={600}><LeaveDates from={r.dateFrom} to={r.dateTo} /></Text>
-                <Text size="sm" c="dimmed">{r.leaveTypeName}, {leaveDaysText(t, r.workingDays)}</Text>
+                <Text size="sm" c="dimmed">{r.leaveTypeName}, {leaveDaysText(t, r.workingDays, r.dayCount)}</Text>
                 <Text size="xs" c="dimmed">{leaveSplitText(t, r)}</Text>
               </Stack>
               <LeaveStatusBadge status={r.status} />

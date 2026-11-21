@@ -161,7 +161,7 @@ export const CalendarGrid = ({ days, people, absences, today, onOpen }: {
                 />
               ))}
               {own.flatMap((a) =>
-                calendarSegments(a.dateFrom, a.dateTo, days, 'working').map((s) => {
+                calendarSegments(a.dateFrom, a.dateTo, days, a.dayCount).map((s) => {
                   const column = `${col(s.start)} / ${col(s.end) + 1}`;
                   return s.bridge ? (
                     <Box

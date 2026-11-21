@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { AxiosError, AxiosHeaders } from 'axios';
 import type { MyLeaveOverview } from '@app/shared';
 import { api } from '../../../../core/api/client';
@@ -12,6 +12,7 @@ const overview: MyLeaveOverview = {
     { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, dayCount: 'working', requiresApproval: true, usedOfLimit: 0 },
     { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, dayCount: 'working', requiresApproval: true, usedOfLimit: 1 },
     { id: 3, name: 'Okolicznościowy', deductsPool: false, yearlyLimit: null, dayCount: 'working', requiresApproval: true, usedOfLimit: 0 },
+    { id: 7, name: 'Chorobowe', deductsPool: false, yearlyLimit: null, dayCount: 'calendar', requiresApproval: false, usedOfLimit: 0 },
   ],
   years: [2026],
   busy: [{ dateFrom: '2026-11-26', dateTo: '2026-11-27', leaveTypeName: 'Wypoczynkowy', status: 'pending' }],
@@ -97,6 +98,34 @@ describe('RequestModal', () => {
     setDates('30.11.2026', '30.11.2026');
     expect(await screen.findByText('Ten typ nie odejmuje dni z puli.')).toBeInTheDocument();
   });
+
+  it('type without approval (sick leave): hints, "Zgłoś" button, start 7 days back, weekend counts, toast "Zgłoszono"', async () => {
+    const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { id: 34 } });
+    const success = vi.spyOn(notify, 'success');
+    const onClose = show();
+    await chooseType('Chorobowe');
+    expect(screen.getByText(/Liczone w dniach kalendarzowych: weekendy i święta też się liczą/)).toBeInTheDocument();
+    expect(screen.getByText(/Możesz zacząć do 7 dni wstecz/)).toBeInTheDocument();
+    setDates('10.11.2026', '16.11.2026');
+    expect(await screen.findByText('7 dni kalendarzowych')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Złóż wniosek' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Zgłoś' }));
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/my-leave/requests', { leaveTypeId: '7', dateFrom: '2026-11-10', dateTo: '2026-11-16', comment: '' }));
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(success).toHaveBeenCalledWith('Zgłoszono. Administrator dostał powiadomienie.');
+  });
+
+  it('type without approval: 8 days back cannot be chosen; the weekend counts', async () => {
+    show();
+    await chooseType('Chorobowe');
+    setDates('09.11.2026', '10.11.2026');
+    expect(screen.queryByText(/dni kalendarzow/)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Zgłoś' })).toBeDisabled();
+    setDates('14.11.2026', '15.11.2026');
+    expect(await screen.findByText('2 dni kalendarzowe')).toBeInTheDocument();
+    expect(screen.getByLabelText('15.11.2026: Liczy się do wniosku (dni kalendarzowe)')).toHaveAttribute('data-off', 'false');
+  });
+
 
   it('sends only schema fields, closes with a toast', async () => {
     const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { id: 33 } });

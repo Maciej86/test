@@ -17,7 +17,7 @@ export const WithdrawModal = ({ request, onClose }: { request: MyLeaveRequest; o
   const confirm = () => {
     withdraw.mutate(request.id, {
       onSuccess: () => {
-        notify.success(reserved > 0 ? t('withdrawn_done') : t('withdrawn_done_no_pool'));
+        notify.success(reserved > 0 && !request.autoApproved ? t('withdrawn_done') : t('withdrawn_done_no_pool'));
         onClose();
       },
       onError: (error) => notify.error(apiErrorMessage(error, t)),
@@ -36,9 +36,11 @@ export const WithdrawModal = ({ request, onClose }: { request: MyLeaveRequest; o
       onClose={onClose}
     >
       <Text>
-        {request.leaveTypeName}, <LeaveDates from={request.dateFrom} to={request.dateTo} /> ({leaveDaysText(t, request.workingDays)}).
+        {request.leaveTypeName}, <LeaveDates from={request.dateFrom} to={request.dateTo} /> ({leaveDaysText(t, request.workingDays, request.dayCount)}).
       </Text>
-      <Text size="sm" c="dimmed">{reserved > 0 ? t('withdraw_text', { count: reserved }) : t('withdraw_text_no_pool')}</Text>
+      <Text size="sm" c="dimmed">
+        {request.autoApproved ? t('withdraw_text_auto') : reserved > 0 ? t('withdraw_text', { count: reserved }) : t('withdraw_text_no_pool')}
+      </Text>
     </ConfirmModal>
   );
 };

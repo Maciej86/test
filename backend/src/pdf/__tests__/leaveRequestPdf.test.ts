@@ -17,6 +17,8 @@ const base: LeaveRequestPdfData = {
   comment: 'Święta u rodziców.',
   decidedByName: 'Anna Nowak',
   decidedAt: '2026-12-01T23:30:00.000Z',
+  dayCount: 'working',
+  autoApproved: false,
 };
 
 /** Cały tekst dokumentu w kolejności, jedną linią. */
@@ -65,6 +67,12 @@ describe('buildLeaveRequestPdf', () => {
 
   it('decision with decided_by_name and date in Warsaw time', () => {
     expect(text()).toContain('Decyzja Zatwierdził(a) Anna Nowak, 02.12.2026');
+  });
+
+  it('sick leave approved automatically: calendar days and "Zatwierdzony automatycznie (typ bez zatwierdzania)"', () => {
+    const t = text({ leaveTypeName: 'Chorobowe', deductsPool: false, workingDays: 7, dayCount: 'calendar', autoApproved: true, decidedByName: null, decidedAt: '2026-11-16T06:20:00.000Z' });
+    expect(t).toContain('Dni 7 dni kalendarzowych');
+    expect(t).toContain('Decyzja Zatwierdzony automatycznie (typ bez zatwierdzania), 16.11.2026');
   });
 
   it('missing decision name does not throw', () => {

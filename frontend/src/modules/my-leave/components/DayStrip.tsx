@@ -1,6 +1,6 @@
 import { Group, Paper, Stack, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { dayjs, formatDate, getHoliday, ISO_DATE_FORMAT, isWeekend, translateKey } from '@app/shared';
+import { dayjs, formatDate, getHoliday, ISO_DATE_FORMAT, isWeekend, translateKey, type LeaveDayCount } from '@app/shared';
 
 /** Najdłuższy pasek dni; dłuższy termin pokazuje tylko podsumowanie (pasek byłby nieczytelny). */
 const MAX_DAYS = 45;
@@ -8,8 +8,9 @@ const MAX_DAYS = 45;
 /**
  * Dni wybranego terminu jeden po drugim: dzień roboczy (liczony) jasny, sobota, niedziela i święto przygaszone
  * i przekreślone, z nazwą święta w dymku. Pracownik od razu widzi, skąd bierze się liczba dni roboczych.
+ * Typ liczony w dniach kalendarzowych: każdy dzień się liczy (święto zostaje w dymku).
  */
-export const DayStrip = ({ from, to }: { from: string; to: string }) => {
+export const DayStrip = ({ from, to, dayCount }: { from: string; to: string; dayCount: LeaveDayCount }) => {
   const { t } = useTranslation('my-leave');
   const start = dayjs(from, ISO_DATE_FORMAT);
   const length = dayjs(to, ISO_DATE_FORMAT).diff(start, 'day') + 1;
@@ -22,8 +23,10 @@ export const DayStrip = ({ from, to }: { from: string; to: string }) => {
       {days.map((d) => {
         const iso = d.format(ISO_DATE_FORMAT);
         const holiday = getHoliday(iso);
-        const off = holiday !== null || isWeekend(iso);
-        const tip = holiday ? translateKey(t, holiday.label) : off ? t('strip_weekend') : t('strip_working');
+        const off = dayCount === 'working' && (holiday !== null || isWeekend(iso));
+        const tip = dayCount === 'calendar'
+          ? (holiday ? `${translateKey(t, holiday.label)}. ` : '') + t('strip_counted')
+          : holiday ? translateKey(t, holiday.label) : off ? t('strip_weekend') : t('strip_working');
         return (
           <Tooltip key={iso} label={tip}>
             <Paper

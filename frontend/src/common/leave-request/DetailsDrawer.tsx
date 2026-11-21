@@ -53,7 +53,7 @@ const Content = ({ r, actions, showInCalendar }: { r: LeaveRequestDetails; actio
           <LeaveStatusBadge status={r.status} />
         </Group>
         <Text fz="lg"><LeaveDates from={r.dateFrom} to={r.dateTo} /></Text>
-        <Text c="dimmed">{r.leaveTypeName}, {leaveDaysText(t, r.workingDays)} ({leaveSplitText(t, r)})</Text>
+        <Text c="dimmed">{r.leaveTypeName}, {leaveDaysText(t, r.workingDays, r.dayCount)} ({leaveSplitText(t, r)})</Text>
       </Stack>
 
       {isLate(r) && <Alert color="yellow" variant="light" icon={<Clock size={18} />}>{t('late_hint')}</Alert>}
@@ -72,6 +72,7 @@ const Content = ({ r, actions, showInCalendar }: { r: LeaveRequestDetails; actio
         {r.decidedByName && r.decidedAt && (
           <DetailRow label={t(`decided_${r.status}`)}>{r.decidedByName}, <DateText value={r.decidedAt} withTime /></DetailRow>
         )}
+        {r.autoApproved && r.status === 'approved' && <Text size="sm" c="dimmed">{t('approved_auto')}</Text>}
         {r.decisionReason && <DetailRow label={t('reason')}>{t('my-leave:quoted', { text: r.decisionReason })}</DetailRow>}
       </Stack>
 

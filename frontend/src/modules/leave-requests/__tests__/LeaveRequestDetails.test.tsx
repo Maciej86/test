@@ -93,6 +93,19 @@ describe('DetailsDrawer', () => {
     expect(within(rejected).queryByRole('link', { name: 'Pokaż w kalendarzu' })).not.toBeInTheDocument();
   });
 
+  it('approved automatically (type without approval): calendar days, "Zatwierdzony automatycznie", no Zatwierdź / Odrzuć', async () => {
+    show('/admin/leave-requests/25', () => details({
+      id: 25, leaveTypeName: 'Wypoczynkowy', status: 'approved', workingDays: 7, dayCount: 'calendar', autoApproved: true,
+      decidedByName: null, decidedAt: '2026-11-16T06:20:00.000Z', canCancel: true,
+    }));
+    const d = await drawer();
+    expect(within(d).getByText(/^Wypoczynkowy, 7 dni kalendarzowych/)).toBeInTheDocument();
+    expect(within(d).getByText('Zatwierdzony automatycznie (typ bez zatwierdzania)')).toBeInTheDocument();
+    expect(within(d).queryByRole('button', { name: 'Zatwierdź' })).not.toBeInTheDocument();
+    expect(within(d).queryByRole('button', { name: 'Odrzuć' })).not.toBeInTheDocument();
+    expect(within(d).getByRole('button', { name: 'Anuluj urlop' })).toBeInTheDocument();
+  });
+
   it('pending with a past date: yellow frame', async () => {
     show('/admin/leave-requests/19', () => details({ id: 19, dateFrom: '2020-01-10', dateTo: '2020-01-10' }));
     expect(within(await drawer()).getByText(/Termin tego wniosku już się zaczął albo minął/)).toBeInTheDocument();
