@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Kalendarz: odpowiedzi na 8 pytań w makiecie (http://localhost:5181/admin/calendar, także Ustawienia → Typy urlopów), potem spec.
+**Następny krok:** Kalendarz: spec (podział na części) do akceptacji.
 
 ## Start aplikacji
 
@@ -33,11 +33,12 @@
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
 | 14 | Pulpit | dashboard | zrobiony | zamknięcie | my-leave, leave-requests, tasks |
-| 15 | Kalendarz | calendar | w toku | pytania | leave-types, my-leave, leave-requests |
+| 15 | Kalendarz | calendar | w toku | spec | leave-types, my-leave, leave-requests |
 | 16 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard, calendar |
 
 ## Ostatnie decyzje
 
+- 2026-11-21: Kalendarz: odpowiedzi 1a–8a (decyzje w panelu kalendarza, wszyscy aktywni pracownicy, kolor typu w ustawieniach, typ bez zatwierdzania od razu zatwierdzony z powiadomieniem i e-mailem, pracownik wycofuje do pierwszego dnia, dni kalendarzowe wszędzie, przyciski do kalendarza na Pulpicie i w szczegółach wniosku, administrator nie dodaje nieobecności); pionowa kreska między dniami; panel pytań usunięty.
 - 2026-11-21: Kalendarz, zmiany od użytkownika: typ urlopu dostaje „Liczenie dni” (robocze / kalendarzowe, np. ojcowski 14 dni kalendarzowych) i „Wymaga zatwierdzenia” (chorobowe nie wymaga: wystawił lekarz albo nie); kalendarz pokazuje dziś + 60 dni na całą szerokość ekranu, opis na środku paska, urlop w dniach roboczych przerwany w weekendy i święta. Własna siatka zamiast `@mantine/schedule` (pokazuje tylko jeden miesiąc i nie przerywa pasków; biblioteka odinstalowana). Makieta Typów urlopów wraca do czasu zamknięcia Kalendarza; 8 pytań.
 - 2026-11-21: Kalendarz: makieta (miesiąc: osoby w wierszach, dni w kolumnach na `@mantine/schedule` 9.8.0; paski urlopu i chorobowego, filtry rodzajów jako legenda, wyszukiwarka, „Dziś nie ma: …”, weekendy i święta przyciemnione, szczegóły w panelu z prawej z „Zatwierdź” / „Odrzuć”, telefon przewija się do dziś); 7 pytań.
 - 2026-11-21: Nowy moduł Kalendarz (zgłoszenie użytkownika) przed Publikacją: tylko administrator; pracownicy w kolumnie po lewej, dni po prawej; widać urlop do zatwierdzenia, zatwierdzony i chorobowe. Chorobowe zgłasza pracownik jak wniosek (typ urlopu, który nie zmniejsza puli), administrator zatwierdza (odpowiedzi 1a 2b 3a). Publikacja jest teraz modułem 16.

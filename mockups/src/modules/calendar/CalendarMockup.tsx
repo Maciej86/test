@@ -11,7 +11,6 @@ import { EmptyState } from '../../common/EmptyState';
 import { notify } from '../../common/notify';
 import { PageHeader } from '../../common/PageHeader';
 import { PersonAvatar } from '../../common/PersonAvatar';
-import { Question, Questions } from '../../common/Question';
 import { SideDrawer } from '../../common/SideDrawer';
 import { CalendarGrid } from './CalendarGrid';
 import { ABSENCES, EMPLOYEES, RANGE_DAYS, RANGE_STEP, TODAY, TYPES, employeeOf, typeOf, type MockAbsence } from './data';
@@ -115,97 +114,6 @@ export const CalendarMockup = () => {
 
   return (
     <Stack>
-      <Questions>
-        <Question
-          number={1}
-          about="Panel po kliknięciu paska"
-          options={[
-            { id: 'a', text: 'Szczegóły i od razu „Zatwierdź” / „Odrzuć” przy wniosku, który czeka (te same okna co we Wnioskach urlopowych), plus „Otwórz wniosek”' },
-            { id: 'b', text: 'Tylko szczegóły i „Otwórz wniosek”; decyzje zawsze we Wnioskach urlopowych' },
-          ]}
-          recommended="a"
-        >
-          Czy w kalendarzu można od razu zatwierdzić albo odrzucić wniosek? Widać wtedy, kogo jeszcze nie będzie w tych dniach.
-        </Question>
-        <Question
-          number={2}
-          about="Wiersze z osobami"
-          options={[
-            { id: 'a', text: 'Wszyscy aktywni pracownicy, także ci bez nieobecności w widocznych dniach (widać, kto jest w pracy)' },
-            { id: 'b', text: 'Tylko osoby, które w widocznych dniach mają jakąś nieobecność' },
-          ]}
-          recommended="a"
-        >
-          Kogo pokazujemy w kolumnie po lewej? Osoby z Archiwum nie mają wiersza w żadnym wariancie.
-        </Question>
-        <Question
-          number={3}
-          about="Kolory pasków (Typy urlopów)"
-          options={[
-            { id: 'a', text: 'Każdy typ urlopu ma w ustawieniach kolor do wybrania z 6 (zielony, morski, turkusowy, granatowy, fioletowy, pomarańczowy); wniosek, który czeka, jest w tym kolorze, ale jasny, z przerywaną ramką i dopiskiem „czeka”' },
-            { id: 'b', text: 'Stałe kolory bez ustawień: zielony = zatwierdzony urlop, żółty = czeka, fioletowy = typ bez zatwierdzania (chorobowe)' },
-          ]}
-          recommended="a"
-        >
-          Jak odróżniać typy nieobecności w kalendarzu? Odrzucone, wycofane i anulowane wnioski się nie pojawiają.
-        </Question>
-        <Question
-          number={4}
-          about="Typ bez zatwierdzania (np. chorobowe)"
-          options={[
-            { id: 'a', text: 'Wniosek od razu jest zatwierdzony i odejmuje dni (jeśli typ odejmuje); administrator dostaje powiadomienie w dzwonku i e-mail „Tomasz Wójcik zgłosił chorobowe 16–22.11.2026”' },
-            { id: 'b', text: 'Tak samo, ale bez e-maila, tylko powiadomienie w dzwonku' },
-          ]}
-          recommended="a"
-        >
-          Co się dzieje, gdy pracownik zgłasza nieobecność typu, który nie wymaga zatwierdzenia?
-        </Question>
-        <Question
-          number={5}
-          about="Typ bez zatwierdzania: pomyłki"
-          options={[
-            { id: 'a', text: 'Pracownik może je wycofać do pierwszego dnia (jak wniosek, który czeka); potem tylko administrator może je anulować z powodem, jak zatwierdzony urlop' },
-            { id: 'b', text: 'Pracownik nie może nic zmienić; tylko administrator anuluje' },
-          ]}
-          recommended="a"
-        >
-          Co, gdy pracownik zgłosi chorobowe z błędnymi datami?
-        </Question>
-        <Question
-          number={6}
-          about="Dni kalendarzowe (np. ojcowski 14 dni)"
-          options={[
-            { id: 'a', text: 'Typ „kalendarzowy” liczy wszystkie dni, także weekendy i święta: w formularzu wniosku, w limicie typu, w puli (gdy typ odejmuje), na wydruku i w kalendarzu (ciągły pasek); przy liczbie zawsze dopisek „dni kalendarzowych”. Istniejące typy zostają „robocze”, a nowe ustawienie dotyczy tylko nowych wniosków' },
-            { id: 'b', text: 'Dni kalendarzowe tylko w kalendarzu i na wydruku; limit i pula zawsze w dniach roboczych' },
-          ]}
-          recommended="a"
-        >
-          Gdzie ma działać liczenie w dniach kalendarzowych?
-        </Question>
-        <Question
-          number={7}
-          about="Powiązania z innymi ekranami"
-          options={[
-            { id: 'a', text: 'Na Pulpicie przy boksie „Nieobecności na 2 tygodnie” przycisk „Otwórz kalendarz”, a w szczegółach wniosku „Pokaż w kalendarzu” (zakres od pierwszego dnia wniosku)' },
-            { id: 'b', text: 'Tylko pozycja „Kalendarz” w menu' },
-          ]}
-          recommended="a"
-        >
-          Czy inne ekrany mają prowadzić do kalendarza?
-        </Question>
-        <Question
-          number={8}
-          about="Klik w pusty dzień"
-          options={[
-            { id: 'a', text: 'Nic się nie dzieje: nieobecność zawsze zgłasza pracownik w Moich urlopach' },
-            { id: 'b', text: 'Administrator może wpisać nieobecność za pracownika (np. chorobowe, gdy ten zadzwonił, że jest chory); od razu zatwierdzona' },
-          ]}
-          recommended="a"
-        >
-          Czy administrator może sam dodać nieobecność, klikając dzień w wierszu osoby?
-        </Question>
-      </Questions>
-
       <Paper p="xs" bg="yellow.4" c="dark.9">
         <Group gap="sm">
           <Text size="sm" fw={600}>{t('mockup_state')}</Text>

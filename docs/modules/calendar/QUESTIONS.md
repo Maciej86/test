@@ -25,7 +25,7 @@ Czy w kalendarzu można od razu zatwierdzić albo odrzucić wniosek?
   plus „Otwórz wniosek” **(rekomendacja)**
 - b) Tylko szczegóły i „Otwórz wniosek”; decyzje zawsze we Wnioskach urlopowych
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-21):** a
 
 ## 2. Wiersze z osobami
 
@@ -34,7 +34,7 @@ Kogo pokazujemy w kolumnie po lewej? Osoby z Archiwum nie mają wiersza.
 - a) Wszyscy aktywni pracownicy, także bez nieobecności w widocznych dniach **(rekomendacja)**
 - b) Tylko osoby, które w widocznych dniach mają jakąś nieobecność
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-21):** a
 
 ## 3. Kolory pasków
 
@@ -42,7 +42,7 @@ Kogo pokazujemy w kolumnie po lewej? Osoby z Archiwum nie mają wiersza.
   wniosek, który czeka, jest w tym kolorze, ale jasny, z przerywaną ramką i dopiskiem „czeka” **(rekomendacja)**
 - b) Stałe kolory: zielony = zatwierdzony urlop, żółty = czeka, fioletowy = typ bez zatwierdzania
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-21):** a
 
 ## 4. Typ bez zatwierdzania (np. chorobowe): zgłoszenie
 
@@ -50,7 +50,7 @@ Kogo pokazujemy w kolumnie po lewej? Osoby z Archiwum nie mają wiersza.
   w dzwonku i e-mail „Tomasz Wójcik zgłosił chorobowe 16–22.11.2026” **(rekomendacja)**
 - b) Tak samo, ale bez e-maila, tylko powiadomienie w dzwonku
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-21):** a
 
 ## 5. Typ bez zatwierdzania: pomyłki
 
@@ -58,7 +58,7 @@ Kogo pokazujemy w kolumnie po lewej? Osoby z Archiwum nie mają wiersza.
   urlop **(rekomendacja)**
 - b) Pracownik nie może nic zmienić; tylko administrator anuluje
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-21):** a
 
 ## 6. Dni kalendarzowe: gdzie działają
 
@@ -67,7 +67,7 @@ Kogo pokazujemy w kolumnie po lewej? Osoby z Archiwum nie mają wiersza.
   **(rekomendacja)**
 - b) Tylko w kalendarzu i na wydruku; limit i pula zawsze w dniach roboczych
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-21):** a
 
 ## 7. Powiązania z innymi ekranami
 
@@ -75,11 +75,15 @@ Kogo pokazujemy w kolumnie po lewej? Osoby z Archiwum nie mają wiersza.
   „Pokaż w kalendarzu” (zakres od pierwszego dnia wniosku) **(rekomendacja)**
 - b) Tylko pozycja „Kalendarz” w menu
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-21):** a
 
 ## 8. Klik w pusty dzień
 
 - a) Nic się nie dzieje: nieobecność zawsze zgłasza pracownik w Moich urlopach **(rekomendacja)**
 - b) Administrator może wpisać nieobecność za pracownika (np. chorobowe, gdy ten zadzwonił); od razu zatwierdzona
 
-**Odpowiedź:**
+**Odpowiedź (2026-11-21):** a
+
+## Uwagi do makiety (2026-11-21)
+
+- Każdy dzień oddziela pionowa kreska (granica miesiąca mocniejsza).

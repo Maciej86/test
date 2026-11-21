@@ -58,6 +58,8 @@ export const CalendarGrid = ({ days, people, absences, today, phone, onOpen }: {
   const col = (i: number) => i + 2;
   const sticky = { position: 'sticky' as const, left: 0, zIndex: 3, background: 'var(--mantine-color-dark-6)' };
   const line = '1px solid var(--mantine-color-dark-5)';
+  /** Granica miesiąca mocniejsza niż kreska między dniami. */
+  const monthLine = '1px solid var(--mantine-color-dark-3)';
 
   return (
     <Box style={{ overflowX: 'auto' }}>
@@ -75,7 +77,7 @@ export const CalendarGrid = ({ days, people, absences, today, phone, onOpen }: {
         {months.map((m) => {
           const label = dayjs(`${m.key}-01`).locale('pl').format('MMMM YYYY');
           return (
-            <Box key={m.key} style={{ gridColumn: `${col(m.start)} / span ${m.count}`, gridRow: 1, borderLeft: line, minWidth: 0 }} px={6} pt={6}>
+            <Box key={m.key} style={{ gridColumn: `${col(m.start)} / span ${m.count}`, gridRow: 1, borderLeft: monthLine, minWidth: 0 }} px={6} pt={6}>
               <Text size="sm" fw={600} truncate style={{ position: 'sticky', left: labelWidth + 6 }}>
                 {label.charAt(0).toUpperCase() + label.slice(1)}
               </Text>
@@ -99,7 +101,7 @@ export const CalendarGrid = ({ days, people, absences, today, phone, onOpen }: {
                   gridRow: 2,
                   borderBottom: isToday ? '2px solid var(--mantine-color-navy-4)' : line,
                   background: off ? 'var(--mantine-color-dark-8)' : undefined,
-                  borderLeft: iso.endsWith('-01') ? line : undefined,
+                  borderLeft: iso.endsWith('-01') ? monthLine : line,
                 }}
               >
                 <Text fz={10} c="dimmed" lh={1.2}>{dayjs(iso).locale('pl').format('dd')}</Text>
@@ -128,7 +130,7 @@ export const CalendarGrid = ({ days, people, absences, today, phone, onOpen }: {
                   gridColumn: col(i),
                   gridRow: row,
                   borderBottom: line,
-                  borderLeft: iso.endsWith('-01') ? line : undefined,
+                  borderLeft: iso.endsWith('-01') ? monthLine : line,
                   background: isOff(iso) ? 'var(--mantine-color-dark-8)' : iso === today ? 'var(--mantine-color-navy-light)' : undefined,
                 }}
               />
