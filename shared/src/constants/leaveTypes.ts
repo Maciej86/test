@@ -11,6 +11,9 @@ export const LEAVE_TYPE_LIMIT_MAX = 365;
  */
 export const LEAVE_TYPE_COLORS = ['green', 'teal', 'cyan', 'navy', 'grape', 'orange'] as const;
 export type LeaveTypeColor = (typeof LEAVE_TYPE_COLORS)[number];
+/** Jak liczyć dni urlopu: robocze (bez weekendów i świąt) albo kalendarzowe (wszystkie). */
+export const LEAVE_DAY_COUNTS = ['working', 'calendar'] as const;
+export type LeaveDayCount = (typeof LEAVE_DAY_COUNTS)[number];
 /** Kolor nowego typu. */
 export const LEAVE_TYPE_DEFAULT_COLOR: LeaveTypeColor = 'green';
 

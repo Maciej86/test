@@ -50,7 +50,7 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
   `calendar.service.ts` (zakres, dziś, osoby z `listActiveUsers(db, 'employee')`, wnioski tylko tych osób),
   `calendar.routes.ts` z `validateQuery`, `mountModule(api, 'calendar', calendarRoutes)`; wiersz w „Mapie dostępu”
   `SPEC-GENERAL.md`; testy tras (dane, 400, 401, 403) → `npm run check`
-- [ ] 7. Podział paska na kawałki: `calendarSegments(from, to, days, dayCount)` w `shared/src/calendar.ts` (dni
+- [x] 7. Podział paska na kawałki: `calendarSegments(from, to, days, dayCount)` w `shared/src/calendar.ts` (dni
   robocze: kawałki bez weekendów i świąt, przerwy jako „linia”, przerwa na brzegu zakresu pomijana; dni
   kalendarzowe: jeden kawałek; przycięcie do zakresu) + testy (urlop przez weekend, przez Wigilię i święta,
   zaczyna się przed zakresem, kończy po nim, jeden dzień) → `npm run check`

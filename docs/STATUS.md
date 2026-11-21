@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Kalendarz, część 1: implementacja, krok 7 z 12 (podział paska na kawałki).
+**Następny krok:** Kalendarz, część 1: implementacja, krok 8 z 12 (ekran Kalendarz).
 
 ## Start aplikacji
 
@@ -33,7 +33,7 @@
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
 | 14 | Pulpit | dashboard | zrobiony | zamknięcie | my-leave, leave-requests, tasks |
-| 15 | Kalendarz | calendar | w toku | implementacja, część 1/2 (krok 7/12) | leave-types, my-leave, leave-requests |
+| 15 | Kalendarz | calendar | w toku | implementacja, część 1/2 (krok 8/12) | leave-types, my-leave, leave-requests |
 | 16 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard, calendar |
 
 ## Ostatnie decyzje
