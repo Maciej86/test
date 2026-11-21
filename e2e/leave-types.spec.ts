@@ -3,7 +3,7 @@ import { ADMIN, addEmployee, logIn, logInWithOwnPassword, logOut, password } fro
 
 // Typy dodaje sam test („E2E <czas>”), a seed usuwa je przy następnym uruchomieniu (nie mają wniosków).
 const row = (page: Page, name: string) => page.getByRole('row', { name: new RegExp(name) });
-const names = (page: Page) => page.getByRole('table').locator('tbody tr td:nth-child(2) p:first-child').allTextContents();
+const names = (page: Page) => page.getByRole('table').locator('tbody tr td:nth-child(2) p:first-of-type').allTextContents();
 
 const addType = async (page: Page, name: string, limit?: string) => {
   await page.getByRole('button', { name: 'Dodaj typ urlopu' }).first().click();

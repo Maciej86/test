@@ -17,7 +17,7 @@ test.describe('administrator', () => {
 
   test('dodanie i ukrycie typu urlopu pojawia się w historii z „Otwórz typy urlopów”', async ({ page }) => {
     const name = `E2E Historia ${Date.now()}`;
-    const created = await page.request.post('/api/leave-types', { data: { name, deductsPool: true, yearlyLimit: null } });
+    const created = await page.request.post('/api/leave-types', { data: { name, deductsPool: true, yearlyLimit: null, color: 'green' } });
     expect(created.status()).toBe(201);
     const { id } = (await created.json()) as { id: number };
     expect((await page.request.post(`/api/leave-types/${id}/hide`)).status()).toBe(200);
