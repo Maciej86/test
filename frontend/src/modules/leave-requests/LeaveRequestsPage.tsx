@@ -92,6 +92,7 @@ export const LeaveRequestsPage = () => {
       <DetailsDrawer
         id={missing ? null : id}
         details={details}
+        showInCalendar
         onClose={backToList}
         onApprove={actions.onApprove}
         onReject={actions.onReject}

@@ -30,7 +30,8 @@
     "pending": "wniosek czeka na decyzję",
     "off": "weekend albo święto",
     "weekend": "Weekend",
-    "empty": "W najbliższych 2 tygodniach nikt nie ma urlopu."
+    "empty": "W najbliższych 2 tygodniach nikt nie ma urlopu.",
+    "open_calendar": "Otwórz kalendarz"
   },
   "projects": {
     "title": "Stan tablic",

@@ -82,6 +82,17 @@ describe('DetailsDrawer', () => {
     expect(within(d).getByText('„Inwentaryzacja.”')).toBeInTheDocument();
   });
 
+  it('"Pokaż w kalendarzu" for pending and approved: calendar from the first day; not for decided ones', async () => {
+    show('/admin/leave-requests/21', () => details());
+    const d = await drawer();
+    expect(within(d).getByRole('link', { name: 'Pokaż w kalendarzu' })).toHaveAttribute('href', '/admin/calendar?from=2026-11-26');
+    vi.restoreAllMocks();
+    show('/admin/leave-requests/22', () => details({ id: 22, status: 'rejected', decisionReason: 'Inwentaryzacja.' }));
+    const rejected = await screen.findByRole('dialog', { name: /Wniosek nr 22/ });
+    await within(rejected).findByText('„Inwentaryzacja.”');
+    expect(within(rejected).queryByRole('link', { name: 'Pokaż w kalendarzu' })).not.toBeInTheDocument();
+  });
+
   it('pending with a past date: yellow frame', async () => {
     show('/admin/leave-requests/19', () => details({ id: 19, dateFrom: '2020-01-10', dateTo: '2020-01-10' }));
     expect(within(await drawer()).getByText(/Termin tego wniosku już się zaczął albo minął/)).toBeInTheDocument();

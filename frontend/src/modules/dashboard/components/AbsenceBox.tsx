@@ -1,6 +1,8 @@
-import { Text } from '@mantine/core';
+import { Button, Text } from '@mantine/core';
+import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { DASHBOARD_ABSENCE_DAYS, ISO_DATE_FORMAT, dayjs, type DashboardAbsence } from '@app/shared';
+import { CALENDAR_PATH, DASHBOARD_ABSENCE_DAYS, ISO_DATE_FORMAT, dayjs, type DashboardAbsence } from '@app/shared';
+import { ButtonIcon } from '../../../common/ButtonIcon';
 import { InfoCard } from '../../../common/InfoCard';
 import { LeaveStrip, type StripMark } from '../../../common/LeaveStrip';
 
@@ -20,7 +22,10 @@ export const AbsenceBox = ({ absences, today }: { absences: DashboardAbsence[]; 
   const offToday = people.filter((p) => absences.some((a) => a.userId === p.id && a.status === 'approved' && a.dateFrom <= today && a.dateTo >= today));
 
   return (
-    <InfoCard title={t('absence.title')}>
+    <InfoCard
+      title={t('absence.title')}
+      actions={<Button component={Link} to={CALENDAR_PATH} variant="default" leftSection={<ButtonIcon action="calendar" />}>{t('absence.open_calendar')}</Button>}
+    >
       {people.length === 0 ? (
         <Text c="dimmed">{t('absence.empty')}</Text>
       ) : (

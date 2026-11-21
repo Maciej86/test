@@ -63,7 +63,7 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
   Porównane z: `LeaveStrip` (common; komórki dni do 31 dni, bez pasków i bez przewijania z przyklejoną kolumną)
   → inna rama, zostaje osobno; `SearchField` (common) → używam go do wyszukiwarki; filtry: `Chip` dotąd tylko
   w makiecie Kalendarza → w module → `npm run check`
-- [ ] 9. Powiązania: Pulpit, boks „Nieobecności na 2 tygodnie” → przycisk „Otwórz kalendarz” (`CALENDAR_PATH`);
+- [x] 9. Powiązania: Pulpit, boks „Nieobecności na 2 tygodnie” → przycisk „Otwórz kalendarz” (`CALENDAR_PATH`);
   szczegóły wniosku (wspólny panel, poza kalendarzem) → „Pokaż w kalendarzu” (`/admin/calendar?from=<od>`) przy
   czekającym i zatwierdzonym + testy w plikach docelowych (dashboard, common/leave-request) → `npm run check`
 - [ ] 10. `DESIGN.md`: wzorzec „Kalendarz zespołu” opisuje własną siatkę (dziś + 60 dni, kolor typu, czeka = jasny

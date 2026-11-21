@@ -22,5 +22,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    // Połowa rdzeni: przy wszystkich naraz (jsdom jest ciężki) zajęty komputer nie mieści się w limicie 5 s na test.
+    maxWorkers: '50%',
   },
 });

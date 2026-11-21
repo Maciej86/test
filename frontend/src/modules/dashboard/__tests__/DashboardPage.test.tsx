@@ -112,6 +112,11 @@ describe('DashboardPage', () => {
     expect(within(box).getAllByTestId('strip-header-day')[0]).toHaveAttribute('data-today', 'true');
   });
 
+  it('admin: absence box has "Otwórz kalendarz" leading to the calendar', async () => {
+    show(admin);
+    expect(await screen.findByRole('link', { name: 'Otwórz kalendarz' })).toHaveAttribute('href', '/admin/calendar');
+  });
+
   it('admin: two people with the same name get separate rows', async () => {
     show({ ...admin, absences: [
       { userId: 8, name: 'Jan Nowak', dateFrom: '2026-11-20', dateTo: '2026-11-20', status: 'approved' },
