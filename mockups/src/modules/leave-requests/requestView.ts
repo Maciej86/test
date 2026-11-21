@@ -63,6 +63,6 @@ export const toDecision = (r: MockRequest): DecisionRequest => {
 
 /** Wniosek makiety w pasku „Kto jeszcze ma wtedy wolne” (`common/leave-request/TeamStrip`). */
 export const toStrip = (r: MockRequest) => ({
-  request: { employeeName: r.employee, dateFrom: r.from, dateTo: r.to },
+  request: { employeeName: r.employee, dateFrom: r.from, dateTo: r.to, dayCount: r.dayCount },
   others: overlapping(r).map((o) => ({ employeeName: o.employee, dateFrom: o.from, dateTo: o.to, status: o.status })),
 });

@@ -2,7 +2,7 @@ import { screen, within } from '@testing-library/react';
 import { renderWithProviders } from '../../../test/render';
 import { TeamStrip } from '../TeamStrip';
 
-const piotr = { employeeName: 'Piotr Zieliński', dateFrom: '2026-12-21', dateTo: '2026-12-24' };
+const piotr = { employeeName: 'Piotr Zieliński', dateFrom: '2026-12-21', dateTo: '2026-12-24', dayCount: 'working' as const };
 const tomasz = { employeeName: 'Tomasz Wójcik', dateFrom: '2026-12-21', dateTo: '2026-12-22', status: 'approved' as const };
 
 describe('TeamStrip', () => {
@@ -20,6 +20,13 @@ describe('TeamStrip', () => {
     expect(cells(1).map((c) => c.getAttribute('data-mark'))).toEqual(['approved', 'approved', 'none', 'none']);
     expect(cells(2).map((c) => c.getAttribute('data-mark'))).toEqual(['none', 'none', 'pending', 'pending']);
     expect(screen.queryByText('W tym terminie nikt inny nie ma urlopu.')).toBeNull();
+  });
+
+  it('request in calendar days (sick leave): weekend days of this request are filled, not crossed out', () => {
+    renderWithProviders(<TeamStrip request={{ employeeName: 'Iza Chora', dateFrom: '2026-11-20', dateTo: '2026-11-23', dayCount: 'calendar' }} others={[]} />);
+    const cells = within(screen.getAllByTestId('strip-row')[0]!).getAllByTestId('strip-day');
+    expect(cells.map((c) => c.getAttribute('data-off'))).toEqual(['false', 'false', 'false', 'false']);
+    expect(cells.map((c) => c.getAttribute('data-mark'))).toEqual(['request', 'request', 'request', 'request']);
   });
 
   it('nobody else → "W tym terminie nikt inny nie ma urlopu."', () => {

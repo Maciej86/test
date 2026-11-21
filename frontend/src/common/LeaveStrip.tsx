@@ -10,6 +10,8 @@ export interface StripRow {
   key?: string | number;
   name: string;
   bold?: boolean;
+  /** Urlop w dniach kalendarzowych: weekend i święto tego urlopu też są wypełnione kolorem (liczą się). */
+  fillDaysOff?: boolean;
   markOn: (iso: string) => StripMark;
 }
 
@@ -26,8 +28,8 @@ const CELL_BG: Record<StripMark, string | undefined> = {
 const isOff = (iso: string) => isWeekend(iso) || getHoliday(iso) !== null;
 
 /** Komórka dnia: wolny (weekend, święto) przekreślony linią przerywaną, dzień urlopu wypełniony kolorem. */
-const DayCell = ({ iso, mark, label }: { iso: string; mark: StripMark; label: string }) => {
-  const off = isOff(iso);
+const DayCell = ({ iso, mark, label, fillDaysOff = false }: { iso: string; mark: StripMark; label: string; fillDaysOff?: boolean }) => {
+  const off = isOff(iso) && !(fillDaysOff && mark !== 'none');
   return (
     <Tooltip label={label} disabled={!label}>
       <Box
@@ -103,7 +105,7 @@ export const LeaveStrip = ({ days, rows, labels, noneLabel = '', highlight }: {
               <Text size="sm" w={NAME_WIDTH} truncate fw={row.bold ? 600 : 400} style={{ flex: 'none' }}>{row.name}</Text>
               {days.map((iso) => {
                 const mark = row.markOn(iso);
-                return <DayCell key={iso} iso={iso} mark={mark} label={labelOf(iso, mark)} />;
+                return <DayCell key={iso} iso={iso} mark={mark} label={labelOf(iso, mark)} fillDaysOff={row.fillDaysOff} />;
               })}
             </Group>
           ))}

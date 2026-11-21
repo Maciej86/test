@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.51
 
-**Następny krok:** Kalendarz, część 2: etap testy (próby nadużyć, sprawdzenie w przeglądarce, przegląd przed oddaniem, potem użytkownik przechodzi `TESTS-2.md`).
+**Następny krok:** Kalendarz, część 2: użytkownik przechodzi `docs/modules/calendar/TESTS-2.md` i potwierdza „działa”; potem zamknięcie modułu.
 
 ## Start aplikacji
 
@@ -38,6 +38,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-21: Kalendarz, część 2: próby nadużyć odparte (8, prawdziwa baza), przegląd przed oddaniem z poprawkami (makiety powiadomień, wydruku i Pulpitu, nieużywany komunikat, komunikat daty wstecz), sprawdzona w przeglądarce (podpowiedzi typu w osobnych liniach, weekend chorobowego w pasku „Kto jeszcze ma wtedy wolne”); 70 testów e2e zielonych.
 - 2026-11-21: Kalendarz, część 2 zbudowana (kroki 0–14): typy urlopów z liczeniem dni i zatwierdzaniem (migracje 031–035, typ „Chorobowe”), złożenie bez zatwierdzania z powiadomieniem „Zgłoszona nieobecność” i e-mailem, do 7 dni wstecz, wycofanie pomyłki, dni z jednostką wszędzie (wspólne `leaveDaysText`), ciągły pasek w kalendarzu. Przegląd kodu z poprawkami, `npm run check` i 69 testów e2e zielone.
 - 2026-11-21: Kalendarz: spec części 2 zaakceptowany (`SPEC-2.md`: liczenie dni robocze / kalendarzowe zapamiętane we wniosku, typ bez zatwierdzania od razu zatwierdzony z powiadomieniem „Zgłoszona nieobecność” i e-mailem, do 7 dni wstecz, wycofanie do pierwszego dnia albo w dniu złożenia, typ „Chorobowe” na start); napisane `PLAN-2.md` i `TESTS-2.md`.
 - 2026-11-21: Aktualizacja stepkit do 0.1.51: każdy wspólny klocek aplikacji jest też w makietach pod tą samą nazwą (nowy test zasad). Do makiet przeszły `PoolCard`, `LeaveStrip`, `SearchField`, `LeaveRequestParts` i `leave-request/` (`DetailsDrawer`, `DecisionModals`, `TeamStrip`); kopie w makietach podmienione (Moje urlopy, Pulpit, Wnioski urlopowe, Kalendarz, wyszukiwarki). Kalendarz w makiecie pokazuje w szczegółach pasek „Kto jeszcze ma wtedy wolne” jak aplikacja. Układy, menu, `DataState`, `NoAccess` i okno bezczynności zostają tylko w aplikacji.

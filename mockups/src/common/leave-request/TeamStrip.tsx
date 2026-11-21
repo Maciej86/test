@@ -20,7 +20,7 @@ const markOn = (rows: Other[], iso: string): StripMark => {
  * inna osoba z urlopem zatwierdzonym albo wnioskiem czekającym w tym czasie. Rama: `LeaveStrip` (common).
  */
 export const TeamStrip = ({ request, others }: {
-  request: Pick<LeaveRequestDetails, 'employeeName' | 'dateFrom' | 'dateTo'>;
+  request: Pick<LeaveRequestDetails, 'employeeName' | 'dateFrom' | 'dateTo'> & { dayCount?: LeaveRequestDetails['dayCount'] };
   others: Other[];
 }) => {
   const { t } = useTranslation('leave-requests');
@@ -46,7 +46,7 @@ export const TeamStrip = ({ request, others }: {
 
   const days = Array.from({ length }, (_, i) => start.add(i, 'day').format('YYYY-MM-DD'));
   const rows = [
-    { name: request.employeeName, bold: true, markOn: (): StripMark => 'request' },
+    { name: request.employeeName, bold: true, fillDaysOff: request.dayCount === 'calendar', markOn: (): StripMark => 'request' },
     ...people.map((name) => ({ name, markOn: (iso: string) => markOn(others.filter((o) => o.employeeName === name), iso) })),
   ];
 

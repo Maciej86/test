@@ -125,3 +125,7 @@ usunięte.
   przy dacie za wcześnie dla typu bez zatwierdzania mówi „najwcześniej 7 dni przed dziś”, spec Powiadomień z nowym
   rodzajem. Przy sprawdzaniu w przeglądarce: podpowiedzi pod typem urlopu każda w osobnej linii (były sklejone
   przecinkami).
+- Sprawdzenie w przeglądarce (administrator, pracownik, telefon) na tymczasowych kontach `e2e.tmp.review.*` (zgoda
+  użytkownika, usunięte po sprawdzeniu): w pasku „Kto jeszcze ma wtedy wolne” weekend wniosku w dniach
+  kalendarzowych był pusty; teraz jest wypełniony (`fillDaysOff` we wspólnym `LeaveStrip`, aplikacja i makieta).
+  Wiersze innych osób dalej przekreślają weekend (lista „inni” nie zna ich sposobu liczenia).
