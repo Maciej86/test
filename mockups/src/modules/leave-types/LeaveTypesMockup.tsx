@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActionIcon, Badge, Button, Card, Group, Paper, SegmentedControl, Stack, Switch, Table, Text } from '@mantine/core';
+import { ActionIcon, Badge, Button, Card, ColorSwatch, Group, Paper, SegmentedControl, Stack, Switch, Table, Text } from '@mantine/core';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
@@ -22,11 +22,22 @@ const DeductsBadge = ({ deducts }: { deducts: boolean }) => {
   return <Badge variant="light" color={deducts ? 'navy' : 'gray'}>{deducts ? t('deducts_yes') : t('deducts_no')}</Badge>;
 };
 
+const DayCountText = ({ lt }: { lt: MockLeaveType }) => {
+  const { t } = useTranslation('leave-types');
+  return <Text span inherit c={lt.hidden ? 'dimmed' : undefined}>{t(`day_count.${lt.dayCount}`)}</Text>;
+};
+
+const ApprovalBadge = ({ approval }: { approval: boolean }) => {
+  const { t } = useTranslation('leave-types');
+  return <Badge variant="light" color={approval ? 'navy' : 'gray'}>{approval ? t('approval_yes') : t('approval_no')}</Badge>;
+};
+
 const NameCell = ({ lt }: { lt: MockLeaveType }) => {
   const { t } = useTranslation('leave-types');
   return (
     <Stack gap={0}>
       <Group gap={6} wrap="nowrap">
+        <ColorSwatch color={`var(--mantine-color-${lt.color}-8)`} size={12} radius={2} aria-label={t(`colors.${lt.color}`)} />
         <Text fw={600} c={lt.hidden ? 'dimmed' : undefined}>{lt.name}</Text>
         {lt.hidden && <Badge variant="outline" color="gray" size="sm">{t('hidden_badge')}</Badge>}
       </Group>
@@ -82,6 +93,8 @@ const LeaveTypesTable = ({ rows, visibleCount, ...actions }: RowActions & { rows
           <Table.Tr>
             <Table.Th w={70} aria-label={t('col_order')} />
             <Table.Th>{t('col_name')}</Table.Th>
+            <Table.Th>{t('col_day_count')}</Table.Th>
+            <Table.Th>{t('col_approval')}</Table.Th>
             <Table.Th>{t('col_deducts')}</Table.Th>
             <Table.Th>{t('col_limit')}</Table.Th>
             <Table.Th ta="right">{t('col_requests')}</Table.Th>
@@ -93,6 +106,8 @@ const LeaveTypesTable = ({ rows, visibleCount, ...actions }: RowActions & { rows
             <Table.Tr key={lt.id}>
               <Table.Td>{!lt.hidden && <OrderArrows index={i} count={visibleCount} />}</Table.Td>
               <Table.Td><NameCell lt={lt} /></Table.Td>
+              <Table.Td><DayCountText lt={lt} /></Table.Td>
+              <Table.Td><ApprovalBadge approval={lt.approval} /></Table.Td>
               <Table.Td><DeductsBadge deducts={lt.deducts} /></Table.Td>
               <Table.Td c={lt.hidden ? 'dimmed' : undefined}><LimitText limit={lt.limit} /></Table.Td>
               <Table.Td ta="right" c="dimmed">{lt.requests}</Table.Td>
@@ -117,6 +132,10 @@ const LeaveTypeCards = ({ rows, visibleCount, ...actions }: RowActions & { rows:
               <NameCell lt={lt} />
               <DeductsBadge deducts={lt.deducts} />
             </Group>
+            <Group gap="xs"><ApprovalBadge approval={lt.approval} /></Group>
+            <Text size="sm" c="dimmed">
+              {t('col_day_count')}: <DayCountText lt={lt} />
+            </Text>
             <Text size="sm" c="dimmed">
               {t('col_limit')}: <LimitText limit={lt.limit} />
             </Text>

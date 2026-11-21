@@ -3,6 +3,7 @@ import { TASK_SCREENS } from './modules/tasks/navigation';
 import { Done } from './common/Done';
 import type { ExtraScreen } from './Shell';
 import { CalendarMockup } from './modules/calendar/CalendarMockup';
+import { LeaveTypesMockup } from './modules/leave-types/LeaveTypesMockup';
 
 export type { ExtraScreen };
 
@@ -26,8 +27,8 @@ export const SCREENS: Record<string, ComponentType> = {
   ...TASKS_DONE,
   // Moduł Pracownicy zrobiony; makieta zostaje w modules/employees/EmployeesMockup.tsx.
   'employees': () => <Done labelKey="common.nav.employees" />,
-  // Moduł Typy urlopów zrobiony; makieta zostaje w modules/leave-types/LeaveTypesMockup.tsx.
-  'leave-types': () => <Done labelKey="common.nav.leave_types" />,
+  // Typy urlopów: moduł zrobiony, makieta wraca na czas modułu Kalendarz (nowe ustawienia: liczenie dni, zatwierdzanie, kolor).
+  'leave-types': LeaveTypesMockup,
   // Moduł Typy umów zrobiony; makieta zostaje w modules/contract-types/ContractTypesMockup.tsx.
   'contract-types': () => <Done labelKey="common.nav.contract_types" />,
   'activity-log': () => <Done labelKey="common.nav.activity_log" />,

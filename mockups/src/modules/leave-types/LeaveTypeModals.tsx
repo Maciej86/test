@@ -1,10 +1,11 @@
-import { Alert, Anchor, Button, Group, Modal, NumberInput, Stack, Switch, Text, TextInput } from '@mantine/core';
-import { CircleAlert } from 'lucide-react';
+import { useState } from 'react';
+import { Alert, Anchor, Button, ColorSwatch, Group, Modal, NumberInput, Radio, Stack, Switch, Text, TextInput } from '@mantine/core';
+import { Check, CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { ConfirmModal } from '../../common/ConfirmModal';
 import { notify } from '../../common/notify';
-import { TAKEN_NAME, type MockLeaveType } from './data';
+import { TAKEN_NAME, TYPE_COLORS, type MockLeaveType } from './data';
 
 /** Dodawanie (leaveType = null) i edycja typu. `nameTaken` pokazuje błąd nazwy zajętej przez ukryty typ. */
 export const LeaveTypeModal = ({ leaveType, nameTaken = false, onClose }: {
@@ -14,6 +15,7 @@ export const LeaveTypeModal = ({ leaveType, nameTaken = false, onClose }: {
 }) => {
   const { t } = useTranslation('leave-types');
   const isNew = leaveType === null;
+  const [color, setColor] = useState(leaveType?.color ?? 'green');
 
   const save = () => {
     notify.success(isNew ? t('added') : t('saved'));
@@ -40,6 +42,17 @@ export const LeaveTypeModal = ({ leaveType, nameTaken = false, onClose }: {
             </>
           )}
         />
+        <Radio.Group label={t('field_day_count')} defaultValue={leaveType?.dayCount ?? 'working'}>
+          <Stack gap="xs" mt={6}>
+            <Radio value="working" label={t('day_count.working')} description={t('day_count_hint.working')} />
+            <Radio value="calendar" label={t('day_count.calendar')} description={t('day_count_hint.calendar')} />
+          </Stack>
+        </Radio.Group>
+        <Switch
+          label={t('field_approval')}
+          description={t('field_approval_hint')}
+          defaultChecked={leaveType?.approval ?? true}
+        />
         <Switch
           label={t('field_deducts')}
           description={t('field_deducts_hint')}
@@ -55,6 +68,28 @@ export const LeaveTypeModal = ({ leaveType, nameTaken = false, onClose }: {
           suffix={t('field_limit_suffix')}
           w={{ base: '100%', xs: 220 }}
         />
+        <Stack gap={6}>
+          <Text size="sm" fw={500}>{t('field_color')}</Text>
+          <Group gap="xs">
+            {TYPE_COLORS.map((c) => (
+              <ColorSwatch
+                key={c}
+                component="button"
+                type="button"
+                color={`var(--mantine-color-${c}-8)`}
+                radius={3}
+                size={30}
+                aria-label={t(`colors.${c}`)}
+                aria-pressed={color === c}
+                onClick={() => setColor(c)}
+                style={{ cursor: 'pointer', outline: color === c ? '2px solid var(--mantine-color-dark-0)' : undefined, outlineOffset: 2 }}
+              >
+                {color === c && <Check size={16} />}
+              </ColorSwatch>
+            ))}
+          </Group>
+          <Text size="xs" c="dimmed">{t('field_color_hint')}</Text>
+        </Stack>
         <Group justify="flex-end" mt="xs">
           <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
           <Button leftSection={<ButtonIcon action="save" />} onClick={save}>{t('save')}</Button>

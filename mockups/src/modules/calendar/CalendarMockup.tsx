@@ -1,10 +1,9 @@
-import { useMemo, useState, type CSSProperties } from 'react';
-import { ActionIcon, Badge, Box, Button, Chip, Group, Paper, SegmentedControl, Stack, Text, TextInput, Title, Tooltip, useMantineTheme } from '@mantine/core';
+import { useState } from 'react';
+import { ActionIcon, Badge, Box, Button, Chip, ColorSwatch, Group, Paper, SegmentedControl, Stack, Text, TextInput, useMantineTheme } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { ResourcesMonthView, type ScheduleEventData, type ScheduleResourceData } from '@mantine/schedule';
 import { CalendarDays, ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { dayjs, getPolishHolidays, isWeekend } from '@app/shared';
+import { dayjs, formatDate } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { DetailRow } from '../../common/DetailRow';
@@ -14,71 +13,43 @@ import { PageHeader } from '../../common/PageHeader';
 import { PersonAvatar } from '../../common/PersonAvatar';
 import { Question, Questions } from '../../common/Question';
 import { SideDrawer } from '../../common/SideDrawer';
-import { ABSENCES, EMPLOYEES, TODAY, employeeName, type MockAbsence } from './data';
+import { CalendarGrid } from './CalendarGrid';
+import { ABSENCES, EMPLOYEES, RANGE_DAYS, RANGE_STEP, TODAY, TYPES, employeeOf, typeOf, type MockAbsence } from './data';
 
-const STATES = ['month', 'december', 'details_pending', 'details_approved', 'search', 'empty'] as const;
+const STATES = ['range', 'later', 'details_pending', 'details_sick', 'search', 'empty'] as const;
 type State = (typeof STATES)[number];
 
-const KINDS = ['leave_approved', 'leave_pending', 'sick_approved', 'sick_pending'] as const;
-type Kind = (typeof KINDS)[number];
-
-const kindOf = (a: MockAbsence): Kind => `${a.kind}_${a.status}`;
-
-/** Kolor paska: rodzaj nieobecności (urlop zielony, chorobowe fioletowe); wniosek do zatwierdzenia jest jasny. */
-const KIND_STYLE: Record<Kind, { color: string; variant: 'filled' | 'light' }> = {
-  leave_approved: { color: 'green.9', variant: 'filled' },
-  leave_pending: { color: 'yellow', variant: 'light' },
-  sick_approved: { color: 'grape.9', variant: 'filled' },
-  sick_pending: { color: 'grape', variant: 'light' },
-};
-
-const Swatch = ({ kind }: { kind: Kind }) => {
-  const { color, variant } = KIND_STYLE[kind];
-  const [name, shade] = color.split('.');
-  return (
-    <Box
-      w={12}
-      h={12}
-      style={{
-        flex: 'none',
-        borderRadius: 2,
-        background: variant === 'filled' ? `var(--mantine-color-${name}-${shade})` : `var(--mantine-color-${name}-light)`,
-        border: variant === 'light' ? `1px dashed var(--mantine-color-${name}-4)` : undefined,
-      }}
-    />
-  );
-};
-
-const monthLabel = (iso: string) => {
-  const text = dayjs(iso).locale('pl').format('MMMM YYYY');
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
+/** Typy w filtrze i legendzie: jeden kolor = jeden przycisk (Wypoczynkowy i Na żądanie mają ten sam zielony). */
+const LEGEND = TYPES.filter((tp, i) => TYPES.findIndex((o) => o.color === tp.color) === i);
+const typesOfColor = (color: string) => TYPES.filter((tp) => tp.color === color).map((tp) => tp.name).join(', ');
 
 /** Szczegóły klikniętej nieobecności, z decyzją przy wniosku, który czeka. */
 const AbsenceDrawer = ({ absence, onClose }: { absence: MockAbsence; onClose: () => void }) => {
   const { t } = useTranslation('calendar');
-  const name = employeeName(absence.employeeId);
+  const person = employeeOf(absence.employeeId);
+  const type = typeOf(absence.typeId);
+  const status = absence.status === 'pending' ? 'pending' : type.approval ? 'approved' : 'reported';
   return (
     <SideDrawer title={t('details_title')} onClose={onClose}>
       <Stack gap="lg">
         <Group gap="sm">
-          <PersonAvatar name={name} />
+          <PersonAvatar name={person.name} />
           <Stack gap={0}>
-            <Text fw={600}>{name}</Text>
-            <Text size="sm" c="dimmed">{EMPLOYEES.find((e) => e.id === absence.employeeId)?.position}</Text>
+            <Text fw={600}>{person.name}</Text>
+            <Text size="sm" c="dimmed">{person.position}</Text>
           </Stack>
         </Group>
         <Stack gap="xs">
           <DetailRow label={t('type')}>
-            <Group gap={6}><Swatch kind={kindOf(absence)} />{absence.type}</Group>
+            <Group gap={6}><ColorSwatch color={`var(--mantine-color-${type.color}-8)`} size={12} radius={2} />{type.name}</Group>
           </DetailRow>
           <DetailRow label={t('term')}>
             <DateText value={absence.from} />
             {absence.to !== absence.from && <> – <DateText value={absence.to} /></>}
           </DetailRow>
-          <DetailRow label={t('days')}>{t('days_value', { count: absence.days })}</DetailRow>
+          <DetailRow label={t('days')}>{t(`days_value_${type.dayCount}`, { count: absence.days })}</DetailRow>
           <DetailRow label={t('status_label')}>
-            <Badge variant="light" color={absence.status === 'approved' ? 'green' : 'yellow'}>{t(`status.${absence.status}`)}</Badge>
+            <Badge variant="light" color={status === 'pending' ? 'yellow' : 'green'}>{t(`status.${status}`)}</Badge>
           </DetailRow>
           {absence.comment && <DetailRow label={t('comment')}>{absence.comment}</DetailRow>}
           <DetailRow label={t('created_at')}><DateText value={absence.createdAt} withTime /></DetailRow>
@@ -97,7 +68,7 @@ const AbsenceDrawer = ({ absence, onClose }: { absence: MockAbsence; onClose: ()
                 color="green"
                 leftSection={<ButtonIcon action="confirm" size={16} />}
                 onClick={() => {
-                  notify.success(t('approved_toast', { name }));
+                  notify.success(t('approved_toast', { name: person.name }));
                   onClose();
                 }}
               >
@@ -113,61 +84,41 @@ const AbsenceDrawer = ({ absence, onClose }: { absence: MockAbsence; onClose: ()
 
 export const CalendarMockup = () => {
   const { t } = useTranslation('calendar');
-  const [state, setState] = useState<State>('month');
-  const [date, setDate] = useState(TODAY);
-  const [kinds, setKinds] = useState<string[]>([...KINDS]);
-  const [search, setSearch] = useState('');
-  const [open, setOpen] = useState<MockAbsence | null>(null);
   const theme = useMantineTheme();
   const phone = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`, false, { getInitialValueInEffect: false });
+  const [state, setState] = useState<State>('range');
+  const [start, setStart] = useState(TODAY);
+  const [colors, setColors] = useState<string[]>(LEGEND.map((tp) => tp.color));
+  const [search, setSearch] = useState('');
+  const [open, setOpen] = useState<MockAbsence | null>(null);
 
   const changeState = (s: State) => {
     setState(s);
     setOpen(null);
     setSearch(s === 'search' ? 'kow' : '');
-    setDate(s === 'december' ? '2026-12-01' : TODAY);
-    if (s === 'details_pending') setOpen(ABSENCES.find((a) => a.id === 21)!);
-    if (s === 'details_approved') setOpen(ABSENCES.find((a) => a.id === 25)!);
+    setStart(s === 'later' ? dayjs(TODAY).add(RANGE_STEP, 'day').format('YYYY-MM-DD') : TODAY);
+    if (s === 'details_pending') setOpen(ABSENCES.find((a) => a.id === 29)!);
+    if (s === 'details_sick') setOpen(ABSENCES.find((a) => a.id === 25)!);
   };
 
+  const days = Array.from({ length: RANGE_DAYS }, (_, i) => dayjs(start).add(i, 'day').format('YYYY-MM-DD'));
+  const end = days[days.length - 1]!;
   const people = EMPLOYEES.filter((e) => e.name.toLowerCase().includes(search.trim().toLowerCase()));
-  const resources: ScheduleResourceData[] = people.map((e) => ({ id: e.id, label: e.name, payload: { position: e.position } }));
-
-  const month = dayjs(date).format('YYYY-MM');
-  const inMonth = ABSENCES.filter((a) => a.from.slice(0, 7) <= month && a.to.slice(0, 7) >= month);
-  const shown = ABSENCES.filter((a) => kinds.includes(kindOf(a)) && people.some((p) => p.id === a.employeeId));
-
-  const events = useMemo<ScheduleEventData[]>(() => {
-    const year = dayjs(date).year();
-    const holidays = getPolishHolidays(year).map((h) => h.date);
-    const offDays = Array.from({ length: dayjs(date).daysInMonth() }, (_, i) => dayjs(date).startOf('month').add(i, 'day').format('YYYY-MM-DD'))
-      .filter((d) => holidays.includes(d) && !isWeekend(d));
-    const background: ScheduleEventData[] = people.flatMap((p) =>
-      offDays.filter((d) => !shown.some((a) => a.employeeId === p.id && a.from <= d && a.to >= d)).map((d) => ({ id: `off-${p.id}-${d}`, title: '', start: `${d} 00:00:00`, end: `${d} 23:59:59`, color: 'dark.8', display: 'background' as const, resourceId: p.id })),
-    );
-    const bars: ScheduleEventData[] = shown.map((a) => ({
-      id: a.id,
-      title: a.status === 'pending' ? `${a.type} · ${t('pending_short')}` : a.type,
-      start: `${a.from} 00:00:00`,
-      end: `${a.to} 23:59:59`,
-      color: KIND_STYLE[kindOf(a)].color,
-      variant: KIND_STYLE[kindOf(a)].variant,
-      resourceId: a.employeeId,
-      payload: { absence: a },
-    }));
-    return [...background, ...bars];
-  }, [date, people, shown, t]);
-
-  const offToday = ABSENCES.filter((a) => a.from <= TODAY && a.to >= TODAY).map(
-    (a) => `${employeeName(a.employeeId)} (${a.kind === 'sick' ? t('sick_short') : a.type.toLowerCase()}${a.status === 'pending' ? `, ${t('pending_short')}` : ''})`,
-  );
+  const inRange = ABSENCES.filter((a) => a.from <= end && a.to >= start);
+  const shown = inRange.filter((a) => colors.includes(typeOf(a.typeId).color));
+  const offToday = ABSENCES.filter((a) => a.from <= TODAY && a.to >= TODAY).map((a) => {
+    const name = employeeOf(a.employeeId).name;
+    const type = typeOf(a.typeId).name.toLowerCase();
+    return a.status === 'pending' ? `${name} (${type}, ${t('pending_short')})` : `${name} (${type})`;
+  });
+  const shift = (step: number) => setStart(dayjs(start).add(step, 'day').format('YYYY-MM-DD'));
 
   return (
     <Stack>
       <Questions>
         <Question
           number={1}
-          about="Okno po kliknięciu paska"
+          about="Panel po kliknięciu paska"
           options={[
             { id: 'a', text: 'Szczegóły i od razu „Zatwierdź” / „Odrzuć” przy wniosku, który czeka (te same okna co we Wnioskach urlopowych), plus „Otwórz wniosek”' },
             { id: 'b', text: 'Tylko szczegóły i „Otwórz wniosek”; decyzje zawsze we Wnioskach urlopowych' },
@@ -180,8 +131,8 @@ export const CalendarMockup = () => {
           number={2}
           about="Wiersze z osobami"
           options={[
-            { id: 'a', text: 'Wszyscy aktywni pracownicy, także ci bez nieobecności w tym miesiącu (widać, kto jest w pracy)' },
-            { id: 'b', text: 'Tylko osoby, które w tym miesiącu mają urlop albo chorobowe' },
+            { id: 'a', text: 'Wszyscy aktywni pracownicy, także ci bez nieobecności w widocznych dniach (widać, kto jest w pracy)' },
+            { id: 'b', text: 'Tylko osoby, które w widocznych dniach mają jakąś nieobecność' },
           ]}
           recommended="a"
         >
@@ -189,54 +140,65 @@ export const CalendarMockup = () => {
         </Question>
         <Question
           number={3}
-          about="Chorobowe"
+          about="Kolory pasków (Typy urlopów)"
           options={[
-            { id: 'a', text: 'W Typach urlopów nowe pole „Rodzaj”: urlop albo chorobowe. Dopisuję typ „Chorobowe” (nie odejmuje dni z puli). Wszystkie typy z rodzajem „chorobowe” mają w kalendarzu kolor fioletowy' },
-            { id: 'b', text: 'Każdy typ urlopu dostaje własny kolor do wybrania w Typach urlopów' },
+            { id: 'a', text: 'Każdy typ urlopu ma w ustawieniach kolor do wybrania z 6 (zielony, morski, turkusowy, granatowy, fioletowy, pomarańczowy); wniosek, który czeka, jest w tym kolorze, ale jasny, z przerywaną ramką i dopiskiem „czeka”' },
+            { id: 'b', text: 'Stałe kolory bez ustawień: zielony = zatwierdzony urlop, żółty = czeka, fioletowy = typ bez zatwierdzania (chorobowe)' },
           ]}
           recommended="a"
         >
-          Skąd kalendarz ma wiedzieć, który typ to chorobowe? Wnioski o chorobowe składa pracownik w Moich urlopach (ustalone wcześniej).
+          Jak odróżniać typy nieobecności w kalendarzu? Odrzucone, wycofane i anulowane wnioski się nie pojawiają.
         </Question>
         <Question
           number={4}
-          about="Kolory pasków"
+          about="Typ bez zatwierdzania (np. chorobowe)"
           options={[
-            { id: 'a', text: 'Kolor mówi, co to jest (urlop zielony, chorobowe fioletowe), a wniosek do zatwierdzenia jest jasny z przerywaną ramką i dopiskiem „czeka”; urlop do zatwierdzenia żółty jak w całej aplikacji' },
-            { id: 'b', text: 'Tylko dwa kolory: zielony = zatwierdzone, żółty = czeka; chorobowe rozpoznajesz po napisie na pasku' },
+            { id: 'a', text: 'Wniosek od razu jest zatwierdzony i odejmuje dni (jeśli typ odejmuje); administrator dostaje powiadomienie w dzwonku i e-mail „Tomasz Wójcik zgłosił chorobowe 16–22.11.2026”' },
+            { id: 'b', text: 'Tak samo, ale bez e-maila, tylko powiadomienie w dzwonku' },
           ]}
           recommended="a"
         >
-          Jak odróżniać urlop, chorobowe i to, co jeszcze czeka? Odrzucone, wycofane i anulowane wnioski nie pojawiają się w kalendarzu.
+          Co się dzieje, gdy pracownik zgłasza nieobecność typu, który nie wymaga zatwierdzenia?
         </Question>
         <Question
           number={5}
-          about="Zakres i telefon"
+          about="Typ bez zatwierdzania: pomyłki"
           options={[
-            { id: 'a', text: 'Zawsze cały miesiąc ze strzałkami i „Dziś”; na telefonie ten sam widok przewija się w bok i od razu pokazuje dzisiejszy dzień' },
-            { id: 'b', text: 'Na komputerze miesiąc, na telefonie lista nieobecności z najbliższych 2 tygodni zamiast siatki' },
+            { id: 'a', text: 'Pracownik może je wycofać do pierwszego dnia (jak wniosek, który czeka); potem tylko administrator może je anulować z powodem, jak zatwierdzony urlop' },
+            { id: 'b', text: 'Pracownik nie może nic zmienić; tylko administrator anuluje' },
           ]}
           recommended="a"
         >
-          Jaki zakres dni widać naraz i jak kalendarz wygląda na telefonie?
+          Co, gdy pracownik zgłosi chorobowe z błędnymi datami?
         </Question>
         <Question
           number={6}
+          about="Dni kalendarzowe (np. ojcowski 14 dni)"
+          options={[
+            { id: 'a', text: 'Typ „kalendarzowy” liczy wszystkie dni, także weekendy i święta: w formularzu wniosku, w limicie typu, w puli (gdy typ odejmuje), na wydruku i w kalendarzu (ciągły pasek); przy liczbie zawsze dopisek „dni kalendarzowych”. Istniejące typy zostają „robocze”, a nowe ustawienie dotyczy tylko nowych wniosków' },
+            { id: 'b', text: 'Dni kalendarzowe tylko w kalendarzu i na wydruku; limit i pula zawsze w dniach roboczych' },
+          ]}
+          recommended="a"
+        >
+          Gdzie ma działać liczenie w dniach kalendarzowych?
+        </Question>
+        <Question
+          number={7}
           about="Powiązania z innymi ekranami"
           options={[
-            { id: 'a', text: 'Na Pulpicie przy boksie „Nieobecności na 2 tygodnie” przycisk „Otwórz kalendarz”, a w szczegółach wniosku przycisk „Pokaż w kalendarzu” (otwiera miesiąc tego wniosku)' },
-            { id: 'b', text: 'Tylko pozycja „Kalendarz” w menu, bez przycisków na innych ekranach' },
+            { id: 'a', text: 'Na Pulpicie przy boksie „Nieobecności na 2 tygodnie” przycisk „Otwórz kalendarz”, a w szczegółach wniosku „Pokaż w kalendarzu” (zakres od pierwszego dnia wniosku)' },
+            { id: 'b', text: 'Tylko pozycja „Kalendarz” w menu' },
           ]}
           recommended="a"
         >
           Czy inne ekrany mają prowadzić do kalendarza?
         </Question>
         <Question
-          number={7}
+          number={8}
           about="Klik w pusty dzień"
           options={[
-            { id: 'a', text: 'Nic się nie dzieje: nieobecność zawsze zgłasza pracownik, administrator tylko decyduje' },
-            { id: 'b', text: 'Administrator może wpisać chorobowe za pracownika (np. gdy ten zadzwonił, że jest chory); od razu zatwierdzone' },
+            { id: 'a', text: 'Nic się nie dzieje: nieobecność zawsze zgłasza pracownik w Moich urlopach' },
+            { id: 'b', text: 'Administrator może wpisać nieobecność za pracownika (np. chorobowe, gdy ten zadzwonił, że jest chory); od razu zatwierdzona' },
           ]}
           recommended="a"
         >
@@ -262,9 +224,7 @@ export const CalendarMockup = () => {
         subtitle={
           state === 'empty'
             ? undefined
-            : inMonth.length > 0
-              ? t('summary', { month: monthLabel(date), count: inMonth.length, pending: inMonth.filter((a) => a.status === 'pending').length })
-              : t('summary_none', { month: monthLabel(date) })
+            : t('summary', { count: inRange.length, pending: inRange.filter((a) => a.status === 'pending').length })
         }
       />
 
@@ -281,7 +241,7 @@ export const CalendarMockup = () => {
         <>
           <Text fw={500}>{offToday.length > 0 ? t('today_off', { names: offToday.join(', ') }) : t('today_all')}</Text>
 
-          <Group gap="md" align="flex-end" wrap="wrap">
+          <Group gap="md" align="center" wrap="wrap">
             <TextInput
               leftSection={<Search size={16} />}
               placeholder={t('search')}
@@ -290,76 +250,52 @@ export const CalendarMockup = () => {
               onChange={(e) => setSearch(e.currentTarget.value)}
               w={{ base: '100%', sm: 260 }}
             />
-            <Chip.Group multiple value={kinds} onChange={setKinds}>
+            <Chip.Group multiple value={colors} onChange={setColors}>
               <Group gap="xs" wrap="wrap">
-                {KINDS.map((k) => (
-                  <Chip key={k} value={k} variant="outline" size="sm" icon={<Swatch kind={k} />}>
-                    {t(`kind.${k}`)}
+                {LEGEND.map((tp) => (
+                  <Chip key={tp.color} value={tp.color} variant="outline" size="sm" icon={<ColorSwatch color={`var(--mantine-color-${tp.color}-8)`} size={12} radius={2} />}>
+                    {typesOfColor(tp.color)}
                   </Chip>
                 ))}
               </Group>
             </Chip.Group>
           </Group>
 
-          {people.length === 0 ? (
-            <Paper withBorder><EmptyState icon={Search} text={t('no_match')} /></Paper>
-          ) : (
-            <Paper withBorder style={{ overflow: 'hidden' }}>
-              <Group gap="xs" p="xs" justify="space-between" style={{ borderBottom: '1px solid var(--mantine-color-dark-4)' }}>
-                <Group gap="xs" wrap="nowrap">
-                  <ActionIcon variant="default" size="lg" aria-label={t('labels.previous')} onClick={() => setDate(dayjs(date).subtract(1, 'month').format('YYYY-MM-DD'))}>
-                    <ChevronLeft size={18} />
-                  </ActionIcon>
-                  <Title order={3} miw={170} ta="center">{monthLabel(date)}</Title>
-                  <ActionIcon variant="default" size="lg" aria-label={t('labels.next')} onClick={() => setDate(dayjs(date).add(1, 'month').format('YYYY-MM-DD'))}>
-                    <ChevronRight size={18} />
-                  </ActionIcon>
-                </Group>
-                <Button variant="default" leftSection={<CalendarDays size={16} />} onClick={() => setDate(TODAY)} disabled={dayjs(date).isSame(TODAY, 'month')}>
-                  {t('labels.today')}
-                </Button>
+          <Paper withBorder style={{ overflow: 'hidden' }}>
+            <Group gap="xs" p="xs" justify="space-between" style={{ borderBottom: '1px solid var(--mantine-color-dark-4)' }}>
+              <Group gap="xs" wrap="nowrap">
+                <ActionIcon variant="default" size="lg" aria-label={t('previous', { count: RANGE_STEP })} onClick={() => shift(-RANGE_STEP)}>
+                  <ChevronLeft size={18} />
+                </ActionIcon>
+                <Text fw={600} miw={phone ? 0 : 210} ta="center">{formatDate(start)} – {formatDate(end)}</Text>
+                <ActionIcon variant="default" size="lg" aria-label={t('next', { count: RANGE_STEP })} onClick={() => shift(RANGE_STEP)}>
+                  <ChevronRight size={18} />
+                </ActionIcon>
               </Group>
-              <ResourcesMonthView
-                key={`${month}-${phone}`}
-                withHeader={false}
-                style={phone ? { '--resources-month-view-resource-label-width': '8.5rem' } as CSSProperties : undefined}
-                date={date}
-                onDateChange={setDate}
-                resources={resources}
-                events={events}
-                locale="pl"
-                labels={{ ...t('labels', { returnObjects: true }) as Record<string, string> }}
-                startScrollDate={phone ? TODAY : undefined}
-                highlightToday={false}
-                dayWidth={phone ? 40 : 31}
-                rowHeight={46}
-                maxEventsPerTimeSlot={1}
-                renderResourceLabel={(r) => (
-                  <Group gap="xs" wrap="nowrap" px="xs">
-                    {!phone && <PersonAvatar name={String(r.label)} />}
-                    <Stack gap={0} style={{ minWidth: 0 }}>
-                      <Text size="sm" fw={500} truncate>{r.label}</Text>
-                      <Text size="xs" c="dimmed" truncate>{r.payload?.position}</Text>
-                    </Stack>
-                  </Group>
-                )}
-                renderEventBody={(e) => {
-                  const a = e.payload?.absence as MockAbsence | undefined;
-                  if (!a) return null;
-                  return (
-                    <Tooltip label={`${employeeName(a.employeeId)}: ${a.type}, ${t(`status.${a.status}`).toLowerCase()}`} withinPortal>
-                      <Text size="xs" fw={600} truncate>{e.title}</Text>
-                    </Tooltip>
-                  );
-                }}
-                onEventClick={(e) => e.payload?.absence && setOpen(e.payload.absence as MockAbsence)}
-              />
-            </Paper>
-          )}
+              <Button variant="default" leftSection={<CalendarDays size={16} />} onClick={() => setStart(TODAY)} disabled={start === TODAY}>
+                {t('today')}
+              </Button>
+            </Group>
+            {people.length === 0 ? (
+              <EmptyState icon={Search} text={t('no_match')} />
+            ) : (
+              <CalendarGrid days={days} people={people} absences={shown} today={TODAY} phone={phone} onOpen={setOpen} />
+            )}
+          </Paper>
 
-          <Group gap={6}>
-            <Box w={12} h={12} style={{ borderRadius: 2, background: 'var(--mantine-color-dark-8)', border: '1px solid var(--mantine-color-dark-4)' }} />
-            <Text size="xs" c="dimmed">{t('off_day')}</Text>
+          <Group gap="lg">
+            <Group gap={6} wrap="nowrap">
+              <Box w={18} h={12} style={{ borderRadius: 2, background: 'var(--mantine-color-green-light)', border: '1px dashed var(--mantine-color-green-4)' }} />
+              <Text size="xs" c="dimmed">{t('legend_pending')}</Text>
+            </Group>
+            <Group gap={6} wrap="nowrap">
+              <Box w={18} h={12} style={{ borderRadius: 2, background: 'var(--mantine-color-dark-8)', border: '1px solid var(--mantine-color-dark-4)' }} />
+              <Text size="xs" c="dimmed">{t('off_day')}</Text>
+            </Group>
+            <Group gap={6} wrap="nowrap">
+              <Box w={18} h={2} style={{ background: 'var(--mantine-color-green-5)', opacity: 0.6 }} />
+              <Text size="xs" c="dimmed">{t('legend_bridge')}</Text>
+            </Group>
           </Group>
         </>
       )}

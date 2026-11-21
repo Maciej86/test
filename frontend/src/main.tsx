@@ -8,7 +8,6 @@ import { createI18n } from '@app/shared';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
-import '@mantine/schedule/styles.css';
 import '@app/shared/theme.css';
 import { App } from './App';
 import { NOTIFICATION_AUTOCLOSE_MS } from './config/constants';

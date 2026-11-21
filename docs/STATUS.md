@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.48
 
-**Następny krok:** Kalendarz: odpowiedzi na 7 pytań w makiecie (http://localhost:5181/admin/calendar), potem spec.
+**Następny krok:** Kalendarz: odpowiedzi na 8 pytań w makiecie (http://localhost:5181/admin/calendar, także Ustawienia → Typy urlopów), potem spec.
 
 ## Start aplikacji
 
@@ -38,6 +38,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-21: Kalendarz, zmiany od użytkownika: typ urlopu dostaje „Liczenie dni” (robocze / kalendarzowe, np. ojcowski 14 dni kalendarzowych) i „Wymaga zatwierdzenia” (chorobowe nie wymaga: wystawił lekarz albo nie); kalendarz pokazuje dziś + 60 dni na całą szerokość ekranu, opis na środku paska, urlop w dniach roboczych przerwany w weekendy i święta. Własna siatka zamiast `@mantine/schedule` (pokazuje tylko jeden miesiąc i nie przerywa pasków; biblioteka odinstalowana). Makieta Typów urlopów wraca do czasu zamknięcia Kalendarza; 8 pytań.
 - 2026-11-21: Kalendarz: makieta (miesiąc: osoby w wierszach, dni w kolumnach na `@mantine/schedule` 9.8.0; paski urlopu i chorobowego, filtry rodzajów jako legenda, wyszukiwarka, „Dziś nie ma: …”, weekendy i święta przyciemnione, szczegóły w panelu z prawej z „Zatwierdź” / „Odrzuć”, telefon przewija się do dziś); 7 pytań.
 - 2026-11-21: Nowy moduł Kalendarz (zgłoszenie użytkownika) przed Publikacją: tylko administrator; pracownicy w kolumnie po lewej, dni po prawej; widać urlop do zatwierdzenia, zatwierdzony i chorobowe. Chorobowe zgłasza pracownik jak wniosek (typ urlopu, który nie zmniejsza puli), administrator zatwierdza (odpowiedzi 1a 2b 3a). Publikacja jest teraz modułem 16.
 - 2026-11-20: Moduł Pulpit zrobiony (potwierdzony przez użytkownika): administrator (wnioski do rozpatrzenia, nieobecności na 2 tygodnie, stan tablic z zadaniami po terminie, moje zadania), pracownik (pula, moje wnioski, moje zadania); `GET /api/dashboard`. Wspólne: `PoolCard`, `LeaveStrip`, `taskDueState`, `MY_LEAVE_PATH`.
