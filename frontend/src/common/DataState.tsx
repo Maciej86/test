@@ -1,3 +1,4 @@
+// rule-ok: tylko w aplikacji, stan zapytania do API (makiety nie pobierają danych)
 import type { ReactNode } from 'react';
 import { Alert, Button, Center, Loader, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';

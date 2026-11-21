@@ -1,13 +1,15 @@
 import { useState, type ReactNode } from 'react';
-import { Anchor, Badge, Box, Button, Divider, Grid, Group, Paper, Progress, SegmentedControl, Stack, Table, Text, UnstyledButton } from '@mantine/core';
+import { Anchor, Badge, Box, Button, Divider, Grid, Group, Paper, SegmentedControl, Stack, Table, Text, UnstyledButton } from '@mantine/core';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { CALENDAR_PATH, dayjs, formatDate } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { InfoCard } from '../../common/InfoCard';
+import { LeaveDates, LeaveStatusBadge } from '../../common/LeaveRequestParts';
 import { PageHeader } from '../../common/PageHeader';
 import { PersonAvatar } from '../../common/PersonAvatar';
+import { PoolCard } from '../../common/PoolCard';
 import { useMockupRole } from '../../common/mockupRole';
 import { AbsenceStrip } from './AbsenceStrip';
 import {
@@ -59,7 +61,7 @@ const PendingBox = ({ empty }: { empty: boolean }) => {
               <Box miw={0}>
                 <Text fw={600} truncate>{r.employee}</Text>
                 <Text size="sm">
-                  {r.type}, <DateText value={r.from} /> – <DateText value={r.to} />
+                  {r.type}, <LeaveDates from={r.from} to={r.to} />
                 </Text>
                 <Text size="xs" c="dimmed">
                   {t('pending.submitted', { date: formatDate(r.createdAt) })},{' '}
@@ -189,54 +191,19 @@ const AdminDashboard = ({ empty }: { empty: boolean }) => {
   );
 };
 
-/** Ta sama karta co „Urlop w …” na ekranie Moje urlopy (w aplikacji: wspólny klocek), plus przycisk wniosku. */
+/** Ta sama karta co „Urlop w …” na ekranie Moje urlopy (wspólny `PoolCard`), plus przycisk wniosku. */
 const PoolBox = () => {
   const { t } = useTranslation('dashboard');
-  const { t: tc } = useTranslation();
-  const pool = MY_POOL;
-  const total = pool.annual + pool.carried;
-  const used = pool.usedCarried + pool.usedAnnual;
-  const leftCarried = pool.carried - pool.usedCarried;
-  const left = total - used - pool.pending;
-  const parts = [
-    { key: 'used', value: used, color: 'dark.4' },
-    { key: 'pending', value: pool.pending, color: 'yellow.6' },
-    { key: 'carried', value: leftCarried, color: 'navy.3' },
-    { key: 'annual', value: left - leftCarried, color: 'navy.6' },
-  ];
   return (
-    <InfoCard
-      title={tc('pool.title', { year: pool.year })}
-      actions={
-        <Button component={Link} to="/admin/my-leave" leftSection={<ButtonIcon action="add" />}>
-          {t('pool.request')}
-        </Button>
-      }
-    >
-      <Group gap="xs" align="baseline">
-        <Text fz={40} fw={700} lh={1}>{left}</Text>
-        <Text c="dimmed">{tc('pool.left', { total })}</Text>
-      </Group>
-      <Progress.Root size={12} radius="xs" aria-label={tc('pool.aria', { left, total })}>
-        {parts.map((p) => <Progress.Section key={p.key} value={(p.value / total) * 100} color={p.color} />)}
-      </Progress.Root>
-      <Group gap="lg" mt={4}>
-        {parts.map((p) => (
-          <Group key={p.key} gap={6} wrap="nowrap">
-            <Box w={10} h={10} bg={p.color} style={{ borderRadius: 2 }} />
-            <Text size="sm">
-              <Text span fw={700}>{p.value}</Text> <Text span c="dimmed">{tc(`pool.legend_${p.key}`, { year: pool.year - 1 })}</Text>
-            </Text>
-          </Group>
-        ))}
-      </Group>
-    </InfoCard>
+    <PoolCard
+      pool={MY_POOL}
+      actions={<Button component={Link} to="/admin/my-leave" leftSection={<ButtonIcon action="add" />}>{t('pool.request')}</Button>}
+    />
   );
 };
 
 const MyRequestsBox = ({ empty }: { empty: boolean }) => {
   const { t } = useTranslation('dashboard');
-  const { t: tLeave } = useTranslation('my-leave');
   const pending = empty ? [] : MY_PENDING;
   const next = empty ? null : MY_NEXT_LEAVE;
   return (
@@ -246,9 +213,9 @@ const MyRequestsBox = ({ empty }: { empty: boolean }) => {
       {pending.map((r) => (
         <Group key={r.id} justify="space-between" wrap="nowrap">
           <Text>
-            {r.type}, <DateText value={r.from} /> – <DateText value={r.to} />
+            {r.type}, <LeaveDates from={r.from} to={r.to} />
           </Text>
-          <Badge variant="light" color="yellow" style={{ flex: 'none' }}>{tLeave('status.pending')}</Badge>
+          <LeaveStatusBadge status="pending" />
         </Group>
       ))}
       <Divider my={4} />
@@ -258,7 +225,7 @@ const MyRequestsBox = ({ empty }: { empty: boolean }) => {
       ) : (
         <Group justify="space-between" wrap="nowrap">
           <Text>
-            {next.type}, <DateText value={next.from} /> – <DateText value={next.to} />
+            {next.type}, <LeaveDates from={next.from} to={next.to} />
           </Text>
           <Badge variant="light" color="green" style={{ flex: 'none' }}>{t('days', { count: next.days })}</Badge>
         </Group>

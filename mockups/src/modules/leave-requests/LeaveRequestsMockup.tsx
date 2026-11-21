@@ -1,5 +1,5 @@
 import { useState, type MouseEvent } from 'react';
-import { Badge, Button, Card, Group, Paper, SegmentedControl, Select, Stack, Table, Text, TextInput } from '@mantine/core';
+import { Badge, Button, Card, Group, Paper, SegmentedControl, Select, Stack, Table, Text } from '@mantine/core';
 import { CalendarCheck, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH, formatDate } from '@app/shared';
@@ -9,10 +9,13 @@ import { EmptyState } from '../../common/EmptyState';
 import { ListPagination } from '../../common/ListPagination';
 import { notify } from '../../common/notify';
 import { PageHeader } from '../../common/PageHeader';
-import { LeaveRequestDrawer } from '../../common/LeaveRequestDrawer';
-import { ApproveModal, CancelModal, RejectModal, STATUS_COLOR, Term, isLate, splitText, toView } from './LeaveRequestModals';
-import { TeamStrip } from './TeamStrip';
-import { LEAVE_TYPES, POOLS, REQUESTS, YEARS, overlapping, poolLeft, type MockRequest } from './data';
+import { SearchField } from '../../common/SearchField';
+import { LeaveDates, LeaveStatusBadge } from '../../common/LeaveRequestParts';
+import { ApproveModal, CancelModal, RejectModal } from '../../common/leave-request/DecisionModals';
+import { DetailsDrawer } from '../../common/leave-request/DetailsDrawer';
+import { TeamStrip } from '../../common/leave-request/TeamStrip';
+import { isLate, splitText, toDecision, toStrip, toView } from './requestView';
+import { LEAVE_TYPES, POOLS, REQUESTS, YEARS, poolLeft, type MockRequest } from './data';
 
 const STATES = ['list', 'approve', 'details', 'details_late', 'details_approved', 'reject', 'reject_error', 'cancel', 'cancel_started', 'already_decided', 'empty'] as const;
 type State = (typeof STATES)[number];
@@ -80,10 +83,9 @@ const PoolCell = ({ r }: { r: MockRequest }) => {
 };
 
 const StatusCell = ({ r }: { r: MockRequest }) => {
-  const { t } = useTranslation('leave-requests');
   return (
     <Stack gap={4} align="flex-start">
-      <Badge color={STATUS_COLOR[r.status]} variant="light" miw="max-content">{t(`status.${r.status}`)}</Badge>
+      <LeaveStatusBadge status={r.status} />
       {r.decidedBy && <Text size="xs" c="dimmed">{r.decidedBy}, <DateText value={r.decidedAt?.slice(0, 10)} /></Text>}
       {r.reason && <Text size="xs" maw={240} lineClamp={2}>„{r.reason}”</Text>}
     </Stack>
@@ -115,13 +117,13 @@ const RequestsTable = ({ rows, ...actions }: RowActions & { rows: MockRequest[] 
                 {r.comment && <Text size="xs" c="dimmed" maw={240} lineClamp={2}>{r.comment}</Text>}
               </Table.Td>
               <Table.Td>
-                <Text fw={600} style={{ whiteSpace: 'nowrap' }}><Term r={r} /></Text>
+                <Text fw={600} style={{ whiteSpace: 'nowrap' }}><LeaveDates from={r.from} to={r.to} /></Text>
                 {isLate(r) && <Badge mt={4} size="sm" variant="light" color="yellow">{t('late')}</Badge>}
               </Table.Td>
               <Table.Td>{r.type}</Table.Td>
               <Table.Td>
                 <Text fw={600}>{r.days}</Text>
-                <Text size="xs" c="dimmed">{r.status === 'pending' || r.status === 'approved' ? splitText(r, t) : t('split_returned')}</Text>
+                <Text size="xs" c="dimmed">{splitText(r, t)}</Text>
               </Table.Td>
               <Table.Td><PoolCell r={r} /></Table.Td>
               <Table.Td><StatusCell r={r} /></Table.Td>
@@ -146,10 +148,10 @@ const RequestCards = ({ rows, ...actions }: RowActions & { rows: MockRequest[] }
             <Group justify="space-between" align="flex-start" wrap="nowrap">
               <Stack gap={0}>
                 <Text fw={600}>{r.employee}</Text>
-                <Text size="sm"><Term r={r} /></Text>
+                <Text size="sm"><LeaveDates from={r.from} to={r.to} /></Text>
                 <Text size="sm" c="dimmed">{r.type}, {t('days', { count: r.days })}</Text>
               </Stack>
-              <Badge color={STATUS_COLOR[r.status]} variant="light">{t(`status.${r.status}`)}</Badge>
+              <LeaveStatusBadge status={r.status} />
             </Group>
             {isLate(r) && <Badge size="sm" variant="light" color="yellow" w="fit-content">{t('late')}</Badge>}
             {r.comment && <Text size="sm" c="dimmed" lineClamp={2}>{r.comment}</Text>}
@@ -240,14 +242,7 @@ export const LeaveRequestsMockup = () => {
       <Select hiddenFrom="sm" aria-label={t('col_status')} data={statusOptions} value={status} onChange={(v) => v && setStatus(v as StatusFilter)} allowDeselect={false} />
 
       <Group gap="sm" align="flex-end">
-        <TextInput
-          placeholder={t('search')}
-          aria-label={t('search')}
-          leftSection={<Search size={16} />}
-          value={search}
-          onChange={(e) => setSearch(e.currentTarget.value)}
-          w={{ base: '100%', sm: 260 }}
-        />
+        <SearchField label={t('search')} value={search} onChange={setSearch} w={{ base: '100%', sm: 260 }} />
         {status !== 'pending' && (
           <Select w={{ base: '100%', xs: 120 }} aria-label={t('year')} data={YEARS} value={year} onChange={setYear} allowDeselect={false} />
         )}
@@ -270,9 +265,9 @@ export const LeaveRequestsMockup = () => {
         </>
       )}
 
-      <LeaveRequestDrawer
+      <DetailsDrawer
         request={details && toView(details, t)}
-        strip={details && <TeamStrip request={details} others={overlapping(details)} />}
+        strip={details && <TeamStrip {...toStrip(details)} />}
         onClose={() => setDetails(null)}
         onApprove={() => details && setApprove(details)}
         onReject={() => details && setReject({ r: details, error: false })}
@@ -280,9 +275,9 @@ export const LeaveRequestsMockup = () => {
         onPdf={() => notify.success(t('pdf_mockup'))}
         onShowInCalendar={() => notify.success(t('show_in_calendar_mockup'))}
       />
-      {approve && <ApproveModal key={approve.id} request={approve} onClose={() => { setApprove(null); setDetails(null); }} />}
-      {reject && <RejectModal key={`${reject.r.id}-${reject.error}`} request={reject.r} showError={reject.error} onClose={() => setReject(null)} />}
-      {cancel && <CancelModal key={cancel.id} request={cancel} onClose={() => setCancel(null)} />}
+      {approve && <ApproveModal key={approve.id} request={toDecision(approve)} onClose={() => { setApprove(null); setDetails(null); }} />}
+      {reject && <RejectModal key={`${reject.r.id}-${reject.error}`} request={toDecision(reject.r)} showError={reject.error} onClose={() => setReject(null)} />}
+      {cancel && <CancelModal key={cancel.id} request={toDecision(cancel)} onClose={() => setCancel(null)} />}
     </Stack>
   );
 };

@@ -72,6 +72,18 @@ export const sharedFrames = (byFile: { module: string; text: string }[]): Record
   );
 };
 
+/**
+ * 15. Klocek z wyglądem w frontend/src/common/ bez pliku o tej samej ścieżce w mockups/src/common/. Czerwony:
+ * dodaj go w makietach (ten sam kod, bez wywołań API) i podmień na niego wszystkie kopie w makietach („Wspólne
+ * zamiast kopii”). Plik, którego makieta nie potrzebuje (układ aplikacji, sesja, dane z API), ma w pierwszej linii
+ * `// rule-ok: tylko w aplikacji, <powód>`.
+ */
+export const APP_ONLY = /^\/\/ rule-ok: tylko w aplikacji, \S/;
+
+/** Ścieżki klocków (względem common/) bez odpowiednika w makietach i bez wyjątku w pierwszej linii. */
+export const missingInMockups = (blocks: { path: string; text: string }[], mockupPaths: string[]): string[] =>
+  blocks.filter((b) => !mockupPaths.includes(b.path) && !APP_ONLY.test(b.text.split('\n')[0] ?? '')).map((b) => b.path);
+
 describe('convention checks catch violations', () => {
   it('8. own HTTP client', () => {
     expect(ownHttpClient("const r = await fetch('/api/x');")).toEqual([1]);
@@ -94,6 +106,15 @@ describe('convention checks catch violations', () => {
   it('11. notifications without notify', () => {
     expect(ownNotifications('notifications.show({ message })')).toEqual([1]);
     expect(ownNotifications('notify.success(t("saved"))')).toEqual([]);
+  });
+
+  it('15. shared block missing in mockups', () => {
+    const block = { path: 'leave-request/DetailsDrawer.tsx', text: "import { Drawer } from '@mantine/core';" };
+    expect(missingInMockups([block], [])).toEqual(['leave-request/DetailsDrawer.tsx']);
+    expect(missingInMockups([block], ['LeaveRequestDrawer.tsx'])).toEqual(['leave-request/DetailsDrawer.tsx']);
+    expect(missingInMockups([block], ['leave-request/DetailsDrawer.tsx'])).toEqual([]);
+    expect(missingInMockups([{ path: 'AppLayout.tsx', text: '// rule-ok: tylko w aplikacji, układ z menu\nimport x;' }], [])).toEqual([]);
+    expect(missingInMockups([{ path: 'AppLayout.tsx', text: '// rule-ok: \nimport x;' }], [])).toEqual(['AppLayout.tsx']);
   });
 
   it('13. own regular expressions in module schemas', () => {
@@ -153,6 +174,15 @@ describe('frontend follows the conventions', () => {
   it('modules: Drawer, Modal, Avatar and Tabs used in two modules live in common/', () => {
     const byFile = modules.map((f) => ({ module: relative(modulesDir, f).split(sep)[0]!, text: read(f) }));
     expect(sharedFrames(byFile)).toEqual({});
+  });
+
+  it('common/: every block with a look is also in mockups/src/common/ (same path)', () => {
+    const commonDir = join(src, 'common');
+    const mockupsCommon = resolve(process.cwd(), '../mockups/src/common');
+    const tsx = (dir: string) => files(dir).filter((f) => f.endsWith('.tsx') && !f.split(sep).includes('__tests__'));
+    const blocks = tsx(commonDir).map((f) => ({ path: relative(commonDir, f).split(sep).join('/'), text: read(f) }));
+    const mockupPaths = tsx(mockupsCommon).map((f) => relative(mockupsCommon, f).split(sep).join('/'));
+    expect(missingInMockups(blocks, mockupPaths)).toEqual([]);
   });
 
   it('shared/src/schemas: module schemas take formats only from fields.ts', () => {

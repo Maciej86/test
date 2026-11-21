@@ -1,3 +1,4 @@
+// rule-ok: tylko w aplikacji, menu z uprawnień zalogowanej osoby (makiety mają Shell)
 import { NavLink } from '@mantine/core';
 import { NavLink as RouterLink, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';

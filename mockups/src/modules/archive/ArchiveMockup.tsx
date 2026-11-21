@@ -10,12 +10,12 @@ import {
   Table,
   Tabs,
   Text,
-  TextInput,
   Tooltip,
 } from '@mantine/core';
-import { ListTodo, Search, Users } from 'lucide-react';
+import { ListTodo, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
+import { SearchField } from '../../common/SearchField';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { EmptyState } from '../../common/EmptyState';
@@ -256,14 +256,7 @@ export const ArchiveMockup = () => {
         <Tabs.Panel value="employees" pt="md">
           <Stack>
             {state !== 'empty' && (
-              <TextInput
-                key={state}
-                placeholder={t('search_employees')}
-                aria-label={t('search_employees')}
-                leftSection={<Search size={16} />}
-                defaultValue={query}
-                maw={420}
-              />
+              <SearchField key={state} label={t('search_employees')} value={query} onChange={() => undefined} w={{ base: '100%', sm: 420 }} />
             )}
             {state === 'empty' && <Frame><EmptyState icon={Users} title={t('empty_employees_title')} text={t('empty_employees_text')} /></Frame>}
             {state === 'no_results' && <Frame><EmptyState text={t('no_results')} /></Frame>}
@@ -275,14 +268,7 @@ export const ArchiveMockup = () => {
           <Stack>
             {state !== 'empty' && (
               <Group gap="sm" align="flex-end">
-                <TextInput
-                  key={state}
-                  placeholder={t('search_tasks')}
-                  aria-label={t('search_tasks')}
-                  leftSection={<Search size={16} />}
-                  defaultValue={query}
-                  w={{ base: '100%', sm: 320 }}
-                />
+                <SearchField key={state} label={t('search_tasks')} value={query} onChange={() => undefined} w={{ base: '100%', sm: 320 }} />
                 <Select
                   aria-label={t('project')}
                   placeholder={t('all_projects')}

@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Badge, Button, Collapse, Group, Paper, SegmentedControl, Select, Stack, Text, TextInput, ThemeIcon, UnstyledButton } from '@mantine/core';
+import { Badge, Button, Collapse, Group, Paper, SegmentedControl, Select, Stack, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
 import { ArrowRight, CalendarDays, ChevronDown, FileSignature, FolderKanban, History, PieChart, Search, SquareKanban, Tags, UserRound, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatRelativeDay, formatTime, groupByDay } from '@app/shared';
+import { SearchField } from '../../common/SearchField';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateField } from '../../common/DateField';
 import { EmptyState } from '../../common/EmptyState';
@@ -177,14 +178,7 @@ export const ActivityLogMockup = () => {
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <Group gap="sm" align="flex-end">
-        <TextInput
-          placeholder={t('search')}
-          aria-label={t('search')}
-          leftSection={<Search size={16} />}
-          value={search}
-          onChange={(e) => setSearch(e.currentTarget.value)}
-          w={{ base: '100%', sm: 240 }}
-        />
+        <SearchField label={t('search')} value={search} onChange={setSearch} w={{ base: '100%', sm: 240 }} />
         <Select
           w={{ base: '100%', xs: 180 }}
           aria-label={t('area_label')}

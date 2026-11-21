@@ -1,3 +1,4 @@
+// rule-ok: tylko w aplikacji, ekran braku uprawnień przy trasach
 import { Center, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 

@@ -1,3 +1,5 @@
+import type { MyLeaveOverview } from '@app/shared';
+
 /**
  * Zmyślone dane makiety modułu Moje urlopy. Ogląda je Jan Kowalski (pracownik), „dziś” = 17.11.2026.
  * Liczby zgadzają się z makietą Pracowników (Jan: pula 26, zaległe 4, wykorzystane 9, czeka 2).
@@ -8,6 +10,19 @@ export const TODAY = '2026-11-17';
 
 /** Pula na rok otwarty (jeszcze niezamknięty przez administratora). */
 export const POOL = { year: 2026, annual: 26, carried: 4, usedCarried: 4, usedAnnual: 5, pending: 2 };
+
+/** Ta sama pula w kształcie z serwera, dla wspólnej karty `PoolCard`. */
+export const POOL_VIEW: MyLeaveOverview['pool'] = {
+  year: POOL.year,
+  annualDays: POOL.annual,
+  carriedDays: POOL.carried,
+  usedCarried: POOL.usedCarried,
+  usedAnnual: POOL.usedAnnual,
+  pendingDays: POOL.pending,
+  pendingCarried: 0,
+  leftDays: POOL.annual + POOL.carried - POOL.usedCarried - POOL.usedAnnual - POOL.pending,
+  leftCarriedDays: POOL.carried - POOL.usedCarried,
+};
 
 export interface MockLeaveType {
   id: number;

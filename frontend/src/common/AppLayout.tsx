@@ -1,3 +1,4 @@
+// rule-ok: tylko w aplikacji, układ panelu z menu (makiety mają Shell)
 import { useAppNavigation } from '../core/routes/useAppNavigation';
 import { SideMenuLayout } from './SideMenuLayout';
 

@@ -1,3 +1,4 @@
+// rule-ok: tylko w aplikacji, rama układu z menu (makiety mają Shell)
 import { useEffect } from 'react';
 import { AppShell, Burger, Group, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';

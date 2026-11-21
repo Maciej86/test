@@ -1,6 +1,6 @@
 # Stan projektu: test
 
-**Wersja stepkit:** 0.1.48
+**Wersja stepkit:** 0.1.51
 
 **Następny krok:** Kalendarz, część 2 (liczenie dni i zatwierdzanie): napisać `SPEC-2.md` według „Część 2 w skrócie” w `SPEC.md`, potwierdzić z użytkownikiem 7 dni wstecz dla typu bez zatwierdzania.
 
@@ -38,6 +38,7 @@
 
 ## Ostatnie decyzje
 
+- 2026-11-21: Aktualizacja stepkit do 0.1.51: każdy wspólny klocek aplikacji jest też w makietach pod tą samą nazwą (nowy test zasad). Do makiet przeszły `PoolCard`, `LeaveStrip`, `SearchField`, `LeaveRequestParts` i `leave-request/` (`DetailsDrawer`, `DecisionModals`, `TeamStrip`); kopie w makietach podmienione (Moje urlopy, Pulpit, Wnioski urlopowe, Kalendarz, wyszukiwarki). Kalendarz w makiecie pokazuje w szczegółach pasek „Kto jeszcze ma wtedy wolne” jak aplikacja. Układy, menu, `DataState`, `NoAccess` i okno bezczynności zostają tylko w aplikacji.
 - 2026-11-21: Kalendarz, część 1 potwierdzona przez użytkownika („działa”). Następna: część 2.
 - 2026-11-21: Kalendarz, część 1 zbudowana (kroki 0–11): ekran, `GET /api/calendar`, kolor typu urlopu (migracje 029–030), wspólne szczegóły wniosku z decyzjami (common, core), „Otwórz kalendarz” i „Pokaż w kalendarzu”. Przegląd kodu z poprawkami („Dziś nie ma” zawsze o dziś, odświeżanie, odmiana), próby nadużyć odparte, przegląd przed oddaniem z poprawkami (teksty części 1 w Typach urlopów, makiety bez kopii), sprawdzone w przeglądarce, 66 testów e2e zielonych. Testy ekranów na połowie rdzeni.
 - 2026-11-21: Kalendarz: podział na 2 części i `SPEC-1.md` zaakceptowane (1. kalendarz i kolor typu, 2. liczenie dni i zatwierdzanie); napisane `PLAN-1.md` i `TESTS-1.md`.

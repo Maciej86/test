@@ -1,3 +1,4 @@
+// rule-ok: tylko w aplikacji, układ konta z menu (makiety mają Shell)
 import { ACCOUNT_NAVIGATION } from '@app/shared';
 import { SideMenuLayout } from './SideMenuLayout';
 

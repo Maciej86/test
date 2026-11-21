@@ -1,3 +1,4 @@
+import type { MyLeaveOverview } from '@app/shared';
 /**
  * Zmyślone dane makiety Pulpitu. „Dziś” = piątek 20.11.2026. Osoby i projekty jak w makietach Zadań i Wniosków
  * urlopowych; administrator to Anna Nowak, pracownik Jan Kowalski (projekty Marketing i Produkcja).
@@ -90,7 +91,9 @@ export const MY_TASKS: Record<'admin' | 'employee', DashboardTask[]> = {
 };
 
 /** Pula Jana Kowalskiego w roku otwartym (te same pola co na ekranie Moje urlopy). */
-export const MY_POOL = { year: 2026, annual: 26, carried: 4, usedCarried: 4, usedAnnual: 8, pending: 2 };
+export const MY_POOL: MyLeaveOverview['pool'] = {
+  year: 2026, annualDays: 26, carriedDays: 4, usedCarried: 4, usedAnnual: 8, pendingDays: 2, pendingCarried: 0, leftDays: 16, leftCarriedDays: 0,
+};
 
 /** Wnioski Jana: czekające i najbliższy zatwierdzony urlop. */
 export const MY_PENDING = [{ id: 21, type: 'Wypoczynkowy', from: '2026-11-26', to: '2026-11-27', days: 2 }];

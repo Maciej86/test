@@ -1,7 +1,8 @@
 import { useRef, useState, type DragEvent } from 'react';
-import { Avatar, Badge, Button, Group, Paper, SegmentedControl, SimpleGrid, Stack, Switch, Text, TextInput, Title, Tooltip } from '@mantine/core';
-import { Search, SquareKanban } from 'lucide-react';
+import { Avatar, Badge, Button, Group, Paper, SegmentedControl, SimpleGrid, Stack, Switch, Text, Title, Tooltip } from '@mantine/core';
+import { SquareKanban } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { SearchField } from '../../common/SearchField';
 import { MOCK_USER_NAMES } from '../../common/mockUsers';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { EmptyState } from '../../common/EmptyState';
@@ -223,14 +224,7 @@ export const TasksMockup = ({ projectId }: { projectId: number }) => {
       />
 
       <Group gap="md" align="center">
-        <TextInput
-          placeholder={t('search')}
-          aria-label={t('search')}
-          leftSection={<Search size={16} />}
-          value={search}
-          onChange={(e) => setSearch(e.currentTarget.value)}
-          w={{ base: '100%', sm: 260 }}
-        />
+        <SearchField label={t('search')} value={search} onChange={setSearch} w={{ base: '100%', sm: 260 }} />
         <Switch label={t('only_mine')} checked={onlyMine} onChange={(e) => setOnlyMine(e.currentTarget.checked)} />
       </Group>
 

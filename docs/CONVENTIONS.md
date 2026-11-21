@@ -154,9 +154,11 @@ zgłoszone przez użytkownika, gdy inny moduł jest `w toku` (`changes.md`). Nie
 | pomocnik backendu (rozpoznanie powtórzonej nazwy, „nie znaleziono”) | `backend/src/db/` albo `backend/src/middleware/` |
 | logika potrzebna na froncie i w backendzie (daty, liczby, bieżący rok) | `shared/src/` |
 
-Komponent z wyglądem wydzielasz **od razu w obu miejscach**: `frontend/src/common/` i `mockups/src/common/` (ten sam
-kod, w makiecie bez wywołań API). Makiety modułów, które nie są jeszcze zrobione, przepinasz na wspólny klocek;
-makiet modułów zrobionych nie ruszasz.
+Komponent z wyglądem wydzielasz **od razu w obu miejscach**: `frontend/src/common/` i `mockups/src/common/`, pod tą
+samą ścieżką i nazwą (ten sam kod, w makiecie bez wywołań API). Na wspólny klocek przepinasz **wszystkie** makiety,
+także modułów zrobionych: to nie zmienia działania aplikacji, a stara kopia w makiecie staje się wzorem dla następnych
+makiet. Pilnuje tego test zasad (punkt 15). Wyjątek to tylko plik, którego makieta nie potrzebuje (układ aplikacji,
+sesja, dane z API), z `// rule-ok: tylko w aplikacji, <powód>` w pierwszej linii.
 
 Szukasz po tym, **co kod robi**, a nie identycznego kodu: dwa okna z pytaniem i dwoma przyciskami, dwie listy
 z filtrami w adresie, dwa nagłówki ekranu to ten sam klocek, nawet gdy różnią się tekstem, kolorem przycisku,
@@ -608,7 +610,7 @@ w całości). Czerwony test zasad znaczy: popraw kod, nie test.
 |---|---|
 | `backend/src/test/conventions.test.ts` | SQL tylko z `?`; transakcje tylko przez `withTransaction`; `validateBody` przy każdej trasie zapisu; kto i jaka rola tylko z `req.user`; moduły za logowaniem tylko przez `mountModule`; w `__tests__` obok każdego `*.routes.ts` test z 401 i 403; pliki `*.test.ts(x)` tylko w `__tests__` albo `src/test/` (backend, front, shared, makiety); każdy klucz obcy z `ON DELETE`; w module `zrobiony` (według `docs/STATUS.md`) żadnego `it.todo`; funkcje tylko strzałkowe (backend, front, shared, makiety, e2e); numer z adresu tylko przez `idParam` |
 | `backend/src/test/routeProtection.test.ts` | każdy moduł z `mountModule`: bez logowania 401, rola spoza modułu 403 |
-| `frontend/src/test/conventions.test.ts` | zapytania tylko przez `api`; w modułach `api` tylko w `*.api.ts`; brak importów z innego modułu; dymki przez `notify`; brak polskich tekstów w kodzie; schematy w `shared/src/schemas/` bez własnych `.regex(`; `Drawer`, `Modal`, `Avatar`, `Tabs` wprost w najwyżej jednym module (drugi = rama do `common/`) |
+| `frontend/src/test/conventions.test.ts` | zapytania tylko przez `api`; w modułach `api` tylko w `*.api.ts`; brak importów z innego modułu; dymki przez `notify`; brak polskich tekstów w kodzie; schematy w `shared/src/schemas/` bez własnych `.regex(`; `Drawer`, `Modal`, `Avatar`, `Tabs` wprost w najwyżej jednym module (drugi = rama do `common/`); każdy klocek `.tsx` z `frontend/src/common/` ma plik o tej samej ścieżce w `mockups/src/common/` albo `// rule-ok: tylko w aplikacji, <powód>` w pierwszej linii |
 | `frontend/src/test/colors.test.ts`, `formatting.test.ts`, `tables.test.ts` | kolory z motywu; daty i liczby przez `@app/shared`; tabele w `Table.ScrollContainer` |
 
 **Wyjątek** tylko tam, gdzie zasada naprawdę nie pasuje: na końcu linii komentarz `// rule-ok: <powód>` (np. sortowanie
@@ -663,7 +665,8 @@ w poleceniu, bez superpowers przechodzisz ją sam.
 - [ ] zapis zależny od sprawdzenia: blokada rodzica (`FOR UPDATE`), stała kolejność blokad od rodzica do dziecka
 - [ ] nic skopiowanego między modułami: wspólne w `common/` albo `core/`
 - [ ] każdy nowy komponent ma w planie „Porównane z: …”; ta sama rama w innym module (także „prawie”) = jeden
-  klocek w `common/`; test ram (14) zielony bez nowego `rule-ok`
+  klocek w `common/`; test ram (14) zielony bez nowego `rule-ok`; test 15 zielony, każdy klocek z `common/` jest też w
+  `mockups/src/common/` pod tą samą ścieżką
 - [ ] każde `// rule-ok:` ma konkretny, prawdziwy powód; testy zasad niezmienione
 - [ ] pliki przez `saveUpload` / `sendUpload`, pobieranie z kontrolą dostępu, tabela plików z kluczem obcym
 - [ ] testy dla każdej trasy i formularza, `npm run check` zielony

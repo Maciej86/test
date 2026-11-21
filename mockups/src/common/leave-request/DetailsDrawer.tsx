@@ -1,17 +1,19 @@
 import type { ReactNode } from 'react';
-import { Alert, Badge, Button, Divider, Group, Paper, Progress, Stack, Text } from '@mantine/core';
+import { Alert, Button, Divider, Group, Paper, Progress, Stack, Text } from '@mantine/core';
 import { Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ButtonIcon } from './ButtonIcon';
-import { DateText } from './DateText';
-import { DetailRow } from './DetailRow';
-import { SideDrawer } from './SideDrawer';
+import type { LeaveRequestStatus } from '@app/shared';
+import { ButtonIcon } from '../ButtonIcon';
+import { DateText } from '../DateText';
+import { DetailRow } from '../DetailRow';
+import { SideDrawer } from '../SideDrawer';
+import { LeaveDates, LeaveStatusBadge } from '../LeaveRequestParts';
 
 /** Wniosek w szczegółach: dane gotowe do pokazania (makieta nie liczy puli ani statusów sama). */
 export interface LeaveRequestView {
   id: number;
   employee: string;
-  status: 'pending' | 'approved' | 'rejected' | 'withdrawn' | 'cancelled';
+  status: LeaveRequestStatus;
   from: string;
   to: string;
   /** „Wypoczynkowy, 5 dni roboczych (z puli 2026)”. */
@@ -24,15 +26,6 @@ export interface LeaveRequestView {
   /** `note`: zdanie pod paskiem przy czekającym (np. „Po zatwierdzeniu zostanie 15 dni…”). */
   pool?: { year: number; used: number; pending: number; left: number; total: number; carried: number; note?: string };
 }
-
-/** Kolory statusów z księgi wyglądu (DESIGN.md, „Statusy”). */
-export const LEAVE_STATUS_COLOR: Record<LeaveRequestView['status'], string> = {
-  pending: 'yellow',
-  approved: 'green',
-  rejected: 'red',
-  cancelled: 'red',
-  withdrawn: 'gray',
-};
 
 const PoolBox = ({ r, pool }: { r: LeaveRequestView; pool: NonNullable<LeaveRequestView['pool']> }) => {
   const { t } = useTranslation('leave-requests');
@@ -57,10 +50,10 @@ const PoolBox = ({ r, pool }: { r: LeaveRequestView; pool: NonNullable<LeaveRequ
 };
 
 /**
- * Szczegóły wniosku z prawej: ta sama treść we Wnioskach urlopowych i w Kalendarzu (w aplikacji:
- * `common/leave-request/DetailsDrawer`). `strip`: „Kto jeszcze ma wtedy wolne” od ekranu.
+ * Szczegóły wniosku z prawej: ta sama treść we Wnioskach urlopowych i w Kalendarzu (w aplikacji ten sam
+ * plik). `strip`: „Kto jeszcze ma wtedy wolne” (`TeamStrip`) od ekranu.
  */
-export const LeaveRequestDrawer = ({ request: r, strip, onClose, onApprove, onReject, onCancel, onPdf, onShowInCalendar }: {
+export const DetailsDrawer = ({ request: r, strip, onClose, onApprove, onReject, onCancel, onPdf, onShowInCalendar }: {
   request: LeaveRequestView | null;
   strip?: ReactNode;
   onClose: () => void;
@@ -80,9 +73,9 @@ export const LeaveRequestDrawer = ({ request: r, strip, onClose, onApprove, onRe
           <Stack gap={4}>
             <Group justify="space-between" align="flex-start">
               <Text fw={700} fz="xl">{r.employee}</Text>
-              <Badge color={LEAVE_STATUS_COLOR[r.status]} variant="light">{t(`status.${r.status}`)}</Badge>
+              <LeaveStatusBadge status={r.status} />
             </Group>
-            <Text fz="lg"><DateText value={r.from} />{r.to !== r.from && <> – <DateText value={r.to} /></>}</Text>
+            <Text fz="lg"><LeaveDates from={r.from} to={r.to} /></Text>
             <Text c="dimmed">{r.typeLine}</Text>
           </Stack>
 

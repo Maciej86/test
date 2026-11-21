@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActionIcon, Button, Chip, Group, Paper, SegmentedControl, Stack, Text, TextInput, useMantineTheme } from '@mantine/core';
+import { ActionIcon, Button, Chip, Group, Paper, SegmentedControl, Stack, Text, useMantineTheme } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { CalendarDays, ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -7,11 +7,12 @@ import { calendarDays, dayjs, formatDate } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { ColorMark } from '../../common/ColorSwatchPicker';
 import { LegendItem } from '../../common/LegendItem';
-import { DateText } from '../../common/DateText';
 import { EmptyState } from '../../common/EmptyState';
 import { notify } from '../../common/notify';
 import { PageHeader } from '../../common/PageHeader';
-import { LeaveRequestDrawer, type LeaveRequestView } from '../../common/LeaveRequestDrawer';
+import { SearchField } from '../../common/SearchField';
+import { DetailsDrawer, type LeaveRequestView } from '../../common/leave-request/DetailsDrawer';
+import { TeamStrip } from '../../common/leave-request/TeamStrip';
 import { CalendarGrid } from './CalendarGrid';
 import { ABSENCES, EMPLOYEES, RANGE_DAYS, RANGE_STEP, TODAY, TYPES, employeeOf, typeOf, type MockAbsence } from './data';
 
@@ -22,20 +23,14 @@ type State = (typeof STATES)[number];
 const LEGEND = TYPES.filter((tp, i) => TYPES.findIndex((o) => o.color === tp.color) === i);
 const typesOfColor = (color: string) => TYPES.filter((tp) => tp.color === color).map((tp) => tp.name).join(', ');
 
-/** Kto jeszcze ma wolne w terminie wniosku (zatwierdzone i czekające innych osób). */
-const OthersList = ({ absence }: { absence: MockAbsence }) => {
-  const { t } = useTranslation('leave-requests');
+/** „Kto jeszcze ma wtedy wolne”: zatwierdzone i czekające innych osób ze wspólnym dniem (wspólny `TeamStrip`). */
+const AbsenceStrip = ({ absence }: { absence: MockAbsence }) => {
   const others = ABSENCES.filter((o) => o.employeeId !== absence.employeeId && o.from <= absence.to && o.to >= absence.from);
-  if (others.length === 0) return <Text size="sm" c="dimmed">{t('strip_nobody')}</Text>;
   return (
-    <Stack gap={2}>
-      {others.map((o) => (
-        <Text key={o.id} size="sm">
-          {employeeOf(o.employeeId).name}: <DateText value={o.from} /> – <DateText value={o.to} />
-          {o.status === 'pending' && <Text span c="dimmed"> ({t('status.pending').toLowerCase()})</Text>}
-        </Text>
-      ))}
-    </Stack>
+    <TeamStrip
+      request={{ employeeName: employeeOf(absence.employeeId).name, dateFrom: absence.from, dateTo: absence.to }}
+      others={others.map((o) => ({ employeeName: employeeOf(o.employeeId).name, dateFrom: o.from, dateTo: o.to, status: o.status }))}
+    />
   );
 };
 
@@ -55,9 +50,9 @@ const AbsenceDrawer = ({ absence, onClose }: { absence: MockAbsence | null; onCl
     decided: absence.decidedAt ? { by: 'Anna Nowak', at: absence.decidedAt } : undefined,
   };
   return (
-    <LeaveRequestDrawer
+    <DetailsDrawer
       request={view}
-      strip={absence && <OthersList absence={absence} />}
+      strip={absence && <AbsenceStrip absence={absence} />}
       onClose={onClose}
       onApprove={() => { notify.success(t('approved_toast', { name: view?.employee })); onClose(); }}
       onReject={() => notify.success(t('reject_mockup'))}
@@ -136,14 +131,7 @@ export const CalendarMockup = () => {
           <Text fw={500}>{offToday.length > 0 ? t('today_off', { names: offToday.join(', ') }) : t('today_all')}</Text>
 
           <Group gap="md" align="center" wrap="wrap">
-            <TextInput
-              leftSection={<Search size={16} />}
-              placeholder={t('search')}
-              aria-label={t('search')}
-              value={search}
-              onChange={(e) => setSearch(e.currentTarget.value)}
-              w={{ base: '100%', sm: 260 }}
-            />
+            <SearchField label={t('search')} value={search} onChange={setSearch} w={{ base: '100%', sm: 260 }} />
             <Chip.Group multiple value={colors} onChange={setColors}>
               <Group gap="xs" wrap="wrap">
                 {LEGEND.map((tp) => (

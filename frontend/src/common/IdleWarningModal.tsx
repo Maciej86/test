@@ -1,3 +1,4 @@
+// rule-ok: tylko w aplikacji, okno pilnuje bezczynności zalogowanej osoby (makieta Logowania pokazuje jego treść jako stan)
 import { useCallback } from 'react';
 import { Button, Group, Modal, Text } from '@mantine/core';
 import { Clock } from 'lucide-react';

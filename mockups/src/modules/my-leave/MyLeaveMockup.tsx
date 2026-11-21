@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Badge, Button, Card, Grid, Group, Paper, Progress, SegmentedControl, Select, Stack, Table, Text, Title } from '@mantine/core';
+import { Button, Card, Grid, Group, Paper, Progress, SegmentedControl, Select, Stack, Table, Text, Title } from '@mantine/core';
 import { CalendarDays } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
@@ -8,17 +8,10 @@ import { EmptyState } from '../../common/EmptyState';
 import { PageHeader } from '../../common/PageHeader';
 import { DateText } from '../../common/DateText';
 import { InfoCard } from '../../common/InfoCard';
+import { LeaveDates, LeaveStatusBadge } from '../../common/LeaveRequestParts';
+import { PoolCard } from '../../common/PoolCard';
 import { PrintPreview, RequestModal, WithdrawModal } from './MyLeaveModals';
-import { FORM_EXAMPLES, LEAVE_TYPES, MY_REQUESTS, POOL, REQUEST_YEARS, type LeaveStatus, type MockRequest } from './data';
-
-/** Kolory statusów z księgi wyglądu (DESIGN.md, „Statusy”). */
-export const STATUS_COLOR: Record<LeaveStatus, string> = {
-  pending: 'yellow',
-  approved: 'green',
-  rejected: 'red',
-  withdrawn: 'gray',
-  cancelled: 'red',
-};
+import { FORM_EXAMPLES, LEAVE_TYPES, MY_REQUESTS, POOL, POOL_VIEW, REQUEST_YEARS, type MockRequest } from './data';
 
 const STATES = ['list', 'empty', 'form_ok', 'form_not_enough', 'form_limit', 'form_overlap', 'form_next_year', 'withdraw', 'print'] as const;
 type State = (typeof STATES)[number];
@@ -28,48 +21,6 @@ const FORM_STATE: Partial<Record<State, keyof typeof FORM_EXAMPLES>> = {
   form_limit: 'limit',
   form_overlap: 'overlap',
   form_next_year: 'next_year',
-};
-
-/**
- * Pula na rok otwarty jednym paskiem: wykorzystane, czeka na decyzję (zarezerwowane), zostało z zaległego
- * i zostało z puli rocznej. Duża liczba to dni, o które pracownik może jeszcze wnioskować.
- */
-const PoolCard = () => {
-  // Teksty karty wspólne z Pulpitem (common.json, „pool.*”).
-  const { t } = useTranslation();
-  const total = POOL.annual + POOL.carried;
-  const used = POOL.usedCarried + POOL.usedAnnual;
-  const carriedLeft = POOL.carried - POOL.usedCarried;
-  const annualLeft = POOL.annual - POOL.usedAnnual - POOL.pending;
-  const left = carriedLeft + annualLeft;
-  const pct = (d: number) => (d / total) * 100;
-  const parts = [
-    { key: 'used', value: used, color: 'dark.4' },
-    { key: 'pending', value: POOL.pending, color: 'yellow.6' },
-    { key: 'carried', value: carriedLeft, color: 'navy.3' },
-    { key: 'annual', value: annualLeft, color: 'navy.6' },
-  ];
-
-  return (
-    <InfoCard title={t('pool.title', { year: POOL.year })}>
-      <Group gap="xs" align="baseline">
-        <Text fz={40} fw={700} lh={1} c={left === 0 ? 'red.4' : undefined}>{left}</Text>
-        <Text c="dimmed">{t('pool.left', { total })}</Text>
-      </Group>
-      <Progress.Root size={12} radius="xs" aria-label={t('pool.aria', { left, total })}>
-        {parts.map((p) => <Progress.Section key={p.key} value={pct(p.value)} color={p.color} />)}
-      </Progress.Root>
-      <Group gap="lg" mt={4}>
-        {parts.map((p) => (
-          <Group key={p.key} gap={6} wrap="nowrap">
-            <span style={{ width: 10, height: 10, borderRadius: 2, background: `var(--mantine-color-${p.color.replace('.', '-')})`, display: 'inline-block' }} />
-            <Text size="sm"><Text span fw={700}>{p.value}</Text> <Text span c="dimmed">{t(`pool.legend_${p.key}`, { year: POOL.year - 1 })}</Text></Text>
-          </Group>
-        ))}
-      </Group>
-      <Text size="xs" c="dimmed">{t('pool.hint', { annual: POOL.annual, carried: POOL.carried, prev: POOL.year - 1 })}</Text>
-    </InfoCard>
-  );
 };
 
 /** Typy z rocznym limitem: ile dni już zajęte w tym roku (czekające i zatwierdzone). */
@@ -114,10 +65,9 @@ const DaysCell = ({ r }: { r: MockRequest }) => {
 };
 
 const StatusCell = ({ r }: { r: MockRequest }) => {
-  const { t } = useTranslation('my-leave');
   return (
     <Stack gap={4} align="flex-start">
-      <Badge color={STATUS_COLOR[r.status]} variant="light">{t(`status.${r.status}`)}</Badge>
+      <LeaveStatusBadge status={r.status} />
       {r.decidedBy && r.status !== 'pending' && (
         <Text size="xs" c="dimmed">
           {r.decidedBy}, <DateText value={r.decidedAt} />
@@ -164,7 +114,7 @@ const RequestsTable = ({ rows, ...actions }: RowActions & { rows: MockRequest[] 
             <Table.Tr key={r.id}>
               <Table.Td>
                 <Text fw={600} style={{ whiteSpace: 'nowrap' }}>
-                  <DateText value={r.from} />{r.to !== r.from && <> – <DateText value={r.to} /></>}
+                  <LeaveDates from={r.from} to={r.to} />
                 </Text>
                 {r.comment && <Text size="xs" c="dimmed" maw={260} lineClamp={2}>{r.comment}</Text>}
               </Table.Td>
@@ -192,11 +142,11 @@ const RequestCards = ({ rows, ...actions }: RowActions & { rows: MockRequest[] }
             <Group justify="space-between" align="flex-start" wrap="nowrap">
               <Stack gap={0}>
                 <Text fw={600}>
-                  <DateText value={r.from} />{r.to !== r.from && <> – <DateText value={r.to} /></>}
+                  <LeaveDates from={r.from} to={r.to} />
                 </Text>
                 <Text size="sm" c="dimmed">{r.type}, {t('days', { count: r.days })}</Text>
               </Stack>
-              <Badge color={STATUS_COLOR[r.status]} variant="light">{t(`status.${r.status}`)}</Badge>
+              <LeaveStatusBadge status={r.status} />
             </Group>
             {r.comment && <Text size="sm" c="dimmed">{r.comment}</Text>}
             {r.reason && <Text size="sm">„{r.reason}”</Text>}
@@ -274,7 +224,7 @@ export const MyLeaveMockup = () => {
       />
 
       <Grid>
-        <Grid.Col span={{ base: 12, md: 8 }}><PoolCard /></Grid.Col>
+        <Grid.Col span={{ base: 12, md: 8 }}><PoolCard pool={POOL_VIEW} /></Grid.Col>
         <Grid.Col span={{ base: 12, md: 4 }}><LimitsCard /></Grid.Col>
       </Grid>
 

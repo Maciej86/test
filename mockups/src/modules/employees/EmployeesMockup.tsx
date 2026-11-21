@@ -10,12 +10,12 @@ import {
   Stack,
   Table,
   Text,
-  TextInput,
   Tooltip,
 } from '@mantine/core';
-import { Search, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
+import { SearchField } from '../../common/SearchField';
 import { DateText } from '../../common/DateText';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { EmptyState } from '../../common/EmptyState';
@@ -188,14 +188,7 @@ export const EmployeesMockup = () => {
       />
 
       <Group gap="sm" align="flex-end">
-        <TextInput
-          placeholder={t('search')}
-          aria-label={t('search')}
-          leftSection={<Search size={16} />}
-          defaultValue={query}
-          key={query}
-          w={{ base: '100%', sm: 340 }}
-        />
+        <SearchField key={query} label={t('search')} value={query} onChange={() => undefined} />
         <Select
           aria-label={t('filter_role')}
           data={[{ value: 'all', label: t('filter_role_all') }, { value: 'employee', label: t('role.employee') }, { value: 'admin', label: t('role.admin') }]}

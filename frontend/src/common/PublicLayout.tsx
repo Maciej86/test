@@ -1,3 +1,4 @@
+// rule-ok: tylko w aplikacji, układ stron bez logowania (makiety mają Shell)
 import { AppShell, Button, Group, Text } from '@mantine/core';
 import { Link, Outlet, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
