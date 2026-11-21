@@ -69,6 +69,6 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
 - [x] 10. `DESIGN.md`: wzorzec „Kalendarz zespołu” opisuje własną siatkę (dziś + 60 dni, kolor typu, czeka = jasny
   z przerywaną ramką, przerwy w dniach roboczych, kreski między dniami); `SPEC-GENERAL.md` „Mapa dostępu” sprawdzona;
   `TESTS-1.md` uzupełniony → `npm run check`
-- [ ] 11. Test e2e `e2e/calendar.spec.ts` ze scenariuszy `TESTS-1.md` (administrator: kalendarz, wniosek e2e
+- [x] 11. Test e2e `e2e/calendar.spec.ts` ze scenariuszy `TESTS-1.md` (administrator: kalendarz, wniosek e2e
   w zakresie, filtr, wyszukiwanie, panel z decyzją, „Pokaż w kalendarzu”; pracownik: brak pozycji w menu i 403 na
   adresie API); sprzątanie danych `E2E` w `global-teardown.ts`, jeśli test je tworzy → `npm run check`
