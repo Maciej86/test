@@ -83,3 +83,9 @@ test('pracownik nie ma kalendarza w menu, a API odpowiada 403', async ({ page, b
   await expect(worker.getByRole('navigation').getByRole('link', { name: 'Kalendarz' })).toHaveCount(0);
   expect((await worker.request.get('/api/calendar')).status()).toBe(403);
 });
+
+test.describe('część 2: liczenie dni i zatwierdzanie', () => {
+  test.fixme('administrator widzi kolumny „Liczenie dni” i „Zatwierdzanie” i typ „Chorobowe”', async () => {});
+  test.fixme('pracownik zgłasza chorobowe 2 dni wstecz: od razu zatwierdzone, powiadomienie, ciągły pasek, wycofanie', async () => {});
+  test.fixme('typ kalendarzowy z zatwierdzaniem liczy weekend', async () => {});
+});

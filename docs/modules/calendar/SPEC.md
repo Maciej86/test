@@ -92,7 +92,7 @@ Nowych tabel i relacji nie ma. Kalendarz tylko czyta.
   „Odejmuje dni z puli” → „dni wniosku zmniejszają pulę…”, podpowiedź limitu → „Ile dni w roku może wziąć jedna
   osoba, liczonych jak wyżej (robocze albo kalendarzowe)…”, ostrzeżenie przy edycji → „Zmiana liczenia dni,
   zatwierdzania, „Odejmuje dni z puli” i limitu dotyczy tylko nowych wniosków…”.
-- **Do potwierdzenia przy specu części 2:** zwolnienie lekarskie bywa wystawiane z datą wsteczną (do 3 dni), a dziś
+- **Potwierdzone przy specu części 2 (2026-11-21): 7 dni wstecz, wycofanie także w dniu złożenia.** Zwolnienie lekarskie bywa wystawiane z datą wsteczną (do 3 dni), a dziś
   wniosek nie może zaczynać się przed dniem złożenia. Propozycja **[decyzja AI]**: typ bez zatwierdzania może
   zaczynać się do 7 dni wstecz.
 

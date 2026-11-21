@@ -2,7 +2,7 @@ import { useState, type MouseEvent } from 'react';
 import { Badge, Button, Card, Group, Paper, SegmentedControl, Select, Stack, Table, Text } from '@mantine/core';
 import { CalendarCheck, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { TABLE_MIN_WIDTH, formatDate } from '@app/shared';
+import { TABLE_MIN_WIDTH, formatDate, leaveDaysText } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { EmptyState } from '../../common/EmptyState';
@@ -149,7 +149,7 @@ const RequestCards = ({ rows, ...actions }: RowActions & { rows: MockRequest[] }
               <Stack gap={0}>
                 <Text fw={600}>{r.employee}</Text>
                 <Text size="sm"><LeaveDates from={r.from} to={r.to} /></Text>
-                <Text size="sm" c="dimmed">{r.type}, {t('days', { count: r.days })}</Text>
+                <Text size="sm" c="dimmed">{r.type}, {leaveDaysText(t, r.days)}</Text>
               </Stack>
               <LeaveStatusBadge status={r.status} />
             </Group>

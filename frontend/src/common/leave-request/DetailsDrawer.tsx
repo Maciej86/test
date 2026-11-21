@@ -2,7 +2,7 @@ import { Alert, Button, Divider, Group, Paper, Progress, Stack, Text } from '@ma
 import { Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { calendarPath, type LeaveRequestDetails } from '@app/shared';
+import { calendarPath, type LeaveRequestDetails, leaveDaysText } from '@app/shared';
 import { ButtonIcon } from '../ButtonIcon';
 import { DataState } from '../DataState';
 import { DateText } from '../DateText';
@@ -53,7 +53,7 @@ const Content = ({ r, actions, showInCalendar }: { r: LeaveRequestDetails; actio
           <LeaveStatusBadge status={r.status} />
         </Group>
         <Text fz="lg"><LeaveDates from={r.dateFrom} to={r.dateTo} /></Text>
-        <Text c="dimmed">{r.leaveTypeName}, {t('days', { count: r.workingDays })} ({leaveSplitText(t, r)})</Text>
+        <Text c="dimmed">{r.leaveTypeName}, {leaveDaysText(t, r.workingDays)} ({leaveSplitText(t, r)})</Text>
       </Stack>
 
       {isLate(r) && <Alert color="yellow" variant="light" icon={<Clock size={18} />}>{t('late_hint')}</Alert>}

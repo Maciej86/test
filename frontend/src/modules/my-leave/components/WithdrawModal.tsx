@@ -1,3 +1,4 @@
+import { leaveDaysText } from '@app/shared';
 import { Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { MyLeaveRequest } from '@app/shared';
@@ -35,7 +36,7 @@ export const WithdrawModal = ({ request, onClose }: { request: MyLeaveRequest; o
       onClose={onClose}
     >
       <Text>
-        {request.leaveTypeName}, <LeaveDates from={request.dateFrom} to={request.dateTo} /> ({t('days', { count: request.workingDays })}).
+        {request.leaveTypeName}, <LeaveDates from={request.dateFrom} to={request.dateTo} /> ({leaveDaysText(t, request.workingDays)}).
       </Text>
       <Text size="sm" c="dimmed">{reserved > 0 ? t('withdraw_text', { count: reserved }) : t('withdraw_text_no_pool')}</Text>
     </ConfirmModal>

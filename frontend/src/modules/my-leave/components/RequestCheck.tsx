@@ -1,3 +1,4 @@
+import { leaveDaysText } from '@app/shared';
 import type { ReactNode } from 'react';
 import { Alert, Text } from '@mantine/core';
 import { AlertTriangle, CalendarRange, Info } from 'lucide-react';
@@ -29,7 +30,7 @@ export const RequestCheck = ({ check, poolYear, typeName }: { check: RequestChec
       return null;
     case 'ok':
       return (
-        <Alert color="navy" variant="light" icon={<CalendarRange size={18} />} title={t('check_days', { count: check.workingDays })}>
+        <Alert color="navy" variant="light" icon={<CalendarRange size={18} />} title={leaveDaysText(t, check.workingDays)}>
           {check.leftAfter === null
             ? t('check_no_pool')
             : [

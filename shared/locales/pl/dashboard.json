@@ -6,10 +6,6 @@
   "more_few": "i jeszcze {{count}} zadania",
   "more_many": "i jeszcze {{count}} zadań",
   "more_other": "i jeszcze {{count}} zadania",
-  "days_one": "{{count}} dzień",
-  "days_few": "{{count}} dni",
-  "days_many": "{{count}} dni",
-  "days_other": "{{count}} dni",
   "pending": {
     "title": "Wnioski do rozpatrzenia",
     "all": "Wszystkie wnioski",

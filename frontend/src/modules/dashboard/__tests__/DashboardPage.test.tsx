@@ -88,8 +88,8 @@ describe('DashboardPage', () => {
     expect(within(box).getByText('termin już się zaczął')).toHaveAttribute('data-soon', 'true');
     expect(within(box).getByText('zaczyna się za 31 dni')).toHaveAttribute('data-soon', 'false');
     expect(within(box).getByText(/złożony 16\.11\.2026/)).toBeInTheDocument();
-    expect(within(box).getAllByText('2 dni')).toHaveLength(2);
-    expect(within(box).getByText('7 dni')).toBeInTheDocument();
+    expect(within(box).getAllByText('2 dni robocze')).toHaveLength(2);
+    expect(within(box).getByText('7 dni roboczych')).toBeInTheDocument();
     expect(link('Jan Kowalski')).toHaveAttribute('href', '/admin/leave-requests/21');
     expect(within(box).getByRole('link', { name: 'Wszystkie wnioski' })).toHaveAttribute('href', '/admin/leave-requests');
   });
@@ -204,7 +204,7 @@ describe('DashboardPage', () => {
     expect(box).toHaveTextContent('Wypoczynkowy, 26.11.2026 – 27.11.2026');
     expect(within(box).getByText('Czeka na decyzję', { selector: '.mantine-Badge-label' })).toBeInTheDocument();
     expect(box).toHaveTextContent('Wypoczynkowy, 21.12.2026 – 23.12.2026');
-    expect(within(box).getByText('3 dni')).toBeInTheDocument();
+    expect(within(box).getByText('3 dni robocze')).toBeInTheDocument();
     expect(within(box).getByRole('link', { name: 'Moje urlopy' })).toHaveAttribute('href', '/admin/my-leave');
   });
 

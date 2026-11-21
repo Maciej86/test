@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Alert, Badge, Button, Divider, Grid, Group, Modal, Paper, Select, SimpleGrid, Stack, Text, Textarea, Title } from '@mantine/core';
 import { AlertTriangle, CalendarRange, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { countWorkingDays, dayjs } from '@app/shared';
+import { countWorkingDays, dayjs, leaveDaysText } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { ConfirmModal } from '../../common/ConfirmModal';
 import { DateField } from '../../common/DateField';
@@ -56,7 +56,7 @@ const CheckBox = ({ check }: { check: Check }) => {
       return <Text size="sm" c="dimmed">{t('check_empty')}</Text>;
     case 'ok':
       return (
-        <Alert color="navy" variant="light" icon={<CalendarRange size={18} />} title={t('check_days', { count: check.days })}>
+        <Alert color="navy" variant="light" icon={<CalendarRange size={18} />} title={leaveDaysText(t, check.days)}>
           {check.leftAfter === null
             ? t('check_no_pool')
             : [
@@ -194,7 +194,7 @@ export const WithdrawModal = ({ request, onClose }: { request: MockRequest | nul
     >
       <Text>
         {request.type}, <DateText value={request.from} /> – <DateText value={request.to} />{' '}
-        ({t('days', { count: request.days })}).
+        ({leaveDaysText(t, request.days)}).
       </Text>
       <Text size="sm" c="dimmed">{t('withdraw_text', { count: request.fromCarried + request.fromAnnual })}</Text>
     </ConfirmModal>
@@ -235,7 +235,7 @@ export const PrintPreview = ({ request, onClose }: { request: MockRequest | null
                 <PaperRow label={t('field_type')}>{request.type}</PaperRow>
                 <PaperRow label={t('col_dates')}><DateText value={request.from} /> – <DateText value={request.to} /></PaperRow>
                 <PaperRow label={t('col_days')}>
-                  {t('days', { count: request.days })}
+                  {leaveDaysText(t, request.days)}
                   {request.fromCarried + request.fromAnnual > 0 && (
                     <> ({[
                       request.fromCarried > 0 ? t('split_carried', { count: request.fromCarried }) : null,

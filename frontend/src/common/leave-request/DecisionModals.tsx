@@ -4,7 +4,7 @@ import { Alert, Text, Textarea } from '@mantine/core';
 import { CircleAlert, Clock } from 'lucide-react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import { LEAVE_DECISION_REASON_MAX, LEAVE_REQUESTS_MESSAGES, leaveDecisionReasonSchema, todayIsoDate, translateKey, type LeaveDecisionReasonInput, type LeaveRequestListItem } from '@app/shared';
+import { LEAVE_DECISION_REASON_MAX, LEAVE_REQUESTS_MESSAGES, leaveDecisionReasonSchema, todayIsoDate, translateKey, type LeaveDecisionReasonInput, type LeaveRequestListItem, leaveDaysText } from '@app/shared';
 import { ConfirmModal } from '../ConfirmModal';
 import { LeaveDates } from '../LeaveRequestParts';
 import { apiErrorBody, apiErrorFields, apiErrorKey, apiErrorMessage } from '../../core/api/client';
@@ -27,7 +27,7 @@ const Summary = ({ r }: { r: LeaveRequestListItem }) => {
   const { t } = useTranslation('leave-requests');
   return (
     <Text>
-      {r.employeeName}: {r.leaveTypeName}, <LeaveDates from={r.dateFrom} to={r.dateTo} /> ({t('days', { count: r.workingDays })}).
+      {r.employeeName}: {r.leaveTypeName}, <LeaveDates from={r.dateFrom} to={r.dateTo} /> ({leaveDaysText(t, r.workingDays)}).
     </Text>
   );
 };

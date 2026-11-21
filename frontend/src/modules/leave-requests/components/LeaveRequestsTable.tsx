@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react';
 import { Badge, Button, Card, Group, Stack, Table, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { TABLE_MIN_WIDTH, type LeaveRequestListItem } from '@app/shared';
+import { TABLE_MIN_WIDTH, type LeaveRequestListItem, leaveDaysText } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
 import { DateText } from '../../../common/DateText';
 import { LeaveDates, LeaveStatusBadge, leaveSplitText } from '../../../common/LeaveRequestParts';
@@ -151,7 +151,7 @@ export const LeaveRequestCards = ({ rows, ...actions }: RowActions & { rows: Lea
               <Stack gap={0}>
                 <Employee r={r} />
                 <Text size="sm"><LeaveDates from={r.dateFrom} to={r.dateTo} /></Text>
-                <Text size="sm" c="dimmed">{r.leaveTypeName}, {t('days', { count: r.workingDays })}</Text>
+                <Text size="sm" c="dimmed">{r.leaveTypeName}, {leaveDaysText(t, r.workingDays)}</Text>
               </Stack>
               <LeaveStatusBadge status={r.status} />
             </Group>

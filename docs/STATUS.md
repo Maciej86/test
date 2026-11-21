@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.51
 
-**Następny krok:** Kalendarz, część 2 (liczenie dni i zatwierdzanie): napisać `SPEC-2.md` według „Część 2 w skrócie” w `SPEC.md`, potwierdzić z użytkownikiem 7 dni wstecz dla typu bez zatwierdzania.
+**Następny krok:** Kalendarz, część 2: `SPEC-2.md` zaakceptowany; `PLAN-2.md` (15 kroków) i `TESTS-2.md` napisane, czekają na akceptację planu; potem implementacja od kroku 0.
 
 ## Start aplikacji
 
@@ -33,11 +33,12 @@
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
 | 14 | Pulpit | dashboard | zrobiony | zamknięcie | my-leave, leave-requests, tasks |
-| 15 | Kalendarz | calendar | w toku | spec, część 2/2 | leave-types, my-leave, leave-requests |
+| 15 | Kalendarz | calendar | w toku | plan, część 2/2 | leave-types, my-leave, leave-requests |
 | 16 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard, calendar |
 
 ## Ostatnie decyzje
 
+- 2026-11-21: Kalendarz: spec części 2 zaakceptowany (`SPEC-2.md`: liczenie dni robocze / kalendarzowe zapamiętane we wniosku, typ bez zatwierdzania od razu zatwierdzony z powiadomieniem „Zgłoszona nieobecność” i e-mailem, do 7 dni wstecz, wycofanie do pierwszego dnia albo w dniu złożenia, typ „Chorobowe” na start); napisane `PLAN-2.md` i `TESTS-2.md`.
 - 2026-11-21: Aktualizacja stepkit do 0.1.51: każdy wspólny klocek aplikacji jest też w makietach pod tą samą nazwą (nowy test zasad). Do makiet przeszły `PoolCard`, `LeaveStrip`, `SearchField`, `LeaveRequestParts` i `leave-request/` (`DetailsDrawer`, `DecisionModals`, `TeamStrip`); kopie w makietach podmienione (Moje urlopy, Pulpit, Wnioski urlopowe, Kalendarz, wyszukiwarki). Kalendarz w makiecie pokazuje w szczegółach pasek „Kto jeszcze ma wtedy wolne” jak aplikacja. Układy, menu, `DataState`, `NoAccess` i okno bezczynności zostają tylko w aplikacji.
 - 2026-11-21: Kalendarz, część 1 potwierdzona przez użytkownika („działa”). Następna: część 2.
 - 2026-11-21: Kalendarz, część 1 zbudowana (kroki 0–11): ekran, `GET /api/calendar`, kolor typu urlopu (migracje 029–030), wspólne szczegóły wniosku z decyzjami (common, core), „Otwórz kalendarz” i „Pokaż w kalendarzu”. Przegląd kodu z poprawkami („Dziś nie ma” zawsze o dziś, odświeżanie, odmiana), próby nadużyć odparte, przegląd przed oddaniem z poprawkami (teksty części 1 w Typach urlopów, makiety bez kopii), sprawdzone w przeglądarce, 66 testów e2e zielonych. Testy ekranów na połowie rdzeni.

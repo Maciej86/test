@@ -3,7 +3,7 @@ import { ActionIcon, Button, Chip, Group, Paper, SegmentedControl, Stack, Text, 
 import { useMediaQuery } from '@mantine/hooks';
 import { CalendarDays, ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { calendarDays, dayjs, formatDate } from '@app/shared';
+import { calendarDays, dayjs, formatDate, leaveDaysText } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { ColorMark } from '../../common/ColorSwatchPicker';
 import { LegendItem } from '../../common/LegendItem';
@@ -43,7 +43,7 @@ const AbsenceDrawer = ({ absence, onClose }: { absence: MockAbsence | null; onCl
     status: absence.status,
     from: absence.from,
     to: absence.to,
-    typeLine: `${typeOf(absence.typeId).name}, ${t(`days_value_${typeOf(absence.typeId).dayCount}`, { count: absence.days })}`,
+    typeLine: `${typeOf(absence.typeId).name}, ${leaveDaysText(t, absence.days, typeOf(absence.typeId).dayCount)}`,
     late: absence.status === 'pending' && absence.from < TODAY,
     comment: absence.comment,
     createdAt: absence.createdAt,

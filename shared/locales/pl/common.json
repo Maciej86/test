@@ -110,5 +110,15 @@
   "strip": {
     "weekend": "Weekend, nie liczy się do urlopu",
     "off": "weekend albo święto"
+  },
+  "leave_days": {
+    "working_one": "{{count}} dzień roboczy",
+    "working_few": "{{count}} dni robocze",
+    "working_many": "{{count}} dni roboczych",
+    "working_other": "{{count}} dnia roboczego",
+    "calendar_one": "{{count}} dzień kalendarzowy",
+    "calendar_few": "{{count}} dni kalendarzowe",
+    "calendar_many": "{{count}} dni kalendarzowych",
+    "calendar_other": "{{count}} dnia kalendarzowego"
   }
 }

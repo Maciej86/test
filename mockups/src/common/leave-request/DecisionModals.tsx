@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Alert, Text, Textarea } from '@mantine/core';
 import { CircleAlert, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { LEAVE_DECISION_REASON_MAX } from '@app/shared';
+import { LEAVE_DECISION_REASON_MAX, leaveDaysText } from '@app/shared';
 import { ConfirmModal } from '../ConfirmModal';
 import { LeaveDates } from '../LeaveRequestParts';
 import { notify } from '../notify';
@@ -38,7 +38,7 @@ const Summary = ({ r }: { r: DecisionRequest }) => {
   const { t } = useTranslation('leave-requests');
   return (
     <Text>
-      {r.employee}: {r.type}, <LeaveDates from={r.from} to={r.to} /> ({t('days', { count: r.days })}).
+      {r.employee}: {r.type}, <LeaveDates from={r.from} to={r.to} /> ({leaveDaysText(t, r.days)}).
     </Text>
   );
 };

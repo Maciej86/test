@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Card, Grid, Group, Paper, Progress, SegmentedControl, Select, Stack, Table, Text, Title } from '@mantine/core';
 import { CalendarDays } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { TABLE_MIN_WIDTH } from '@app/shared';
+import { TABLE_MIN_WIDTH, leaveDaysText } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { EmptyState } from '../../common/EmptyState';
 import { PageHeader } from '../../common/PageHeader';
@@ -144,7 +144,7 @@ const RequestCards = ({ rows, ...actions }: RowActions & { rows: MockRequest[] }
                 <Text fw={600}>
                   <LeaveDates from={r.from} to={r.to} />
                 </Text>
-                <Text size="sm" c="dimmed">{r.type}, {t('days', { count: r.days })}</Text>
+                <Text size="sm" c="dimmed">{r.type}, {leaveDaysText(t, r.days)}</Text>
               </Stack>
               <LeaveStatusBadge status={r.status} />
             </Group>

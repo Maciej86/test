@@ -1,4 +1,4 @@
-import { createI18n, formatDate } from '@app/shared';
+import { createI18n, formatDate, leaveDaysText } from '@app/shared';
 import { theme } from '@app/shared/theme';
 
 // Dokument „Wniosek o urlop” (moduł Moje urlopy, część 2; użyje go też moduł Wnioski urlopowe). Jasny jak papier,
@@ -44,7 +44,7 @@ const termText = (d: LeaveRequestPdfData): string =>
   d.dateFrom === d.dateTo ? (formatDate(d.dateFrom) ?? '') : `${formatDate(d.dateFrom)} – ${formatDate(d.dateTo)}`;
 
 const daysText = (d: LeaveRequestPdfData): string => {
-  const days = t('days', { count: d.workingDays });
+  const days = leaveDaysText(i18n.t, d.workingDays);
   if (!d.deductsPool || d.daysFromCarried + d.daysFromAnnual === 0) return days;
   const parts = [
     d.daysFromCarried > 0 ? t('split_carried', { count: d.daysFromCarried }) : null,

@@ -1,3 +1,4 @@
+import { leaveDaysText } from '@app/shared';
 import type { TFunction } from 'i18next';
 import type { LeaveRequestView } from '../../common/leave-request/DetailsDrawer';
 import type { DecisionRequest } from '../../common/leave-request/DecisionModals';
@@ -21,7 +22,7 @@ export const toView = (r: MockRequest, t: TFunction): LeaveRequestView => {
     status: r.status,
     from: r.from,
     to: r.to,
-    typeLine: `${r.type}, ${t('days', { count: r.days })} (${splitText(r, t)})`,
+    typeLine: `${r.type}, ${leaveDaysText(t, r.days)} (${splitText(r, t)})`,
     late: isLate(r),
     comment: r.comment,
     createdAt: r.createdAt,

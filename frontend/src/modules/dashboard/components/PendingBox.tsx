@@ -1,7 +1,7 @@
 import { Anchor, Badge, Box, Group, Text } from '@mantine/core';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { LEAVE_REQUESTS_PATH, formatDate, leaveRequestPath, type AdminDashboard } from '@app/shared';
+import { LEAVE_REQUESTS_PATH, formatDate, leaveRequestPath, type AdminDashboard, leaveDaysText } from '@app/shared';
 import { InfoCard } from '../../../common/InfoCard';
 import { LeaveDates } from '../../../common/LeaveRequestParts';
 import { daysUntil } from './daysUntil';
@@ -43,7 +43,7 @@ export const PendingBox = ({ pending, today }: { pending: AdminDashboard['pendin
                   <Text span inherit c={soon ? 'yellow.4' : undefined} fw={soon ? 600 : undefined} data-soon={soon}>{startsText(left)}</Text>
                 </Text>
               </Box>
-              <Badge variant="light" color="gray" style={{ flex: 'none' }}>{t('days', { count: r.workingDays })}</Badge>
+              <Badge variant="light" color="gray" style={{ flex: 'none' }}>{leaveDaysText(t, r.workingDays)}</Badge>
             </Group>
           </RowLink>
         );

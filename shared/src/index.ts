@@ -7,6 +7,7 @@ export * from './holidays';
 export * from './leaveRequestCheck';
 export * from './taskDue';
 export * from './calendar';
+export * from './leaveDays';
 export * from './number';
 export * from './activityLog';
 export * from './schemas/fields';

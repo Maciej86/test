@@ -1,7 +1,7 @@
 import { Anchor, Badge, Divider, Group, Text } from '@mantine/core';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { MY_LEAVE_PATH, type EmployeeDashboard } from '@app/shared';
+import { MY_LEAVE_PATH, type EmployeeDashboard, leaveDaysText } from '@app/shared';
 import { InfoCard } from '../../../common/InfoCard';
 import { LeaveDates, LeaveStatusBadge } from '../../../common/LeaveRequestParts';
 
@@ -25,7 +25,7 @@ export const MyRequestsBox = ({ pending, next }: { pending: EmployeeDashboard['m
       ) : (
         <Group justify="space-between" wrap="nowrap">
           <Text>{next.leaveTypeName}, <LeaveDates from={next.dateFrom} to={next.dateTo} /></Text>
-          <Badge variant="light" color="green" style={{ flex: 'none' }}>{t('days', { count: next.workingDays })}</Badge>
+          <Badge variant="light" color="green" style={{ flex: 'none' }}>{leaveDaysText(t, next.workingDays)}</Badge>
         </Group>
       )}
     </InfoCard>

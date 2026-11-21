@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Anchor, Badge, Box, Button, Divider, Grid, Group, Paper, SegmentedControl, Stack, Table, Text, UnstyledButton } from '@mantine/core';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { CALENDAR_PATH, dayjs, formatDate } from '@app/shared';
+import { CALENDAR_PATH, dayjs, formatDate, leaveDaysText } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DateText } from '../../common/DateText';
 import { InfoCard } from '../../common/InfoCard';
@@ -70,7 +70,7 @@ const PendingBox = ({ empty }: { empty: boolean }) => {
                   </Text>
                 </Text>
               </Box>
-              <Badge variant="light" color="gray" style={{ flex: 'none' }}>{t('days', { count: r.days })}</Badge>
+              <Badge variant="light" color="gray" style={{ flex: 'none' }}>{leaveDaysText(t, r.days)}</Badge>
             </Group>
           </RowLink>
         );
@@ -227,7 +227,7 @@ const MyRequestsBox = ({ empty }: { empty: boolean }) => {
           <Text>
             {next.type}, <LeaveDates from={next.from} to={next.to} />
           </Text>
-          <Badge variant="light" color="green" style={{ flex: 'none' }}>{t('days', { count: next.days })}</Badge>
+          <Badge variant="light" color="green" style={{ flex: 'none' }}>{leaveDaysText(t, next.days)}</Badge>
         </Group>
       )}
     </InfoCard>
