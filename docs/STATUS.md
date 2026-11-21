@@ -2,7 +2,7 @@
 
 **Wersja stepkit:** 0.1.51
 
-**Następny krok:** Kalendarz, część 2: użytkownik przechodzi `docs/modules/calendar/TESTS-2.md` i potwierdza „działa”; potem zamknięcie modułu.
+**Następny krok:** moduł 16 Publikacja (etap makieta według `references/deploy-ovh.md`, bez makiety ekranów).
 
 ## Start aplikacji
 
@@ -33,11 +33,12 @@
 | 12 | Archiwum | archive | zrobiony | zamknięcie | employees, tasks |
 | 13 | Moje konto | my-account | zrobiony | zamknięcie | login |
 | 14 | Pulpit | dashboard | zrobiony | zamknięcie | my-leave, leave-requests, tasks |
-| 15 | Kalendarz | calendar | w toku | testy, część 2/2 | leave-types, my-leave, leave-requests |
+| 15 | Kalendarz | calendar | zrobiony | zamknięcie | leave-types, my-leave, leave-requests |
 | 16 | Publikacja | deploy | czeka | makieta | appearance, login, employees, leave-types, contract-types, email, notifications, my-leave, leave-requests, tasks, activity-log, archive, my-account, dashboard, calendar |
 
 ## Ostatnie decyzje
 
+- 2026-11-21: Moduł Kalendarz zrobiony (część 2 potwierdzona przez użytkownika: „działa”): typy urlopów z liczeniem dni (robocze / kalendarzowe) i zatwierdzaniem, typ „Chorobowe”, zgłoszenie bez zatwierdzania do 7 dni wstecz z powiadomieniem i e-mailem, wycofanie pomyłki, ciągły pasek w kalendarzu.
 - 2026-11-21: Kalendarz, część 2: próby nadużyć odparte (8, prawdziwa baza), przegląd przed oddaniem z poprawkami (makiety powiadomień, wydruku i Pulpitu, nieużywany komunikat, komunikat daty wstecz), sprawdzona w przeglądarce (podpowiedzi typu w osobnych liniach, weekend chorobowego w pasku „Kto jeszcze ma wtedy wolne”); 70 testów e2e zielonych.
 - 2026-11-21: Kalendarz, część 2 zbudowana (kroki 0–14): typy urlopów z liczeniem dni i zatwierdzaniem (migracje 031–035, typ „Chorobowe”), złożenie bez zatwierdzania z powiadomieniem „Zgłoszona nieobecność” i e-mailem, do 7 dni wstecz, wycofanie pomyłki, dni z jednostką wszędzie (wspólne `leaveDaysText`), ciągły pasek w kalendarzu. Przegląd kodu z poprawkami, `npm run check` i 69 testów e2e zielone.
 - 2026-11-21: Kalendarz: spec części 2 zaakceptowany (`SPEC-2.md`: liczenie dni robocze / kalendarzowe zapamiętane we wniosku, typ bez zatwierdzania od razu zatwierdzony z powiadomieniem „Zgłoszona nieobecność” i e-mailem, do 7 dni wstecz, wycofanie do pierwszego dnia albo w dniu złożenia, typ „Chorobowe” na start); napisane `PLAN-2.md` i `TESTS-2.md`.
