@@ -133,4 +133,17 @@ describe('CalendarPage', () => {
     expect(within(drawer).getByRole('button', { name: 'Odrzuć' })).toBeInTheDocument();
     expect(within(drawer).queryByRole('link', { name: 'Pokaż w kalendarzu' })).not.toBeInTheDocument();
   });
+
+  it('abuse: HTML in a name or a leave type is shown as plain text', async () => {
+    const evil = '<img src=x onerror=alert(1)>';
+    show(data({
+      people: [{ id: 2, name: evil }],
+      absences: [absence({ id: 21, userId: 2, leaveTypeName: '<b>Gruby</b>' })],
+      todayOff: [],
+    }));
+    expect(await screen.findByText(evil)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: `${evil}: <b>Gruby</b>` })).toHaveTextContent('<b>Gruby</b>');
+    expect(document.querySelector('img[src="x"]')).toBeNull();
+    expect(document.querySelector('b')).toBeNull();
+  });
 });

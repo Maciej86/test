@@ -30,4 +30,16 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180 (port a
 
 ## Próby nadużyć
 
-(uzupełniane na etapie testy według `abuse.md`)
+Sprawdzone 2026-11-21 (testy `describe('abuse')` w `calendar.routes.test.ts`, `leave-types.routes.test.ts`,
+`CalendarPage.test.tsx`, e2e `calendar.spec.ts`):
+- Pracownik otwiera `GET /api/calendar` z dowolnymi parametrami (`from`, `role`, `userId`) → 403, nic nie czyta: przeszła
+- Administrator z hasłem tymczasowym → 403: przeszła
+- Podrobiony koniec zakresu, „dziś”, osoby i status w adresie → serwer bierze tylko `from`: przeszła
+- SQL, skrypt, bardzo długi tekst, data z godziną, data `DD.MM.RRRR`, dwa `from` naraz → 400: przeszła
+- Zapis (POST, PUT, DELETE, PATCH) na adres kalendarza → 404: przeszła
+- Kolor typu urlopu z CSS (`green; background: url(…)`), zmienną, wielkimi literami albo kolorem statusu → 400
+  (kolor trafia do stylu paska): przeszła
+- HTML w imieniu i nazwisku albo w nazwie typu → widać jako zwykły tekst: przeszła
+- Osoba z Archiwum i administrator nie mają wiersza (serwer bierze tylko aktywnych pracowników): przeszła
+- Decyzje z kalendarza idą trasami Wniosków urlopowych z ich blokadami (dwa zatwierdzenia naraz, wniosek wycofany
+  w międzyczasie → 409 `already_decided`, sprawdzone w module Wnioski urlopowe): przeszła

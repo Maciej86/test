@@ -20,7 +20,11 @@ const view = { from: '2026-11-17', to: '2027-01-16', today: '2026-11-17', people
 const as = (user: SessionUser | null) => {
   vi.mocked(users.findActiveUserById).mockResolvedValue(user);
   const cookie = user ? `${AUTH_COOKIE_NAME}=${signToken(user, 0)}` : '';
-  return { get: (url: string) => request(createApp()).get(`/api${url}`).set('Cookie', cookie) };
+  const app = createApp();
+  return {
+    get: (url: string) => request(app).get(`/api${url}`).set('Cookie', cookie),
+    send: (method: 'post' | 'put' | 'delete' | 'patch', url: string, body: object = {}) => request(app)[method](`/api${url}`).set('Cookie', cookie).send(body),
+  };
 };
 
 beforeEach(() => {
@@ -58,5 +62,42 @@ describe('calendar routes', () => {
       expect(r.body.error.fields).toEqual({ from: key });
     }
     expect(s.getCalendar).not.toHaveBeenCalled();
+  });
+
+  describe('abuse', () => {
+    it('employee gets 403 whatever the parameters (from, role, userId), and nothing is read', async () => {
+      for (const url of ['/calendar', '/calendar?from=2026-12-01', '/calendar?role=admin', '/calendar?userId=1&from=2026-11-17']) {
+        expect((await as(jan).get(url)).status).toBe(403);
+      }
+      expect(s.getCalendar).not.toHaveBeenCalled();
+    });
+
+    it('admin with a temporary password (must change it first) → 403', async () => {
+      expect((await as({ ...anna, mustChangePassword: true }).get('/calendar')).status).toBe(403);
+      expect(s.getCalendar).not.toHaveBeenCalled();
+    });
+
+    it('forged range end, people and today in the address are ignored; only from reaches the service', async () => {
+      await as(anna).get('/calendar?from=2026-12-01&to=2099-12-31&today=2000-01-01&people=1,2&status=rejected');
+      expect(s.getCalendar).toHaveBeenCalledTimes(1);
+      expect(s.getCalendar).toHaveBeenCalledWith('2026-12-01');
+    });
+
+    it('SQL, script, repeated parameter, huge text or a date with time in from → 400, service not called', async () => {
+      for (const from of ["2026-11-17' OR 1=1 --", '<script>alert(1)</script>', 'a'.repeat(5000), '2026-11-17T00:00:00Z', '17.11.2026']) {
+        const r = await as(anna).get(`/calendar?from=${encodeURIComponent(from)}`);
+        expect(r.status).toBe(400);
+        expect(r.body.error.fields.from).toBeDefined();
+      }
+      expect((await as(anna).get('/calendar?from=2026-11-17&from=2026-12-01')).status).toBe(400);
+      expect(s.getCalendar).not.toHaveBeenCalled();
+    });
+
+    it('calendar is read-only: writes to its address → 404, nothing changes', async () => {
+      for (const method of ['post', 'put', 'delete', 'patch'] as const) {
+        expect((await as(anna).send(method, '/calendar', { from: '2026-11-17', userId: 2 })).status).toBe(404);
+      }
+      expect(s.getCalendar).not.toHaveBeenCalled();
+    });
   });
 });

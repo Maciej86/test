@@ -168,6 +168,15 @@ describe('abuse', () => {
     expect(s.createType).not.toHaveBeenCalled();
   });
 
+  it('abuse: color with CSS or a status color (it goes into the calendar style) → 400, service not called', async () => {
+    for (const color of ['green; background: url(https://zly.example/x.png)', 'var(--mantine-color-red-8)', 'GREEN', 'yellow', ' green']) {
+      const r = await as(anna).put('/leave-types/3', { ...body, color });
+      expect(r.status).toBe(400);
+      expect(r.body.error.fields.color).toBe('validation.invalid_option');
+    }
+    expect(s.updateType).not.toHaveBeenCalled();
+  });
+
   it('ids that are not positive whole numbers → 404 on every route with an id', async () => {
     const a = as(anna);
     for (const id of ['0', '-1', '1.5', '1e3', 'abc']) {
