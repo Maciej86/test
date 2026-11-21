@@ -72,3 +72,14 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
 - [x] 11. Test e2e `e2e/calendar.spec.ts` ze scenariuszy `TESTS-1.md` (administrator: kalendarz, wniosek e2e
   w zakresie, filtr, wyszukiwanie, panel z decyzją, „Pokaż w kalendarzu”; pracownik: brak pozycji w menu i 403 na
   adresie API); sprzątanie danych `E2E` w `global-teardown.ts`, jeśli test je tworzy → `npm run check`
+
+## Przegląd kodu (2026-11-21)
+
+Jeden recenzent, lista kontrolna z `CONVENTIONS.md`. Wynik: „z poprawkami”, bez błędów krytycznych.
+- Naprawione: „Dziś nie ma” po przesunięciu zakresu mówiło „wszyscy są w pracy” (serwer zwraca teraz `todayOff`,
+  test); zmiana typu urlopu i pracownika odświeża Kalendarz (`core/queryKeys.ts`); „2 czekają” (odmiana); strzałka
+  wyłączona na granicy dat 2000–2099; wspólny `LegendItem` (common, makiety) w Kalendarzu i `LeaveStrip`; testy
+  ładowania i „Dziś wszyscy są w pracy”.
+- Zostawione świadomie: urlop, którego widoczna część to sam weekend na brzegu zakresu, liczy się w podsumowaniu bez
+  paska (rzadkie); opis paska dla czytnika ekranu bez dat (dymek i szczegóły je pokazują); nazwy miesięcy z `dayjs`
+  jak w `LeaveStrip` (nie ma wspólnego formatu „miesiąc rok”).

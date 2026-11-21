@@ -16,5 +16,7 @@ describe('employees api', () => {
     await result.current.mutateAsync({ id: 2, firstName: 'Jan', lastName: 'Kowalski', login: 'jan@firma.pl', email: '', role: 'employee', hiredOn: null, contractTypeId: null });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['employees'] });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['contract-types'] });
+    // Nowa osoba, inne imię albo archiwum zmienia wiersze Kalendarza.
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['calendar'] });
   });
 });

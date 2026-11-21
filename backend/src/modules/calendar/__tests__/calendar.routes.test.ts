@@ -15,7 +15,7 @@ const { AUTH_COOKIE_NAME } = await import('../../../config/constants');
 
 const anna: SessionUser = { id: 1, name: 'Anna Nowak', role: 'admin', mustChangePassword: false };
 const jan: SessionUser = { id: 2, name: 'Jan Kowalski', role: 'employee', mustChangePassword: false };
-const view = { from: '2026-11-17', to: '2027-01-16', today: '2026-11-17', people: [], absences: [] };
+const view = { from: '2026-11-17', to: '2027-01-16', today: '2026-11-17', people: [], absences: [], todayOff: [] };
 
 const as = (user: SessionUser | null) => {
   vi.mocked(users.findActiveUserById).mockResolvedValue(user);

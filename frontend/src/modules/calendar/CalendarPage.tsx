@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Box, Button, Group, Paper, Stack, Text } from '@mantine/core';
+import { Button, Group, Paper, Stack, Text } from '@mantine/core';
 import { Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
 import {
+  CALENDAR_FROM_MAX,
+  CALENDAR_FROM_MIN,
   CALENDAR_RANGE_DAYS,
   EMPLOYEES_PATH,
   ISO_DATE_FORMAT,
@@ -16,6 +18,7 @@ import {
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { DataState } from '../../common/DataState';
 import { EmptyState } from '../../common/EmptyState';
+import { LegendItem } from '../../common/LegendItem';
 import { PageHeader } from '../../common/PageHeader';
 import { DecisionWindow, type DecisionDialog } from '../../common/leave-request/DecisionModals';
 import { DetailsDrawer } from '../../common/leave-request/DetailsDrawer';
@@ -28,8 +31,8 @@ import { CalendarToolbar } from './components/CalendarToolbar';
 /** „Dziś nie ma: Jan Kowalski (wypoczynkowy), Ewa Mazur (na żądanie, czeka)” w kolejności wierszy. */
 const offToday = (data: CalendarResponse, t: (key: string, o: Record<string, unknown>) => string) =>
   data.people.flatMap((p) =>
-    data.absences
-      .filter((a) => a.userId === p.id && a.dateFrom <= data.today && a.dateTo >= data.today)
+    data.todayOff
+      .filter((a) => a.userId === p.id)
       .map((a) => t(a.status === 'pending' ? 'person_absence_pending' : 'person_absence', { name: p.name, type: a.leaveTypeName.toLowerCase() })),
   );
 
@@ -37,18 +40,9 @@ const Legend = () => {
   const { t } = useTranslation('calendar');
   return (
     <Group gap="lg">
-      <Group gap={6} wrap="nowrap">
-        <Box w={18} h={12} style={{ borderRadius: 2, background: 'var(--mantine-color-green-light)', border: '1px dashed var(--mantine-color-green-4)' }} />
-        <Text size="xs" c="dimmed">{t('legend_pending')}</Text>
-      </Group>
-      <Group gap={6} wrap="nowrap">
-        <Box w={18} h={12} style={{ borderRadius: 2, background: 'var(--mantine-color-dark-8)', border: '1px solid var(--mantine-color-dark-4)' }} />
-        <Text size="xs" c="dimmed">{t('off_day')}</Text>
-      </Group>
-      <Group gap={6} wrap="nowrap">
-        <Box w={18} h={2} style={{ background: 'var(--mantine-color-green-5)', opacity: 0.6 }} />
-        <Text size="xs" c="dimmed">{t('legend_bridge')}</Text>
-      </Group>
+      <LegendItem label={t('legend_pending')} w={18} h={12} swatch={{ background: 'var(--mantine-color-green-light)', border: '1px dashed var(--mantine-color-green-4)' }} />
+      <LegendItem label={t('off_day')} w={18} h={12} swatch={{ background: 'var(--mantine-color-dark-8)', border: '1px solid var(--mantine-color-dark-4)' }} />
+      <LegendItem label={t('legend_bridge')} w={18} h={2} swatch={{ background: 'var(--mantine-color-green-5)', opacity: 0.6 }} />
     </Group>
   );
 };
@@ -70,7 +64,16 @@ export const CalendarPage = () => {
   const data = calendar.data;
 
   // Od początku z adresu (brak = dziś według serwera), nie od ostatniej odpowiedzi: dwa szybkie kliknięcia to 60 dni.
-  const shift = (days: number) => data && setParams({ from: dayjs(from ?? data.today).add(days, 'day').format(ISO_DATE_FORMAT) });
+  const shifted = (days: number) => (data ? dayjs(from ?? data.today).add(days, 'day').format(ISO_DATE_FORMAT) : null);
+  // Poza 2000–2099 serwer odmówi, a adres wróciłby do dziś: strzałka przy granicy jest wyłączona.
+  const canShift = (days: number) => {
+    const next = shifted(days);
+    return next !== null && next >= CALENDAR_FROM_MIN && next <= CALENDAR_FROM_MAX;
+  };
+  const shift = (days: number) => {
+    const next = shifted(days);
+    if (next && canShift(days)) setParams({ from: next });
+  };
   const people = data?.people.filter((p) => p.name.toLowerCase().includes(search.trim().toLowerCase())) ?? [];
   const absences = data?.absences.filter((a) => !hidden.includes(a.color)) ?? [];
   const names = data ? offToday(data, t) : [];
@@ -79,7 +82,7 @@ export const CalendarPage = () => {
     <Stack>
       <PageHeader
         title={t('title')}
-        subtitle={data && data.people.length > 0 && t('summary', { count: data.absences.length, pending: data.absences.filter((a) => a.status === 'pending').length })}
+        subtitle={data && data.people.length > 0 && t('summary', { count: data.absences.length, pending: t('pending_count', { count: data.absences.filter((a) => a.status === 'pending').length }) })}
       />
       <DataState query={calendar}>
         {data && data.people.length === 0 && (
@@ -97,7 +100,7 @@ export const CalendarPage = () => {
             <Text fw={500}>{names.length > 0 ? t('today_off', { names: names.join(', ') }) : t('today_all')}</Text>
             <CalendarFilters search={search} onSearch={setSearch} absences={data.absences} hidden={hidden} onHidden={setHidden} />
             <Paper withBorder style={{ overflow: 'hidden' }}>
-              <CalendarToolbar from={data.from} to={data.to} today={data.today} onShift={shift} onToday={() => setParams({})} />
+              <CalendarToolbar from={data.from} to={data.to} today={data.today} canShift={canShift} onShift={shift} onToday={() => setParams({})} />
               {people.length === 0 ? (
                 <EmptyState icon={Search} text={t('no_match')} />
               ) : (

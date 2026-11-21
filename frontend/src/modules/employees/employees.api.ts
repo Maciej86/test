@@ -9,6 +9,7 @@ import type {
   SelectableContractType,
 } from '@app/shared';
 import { api } from '../../core/api/client';
+import { CALENDAR_KEY } from '../../core/queryKeys';
 
 const KEY = ['employees'] as const;
 /** Typy umów pokazują liczbę pracowników z każdym typem: po zapisie pracownika też się odświeżają. */
@@ -30,7 +31,7 @@ export const useContractTypeOptions = () => {
   });
 };
 
-/** Każda zmiana odświeża listę i podgląd zamknięcia roku. */
+/** Każda zmiana odświeża listę, podgląd zamknięcia roku i wiersze Kalendarza. */
 const useEmployeesMutation = <T>(fn: (input: T) => Promise<unknown>) => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -38,6 +39,7 @@ const useEmployeesMutation = <T>(fn: (input: T) => Promise<unknown>) => {
     onSuccess: () => Promise.all([
       queryClient.invalidateQueries({ queryKey: KEY }),
       queryClient.invalidateQueries({ queryKey: CONTRACT_TYPES_KEY }),
+      queryClient.invalidateQueries({ queryKey: CALENDAR_KEY }),
     ]),
   });
 };

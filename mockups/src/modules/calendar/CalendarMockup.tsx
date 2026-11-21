@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ActionIcon, Box, Button, Chip, Group, Paper, SegmentedControl, Stack, Text, TextInput, useMantineTheme } from '@mantine/core';
+import { ActionIcon, Button, Chip, Group, Paper, SegmentedControl, Stack, Text, TextInput, useMantineTheme } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { CalendarDays, ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { dayjs, formatDate } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { ColorMark } from '../../common/ColorSwatchPicker';
+import { LegendItem } from '../../common/LegendItem';
 import { DateText } from '../../common/DateText';
 import { EmptyState } from '../../common/EmptyState';
 import { notify } from '../../common/notify';
@@ -117,7 +118,7 @@ export const CalendarMockup = () => {
         subtitle={
           state === 'empty'
             ? undefined
-            : t('summary', { count: inRange.length, pending: inRange.filter((a) => a.status === 'pending').length })
+            : t('summary', { count: inRange.length, pending: t('pending_count', { count: inRange.filter((a) => a.status === 'pending').length }) })
         }
       />
 
@@ -177,18 +178,9 @@ export const CalendarMockup = () => {
           </Paper>
 
           <Group gap="lg">
-            <Group gap={6} wrap="nowrap">
-              <Box w={18} h={12} style={{ borderRadius: 2, background: 'var(--mantine-color-green-light)', border: '1px dashed var(--mantine-color-green-4)' }} />
-              <Text size="xs" c="dimmed">{t('legend_pending')}</Text>
-            </Group>
-            <Group gap={6} wrap="nowrap">
-              <Box w={18} h={12} style={{ borderRadius: 2, background: 'var(--mantine-color-dark-8)', border: '1px solid var(--mantine-color-dark-4)' }} />
-              <Text size="xs" c="dimmed">{t('off_day')}</Text>
-            </Group>
-            <Group gap={6} wrap="nowrap">
-              <Box w={18} h={2} style={{ background: 'var(--mantine-color-green-5)', opacity: 0.6 }} />
-              <Text size="xs" c="dimmed">{t('legend_bridge')}</Text>
-            </Group>
+            <LegendItem label={t('legend_pending')} w={18} h={12} swatch={{ background: 'var(--mantine-color-green-light)', border: '1px dashed var(--mantine-color-green-4)' }} />
+            <LegendItem label={t('off_day')} w={18} h={12} swatch={{ background: 'var(--mantine-color-dark-8)', border: '1px solid var(--mantine-color-dark-4)' }} />
+            <LegendItem label={t('legend_bridge')} w={18} h={2} swatch={{ background: 'var(--mantine-color-green-5)', opacity: 0.6 }} />
           </Group>
         </>
       )}

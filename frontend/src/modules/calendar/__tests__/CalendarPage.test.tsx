@@ -20,6 +20,7 @@ const data = (o: Partial<CalendarResponse> = {}): CalendarResponse => ({
     absence({ id: 21, userId: 2, status: 'pending', dateFrom: '2026-11-26', dateTo: '2026-11-27', days: 2 }),
     absence({ id: 27, userId: 8, leaveTypeName: 'Opieka nad dzieckiem', color: 'navy', dateFrom: '2026-11-17', dateTo: '2026-11-18', days: 2 }),
   ],
+  todayOff: [absence({ id: 27, userId: 8, leaveTypeName: 'Opieka nad dzieckiem', color: 'navy', dateFrom: '2026-11-17', dateTo: '2026-11-18', days: 2 })],
   ...o,
 });
 
@@ -43,6 +44,32 @@ describe('CalendarPage', () => {
     expect(await screen.findByText('Widoczne dni: 3 nieobecności, 1 czeka na decyzję')).toBeInTheDocument();
     expect(screen.getByText('Dziś nie ma: Paweł Dąbrowski (opieka nad dzieckiem)')).toBeInTheDocument();
     expect(screen.getAllByTestId('calendar-row').map((r) => r.dataset.name)).toEqual(['Paweł Dąbrowski', 'Jan Kowalski', 'Magdalena Lewandowska']);
+  });
+
+  it('"Dziś nie ma" comes from todayOff, also when the visible range starts later; nobody → "Dziś wszyscy są w pracy"', async () => {
+    show(data({ from: '2026-12-17', to: '2027-02-15', absences: [] }), '/admin/calendar?from=2026-12-17');
+    expect(await screen.findByText('Dziś nie ma: Paweł Dąbrowski (opieka nad dzieckiem)')).toBeInTheDocument();
+    vi.restoreAllMocks();
+    show(data({ todayOff: [] }));
+    expect(await screen.findByText('Dziś wszyscy są w pracy')).toBeInTheDocument();
+  });
+
+  it('pending count uses the right verb form', async () => {
+    show(data({ absences: [absence({ id: 1, userId: 2, status: 'pending' }), absence({ id: 2, userId: 5, status: 'pending' })] }));
+    expect(await screen.findByText('Widoczne dni: 2 nieobecności, 2 czekają na decyzję')).toBeInTheDocument();
+  });
+
+  it('arrow at the last allowed start is disabled (no jump back to today)', async () => {
+    show(data({ from: '2099-12-31', to: '2100-03-01' }), '/admin/calendar?from=2099-12-31');
+    await screen.findAllByTestId('calendar-row');
+    expect(screen.getByRole('button', { name: '30 dni później' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '30 dni wcześniej' })).toBeEnabled();
+  });
+
+  it('loading → spinner', async () => {
+    vi.spyOn(api, 'get').mockReturnValue(new Promise(() => undefined));
+    renderRoutes([{ path: '/admin/calendar', element: <CalendarPage /> }], '/admin/calendar');
+    expect(await screen.findByLabelText('Wczytywanie…')).toBeInTheDocument();
   });
 
   it('server error → error box with retry', async () => {

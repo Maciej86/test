@@ -50,7 +50,7 @@ describe('CalendarGrid', () => {
     expect(day('2026-11-23')).toHaveAttribute('data-off', 'false');
   });
 
-  it('click and Enter on a bar open details', () => {
+  it('click on a bar opens details; bars are real buttons (Enter and Space work natively)', () => {
     const { onOpen } = show();
     const bar = screen.getByRole('button', { name: 'Jan Kowalski: Wypoczynkowy (czeka)' });
     fireEvent.click(bar);

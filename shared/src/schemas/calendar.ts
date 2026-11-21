@@ -37,4 +37,6 @@ export interface CalendarResponse {
   today: string;
   people: CalendarPerson[];
   absences: CalendarAbsence[];
+  /** Nieobecni dziś (do zdania „Dziś nie ma”), niezależnie od widocznego zakresu. */
+  todayOff: CalendarAbsence[];
 }

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { todayIsoDate, type LeaveRequestDetails, type LeaveRequestListItem } from '@app/shared';
 import { api } from './api/client';
+import { CALENDAR_KEY, DASHBOARD_KEY } from './queryKeys';
 
 /** Klucz zapytań Wniosków urlopowych (lista i szczegóły). */
 export const LEAVE_REQUESTS_KEY = ['leave-requests'] as const;
@@ -9,7 +10,7 @@ export const LEAVE_REQUESTS_KEY = ['leave-requests'] as const;
  * Dane, które pokazują skutek decyzji o wniosku: wnioski, pule w Pracownikach, kalendarz i Pulpit (czekające,
  * nieobecności). Decyzja odświeża je wszystkie, także po odmowie serwera (ktoś był szybszy).
  */
-const AFFECTED = [LEAVE_REQUESTS_KEY, ['employees'], ['calendar'], ['dashboard']] as const;
+const AFFECTED = [LEAVE_REQUESTS_KEY, ['employees'], CALENDAR_KEY, DASHBOARD_KEY] as const;
 
 /** Czekający wniosek, którego termin już się zaczął albo minął (można go rozpatrzyć, ale warto to widzieć). */
 export const isLate = (r: Pick<LeaveRequestListItem, 'status' | 'dateFrom'>) => r.status === 'pending' && r.dateFrom < todayIsoDate();

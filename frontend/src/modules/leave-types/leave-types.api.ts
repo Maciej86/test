@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { OrderDirection, LeaveTypeInput, LeaveTypesListResponse } from '@app/shared';
 import { api } from '../../core/api/client';
+import { CALENDAR_KEY } from '../../core/queryKeys';
 
 const KEY = ['leave-types'] as const;
 
@@ -16,7 +17,8 @@ const useLeaveTypesMutation = <T>(fn: (input: T) => Promise<unknown>) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: fn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY }),
+    // Kolor i nazwa typu są też na paskach Kalendarza.
+    onSuccess: () => Promise.all([queryClient.invalidateQueries({ queryKey: KEY }), queryClient.invalidateQueries({ queryKey: CALENDAR_KEY })]),
   });
 };
 
