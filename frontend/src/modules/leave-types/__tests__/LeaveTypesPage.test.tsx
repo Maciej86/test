@@ -6,11 +6,11 @@ import { renderWithProviders } from '../../../test/render';
 import { LeaveTypesPage } from '../LeaveTypesPage';
 
 const type = (o: Partial<LeaveTypeItem>): LeaveTypeItem => ({
-  id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, hidden: false, requestsCount: 0, ...o,
+  id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, color: 'green', hidden: false, requestsCount: 0, ...o,
 });
 const vacation = type({});
 const onDemand = type({ id: 2, name: 'Na żądanie', yearlyLimit: 4, requestsCount: 3 });
-const unpaid = type({ id: 4, name: 'Bezpłatny', deductsPool: false });
+const unpaid = type({ id: 4, name: 'Bezpłatny', deductsPool: false, color: 'orange' });
 const training = type({ id: 7, name: 'Szkoleniowy', hidden: true });
 
 const show = (items: LeaveTypeItem[]) => {
@@ -67,6 +67,12 @@ describe('LeaveTypesPage', () => {
     expect(within(demand).getByText('3')).toBeInTheDocument();
     expect(within(await rowOf('Wypoczynkowy')).getByText('bez limitu')).toBeInTheDocument();
     expect(within(await rowOf('Bezpłatny')).getByText('nie odejmuje')).toBeInTheDocument();
+  });
+
+  it('color square with the color name next to every type name', async () => {
+    show([vacation, unpaid]);
+    expect(within(await rowOf('Bezpłatny')).getByLabelText('pomarańczowy')).toBeInTheDocument();
+    expect(within(await rowOf('Wypoczynkowy')).getByLabelText('zielony')).toBeInTheDocument();
   });
 
   it('"Hide" disabled for the only visible type', async () => {

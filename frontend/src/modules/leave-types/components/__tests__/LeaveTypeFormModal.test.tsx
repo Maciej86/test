@@ -7,7 +7,7 @@ import { renderWithProviders } from '../../../../test/render';
 import { HideLeaveTypeModal } from '../HideLeaveTypeModal';
 import { LeaveTypeFormModal } from '../LeaveTypeFormModal';
 
-const onDemand: LeaveTypeItem = { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, hidden: false, requestsCount: 3 };
+const onDemand: LeaveTypeItem = { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, color: 'teal', hidden: false, requestsCount: 3 };
 
 const conflict = (message: string, hiddenType?: { id: number; name: string }) => {
   const config = { url: '/leave-types', headers: new AxiosHeaders() };
@@ -38,6 +38,22 @@ describe('LeaveTypeFormModal', () => {
     expect(post).not.toHaveBeenCalled();
   });
 
+  it('color: new type is green; editing keeps the type color; click on "fioletowy" sends grape', async () => {
+    vi.spyOn(api, 'post').mockResolvedValue({ data: { id: 8 } });
+    show(null);
+    expect(screen.getByText('Kolor w kalendarzu')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'zielony' })).toHaveAttribute('aria-pressed', 'true');
+    fill('Nazwa', 'Chorobowe');
+    fireEvent.click(screen.getByRole('button', { name: 'fioletowy' }));
+    save();
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/leave-types', { name: 'Chorobowe', deductsPool: true, yearlyLimit: '', color: 'grape' }));
+  });
+
+  it('color of an edited type is preselected', () => {
+    show(onDemand);
+    expect(screen.getByRole('button', { name: 'morski' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
   it('limit 0 and 366 → error under the field; cleared limit is sent empty (server saves NULL)', async () => {
     const post = vi.spyOn(api, 'post').mockResolvedValue({ data: { id: 6 } });
     show(null);
@@ -50,7 +66,7 @@ describe('LeaveTypeFormModal', () => {
     expect(await screen.findByText('Wartość jest za duża.')).toBeInTheDocument();
     fill('Limit dni w roku', '');
     save();
-    await waitFor(() => expect(post).toHaveBeenCalledWith('/leave-types', { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: '' }));
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/leave-types', { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: '', color: 'green' }));
   });
 
   it('editing a type used in requests shows the warning; 0 requests → no warning', () => {
@@ -70,7 +86,7 @@ describe('LeaveTypeFormModal', () => {
     show(onDemand);
     fill('Limit dni w roku', '');
     save();
-    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/leave-types/2', { name: 'Na żądanie', deductsPool: true, yearlyLimit: '' }));
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/leave-types/2', { name: 'Na żądanie', deductsPool: true, yearlyLimit: '', color: 'teal' }));
   });
 
   it('409 name_taken → error under the name', async () => {
@@ -102,7 +118,7 @@ describe('LeaveTypeFormModal', () => {
     const success = vi.spyOn(notify, 'success');
     const { onClose } = show(onDemand);
     save();
-    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/leave-types/2', { name: 'Na żądanie', deductsPool: true, yearlyLimit: 4 }));
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/leave-types/2', { name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, color: 'teal' }));
     await waitFor(() => expect(success).toHaveBeenCalledWith('Zapisano zmiany'));
     expect(onClose).toHaveBeenCalled();
   });

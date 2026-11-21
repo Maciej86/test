@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { ActionIcon, Box, Button, Chip, ColorSwatch, Group, Paper, SegmentedControl, Stack, Text, TextInput, useMantineTheme } from '@mantine/core';
+import { ActionIcon, Box, Button, Chip, Group, Paper, SegmentedControl, Stack, Text, TextInput, useMantineTheme } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { CalendarDays, ChevronLeft, ChevronRight, Search, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { dayjs, formatDate } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { ColorMark } from '../../common/ColorSwatchPicker';
 import { DateText } from '../../common/DateText';
 import { EmptyState } from '../../common/EmptyState';
 import { notify } from '../../common/notify';
@@ -145,7 +146,7 @@ export const CalendarMockup = () => {
             <Chip.Group multiple value={colors} onChange={setColors}>
               <Group gap="xs" wrap="wrap">
                 {LEGEND.map((tp) => (
-                  <Chip key={tp.color} value={tp.color} variant="outline" size="sm" icon={<ColorSwatch color={`var(--mantine-color-${tp.color}-8)`} size={12} radius={2} />}>
+                  <Chip key={tp.color} value={tp.color} variant="outline" size="sm" icon={<ColorMark color={tp.color} />}>
                     {typesOfColor(tp.color)}
                   </Chip>
                 ))}

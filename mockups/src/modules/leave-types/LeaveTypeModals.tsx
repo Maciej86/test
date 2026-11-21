@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Alert, Anchor, Button, ColorSwatch, Group, Modal, NumberInput, Radio, Stack, Switch, Text, TextInput } from '@mantine/core';
-import { Check, CircleAlert } from 'lucide-react';
+import { Alert, Anchor, Button, Group, Modal, NumberInput, Radio, Stack, Switch, Text, TextInput } from '@mantine/core';
+import { CircleAlert } from 'lucide-react';
+import { ColorSwatchPicker } from '../../common/ColorSwatchPicker';
 import { useTranslation } from 'react-i18next';
 import { ButtonIcon } from '../../common/ButtonIcon';
 import { ConfirmModal } from '../../common/ConfirmModal';
@@ -68,28 +69,14 @@ export const LeaveTypeModal = ({ leaveType, nameTaken = false, onClose }: {
           suffix={t('field_limit_suffix')}
           w={{ base: '100%', xs: 220 }}
         />
-        <Stack gap={6}>
-          <Text size="sm" fw={500}>{t('field_color')}</Text>
-          <Group gap="xs">
-            {TYPE_COLORS.map((c) => (
-              <ColorSwatch
-                key={c}
-                component="button"
-                type="button"
-                color={`var(--mantine-color-${c}-8)`}
-                radius={3}
-                size={30}
-                aria-label={t(`colors.${c}`)}
-                aria-pressed={color === c}
-                onClick={() => setColor(c)}
-                style={{ cursor: 'pointer', outline: color === c ? '2px solid var(--mantine-color-dark-0)' : undefined, outlineOffset: 2 }}
-              >
-                {color === c && <Check size={16} />}
-              </ColorSwatch>
-            ))}
-          </Group>
-          <Text size="xs" c="dimmed">{t('field_color_hint')}</Text>
-        </Stack>
+        <ColorSwatchPicker
+          label={t('field_color')}
+          description={t('field_color_hint')}
+          colors={TYPE_COLORS}
+          value={color}
+          onChange={setColor}
+          labelOf={(c) => t(`colors.${c}`)}
+        />
         <Group justify="flex-end" mt="xs">
           <Button variant="default" leftSection={<ButtonIcon action="cancel" />} onClick={onClose}>{t('cancel')}</Button>
           <Button leftSection={<ButtonIcon action="save" />} onClick={save}>{t('save')}</Button>

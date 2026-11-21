@@ -20,6 +20,7 @@ export const formatChangeValue = (field: string, value: unknown, t: TFunction): 
   if (field === 'password') return t(value === 'changed' ? 'values.password_changed' : 'values.password_reset');
   if (field === 'status') return translateKey(t, `my-leave.status.${String(value)}`);
   if (field === 'column_key') return translateKey(t, `tasks.column.${String(value)}`);
+  if (field === 'color') return translateKey(t, `leave-types.colors.${String(value)}`);
   if (field === 'role' && isRole(value)) return translateKey(t, ROLE_LABELS[value]);
   if (DATE_FIELDS.has(field)) return formatDate(String(value)) ?? String(value);
   if (BOOL_FIELDS.has(field)) return t(value ? 'values.yes' : 'values.no');

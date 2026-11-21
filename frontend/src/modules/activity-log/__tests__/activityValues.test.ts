@@ -11,6 +11,12 @@ describe('formatChangeValue', () => {
     expect(v('role', 'admin')).toBe(i18n.t('roles.admin', { ns: 'common' }));
   });
 
+  it('leave type color → color name, field label', () => {
+    expect(v('color', 'grape')).toBe('fioletowy');
+    expect(v('color', 'teal')).toBe('morski');
+    expect(t('fields.color')).toBe('Kolor w kalendarzu');
+  });
+
   it('dates, yes/no, people, password and empty values', () => {
     expect(v('due_date', '2026-11-25')).toBe('25.11.2026');
     expect(v('hired_on', null)).toBeNull();

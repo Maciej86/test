@@ -24,8 +24,8 @@ const { logActivity } = await import('../../../db/activityLog');
 const s = await import('../leave-types.service');
 const { LEAVE_TYPE_MESSAGES: M, SERVER_MESSAGES } = await import('@app/shared');
 
-const data = { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null };
-const typeRow = (o: Record<string, unknown> = {}) => ({ id: 3, name: 'Okolicznościowy', deducts_pool: 0, yearly_limit: null, position: 3, hidden_at: null, ...o }) as never;
+const data = { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null, color: 'green' as const };
+const typeRow = (o: Record<string, unknown> = {}) => ({ id: 3, name: 'Okolicznościowy', deducts_pool: 0, yearly_limit: null, color: 'teal', position: 3, hidden_at: null, ...o }) as never;
 const dup = () => Object.assign(new Error("Duplicate entry 'x' for key 'uq_leave_types_name'"), { code: 'ER_DUP_ENTRY' });
 
 const anna = { id: 1, name: 'Anna Nowak' };
@@ -77,8 +77,8 @@ describe('leave types service', () => {
 
   it('listTypes fills requestsCount from Moje urlopy (0 for types without requests)', async () => {
     vi.mocked(q.listLeaveTypes).mockResolvedValue([
-      { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, hidden: false, requestsCount: 0 },
-      { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, hidden: false, requestsCount: 0 },
+      { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, color: 'green', hidden: false, requestsCount: 0 },
+      { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, color: 'green', hidden: false, requestsCount: 0 },
     ]);
     vi.mocked(myLeave.countRequestsByLeaveType).mockResolvedValue(new Map([[1, 3]]));
     expect((await s.listTypes()).items.map((i) => i.requestsCount)).toEqual([3, 0]);
@@ -144,19 +144,25 @@ describe('activity log', () => {
     await s.createType(data, anna);
     expect(logActivity).toHaveBeenCalledWith(conn, {
       userId: 1, userName: 'Anna Nowak', action: 'create', entityType: 'leave_types', entityId: 6, entityName: data.name,
-      changes: { name: { before: undefined, after: 'Szkoleniowy' }, deducts_pool: { before: undefined, after: true }, yearly_limit: { before: undefined, after: null } },
+      changes: { name: { before: undefined, after: 'Szkoleniowy' }, deducts_pool: { before: undefined, after: true }, yearly_limit: { before: undefined, after: null }, color: { before: undefined, after: 'green' } },
     });
   });
 
   it('update writes changed fields only, in a transaction; nothing changed → no entry', async () => {
-    vi.mocked(q.findLeaveType).mockResolvedValue(typeRow({ name: 'Szkoleniowy', deducts_pool: 1, yearly_limit: 5 }));
-    await s.updateType(3, { name: 'Szkolenie', deductsPool: true, yearlyLimit: 5 }, anna);
+    vi.mocked(q.findLeaveType).mockResolvedValue(typeRow({ name: 'Szkoleniowy', deducts_pool: 1, yearly_limit: 5, color: 'green' }));
+    await s.updateType(3, { name: 'Szkolenie', deductsPool: true, yearlyLimit: 5, color: 'green' }, anna);
     expect(q.findLeaveType).toHaveBeenCalledWith(conn, 3, { lock: true });
     expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'update', entityType: 'leave_types', changes: { name: { before: 'Szkoleniowy', after: 'Szkolenie' } } }));
     vi.mocked(logActivity).mockClear();
-    vi.mocked(q.findLeaveType).mockResolvedValue(typeRow({ name: 'Szkoleniowy', deducts_pool: 1, yearly_limit: null }));
+    vi.mocked(q.findLeaveType).mockResolvedValue(typeRow({ name: 'Szkoleniowy', deducts_pool: 1, yearly_limit: null, color: 'green' }));
     await s.updateType(3, data, anna);
     expect(logActivity).not.toHaveBeenCalled();
+  });
+
+  it('color change is logged with before → after', async () => {
+    vi.mocked(q.findLeaveType).mockResolvedValue(typeRow({ name: 'Szkoleniowy', deducts_pool: 1, yearly_limit: null, color: 'green' }));
+    await s.updateType(3, { ...data, color: 'grape' }, anna);
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ action: 'update', changes: { color: { before: 'green', after: 'grape' } } }));
   });
 
   it('hide and unhide write entries with the type name', async () => {

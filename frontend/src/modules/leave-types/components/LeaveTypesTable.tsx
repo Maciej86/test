@@ -2,6 +2,7 @@ import { Badge, Button, Card, Group, Stack, Table, Text, Tooltip } from '@mantin
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH, type OrderDirection, type LeaveTypeItem } from '@app/shared';
 import { ButtonIcon } from '../../../common/ButtonIcon';
+import { ColorMark } from '../../../common/ColorSwatchPicker';
 import { OrderArrows } from '../../../common/OrderArrows';
 
 export interface RowActions {
@@ -29,6 +30,7 @@ const NameCell = ({ lt }: { lt: LeaveTypeItem }) => {
   return (
     <Stack gap={0}>
       <Group gap={6} wrap="nowrap">
+        <ColorMark color={lt.color} label={t(`colors.${lt.color}`)} />
         <Text fw={600} c={lt.hidden ? 'dimmed' : undefined}>{lt.name}</Text>
         {lt.hidden && <Badge variant="outline" color="gray" size="sm">{t('hidden_badge')}</Badge>}
       </Group>

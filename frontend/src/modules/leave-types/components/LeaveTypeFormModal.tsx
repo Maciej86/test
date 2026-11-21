@@ -4,7 +4,8 @@ import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { LEAVE_TYPE_LIMIT_MAX, LEAVE_TYPE_LIMIT_MIN, LEAVE_TYPE_MESSAGES, leaveTypeSchema, type LeaveTypeItem } from '@app/shared';
+import { LEAVE_TYPE_COLORS, LEAVE_TYPE_DEFAULT_COLOR, LEAVE_TYPE_LIMIT_MAX, LEAVE_TYPE_LIMIT_MIN, LEAVE_TYPE_MESSAGES, leaveTypeSchema, type LeaveTypeColor, type LeaveTypeItem } from '@app/shared';
+import { ColorSwatchPicker } from '../../../common/ColorSwatchPicker';
 import { FormModal } from '../../../common/FormModal';
 import { apiErrorBody, apiErrorFields, apiErrorMessage } from '../../../core/api/client';
 import { fieldError } from '../../../core/fieldError';
@@ -16,6 +17,7 @@ type FormValues = {
   deductsPool: boolean;
   /** Puste pole = bez limitu (schemat zamienia je na null). */
   yearlyLimit: number | '';
+  color: LeaveTypeColor;
 };
 
 interface HiddenType {
@@ -36,6 +38,7 @@ export const LeaveTypeFormModal = ({ leaveType, onClose }: { leaveType: LeaveTyp
       name: leaveType?.name ?? '',
       deductsPool: leaveType?.deductsPool ?? true,
       yearlyLimit: leaveType?.yearlyLimit ?? '',
+      color: leaveType?.color ?? LEAVE_TYPE_DEFAULT_COLOR,
     },
     validate: zod4Resolver(leaveTypeSchema),
   });
@@ -111,6 +114,14 @@ export const LeaveTypeFormModal = ({ leaveType, onClose }: { leaveType: LeaveTyp
         w={{ base: '100%', xs: 220 }}
         {...form.getInputProps('yearlyLimit')}
         error={fieldError(t, form.errors.yearlyLimit)}
+      />
+      <ColorSwatchPicker
+        label={t('field_color')}
+        description={t('field_color_hint')}
+        colors={LEAVE_TYPE_COLORS}
+        value={form.values.color}
+        onChange={(color) => form.setFieldValue('color', color)}
+        labelOf={(color) => t(`colors.${color}`)}
       />
     </FormModal>
   );

@@ -4,7 +4,7 @@ vi.mock('../../../db/pool', () => ({ pool: { query: vi.fn() } }));
 const q = await import('../leave-types.queries');
 
 const db = (rows: unknown = []) => ({ query: vi.fn().mockResolvedValue([rows]) });
-const row = (o: Record<string, unknown>) => ({ id: 1, name: 'Wypoczynkowy', deducts_pool: 1, yearly_limit: null, position: 1, hidden_at: null, ...o });
+const row = (o: Record<string, unknown>) => ({ id: 1, name: 'Wypoczynkowy', deducts_pool: 1, yearly_limit: null, color: 'green', position: 1, hidden_at: null, ...o });
 
 describe('leave types queries', () => {
   it('findLeaveType with lock adds FOR UPDATE (rename: true „before” in the history)', async () => {
@@ -21,8 +21,8 @@ describe('leave types queries', () => {
     const spy = { query: vi.fn(async (sql: string, params?: unknown[]) => { calls.push([sql, params]); return [[{ id: 3, insertId: 3, max: 2 }]]; }) } as unknown as Parameters<typeof q.findLeaveType>[0];
     await q.findLeaveType(spy, 3);
     await q.findByName(spy, 'Na żądanie', 3);
-    await q.insertLeaveType(spy, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: 5 }, 6);
-    await q.updateLeaveType(spy, 3, { name: 'Szkoleniowy', deductsPool: false, yearlyLimit: null });
+    await q.insertLeaveType(spy, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: 5, color: 'teal' }, 6);
+    await q.updateLeaveType(spy, 3, { name: 'Szkoleniowy', deductsPool: false, yearlyLimit: null, color: 'grape' });
     await q.setPosition(spy, 3, 2);
     await q.setHidden(spy, 3);
     await q.setVisible(spy, 3, 7);
@@ -32,7 +32,8 @@ describe('leave types queries', () => {
       expect(params?.length).toBeGreaterThan(0);
     }
     expect(calls[1]![1]).toEqual(['Na żądanie', 3, 3]);
-    expect(calls[2]![1]).toEqual(['Szkoleniowy', true, 5, 6]);
+    expect(calls[2]![1]).toEqual(['Szkoleniowy', true, 5, 'teal', 6]);
+    expect(calls[3]![1]).toEqual(['Szkoleniowy', false, null, 'grape', 3]);
     expect(calls[6]![1]).toEqual([7, 3]);
   });
 
@@ -43,12 +44,12 @@ describe('leave types queries', () => {
   });
 
   it('listLeaveTypes: visible by position, then hidden by name, mapped to LeaveTypeItem with requestsCount 0', async () => {
-    const spy = db([row({}), row({ id: 5, name: 'Bezpłatny', deducts_pool: 0, yearly_limit: 4, hidden_at: new Date() })]);
+    const spy = db([row({}), row({ id: 5, name: 'Bezpłatny', deducts_pool: 0, yearly_limit: 4, color: 'orange', hidden_at: new Date() })]);
     const items = await q.listLeaveTypes(spy);
     expect(spy.query.mock.calls[0]![0]).toMatch(/ORDER BY hidden_at IS NOT NULL, CASE WHEN hidden_at IS NULL THEN position END, name/);
     expect(items).toEqual([
-      { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, hidden: false, requestsCount: 0 },
-      { id: 5, name: 'Bezpłatny', deductsPool: false, yearlyLimit: 4, hidden: true, requestsCount: 0 },
+      { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, color: 'green', hidden: false, requestsCount: 0 },
+      { id: 5, name: 'Bezpłatny', deductsPool: false, yearlyLimit: 4, color: 'orange', hidden: true, requestsCount: 0 },
     ]);
   });
 

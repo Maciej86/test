@@ -1,5 +1,5 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
-import type { LeaveTypeData, LeaveTypeItem, SelectableLeaveType } from '@app/shared';
+import type { LeaveTypeColor, LeaveTypeData, LeaveTypeItem, SelectableLeaveType } from '@app/shared';
 import { pool, type Db } from '../../db/pool';
 
 export interface LeaveTypeRow extends RowDataPacket {
@@ -7,6 +7,7 @@ export interface LeaveTypeRow extends RowDataPacket {
   name: string;
   deducts_pool: number | boolean;
   yearly_limit: number | null;
+  color: LeaveTypeColor;
   position: number;
   hidden_at: Date | null;
 }
@@ -21,13 +22,13 @@ const toSelectable = (r: LeaveTypeRow): SelectableLeaveType => ({
 /** Lista na ekran: widoczne według kolejności, potem ukryte alfabetycznie. Liczbę wniosków dopisuje usługa (z Moich urlopów). */
 export const listLeaveTypes = async (db: Db): Promise<LeaveTypeItem[]> => {
   const [rows] = await db.query<LeaveTypeRow[]>(
-    'SELECT id, name, deducts_pool, yearly_limit, position, hidden_at FROM leave_types ORDER BY hidden_at IS NOT NULL, CASE WHEN hidden_at IS NULL THEN position END, name',
+    'SELECT id, name, deducts_pool, yearly_limit, color, position, hidden_at FROM leave_types ORDER BY hidden_at IS NOT NULL, CASE WHEN hidden_at IS NULL THEN position END, name',
   );
-  return rows.map((r) => ({ ...toSelectable(r), hidden: r.hidden_at !== null, requestsCount: 0 }));
+  return rows.map((r) => ({ ...toSelectable(r), color: r.color, hidden: r.hidden_at !== null, requestsCount: 0 }));
 };
 
 export const findLeaveType = async (db: Db, id: number, opts: { lock?: boolean } = {}): Promise<LeaveTypeRow | null> => {
-  const sql = 'SELECT id, name, deducts_pool, yearly_limit, position, hidden_at FROM leave_types WHERE id = ?';
+  const sql = 'SELECT id, name, deducts_pool, yearly_limit, color, position, hidden_at FROM leave_types WHERE id = ?';
   // Z blokadą (zmiana typu): drugi równoczesny zapis czeka, więc „przed” w historii zmian jest prawdziwe.
   const [rows] = await db.query<LeaveTypeRow[]>(opts.lock ? `${sql} FOR UPDATE` : sql, [id]); // rule-ok: dopisane tylko stałe FOR UPDATE
   return rows[0] ?? null;
@@ -36,7 +37,7 @@ export const findLeaveType = async (db: Db, id: number, opts: { lock?: boolean }
 /** Typ o tej nazwie (bez względu na wielkość liter, także ukryty), z pominięciem `exceptId`. */
 export const findByName = async (db: Db, name: string, exceptId: number | null): Promise<{ id: number; name: string; hidden: boolean } | null> => {
   const [rows] = await db.query<LeaveTypeRow[]>(
-    'SELECT id, name, deducts_pool, yearly_limit, position, hidden_at FROM leave_types WHERE name = ? AND (? IS NULL OR id <> ?) LIMIT 1',
+    'SELECT id, name, deducts_pool, yearly_limit, color, position, hidden_at FROM leave_types WHERE name = ? AND (? IS NULL OR id <> ?) LIMIT 1',
     [name, exceptId, exceptId],
   );
   const r = rows[0];
@@ -51,17 +52,18 @@ export const maxPosition = async (db: Db): Promise<number> => {
 
 export const insertLeaveType = async (db: Db, data: LeaveTypeData, position: number): Promise<number> => {
   const [result] = await db.query<ResultSetHeader>(
-    'INSERT INTO leave_types (name, deducts_pool, yearly_limit, position) VALUES (?, ?, ?, ?)',
-    [data.name, data.deductsPool, data.yearlyLimit, position],
+    'INSERT INTO leave_types (name, deducts_pool, yearly_limit, color, position) VALUES (?, ?, ?, ?, ?)',
+    [data.name, data.deductsPool, data.yearlyLimit, data.color, position],
   );
   return result.insertId;
 };
 
 export const updateLeaveType = async (db: Db, id: number, data: LeaveTypeData): Promise<void> => {
-  await db.query('UPDATE leave_types SET name = ?, deducts_pool = ?, yearly_limit = ? WHERE id = ?', [
+  await db.query('UPDATE leave_types SET name = ?, deducts_pool = ?, yearly_limit = ?, color = ? WHERE id = ?', [
     data.name,
     data.deductsPool,
     data.yearlyLimit,
+    data.color,
     id,
   ]);
 };
@@ -86,12 +88,12 @@ export const setVisible = async (db: Db, id: number, position: number): Promise<
 
 /** Dla modułu Moje urlopy: typy do wyboru w formularzu wniosku, w ustalonej kolejności. */
 export const listSelectableLeaveTypes = async (db: Db = pool): Promise<SelectableLeaveType[]> => {
-  const [rows] = await db.query<LeaveTypeRow[]>('SELECT id, name, deducts_pool, yearly_limit, position, hidden_at FROM leave_types WHERE hidden_at IS NULL ORDER BY position');
+  const [rows] = await db.query<LeaveTypeRow[]>('SELECT id, name, deducts_pool, yearly_limit, color, position, hidden_at FROM leave_types WHERE hidden_at IS NULL ORDER BY position');
   return rows.map(toSelectable);
 };
 
 /** Dla modułu Moje urlopy: zasady wybranego typu; ukryty albo brak → null. */
 export const findSelectableLeaveType = async (id: number, db: Db = pool): Promise<SelectableLeaveType | null> => {
-  const [rows] = await db.query<LeaveTypeRow[]>('SELECT id, name, deducts_pool, yearly_limit, position, hidden_at FROM leave_types WHERE id = ? AND hidden_at IS NULL', [id]);
+  const [rows] = await db.query<LeaveTypeRow[]>('SELECT id, name, deducts_pool, yearly_limit, color, position, hidden_at FROM leave_types WHERE id = ? AND hidden_at IS NULL', [id]);
   return rows[0] ? toSelectable(rows[0]) : null;
 };

@@ -5,6 +5,14 @@ export const LEAVE_TYPE_NAME_MAX = 40;
 /** Roczny limit dni na osobę: 1–365; brak = bez limitu. */
 export const LEAVE_TYPE_LIMIT_MIN = 1;
 export const LEAVE_TYPE_LIMIT_MAX = 365;
+/**
+ * Kolor typu w Kalendarzu: kolory Mantine z motywu. Bez żółtego i czerwonego (to kolory statusów: czeka, odrzucony).
+ * Długość nazwy mieści się w VARCHAR(10) w bazie.
+ */
+export const LEAVE_TYPE_COLORS = ['green', 'teal', 'cyan', 'navy', 'grape', 'orange'] as const;
+export type LeaveTypeColor = (typeof LEAVE_TYPE_COLORS)[number];
+/** Kolor nowego typu. */
+export const LEAVE_TYPE_DEFAULT_COLOR: LeaveTypeColor = 'green';
 
 
 /** Klucze błędów serwera modułu (teksty w shared/locales/pl/leave-types.json, sekcja server). */

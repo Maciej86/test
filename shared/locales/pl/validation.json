@@ -24,5 +24,6 @@
   "whole_number": "Podaj liczbę całkowitą, np. 26.",
   "date": "Podaj poprawną datę, np. 01.03.2024.",
   "too_many": "Wybrano za dużo pozycji.",
-  "duplicates": "Ta sama pozycja jest wybrana dwa razy."
+  "duplicates": "Ta sama pozycja jest wybrana dwa razy.",
+  "invalid_option": "Wybierz jedną z podanych możliwości."
 }

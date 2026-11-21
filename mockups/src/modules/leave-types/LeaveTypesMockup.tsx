@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ActionIcon, Badge, Button, Card, ColorSwatch, Group, Paper, SegmentedControl, Stack, Switch, Table, Text } from '@mantine/core';
+import { ActionIcon, Badge, Button, Card, Group, Paper, SegmentedControl, Stack, Switch, Table, Text } from '@mantine/core';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TABLE_MIN_WIDTH } from '@app/shared';
 import { ButtonIcon } from '../../common/ButtonIcon';
+import { ColorMark } from '../../common/ColorSwatchPicker';
 import { PageHeader } from '../../common/PageHeader';
 import { notify } from '../../common/notify';
 import { HideModal, LeaveTypeModal } from './LeaveTypeModals';
@@ -37,7 +38,7 @@ const NameCell = ({ lt }: { lt: MockLeaveType }) => {
   return (
     <Stack gap={0}>
       <Group gap={6} wrap="nowrap">
-        <ColorSwatch color={`var(--mantine-color-${lt.color}-8)`} size={12} radius={2} aria-label={t(`colors.${lt.color}`)} />
+        <ColorMark color={lt.color} label={t(`colors.${lt.color}`)} />
         <Text fw={600} c={lt.hidden ? 'dimmed' : undefined}>{lt.name}</Text>
         {lt.hidden && <Badge variant="outline" color="gray" size="sm">{t('hidden_badge')}</Badge>}
       </Group>

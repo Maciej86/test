@@ -35,7 +35,7 @@ const as = (user: SessionUser | null) => {
   };
 };
 
-const body = { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: '' };
+const body = { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: '', color: 'teal' };
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -56,7 +56,7 @@ describe('leave types routes', () => {
   });
 
   it('GET /leave-types → items in order', async () => {
-    const items = [{ id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, hidden: false, requestsCount: 0 }];
+    const items = [{ id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, color: 'green' as const, hidden: false, requestsCount: 0 }];
     vi.mocked(s.listTypes).mockResolvedValue({ items });
     const res = await as(anna).get('/leave-types');
     expect(res.status).toBe(200);
@@ -68,9 +68,9 @@ describe('leave types routes', () => {
     const res = await as(anna).post('/leave-types', { ...body, name: ' Szkoleniowy ', position: 1 });
     expect(res.status).toBe(201);
     expect(res.body).toEqual({ id: 6 });
-    expect(s.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null }, { id: 1, name: 'Anna Nowak' });
+    expect(s.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null, color: 'teal' }, { id: 1, name: 'Anna Nowak' });
 
-    const bad = await as(anna).post('/leave-types', { name: 'S', deductsPool: true, yearlyLimit: 0 });
+    const bad = await as(anna).post('/leave-types', { name: 'S', deductsPool: true, yearlyLimit: 0, color: 'green' });
     expect(bad.status).toBe(400);
     expect(bad.body.error.fields).toEqual({ name: 'validation.too_short', yearlyLimit: 'validation.min' });
   });
@@ -84,10 +84,17 @@ describe('leave types routes', () => {
     expect(res.body.error).toEqual({ message: M.nameTakenHidden, fields: { name: M.nameTakenHidden }, hiddenType: { id: 7, name: 'Szkoleniowy' } });
   });
 
+  it('PUT /leave-types/:id with a color outside the list → 400 with fields.color, service not called', async () => {
+    const res = await as(anna).put('/leave-types/3', { ...body, color: 'red' });
+    expect(res.status).toBe(400);
+    expect(res.body.error.fields).toEqual({ color: 'validation.invalid_option' });
+    expect(s.updateType).not.toHaveBeenCalled();
+  });
+
   it('PUT /leave-types/:id → ok; missing → 404; bad id → 404', async () => {
     const res = await as(anna).put('/leave-types/3', body);
     expect(res.status).toBe(200);
-    expect(s.updateType).toHaveBeenCalledWith(3, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null }, { id: 1, name: 'Anna Nowak' });
+    expect(s.updateType).toHaveBeenCalledWith(3, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null, color: 'teal' }, { id: 1, name: 'Anna Nowak' });
     vi.mocked(s.updateType).mockResolvedValueOnce({ error: { status: 404, message: 'server.not_found' } });
     expect((await as(anna).put('/leave-types/99', body)).status).toBe(404);
     expect((await as(anna).put('/leave-types/abc', body)).status).toBe(404);
@@ -135,9 +142,9 @@ describe('abuse', () => {
     vi.mocked(s.createType).mockResolvedValue({ id: 6 });
     const forged = { ...body, id: 1, position: 1, hidden: true, hiddenAt: '2020-01-01', requestsCount: 99 };
     await as(anna).post('/leave-types', forged);
-    expect(s.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null }, { id: 1, name: 'Anna Nowak' });
+    expect(s.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null, color: 'teal' }, { id: 1, name: 'Anna Nowak' });
     await as(anna).put('/leave-types/3', forged);
-    expect(s.updateType).toHaveBeenCalledWith(3, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null }, { id: 1, name: 'Anna Nowak' });
+    expect(s.updateType).toHaveBeenCalledWith(3, { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null, color: 'teal' }, { id: 1, name: 'Anna Nowak' });
     await as(anna).post('/leave-types/3/move', { direction: 'up', position: 1 });
     expect(s.moveType).toHaveBeenCalledWith(3, 'up');
   });
@@ -149,6 +156,9 @@ describe('abuse', () => {
       [{ ...body, yearlyLimit: 99999999 }, 'yearlyLimit'],
       [{ ...body, yearlyLimit: 'abc' }, 'yearlyLimit'],
       [{ ...body, deductsPool: 'yes' }, 'deductsPool'],
+      [{ ...body, color: 'yellow' }, 'color'],
+      [{ ...body, color: 'var(--mantine-color-red-8)' }, 'color'],
+      [{ name: 'Szkoleniowy', deductsPool: true }, 'color'],
     ];
     for (const [data, field] of cases) {
       const res = await as(anna).post('/leave-types', data);

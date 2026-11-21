@@ -88,7 +88,8 @@
     "contract_type": "Rodzaj umowy",
     "password": "Hasło",
     "deducts_pool": "Odejmuje dni z puli",
-    "yearly_limit": "Limit dni w roku"
+    "yearly_limit": "Limit dni w roku",
+    "color": "Kolor w kalendarzu"
   },
   "changes_title": "Co się zmieniło",
   "no_changes": "Bez szczegółów do pokazania.",

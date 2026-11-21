@@ -35,12 +35,12 @@ pokazuje już wszystko. Jedna wersja szczegółów w całej aplikacji, a nie dwi
   `SideDrawer`, wspólna jest cała treść szczegółów wniosku → `npm run check`
 - [x] 2. Makiety: `mockups/src/common/LeaveRequestDrawer.tsx` (treść jak `DetailsDrawer` z makiety Wniosków), makieta
   Kalendarza używa go zamiast własnego panelu → `npx tsc -p mockups`, `npm run check`
-- [ ] 3. Kolor typu urlopu: `LEAVE_TYPE_COLORS` w `shared/src/constants/leaveTypes.ts`, pole `color` w schemacie typu
+- [x] 3. Kolor typu urlopu: `LEAVE_TYPE_COLORS` w `shared/src/constants/leaveTypes.ts`, pole `color` w schemacie typu
   (`z.enum`) + testy schematu (każdy z 6, `yellow` → błąd, brak → błąd) → `npm run check`
-- [ ] 4. Migracje `029_leave_types_color.sql` (kolumna) i `030_leave_types_color_seed.sql` (kolory typów startowych
+- [x] 4. Migracje `029_leave_types_color.sql` (kolumna) i `030_leave_types_color_seed.sql` (kolory typów startowych
   po nazwie) → `npm run migrate`; `leave-types.queries.ts` czyta i zapisuje `color`; testy tras typów: zapis koloru,
   kolor spoza listy → 400, wpis w historii zmian z `color` przed → po → `npm run check`
-- [ ] 5. Typy urlopów na froncie: kwadracik koloru przy nazwie (tabela i karty), „Kolor w kalendarzu” w oknie
+- [x] 5. Typy urlopów na froncie: kwadracik koloru przy nazwie (tabela i karty), „Kolor w kalendarzu” w oknie
   (6 kwadratów, wybrany z ptaszkiem, nowy = zielony) + testy (wybór koloru wysyła `color`, kwadracik w wierszu).
   Porównane z: `ColorSwatch` nieużywany dotąd w `frontend/src` i `mockups/src` (poza makietami Kalendarza i Typów)
   → nowy klocek `common/ColorSwatchPicker.tsx` (front i makiety) z `value`, `onChange`, `colors` → `npm run check`
