@@ -172,4 +172,67 @@ test.describe('część 2: liczenie dni i zatwierdzanie', () => {
     const late = await ola.request.post('/api/my-leave/requests', { data: { leaveTypeId: typeId, dateFrom: iso(yesterday), dateTo: iso(yesterday), comment: '' } });
     expect(late.status()).toBe(400);
   });
+
+  test('abuse: podrobione pola, cudzy wniosek, przejścia statusów, dwa razy naraz (prawdziwa baza)', async ({ page, browser }) => {
+    test.setTimeout(90_000);
+    const from = new Date(todayUtc().getTime() - 2 * DAY);
+    const to = new Date(todayUtc().getTime() + 1 * DAY);
+    test.skip(from.getUTCFullYear() !== to.getUTCFullYear(), 'przełom roku');
+    await logIn(page, ADMIN, password());
+    await expect(page.getByRole('heading', { name: 'Pulpit' })).toBeVisible();
+    const { page: a } = await employee(page, browser, 'Ala', 'Nadużycie');
+    const { page: b } = await employee(page, browser, 'Bartek', 'Nadużycie');
+    const types = ((await (await a.request.get('/api/my-leave/overview')).json()) as { types: { id: number; name: string }[] }).types;
+    const sick = types.find((t) => t.name === 'Chorobowe')!.id;
+    const vacation = types.find((t) => t.name === 'Wypoczynkowy')!.id;
+
+    // Podrobione pola: wypoczynkowy jako „zatwierdzony automatycznie” w dniach kalendarzowych → zwykły czekający w roboczych.
+    const tomorrow = new Date(todayUtc().getTime() + 30 * DAY);
+    if (tomorrow.getUTCFullYear() === todayUtc().getUTCFullYear()) {
+      const forged = await a.request.post('/api/my-leave/requests', {
+        data: { leaveTypeId: vacation, dateFrom: iso(tomorrow), dateTo: iso(tomorrow), comment: '', status: 'approved', autoApproved: true, dayCount: 'calendar', requiresApproval: false },
+      });
+      if (forged.status() === 201) expect(await forged.json()).toMatchObject({ status: 'pending', autoApproved: false, dayCount: 'working' });
+      else expect(forged.status()).toBe(409); // weekend albo święto: brak dni roboczych, też nie „zatwierdzony”
+    }
+
+    // Wypoczynkowy wstecz (typ z zatwierdzaniem) → 400; chorobowe 8 dni wstecz → 400.
+    const yesterday = new Date(todayUtc().getTime() - DAY);
+    expect((await a.request.post('/api/my-leave/requests', { data: { leaveTypeId: vacation, dateFrom: iso(yesterday), dateTo: iso(yesterday), comment: '' } })).status()).toBe(400);
+    const tooEarly = new Date(todayUtc().getTime() - 9 * DAY);
+    if (tooEarly.getUTCFullYear() === todayUtc().getUTCFullYear()) {
+      expect((await a.request.post('/api/my-leave/requests', { data: { leaveTypeId: sick, dateFrom: iso(tooEarly), dateTo: iso(tooEarly), comment: '' } })).status()).toBe(400);
+    }
+
+    // Dwa zgłoszenia chorobowego naraz na ten sam termin → jedno zapisane, drugie „termin zajęty”.
+    const sickBody = { data: { leaveTypeId: sick, dateFrom: iso(from), dateTo: iso(to), comment: '' } };
+    const both = await Promise.all([a.request.post('/api/my-leave/requests', sickBody), a.request.post('/api/my-leave/requests', sickBody)]);
+    expect(both.map((r) => r.status()).sort()).toEqual([201, 409]);
+    const saved = (await both.find((r) => r.status() === 201)!.json()) as { id: number; status: string; autoApproved: boolean };
+    expect(saved).toMatchObject({ status: 'approved', autoApproved: true });
+
+    // Cudzy wniosek: Bartek nie wycofa ani nie pobierze PDF chorobowego Ali → 404.
+    expect((await b.request.post(`/api/my-leave/requests/${saved.id}/withdraw`)).status()).toBe(404);
+    expect((await b.request.get(`/api/my-leave/requests/${saved.id}/pdf`)).status()).toBe(404);
+
+    // Administrator nie zatwierdzi ani nie odrzuci już zatwierdzonego → 409.
+    expect((await page.request.post(`/api/leave-requests/${saved.id}/approve`)).status()).toBe(409);
+    expect((await page.request.post(`/api/leave-requests/${saved.id}/reject`, { data: { reason: 'Próba.' } })).status()).toBe(409);
+
+    // Dwa wycofania naraz → jedno ok, drugie 409; trzecie po wycofaniu → 409.
+    const withdrawals = await Promise.all([a.request.post(`/api/my-leave/requests/${saved.id}/withdraw`), a.request.post(`/api/my-leave/requests/${saved.id}/withdraw`)]);
+    expect(withdrawals.map((r) => r.status()).sort()).toEqual([200, 409]);
+    expect((await a.request.post(`/api/my-leave/requests/${saved.id}/withdraw`)).status()).toBe(409);
+
+    // Zatwierdzony przez administratora urlop pracownik nie wycofa sam → 409.
+    if (tomorrow.getUTCFullYear() === todayUtc().getUTCFullYear()) {
+      const monday = next(1, 10);
+      const req = await a.request.post('/api/my-leave/requests', { data: { leaveTypeId: vacation, dateFrom: iso(monday), dateTo: iso(monday), comment: '' } });
+      if (req.status() === 201) {
+        const { id } = (await req.json()) as { id: number };
+        expect((await page.request.post(`/api/leave-requests/${id}/approve`)).status()).toBe(200);
+        expect((await a.request.post(`/api/my-leave/requests/${id}/withdraw`)).status()).toBe(409);
+      }
+    }
+  });
 });

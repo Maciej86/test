@@ -26,4 +26,14 @@ Przed testem: `npm run db`, `npm run dev`, otwórz http://localhost:5180.
 5. Wybierz „Wypoczynkowy” → „Od” nadal tylko od dziś, wynik w dniach roboczych, przycisk „Złóż wniosek”.
 
 ## Próby nadużyć
-(uzupełniane na etapie testy według `abuse.md`)
+Sprawdzone 2026-11-21 na prawdziwej bazie (`e2e/calendar.spec.ts`, test „abuse”) i w testach tras
+(`my-leave.routes.test.ts`, `leave-types.routes.test.ts`, `leave-requests.service.test.ts`):
+- Pracownik dopisuje do wniosku `status: approved`, `autoApproved`, `dayCount: calendar`, `requiresApproval: false` →
+  serwer bierze zasady z typu w bazie (zwykły wniosek czekający w dniach roboczych): przeszła
+- Wypoczynkowy od wczoraj → 400; chorobowe 9 dni wstecz → 400: przeszła
+- Dwa zgłoszenia chorobowego naraz na ten sam termin → jedno zapisane, drugie „termin zajęty”: przeszła
+- Cudze chorobowe: wycofanie i PDF przez innego pracownika → 404: przeszła
+- Administrator zatwierdza albo odrzuca wniosek zatwierdzony automatycznie → 409: przeszła
+- Dwa wycofania naraz → jedno, drugie 409; ponowne wycofanie → 409: przeszła
+- Pracownik wycofuje urlop zatwierdzony przez administratora → 409 (anuluje tylko administrator): przeszła
+- Liczenie dni `hours`, zatwierdzanie jako tekst, brak pól w typie urlopu → 400 przy polu: przeszła
