@@ -1,4 +1,4 @@
-import { createI18n, formatDate, formatNumber, leaveDaysText } from '@app/shared';
+import { createI18n, formatDate, formatNumber, leaveDaysText, type LeaveDayCount } from '@app/shared';
 import { env } from '../../env';
 import { escapeHtml } from '../escapeHtml';
 import { EMAIL_COLORS as c, FONT_SERIF, emailLayout } from '../layout';
@@ -11,7 +11,11 @@ export interface NewLeaveRequestEmailData {
   /** `RRRR-MM-DD` */
   dateFrom: string;
   dateTo: string;
+  /** Dni wniosku liczone sposobem `dayCount` (robocze albo kalendarzowe). */
   workingDays: number;
+  dayCount: LeaveDayCount;
+  /** Typ bez zatwierdzania: e-mail „Zgłoszona nieobecność” (już zatwierdzona, bez prośby o decyzję). */
+  autoApproved: boolean;
   daysFromCarried: number;
   daysFromAnnual: number;
   /** Dni w puli po zatwierdzeniu; `null` dla typu, który nie odejmuje dni (bez wierszy o puli). */
@@ -21,7 +25,10 @@ export interface NewLeaveRequestEmailData {
 
 const whole = (n: number): string => formatNumber(n, 0) ?? String(n);
 
-/** E-mail „Nowy wniosek urlopowy” dla administratora: temat, HTML i wersja tekstowa z tych samych kluczy. */
+/**
+ * E-mail „Nowy wniosek urlopowy” (albo „Zgłoszona nieobecność” przy typie bez zatwierdzania) dla administratora:
+ * temat, HTML i wersja tekstowa z tych samych kluczy.
+ */
 export const newLeaveRequestEmail = (data: NewLeaveRequestEmailData): { subject: string; html: string; text: string } => {
   const t = createI18n().t;
   const k = (key: string, vars?: Record<string, unknown>) => t(`new_request.${key}`, { ns: 'email', ...vars }) as string;
@@ -34,7 +41,7 @@ export const newLeaveRequestEmail = (data: NewLeaveRequestEmailData): { subject:
   const rows: [string, string][] = [
     [k('employee'), data.employeeName],
     [k('leave_type'), data.leaveTypeName],
-    [k('days'), leaveDaysText(t, data.workingDays)],
+    [k('days'), leaveDaysText(t, data.workingDays, data.dayCount)],
     ...(data.leftAfter === null
       ? []
       : ([
@@ -44,9 +51,10 @@ export const newLeaveRequestEmail = (data: NewLeaveRequestEmailData): { subject:
     ...(comment ? ([[k('comment'), comment]] as [string, string][]) : []),
   ];
 
-  const subject = k('subject', { employee: data.employeeName, dateFrom, dateTo });
-  const heading = k('heading');
-  const intro = k('intro', { employee: data.employeeName });
+  const variant = data.autoApproved ? '_reported' : '';
+  const subject = k(`subject${variant}`, { employee: data.employeeName, dateFrom, dateTo });
+  const heading = k(`heading${variant}`);
+  const intro = k(`intro${variant}`, { employee: data.employeeName });
   const footer = k('footer');
   const appName = t('app_name', { ns: 'common' }) as string;
 

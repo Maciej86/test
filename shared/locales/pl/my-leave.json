@@ -119,7 +119,8 @@
     "not_enough_days": "Za mało dni: wniosek ma {{days}}, a możesz wykorzystać jeszcze {{left}}.",
     "limit_exceeded": "Przekroczony limit: {{leaveType}}. Limit to {{limit}} dni, wykorzystano już {{used}}, a wniosek ma {{days}}.",
     "not_pending": "Tego wniosku nie można już wycofać, bo nie czeka na decyzję. Odśwież stronę.",
-    "not_approved": "Wydrukować można tylko zatwierdzony wniosek."
+    "not_approved": "Wydrukować można tylko zatwierdzony wniosek.",
+    "cannot_withdraw": "Tego wniosku nie możesz już wycofać. Odśwież listę; w razie pomyłki napisz do administratora."
   },
   "validation": {
     "past_date": "Data „Od” nie może być wcześniejsza niż dziś.",

@@ -9,9 +9,9 @@ import { RequestModal } from '../RequestModal';
 const overview: MyLeaveOverview = {
   pool: { year: 2026, annualDays: 26, carriedDays: 4, usedCarried: 0, usedAnnual: 7, pendingDays: 2, pendingCarried: 0, leftDays: 21, leftCarriedDays: 4 },
   types: [
-    { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, usedOfLimit: 0 },
-    { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, usedOfLimit: 1 },
-    { id: 3, name: 'Okolicznościowy', deductsPool: false, yearlyLimit: null, usedOfLimit: 0 },
+    { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, dayCount: 'working', requiresApproval: true, usedOfLimit: 0 },
+    { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, dayCount: 'working', requiresApproval: true, usedOfLimit: 1 },
+    { id: 3, name: 'Okolicznościowy', deductsPool: false, yearlyLimit: null, dayCount: 'working', requiresApproval: true, usedOfLimit: 0 },
   ],
   years: [2026],
   busy: [{ dateFrom: '2026-11-26', dateTo: '2026-11-27', leaveTypeName: 'Wypoczynkowy', status: 'pending' }],

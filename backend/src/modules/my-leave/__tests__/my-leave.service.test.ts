@@ -36,10 +36,12 @@ const { MY_LEAVE_MESSAGES: M } = await import('@app/shared');
 const openPool = { id: 3, user_id: 7, year: 2026, annual_days: 26, carried_days: 4, closed_at: null } as never;
 const usage = (o = {}) => new Map([[7, { usedCarried: 4, usedAnnual: 5, pendingCarried: 0, pendingAnnual: 2, ...o }]]);
 const types = [
-  { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null },
-  { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4 },
-  { id: 3, name: 'Okolicznościowy', deductsPool: false, yearlyLimit: null },
+  { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, dayCount: 'working' as const, requiresApproval: true },
+  { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, dayCount: 'working' as const, requiresApproval: true },
+  { id: 3, name: 'Okolicznościowy', deductsPool: false, yearlyLimit: null, dayCount: 'working' as const, requiresApproval: true },
 ];
+/** Chorobowe: dni kalendarzowe, bez zatwierdzania, nie odejmuje dni z puli. */
+const sick = { id: 7, name: 'Chorobowe', deductsPool: false, yearlyLimit: null, dayCount: 'calendar' as const, requiresApproval: false };
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -88,6 +90,21 @@ describe('my leave service: overview and list', () => {
     expect(await s.getMyLeaveOverview(7)).toBeNull();
   });
 
+  it('list: every request gets canWithdraw counted by the server (today in the app time zone)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-17T10:00:00Z'));
+    const base = { dateFrom: '2026-11-12', createdAt: '2026-11-10T08:00:00.000Z' };
+    vi.mocked(q.listRequests).mockResolvedValueOnce([
+      { id: 1, status: 'pending', autoApproved: false, ...base },
+      { id: 2, status: 'approved', autoApproved: true, ...base },
+      { id: 3, status: 'approved', autoApproved: true, ...base, createdAt: '2026-11-17T07:00:00.000Z' },
+      { id: 4, status: 'approved', autoApproved: false, ...base, dateFrom: '2026-12-01' },
+    ] as never);
+    const { items } = await s.listMyRequests(7, 2026);
+    expect(items.map((i) => [i.id, i.canWithdraw])).toEqual([[1, true], [2, false], [3, true], [4, false]]);
+    vi.useRealTimers();
+  });
+
   it('list: requests of the asked year, or of the open year by default', async () => {
     expect(await s.listMyRequests(7, 2025)).toEqual({ year: 2025, items: [] });
     expect(q.listRequests).toHaveBeenCalledWith(pool, 7, 2025);
@@ -110,12 +127,13 @@ describe('my leave service: create', () => {
     vi.mocked(q.insertRequest).mockResolvedValue(33);
     vi.mocked(q.findOwnRequest).mockResolvedValue({ id: 33 } as never);
     vi.mocked(q.toRequest).mockReturnValue(saved);
+    vi.mocked(q.insertRequest).mockClear();
     vi.mocked(emailAdminsAboutNewRequest).mockResolvedValue(1);
   });
   afterEach(() => vi.useRealTimers());
 
   it('locks the pool row before counting (FOR UPDATE), all in one transaction', async () => {
-    expect(await s.createRequest(input, jan)).toBe(saved);
+    expect(await s.createRequest(input, jan)).toMatchObject(saved);
     expect(employees.findOpenPoolOfUser).toHaveBeenCalledWith(conn, 7, true);
     const lockOrder = vi.mocked(employees.findOpenPoolOfUser).mock.invocationCallOrder[0]!;
     expect(lockOrder).toBeLessThan(vi.mocked(q.sumPoolUsage).mock.invocationCallOrder[0]!);
@@ -162,8 +180,8 @@ describe('my leave service: create', () => {
   it('server counts days and split, user id and pool year from the server', async () => {
     await s.createRequest(input, jan);
     expect(q.insertRequest).toHaveBeenCalledWith(conn, {
-      userId: 7, leaveTypeId: 1, dateFrom: '2026-12-21', dateTo: '2026-12-31', workingDays: 7, daysFromCarried: 4, daysFromAnnual: 3,
-      poolYear: 2026, comment: 'Święta u rodziców.',
+      userId: 7, leaveTypeId: 1, dateFrom: '2026-12-21', dateTo: '2026-12-31', dayCount: 'working', workingDays: 7, daysFromCarried: 4, daysFromAnnual: 3,
+      poolYear: 2026, comment: 'Święta u rodziców.', autoApproved: false,
     });
     expect(q.findOwnRequest).toHaveBeenCalledWith(conn, 33, 7);
   });
@@ -184,13 +202,13 @@ describe('my leave service: create', () => {
     });
     expect(notifyAdmins).toHaveBeenCalledWith(conn, {
       type: 'leave_request_new',
-      params: { employee: 'Jan Kowalski', leaveType: 'Wypoczynkowy', dateFrom: '2026-12-21', dateTo: '2026-12-31', days: 7 },
+      params: { employee: 'Jan Kowalski', leaveType: 'Wypoczynkowy', dateFrom: '2026-12-21', dateTo: '2026-12-31', days: 7, dayCount: 'working' },
       link: '/admin/leave-requests/33',
       actor: jan,
     });
     expect(emailAdminsAboutNewRequest).toHaveBeenCalledWith({
       requestId: 33, employeeName: 'Jan Kowalski', leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-12-21', dateTo: '2026-12-31',
-      workingDays: 7, daysFromCarried: 4, daysFromAnnual: 3, leftAfter: 23, comment: 'Święta u rodziców.',
+      workingDays: 7, dayCount: 'working', autoApproved: false, daysFromCarried: 4, daysFromAnnual: 3, leftAfter: 23, comment: 'Święta u rodziców.',
     });
     const committed = vi.mocked(withTransaction).mock.results[0]!.value as Promise<unknown>;
     await committed;
@@ -203,19 +221,82 @@ describe('my leave service: create', () => {
     expect(notifyAdmins).not.toHaveBeenCalled();
   });
 
+  it('type without approval: saved as approved (auto), weekend counted, admins get "absence reported" and the e-mail', async () => {
+    vi.mocked(leaveTypes.findSelectableLeaveType).mockResolvedValue(sick);
+    await s.createRequest({ leaveTypeId: 7, dateFrom: '2026-11-13', dateTo: '2026-11-19', comment: null }, jan);
+    expect(q.insertRequest).toHaveBeenCalledWith(conn, expect.objectContaining({ dayCount: 'calendar', workingDays: 7, daysFromCarried: 0, daysFromAnnual: 0, autoApproved: true }));
+    expect(notifyAdmins).toHaveBeenCalledWith(conn, {
+      type: 'leave_absence_reported',
+      params: { employee: 'Jan Kowalski', leaveType: 'Chorobowe', dateFrom: '2026-11-13', dateTo: '2026-11-19', days: 7, dayCount: 'calendar' },
+      link: '/admin/leave-requests/33',
+      actor: jan,
+    });
+    expect(emailAdminsAboutNewRequest).toHaveBeenCalledWith(expect.objectContaining({ autoApproved: true, dayCount: 'calendar', workingDays: 7, leftAfter: null }));
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({
+      action: 'create',
+      changes: expect.objectContaining({ day_count: { before: undefined, after: 'calendar' }, status: { before: undefined, after: 'approved' }, auto_approved: { before: undefined, after: true } }),
+    }));
+  });
+
+  it('type without approval may start 7 days ago (server today); 8 days ago → 400 past_date', async () => {
+    vi.mocked(leaveTypes.findSelectableLeaveType).mockResolvedValue(sick);
+    expect(await s.createRequest({ leaveTypeId: 7, dateFrom: '2026-11-10', dateTo: '2026-11-18', comment: null }, jan)).toMatchObject(saved);
+    expect(await s.createRequest({ leaveTypeId: 7, dateFrom: '2026-11-09', dateTo: '2026-11-18', comment: null }, jan)).toEqual({
+      error: { status: 400, message: M.pastDate, fields: { dateFrom: M.pastDate } },
+    });
+  });
+
+  it('type without approval overlapping an approved leave → 409 overlap, nothing saved', async () => {
+    vi.mocked(leaveTypes.findSelectableLeaveType).mockResolvedValue(sick);
+    const other = { dateFrom: '2026-11-16', dateTo: '2026-11-20', leaveTypeName: 'Wypoczynkowy', status: 'approved' as const };
+    vi.mocked(q.listBusy).mockResolvedValueOnce([other]);
+    expect(await s.createRequest({ leaveTypeId: 7, dateFrom: '2026-11-13', dateTo: '2026-11-17', comment: null }, jan)).toEqual({ error: { status: 409, message: M.overlap, other } });
+    expect(q.insertRequest).not.toHaveBeenCalled();
+  });
+
   it('e-mail error does not break the answer', async () => {
     vi.mocked(emailAdminsAboutNewRequest).mockRejectedValueOnce(new Error('smtp down'));
-    expect(await s.createRequest(input, jan)).toBe(saved);
+    expect(await s.createRequest(input, jan)).toMatchObject(saved);
   });
 });
 
 describe('my leave service: withdraw', () => {
   const jan = { id: 7, name: 'Jan Kowalski' };
-  const pendingRow = { id: 21, user_id: 7, leave_type_name: 'Wypoczynkowy', date_from: '2026-11-26', date_to: '2026-11-27', working_days: 2, status: 'pending' } as never;
+  const pendingRow = {
+    id: 21, user_id: 7, leave_type_name: 'Wypoczynkowy', date_from: '2026-11-26', date_to: '2026-11-27', working_days: 2, status: 'pending',
+    auto_approved: 0, created_at: new Date('2026-11-10T08:00:00Z'),
+  } as never;
+  const autoRow = (o: Record<string, unknown>) => ({ ...(pendingRow as object), leave_type_name: 'Chorobowe', status: 'approved', auto_approved: 1, ...o }) as never;
 
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-17T10:00:00Z'));
     vi.mocked(q.findOwnRequest).mockResolvedValue(pendingRow);
     vi.mocked(q.setWithdrawn).mockResolvedValue(1);
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('auto-approved before its first day → withdrawn (UPDATE only while still approved), admins notified', async () => {
+    vi.mocked(q.findOwnRequest).mockResolvedValueOnce(autoRow({ date_from: '2026-11-18', date_to: '2026-11-20' }));
+    expect(await s.withdrawRequest(21, jan)).toEqual({ ok: true });
+    expect(q.setWithdrawn).toHaveBeenCalledWith(conn, 21, 7, 'approved');
+    expect(logActivity).toHaveBeenCalledWith(conn, expect.objectContaining({ changes: { status: { before: 'approved', after: 'withdrawn' } } }));
+    expect(notifyAdmins).toHaveBeenCalledWith(conn, expect.objectContaining({ type: 'leave_request_withdrawn' }));
+  });
+
+  it('auto-approved filed today, started in the past → withdrawn; filed earlier and started → 409 cannot_withdraw', async () => {
+    vi.mocked(q.findOwnRequest).mockResolvedValueOnce(autoRow({ date_from: '2026-11-12', created_at: new Date('2026-11-17T06:00:00Z') }));
+    expect(await s.withdrawRequest(21, jan)).toEqual({ ok: true });
+    vi.mocked(q.setWithdrawn).mockClear();
+    vi.mocked(q.findOwnRequest).mockResolvedValueOnce(autoRow({ date_from: '2026-11-12' }));
+    expect(await s.withdrawRequest(21, jan)).toEqual({ error: { status: 409, message: M.cannotWithdraw } });
+    expect(q.setWithdrawn).not.toHaveBeenCalled();
+  });
+
+  it('approved by an administrator → 409 cannot_withdraw (only the administrator cancels it)', async () => {
+    vi.mocked(q.findOwnRequest).mockResolvedValueOnce(autoRow({ auto_approved: 0, date_from: '2026-12-01' }));
+    expect(await s.withdrawRequest(21, jan)).toEqual({ error: { status: 409, message: M.cannotWithdraw } });
+    expect(q.setWithdrawn).not.toHaveBeenCalled();
   });
 
   it('foreign or missing request → 404 (looked up with the user id)', async () => {
@@ -225,19 +306,19 @@ describe('my leave service: withdraw', () => {
     expect(q.setWithdrawn).not.toHaveBeenCalled();
   });
 
-  it('not pending → 409 not_pending; second withdraw at the same time → 409', async () => {
-    vi.mocked(q.findOwnRequest).mockResolvedValueOnce({ ...(pendingRow as object), status: 'approved' } as never);
-    expect(await s.withdrawRequest(21, jan)).toEqual({ error: { status: 409, message: M.notPending } });
+  it('rejected → 409 cannot_withdraw; second withdraw at the same time → 409', async () => {
+    vi.mocked(q.findOwnRequest).mockResolvedValueOnce({ ...(pendingRow as object), status: 'rejected' } as never);
+    expect(await s.withdrawRequest(21, jan)).toEqual({ error: { status: 409, message: M.cannotWithdraw } });
     expect(q.setWithdrawn).not.toHaveBeenCalled();
     vi.mocked(q.setWithdrawn).mockResolvedValueOnce(0);
-    expect(await s.withdrawRequest(21, jan)).toEqual({ error: { status: 409, message: M.notPending } });
+    expect(await s.withdrawRequest(21, jan)).toEqual({ error: { status: 409, message: M.cannotWithdraw } });
     expect(logActivity).not.toHaveBeenCalled();
     expect(notifyAdmins).not.toHaveBeenCalled();
   });
 
   it('pending → withdrawn, activity and notification in the transaction', async () => {
     expect(await s.withdrawRequest(21, jan)).toEqual({ ok: true });
-    expect(q.setWithdrawn).toHaveBeenCalledWith(conn, 21, 7);
+    expect(q.setWithdrawn).toHaveBeenCalledWith(conn, 21, 7, 'pending');
     expect(logActivity).toHaveBeenCalledWith(conn, {
       userId: 7, userName: 'Jan Kowalski', action: 'status', entityType: 'leave_requests', entityId: 21,
       entityName: 'Jan Kowalski', entityContext: { leaveType: 'Wypoczynkowy', from: '2026-11-26', to: '2026-11-27', days: 2 },

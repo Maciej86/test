@@ -9,9 +9,9 @@ import { MyLeavePage } from '../MyLeavePage';
 const overview: MyLeaveOverview = {
   pool: { year: 2026, annualDays: 26, carriedDays: 4, usedCarried: 4, usedAnnual: 5, pendingDays: 2, pendingCarried: 0, leftDays: 19, leftCarriedDays: 0 },
   types: [
-    { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, usedOfLimit: 0 },
-    { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, usedOfLimit: 1 },
-    { id: 3, name: 'Okolicznościowy', deductsPool: false, yearlyLimit: null, usedOfLimit: 0 },
+    { id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, dayCount: 'working', requiresApproval: true, usedOfLimit: 0 },
+    { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, dayCount: 'working', requiresApproval: true, usedOfLimit: 1 },
+    { id: 3, name: 'Okolicznościowy', deductsPool: false, yearlyLimit: null, dayCount: 'working', requiresApproval: true, usedOfLimit: 0 },
   ],
   years: [2026, 2025],
   busy: [{ dateFrom: '2026-11-26', dateTo: '2026-11-27', leaveTypeName: 'Wypoczynkowy', status: 'pending' }],
@@ -20,7 +20,7 @@ const overview: MyLeaveOverview = {
 const request = (o: Partial<MyLeaveRequest>): MyLeaveRequest => ({
   id: 21, leaveTypeName: 'Wypoczynkowy', deductsPool: true, dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2,
   daysFromCarried: 0, daysFromAnnual: 2, poolYear: 2026, comment: 'Wyjazd rodzinny.', status: 'pending', decisionReason: null,
-  decidedByName: null, decidedAt: null, createdAt: '2026-11-16T08:12:00.000Z', ...o,
+  decidedByName: null, decidedAt: null, createdAt: '2026-11-16T08:12:00.000Z', dayCount: 'working', autoApproved: false, canWithdraw: true, ...o,
 });
 
 const requests = [

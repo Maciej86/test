@@ -6,7 +6,7 @@ import { renderWithProviders } from '../../../test/render';
 import { LeaveTypesPage } from '../LeaveTypesPage';
 
 const type = (o: Partial<LeaveTypeItem>): LeaveTypeItem => ({
-  id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, color: 'green', hidden: false, requestsCount: 0, ...o,
+  id: 1, name: 'Wypoczynkowy', deductsPool: true, yearlyLimit: null, color: 'green', dayCount: 'working', requiresApproval: true, hidden: false, requestsCount: 0, ...o,
 });
 const vacation = type({});
 const onDemand = type({ id: 2, name: 'Na żądanie', yearlyLimit: 4, requestsCount: 3 });
@@ -67,6 +67,18 @@ describe('LeaveTypesPage', () => {
     expect(within(demand).getByText('3')).toBeInTheDocument();
     expect(within(await rowOf('Wypoczynkowy')).getByText('bez limitu')).toBeInTheDocument();
     expect(within(await rowOf('Bezpłatny')).getByText('nie odejmuje')).toBeInTheDocument();
+  });
+
+  it('day count and approval columns: working / calendar days, "wymaga" / "bez zatwierdzenia"', async () => {
+    const sick = type({ id: 8, name: 'Chorobowe', deductsPool: false, color: 'grape', dayCount: 'calendar', requiresApproval: false });
+    show([vacation, sick]);
+    const table = within(await screen.findByRole('table'));
+    expect(table.getByRole('columnheader', { name: 'Liczenie dni' })).toBeInTheDocument();
+    expect(table.getByRole('columnheader', { name: 'Zatwierdzanie' })).toBeInTheDocument();
+    expect(within(await rowOf('Chorobowe')).getByText('dni kalendarzowe')).toBeInTheDocument();
+    expect(within(await rowOf('Chorobowe')).getByText('bez zatwierdzenia')).toBeInTheDocument();
+    expect(within(await rowOf('Wypoczynkowy')).getByText('dni robocze')).toBeInTheDocument();
+    expect(within(await rowOf('Wypoczynkowy')).getByText('wymaga')).toBeInTheDocument();
   });
 
   it('color square with the color name next to every type name', async () => {

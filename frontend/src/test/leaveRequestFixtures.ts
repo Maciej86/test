@@ -6,7 +6,7 @@ export const requestItem = (o: Partial<LeaveRequestListItem> = {}): LeaveRequest
   id: 21, employeeName: 'Jan Kowalski', employeeArchived: false, leaveTypeName: 'Wypoczynkowy', deductsPool: true,
   dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2, daysFromCarried: 0, daysFromAnnual: 2, poolYear: 2026,
   comment: 'Wyjazd rodzinny, wracam w poniedziałek.', status: 'pending', decisionReason: null, decidedByName: null, decidedAt: null,
-  createdAt: '2026-11-16T08:12:00.000Z', poolLeft: { left: 19, total: 30 }, canCancel: false, ...o,
+  createdAt: '2026-11-16T08:12:00.000Z', dayCount: 'working', autoApproved: false, poolLeft: { left: 19, total: 30 }, canCancel: false, ...o,
 });
 
 export const list = (items: LeaveRequestListItem[], o: Partial<LeaveRequestsListResponse> = {}): LeaveRequestsListResponse => ({

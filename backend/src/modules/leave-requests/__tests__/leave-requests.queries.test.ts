@@ -68,11 +68,11 @@ describe('leave requests queries', () => {
       id: 21, user_id: 7, employee_name: 'Jan Kowalski', employee_archived_at: null, leave_type_id: 1, leave_type_name: 'Wypoczynkowy',
       deducts_pool: 1, date_from: '2026-11-26', date_to: '2026-11-27', working_days: 2, days_from_carried: 0, days_from_annual: 2,
       pool_year: 2026, comment: null, status: 'pending', decision_reason: null, decided_by_name: null, decided_at: null,
-      created_at: new Date('2026-11-16T08:12:00Z'),
+      created_at: new Date('2026-11-16T08:12:00Z'), day_count: 'calendar', auto_approved: 1,
     };
     const { db } = spyDb([row, { ...row, id: 4, employee_archived_at: new Date() }], [{ total: 2 }]);
     const { rows } = await q.listRequests(db, filters());
-    expect(rows[0]).toMatchObject({ id: 21, userId: 7, employeeName: 'Jan Kowalski', employeeArchived: false, deductsPool: true, createdAt: '2026-11-16T08:12:00.000Z' });
+    expect(rows[0]).toMatchObject({ id: 21, userId: 7, employeeName: 'Jan Kowalski', employeeArchived: false, deductsPool: true, createdAt: '2026-11-16T08:12:00.000Z', dayCount: 'calendar', autoApproved: true });
     expect(rows[1]!.employeeArchived).toBe(true);
   });
 

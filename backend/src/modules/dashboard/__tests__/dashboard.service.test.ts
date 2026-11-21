@@ -51,7 +51,7 @@ describe('dashboard service', () => {
   });
 
   it('employee: own pool, own pending and next approved, own tasks (viewer id)', async () => {
-    const next = { id: 19, leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-12-21', dateTo: '2026-12-23', workingDays: 3 };
+    const next = { id: 19, leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-12-21', dateTo: '2026-12-23', workingDays: 3, dayCount: 'working' as const };
     vi.mocked(ml.listUpcomingOwn).mockResolvedValue({ pending: [], nextApproved: next });
     const result = await getDashboard(jan);
     expect(result).toEqual({ role: 'employee', today: '2026-11-20', pool: pool2026, myPending: [], nextLeave: next, myTasks: list });

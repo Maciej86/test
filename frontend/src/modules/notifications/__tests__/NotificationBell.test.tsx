@@ -57,7 +57,7 @@ describe('NotificationBell', () => {
     show({ unread: 1, latest: [item({}), item({ id: 6, type: 'leave_request_withdrawn', readAt: new Date().toISOString() })] });
     fireEvent.click(await bell());
     expect(await screen.findByText('Nowy wniosek: Jan Kowalski')).toBeInTheDocument();
-    expect(screen.getByText('Wypoczynkowy, 08.02.2027 – 12.02.2027, dni robocze: 5')).toBeInTheDocument();
+    expect(screen.getByText('Wypoczynkowy, 08.02.2027 – 12.02.2027, 5 dni roboczych')).toBeInTheDocument();
     expect(screen.getByText('Wniosek wycofany: Jan Kowalski')).toBeInTheDocument();
   });
 

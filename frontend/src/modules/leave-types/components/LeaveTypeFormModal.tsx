@@ -1,10 +1,10 @@
 import { useState, type ReactNode } from 'react';
-import { Alert, Anchor, NumberInput, Switch, TextInput } from '@mantine/core';
+import { Alert, Anchor, NumberInput, Radio, Stack, Switch, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { zod4Resolver } from 'mantine-form-zod-resolver';
 import { CircleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { LEAVE_TYPE_COLORS, LEAVE_TYPE_DEFAULT_COLOR, LEAVE_TYPE_LIMIT_MAX, LEAVE_TYPE_LIMIT_MIN, LEAVE_TYPE_MESSAGES, leaveTypeSchema, type LeaveTypeColor, type LeaveTypeItem } from '@app/shared';
+import { LEAVE_DAY_COUNTS, LEAVE_TYPE_COLORS, LEAVE_TYPE_DEFAULT_COLOR, LEAVE_TYPE_LIMIT_MAX, LEAVE_TYPE_LIMIT_MIN, LEAVE_TYPE_MESSAGES, leaveTypeSchema, type LeaveDayCount, type LeaveTypeColor, type LeaveTypeItem } from '@app/shared';
 import { ColorSwatchPicker } from '../../../common/ColorSwatchPicker';
 import { FormModal } from '../../../common/FormModal';
 import { apiErrorBody, apiErrorFields, apiErrorMessage } from '../../../core/api/client';
@@ -18,6 +18,8 @@ type FormValues = {
   /** Puste pole = bez limitu (schemat zamienia je na null). */
   yearlyLimit: number | '';
   color: LeaveTypeColor;
+  dayCount: LeaveDayCount;
+  requiresApproval: boolean;
 };
 
 interface HiddenType {
@@ -39,6 +41,8 @@ export const LeaveTypeFormModal = ({ leaveType, onClose }: { leaveType: LeaveTyp
       deductsPool: leaveType?.deductsPool ?? true,
       yearlyLimit: leaveType?.yearlyLimit ?? '',
       color: leaveType?.color ?? LEAVE_TYPE_DEFAULT_COLOR,
+      dayCount: leaveType?.dayCount ?? 'working',
+      requiresApproval: leaveType?.requiresApproval ?? true,
     },
     validate: zod4Resolver(leaveTypeSchema),
   });
@@ -95,6 +99,18 @@ export const LeaveTypeFormModal = ({ leaveType, onClose }: { leaveType: LeaveTyp
         autoComplete="off"
         {...form.getInputProps('name')}
         error={nameError()}
+      />
+      <Radio.Group label={t('field_day_count')} {...form.getInputProps('dayCount')} error={fieldError(t, form.errors.dayCount)}>
+        <Stack gap="xs" mt={6}>
+          {LEAVE_DAY_COUNTS.map((d) => (
+            <Radio key={d} value={d} label={t(`day_count.${d}`)} description={t(`day_count_hint.${d}`)} />
+          ))}
+        </Stack>
+      </Radio.Group>
+      <Switch
+        label={t('field_approval')}
+        description={t('field_approval_hint')}
+        {...form.getInputProps('requiresApproval', { type: 'checkbox' })}
       />
       <Switch
         label={t('field_deducts')}

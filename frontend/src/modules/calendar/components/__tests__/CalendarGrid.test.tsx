@@ -6,8 +6,8 @@ import { CalendarGrid } from '../CalendarGrid';
 const days = calendarDays('2026-11-17', 61);
 const people = [{ id: 2, name: 'Jan Kowalski' }, { id: 5, name: 'Magdalena Lewandowska' }];
 const absences: CalendarAbsence[] = [
-  { id: 21, userId: 2, leaveTypeName: 'Wypoczynkowy', color: 'green', status: 'pending', dateFrom: '2026-11-26', dateTo: '2026-11-27', days: 2 },
-  { id: 20, userId: 5, leaveTypeName: 'Wypoczynkowy', color: 'green', status: 'approved', dateFrom: '2026-11-20', dateTo: '2026-11-24', days: 3 },
+  { id: 21, userId: 2, leaveTypeName: 'Wypoczynkowy', color: 'green', status: 'pending', dateFrom: '2026-11-26', dateTo: '2026-11-27', days: 2, dayCount: 'working' },
+  { id: 20, userId: 5, leaveTypeName: 'Wypoczynkowy', color: 'green', status: 'approved', dateFrom: '2026-11-20', dateTo: '2026-11-24', days: 3, dayCount: 'working' },
 ];
 
 const show = () => {

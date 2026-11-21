@@ -19,13 +19,13 @@ const spyDb = (...results: unknown[]) => {
   return { db: db as unknown as Db, calls };
 };
 
-const row = (id: number, from: string, to: string) => ({ id, leave_type_name: 'Wypoczynkowy', date_from: from, date_to: to, working_days: 2 });
+const row = (id: number, from: string, to: string) => ({ id, leave_type_name: 'Wypoczynkowy', date_from: from, date_to: to, working_days: 2, day_count: 'calendar' });
 
 describe('my leave queries for the dashboard', () => {
   it('listUpcomingOwn: own pending requests by date_from', async () => {
     const { db, calls } = spyDb([row(21, '2026-11-26', '2026-11-27')], []);
     const result = await q.listUpcomingOwn(db, 7, '2026-11-20');
-    expect(result.pending).toEqual([{ id: 21, leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2 }]);
+    expect(result.pending).toEqual([{ id: 21, leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2, dayCount: 'calendar' }]);
     const [sql, params] = calls[0]!;
     expect(sql).toMatch(/r\.user_id = \? AND r\.status = \?/);
     expect(sql).toMatch(/ORDER BY r\.date_from, r\.id/);
@@ -35,7 +35,7 @@ describe('my leave queries for the dashboard', () => {
   it('listUpcomingOwn: next approved with date_to >= today (ongoing too), earliest date_from; none → null', async () => {
     const { db, calls } = spyDb([], [row(19, '2026-11-18', '2026-11-23')]);
     expect((await q.listUpcomingOwn(db, 7, '2026-11-20')).nextApproved).toEqual({
-      id: 19, leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-11-18', dateTo: '2026-11-23', workingDays: 2,
+      id: 19, leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-11-18', dateTo: '2026-11-23', workingDays: 2, dayCount: 'calendar',
     });
     const [sql, params] = calls[1]!;
     expect(sql).toMatch(/r\.user_id = \? AND r\.status = \? AND r\.date_to >= \?/);

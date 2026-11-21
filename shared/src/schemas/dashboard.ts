@@ -1,3 +1,4 @@
+import type { LeaveDayCount } from '../constants/leaveTypes';
 import type { Role } from '../constants/roles';
 import type { MyLeaveOverview } from './myLeave';
 
@@ -16,6 +17,7 @@ export interface DashboardPendingRequest {
   dateFrom: string;
   dateTo: string;
   workingDays: number;
+  dayCount: LeaveDayCount;
   createdAt: string;
 }
 
@@ -54,6 +56,7 @@ export interface DashboardOwnRequest {
   dateFrom: string;
   dateTo: string;
   workingDays: number;
+  dayCount: LeaveDayCount;
 }
 
 export interface AdminDashboard {

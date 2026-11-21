@@ -1,6 +1,7 @@
 /** Rodzaje powiadomień (moduł Powiadomienia). Tekst: `types.<rodzaj>.title|detail` w notifications.json. */
 export const NOTIFICATION_TYPES = [
   'leave_request_new',
+  'leave_absence_reported',
   'leave_request_withdrawn',
   'leave_approved',
   'leave_rejected',

@@ -14,6 +14,8 @@ const data: NewLeaveRequestEmailData = {
   dateFrom: '2027-02-08',
   dateTo: '2027-02-12',
   workingDays: 5,
+  dayCount: 'working',
+  autoApproved: false,
   daysFromCarried: 3,
   daysFromAnnual: 2,
   leftAfter: 24,

@@ -14,7 +14,7 @@ const spyDb = (result: unknown = []) => {
 const requestRow = (o: Record<string, unknown> = {}) => ({
   id: 21, leave_type_name: 'Wypoczynkowy', deducts_pool: 1, date_from: '2026-11-26', date_to: '2026-11-27', working_days: 2,
   days_from_carried: 0, days_from_annual: 2, pool_year: 2026, comment: null, status: 'pending', decision_reason: null,
-  decided_by_name: null, decided_at: null, created_at: new Date('2026-11-16T08:12:00Z'), ...o,
+  decided_by_name: null, decided_at: null, created_at: new Date('2026-11-16T08:12:00Z'), day_count: 'working', auto_approved: 0, ...o,
 });
 
 describe('my leave queries', () => {
@@ -25,7 +25,7 @@ describe('my leave queries', () => {
     await q.listBusy(db, 7, 2026);
     await q.sumTypeUsage(db, 7, 2026);
     await q.findOwnRequest(db, 21, 7);
-    await q.setWithdrawn(db, 21, 7);
+    await q.setWithdrawn(db, 21, 7, 'pending');
     for (const [sql, params] of calls) {
       expect(sql).toMatch(/user_id = \?/);
       expect(params).toContain(7);
@@ -35,14 +35,14 @@ describe('my leave queries', () => {
   });
 
   it('listRequests maps rows; pending first, then newest date', async () => {
-    const { db, calls } = spyDb([requestRow({ deducts_pool: 0, comment: 'Ślub siostry.' })]);
+    const { db, calls } = spyDb([requestRow({ deducts_pool: 0, comment: 'Ślub siostry.', day_count: 'calendar', auto_approved: 1 })]);
     const items = await q.listRequests(db, 7, 2026);
     expect(calls[0]![0]).toMatch(/ORDER BY r\.status = \? DESC, r\.date_from DESC, r\.id DESC/);
     expect(calls[0]![1]).toEqual([7, 2026, 'pending']);
     expect(items[0]).toEqual({
       id: 21, leaveTypeName: 'Wypoczynkowy', deductsPool: false, dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2,
       daysFromCarried: 0, daysFromAnnual: 2, poolYear: 2026, comment: 'Ślub siostry.', status: 'pending', decisionReason: null,
-      decidedByName: null, decidedAt: null, createdAt: '2026-11-16T08:12:00.000Z',
+      decidedByName: null, decidedAt: null, createdAt: '2026-11-16T08:12:00.000Z', dayCount: 'calendar', autoApproved: true,
     });
   });
 
@@ -53,20 +53,34 @@ describe('my leave queries', () => {
     for (const [, params] of calls) expect(params).toEqual([7, 2026, ['pending', 'approved']]);
   });
 
-  it('insertRequest saves values counted by the server', async () => {
+  it('insertRequest saves values counted by the server: pending, without decision time', async () => {
     const { db, calls } = spyDb({ insertId: 33 });
     const id = await q.insertRequest(db, {
-      userId: 7, leaveTypeId: 1, dateFrom: '2026-12-21', dateTo: '2026-12-31', workingDays: 7, daysFromCarried: 4, daysFromAnnual: 3, poolYear: 2026, comment: null,
+      userId: 7, leaveTypeId: 1, dateFrom: '2026-12-21', dateTo: '2026-12-31', dayCount: 'working', workingDays: 7, daysFromCarried: 4, daysFromAnnual: 3,
+      poolYear: 2026, comment: null, autoApproved: false,
     });
     expect(id).toBe(33);
-    expect(calls[0]![1]).toEqual([7, 1, '2026-12-21', '2026-12-31', 7, 4, 3, 2026, null, 'pending']);
+    expect(calls[0]![1]).toEqual([7, 1, '2026-12-21', '2026-12-31', 'working', 7, 4, 3, 2026, null, 'pending', false, false]);
   });
 
-  it('setWithdrawn changes only pending requests of this user and returns affected rows', async () => {
+  it('insertRequest of a type without approval: approved at once, auto_approved, decided_at = NOW(), no decided_by', async () => {
+    const { db, calls } = spyDb({ insertId: 34 });
+    await q.insertRequest(db, {
+      userId: 7, leaveTypeId: 7, dateFrom: '2026-11-13', dateTo: '2026-11-19', dayCount: 'calendar', workingDays: 7, daysFromCarried: 0, daysFromAnnual: 0,
+      poolYear: 2026, comment: null, autoApproved: true,
+    });
+    expect(calls[0]![0]).toMatch(/IF\(\?, NOW\(\), NULL\)/);
+    expect(calls[0]![0]).not.toContain('decided_by');
+    expect(calls[0]![1]).toEqual([7, 7, '2026-11-13', '2026-11-19', 'calendar', 7, 0, 0, 2026, null, 'approved', true, true]);
+  });
+
+  it('setWithdrawn changes the request of this user only while it still has the checked status; returns affected rows', async () => {
     const { db, calls } = spyDb({ affectedRows: 0 });
-    expect(await q.setWithdrawn(db, 21, 7)).toBe(0);
+    expect(await q.setWithdrawn(db, 21, 7, 'pending')).toBe(0);
     expect(calls[0]![0]).toMatch(/WHERE id = \? AND user_id = \? AND status = \?/);
     expect(calls[0]![1]).toEqual(['withdrawn', 21, 7, 'pending']);
+    await q.setWithdrawn(db, 22, 7, 'approved');
+    expect(calls[1]![1]).toEqual(['withdrawn', 22, 7, 'approved']);
   });
 
   it('sumPoolUsage with lock reads the latest state (FOR SHARE), e.g. in „Zamknij rok” after a decision', async () => {

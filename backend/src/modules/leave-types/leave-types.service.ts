@@ -21,8 +21,22 @@ const logType = (conn: PoolConnection, actor: Actor, id: number, name: string, a
   logActivity(conn, { userId: actor.id, userName: actor.name, action, entityType: ENTITY, entityId: id, entityName: name, changes });
 
 /** Pola typu do „przed → po” (te same nazwy z wiersza bazy i z formularza). */
-const fieldsOfData = (d: LeaveTypeData) => ({ name: d.name, deducts_pool: d.deductsPool, yearly_limit: d.yearlyLimit, color: d.color });
-const fieldsOfRow = (t: NonNullable<Awaited<ReturnType<typeof q.findLeaveType>>>) => ({ name: t.name, deducts_pool: Boolean(t.deducts_pool), yearly_limit: t.yearly_limit, color: t.color });
+const fieldsOfData = (d: LeaveTypeData) => ({
+  name: d.name,
+  deducts_pool: d.deductsPool,
+  yearly_limit: d.yearlyLimit,
+  color: d.color,
+  day_count: d.dayCount,
+  requires_approval: d.requiresApproval,
+});
+const fieldsOfRow = (t: NonNullable<Awaited<ReturnType<typeof q.findLeaveType>>>) => ({
+  name: t.name,
+  deducts_pool: Boolean(t.deducts_pool),
+  yearly_limit: t.yearly_limit,
+  color: t.color,
+  day_count: t.day_count,
+  requires_approval: Boolean(t.requires_approval),
+});
 
 const nameTaken = () => fail(409, M.nameTaken, { fields: { name: M.nameTaken } });
 

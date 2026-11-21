@@ -14,10 +14,10 @@ const admin: AdminDashboard = {
   today: '2026-11-20',
   pending: {
     items: [
-      { id: 21, employeeName: 'Jan Kowalski', leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2, createdAt: '2026-11-16T08:12:00.000Z' },
-      { id: 22, employeeName: 'Piotr Zieliński', leaveTypeName: 'Okolicznościowy', dateFrom: '2026-11-20', dateTo: '2026-11-20', workingDays: 1, createdAt: '2026-11-17T08:12:00.000Z' },
-      { id: 23, employeeName: 'Ewa Mazur', leaveTypeName: 'Na żądanie', dateFrom: '2026-11-18', dateTo: '2026-11-21', workingDays: 2, createdAt: '2026-11-17T08:12:00.000Z' },
-      { id: 24, employeeName: 'Katarzyna Wiśniewska', leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-12-21', dateTo: '2026-12-31', workingDays: 7, createdAt: '2026-11-19T08:12:00.000Z' },
+      { id: 21, employeeName: 'Jan Kowalski', leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2, dayCount: 'working', createdAt: '2026-11-16T08:12:00.000Z' },
+      { id: 22, employeeName: 'Piotr Zieliński', leaveTypeName: 'Okolicznościowy', dateFrom: '2026-11-20', dateTo: '2026-11-20', workingDays: 1, dayCount: 'working', createdAt: '2026-11-17T08:12:00.000Z' },
+      { id: 23, employeeName: 'Ewa Mazur', leaveTypeName: 'Na żądanie', dateFrom: '2026-11-18', dateTo: '2026-11-21', workingDays: 2, dayCount: 'working', createdAt: '2026-11-17T08:12:00.000Z' },
+      { id: 24, employeeName: 'Katarzyna Wiśniewska', leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-12-21', dateTo: '2026-12-31', workingDays: 7, dayCount: 'working', createdAt: '2026-11-19T08:12:00.000Z' },
     ],
     total: 7,
   },
@@ -47,8 +47,8 @@ const employee: EmployeeDashboard = {
   role: 'employee',
   today: '2026-11-20',
   pool: { year: 2026, annualDays: 26, carriedDays: 4, usedCarried: 4, usedAnnual: 8, pendingDays: 2, pendingCarried: 0, leftDays: 16, leftCarriedDays: 0 },
-  myPending: [{ id: 21, leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2 }],
-  nextLeave: { id: 19, leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-12-21', dateTo: '2026-12-23', workingDays: 3 },
+  myPending: [{ id: 21, leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2, dayCount: 'working' }],
+  nextLeave: { id: 19, leaveTypeName: 'Wypoczynkowy', dateFrom: '2026-12-21', dateTo: '2026-12-23', workingDays: 3, dayCount: 'working' },
   myTasks: { items: [task({ id: 3, title: 'Oferta dla hurtowni', dueDate: '2026-11-18' })], total: 1 },
 };
 

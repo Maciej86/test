@@ -1,5 +1,5 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
-import type { DashboardOwnRequest, LeaveBusyRange, LeaveRequestStatus, MyLeaveRequest } from '@app/shared';
+import type { DashboardOwnRequest, LeaveBusyRange, LeaveDayCount, LeaveRequestStatus, MyLeaveRequest } from '@app/shared';
 import { pool, type Db } from '../../db/pool';
 
 const PENDING: LeaveRequestStatus = 'pending';
@@ -27,13 +27,19 @@ export interface RequestRow extends RowDataPacket {
   decided_by_name: string | null;
   decided_at: Date | null;
   created_at: Date;
+  day_count: LeaveDayCount;
+  auto_approved: number | boolean;
 }
 
 const REQUEST_COLUMNS = `r.id, r.user_id, r.leave_type_id, lt.name AS leave_type_name, lt.deducts_pool, r.date_from, r.date_to, r.working_days,
-  r.days_from_carried, r.days_from_annual, r.pool_year, r.comment, r.status, r.decision_reason, r.decided_by_name, r.decided_at, r.created_at
+  r.days_from_carried, r.days_from_annual, r.pool_year, r.comment, r.status, r.decision_reason, r.decided_by_name, r.decided_at, r.created_at,
+  r.day_count, r.auto_approved
   FROM leave_requests r JOIN leave_types lt ON lt.id = r.leave_type_id`;
 
-export const toRequest = (r: RequestRow): MyLeaveRequest => ({
+/** Wniosek z bazy; czy można go jeszcze wycofać, dolicza usługa (zależy od dziś). */
+export type StoredRequest = Omit<MyLeaveRequest, 'canWithdraw'>;
+
+export const toRequest = (r: RequestRow): StoredRequest => ({
   id: r.id,
   leaveTypeName: r.leave_type_name,
   deductsPool: Boolean(r.deducts_pool),
@@ -49,12 +55,14 @@ export const toRequest = (r: RequestRow): MyLeaveRequest => ({
   decidedByName: r.decided_by_name,
   decidedAt: r.decided_at ? r.decided_at.toISOString() : null,
   createdAt: r.created_at.toISOString(),
+  dayCount: r.day_count,
+  autoApproved: Boolean(r.auto_approved),
 });
 
 /* Wnioski jednej osoby: każde zapytanie ma user_id w warunku. */
 
 /** Wnioski osoby z roku puli: czekające na górze, potem od najnowszego terminu. */
-export const listRequests = async (db: Db, userId: number, year: number): Promise<MyLeaveRequest[]> => {
+export const listRequests = async (db: Db, userId: number, year: number): Promise<StoredRequest[]> => {
   const [rows] = await db.query<RequestRow[]>(
     `SELECT ${REQUEST_COLUMNS} WHERE r.user_id = ? AND r.pool_year = ? ORDER BY r.status = ? DESC, r.date_from DESC, r.id DESC`, // rule-ok: wstawiona tylko stała lista kolumn REQUEST_COLUMNS z tego pliku, dane idą przez ?
     [userId, year, PENDING],
@@ -68,9 +76,10 @@ const toOwn = (r: RowDataPacket): DashboardOwnRequest => ({
   dateFrom: r.date_from as string,
   dateTo: r.date_to as string,
   workingDays: r.working_days as number,
+  dayCount: r.day_count as LeaveDayCount,
 });
 
-const OWN_COLUMNS = 'SELECT r.id, lt.name AS leave_type_name, r.date_from, r.date_to, r.working_days FROM leave_requests r JOIN leave_types lt ON lt.id = r.leave_type_id';
+const OWN_COLUMNS = 'SELECT r.id, lt.name AS leave_type_name, r.date_from, r.date_to, r.working_days, r.day_count FROM leave_requests r JOIN leave_types lt ON lt.id = r.leave_type_id';
 
 /**
  * Pulpit pracownika: jego wnioski czekające (od najwcześniejszego początku) i najbliższy zatwierdzony urlop, który
@@ -117,18 +126,26 @@ export interface NewRequestRow {
   leaveTypeId: number;
   dateFrom: string;
   dateTo: string;
+  /** Sposób liczenia z typu w chwili złożenia; `workingDays` to dni wniosku liczone tym sposobem. */
+  dayCount: LeaveDayCount;
   workingDays: number;
   daysFromCarried: number;
   daysFromAnnual: number;
   poolYear: number;
   comment: string | null;
+  /** Typ bez zatwierdzania: wniosek od razu zatwierdzony (`approved`, chwila decyzji = chwila złożenia, bez osoby). */
+  autoApproved: boolean;
 }
 
 export const insertRequest = async (db: Db, row: NewRequestRow): Promise<number> => {
   const [result] = await db.query<ResultSetHeader>(
-    `INSERT INTO leave_requests (user_id, leave_type_id, date_from, date_to, working_days, days_from_carried, days_from_annual, pool_year, comment, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [row.userId, row.leaveTypeId, row.dateFrom, row.dateTo, row.workingDays, row.daysFromCarried, row.daysFromAnnual, row.poolYear, row.comment, PENDING],
+    `INSERT INTO leave_requests (user_id, leave_type_id, date_from, date_to, day_count, working_days, days_from_carried, days_from_annual, pool_year,
+       comment, status, auto_approved, decided_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, IF(?, NOW(), NULL))`,
+    [
+      row.userId, row.leaveTypeId, row.dateFrom, row.dateTo, row.dayCount, row.workingDays, row.daysFromCarried, row.daysFromAnnual, row.poolYear,
+      row.comment, row.autoApproved ? APPROVED : PENDING, row.autoApproved, row.autoApproved,
+    ],
   );
   return result.insertId;
 };
@@ -140,13 +157,16 @@ export const findOwnRequest = async (db: Db, id: number, userId: number): Promis
 };
 
 
-/** Wycofanie: tylko czekający wniosek tej osoby; zwraca liczbę zmienionych (0 = już nie czekał). */
-export const setWithdrawn = async (db: Db, id: number, userId: number): Promise<number> => {
+/**
+ * Wycofanie wniosku tej osoby, tylko gdy ma wciąż status sprawdzony przed chwilą (czekający albo zatwierdzony
+ * automatycznie); zwraca liczbę zmienionych (0 = w międzyczasie ktoś go zmienił, np. drugie wycofanie naraz).
+ */
+export const setWithdrawn = async (db: Db, id: number, userId: number, fromStatus: LeaveRequestStatus): Promise<number> => {
   const [result] = await db.query<ResultSetHeader>('UPDATE leave_requests SET status = ? WHERE id = ? AND user_id = ? AND status = ?', [
     WITHDRAWN,
     id,
     userId,
-    PENDING,
+    fromStatus,
   ]);
   return result.affectedRows;
 };

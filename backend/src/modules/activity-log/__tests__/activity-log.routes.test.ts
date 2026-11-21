@@ -106,9 +106,9 @@ describe('abuse', () => {
 
   it('who made a change comes from the session, never from the request body', async () => {
     vi.mocked(leaveTypes.createType).mockResolvedValue({ id: 6 });
-    const res = await as(anna).post('/leave-types', { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null, color: 'teal', userId: 99, userName: 'Ktoś inny', actor: { id: 99 } });
+    const res = await as(anna).post('/leave-types', { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null, color: 'teal', dayCount: 'working', requiresApproval: true, userId: 99, userName: 'Ktoś inny', actor: { id: 99 } });
     expect(res.status).toBe(201);
-    expect(leaveTypes.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null, color: 'teal' }, { id: 1, name: 'Anna Nowak' });
+    expect(leaveTypes.createType).toHaveBeenCalledWith({ name: 'Szkoleniowy', deductsPool: true, yearlyLimit: null, color: 'teal', dayCount: 'working', requiresApproval: true }, { id: 1, name: 'Anna Nowak' });
   });
 });
 

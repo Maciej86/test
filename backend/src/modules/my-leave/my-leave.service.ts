@@ -1,5 +1,6 @@
 import {
   leaveRequestPath,
+  canWithdrawRequest,
   checkLeaveRequest,
   MY_LEAVE_MESSAGES as M,
   currentYear,
@@ -63,10 +64,15 @@ export const getMyLeaveOverview = async (userId: number): Promise<MyLeaveOvervie
   };
 };
 
+/** Wniosek dla ekranu: czy pracownik może go jeszcze wycofać, liczy serwer (`canWithdrawRequest`). */
+const withCanWithdraw = (r: q.StoredRequest, today: string): MyLeaveRequest => ({ ...r, canWithdraw: canWithdrawRequest(r, today) });
+
 /** Wnioski osoby z wybranego roku; bez roku: rok otwarty (bez puli: bieżący rok). */
 export const listMyRequests = async (userId: number, year?: number): Promise<MyLeaveRequestsResponse> => {
   const listYear = year ?? (await findOpenPoolOfUser(pool, userId, false))?.year ?? currentYear();
-  return { year: listYear, items: await q.listRequests(pool, userId, listYear) };
+  const today = todayIsoDate();
+  const items = await q.listRequests(pool, userId, listYear);
+  return { year: listYear, items: items.map((r) => withCanWithdraw(r, today)) };
 };
 
 type Refusal = Exclude<LeaveRequestCheck, { kind: 'ok' }>;
@@ -98,7 +104,8 @@ const emailInBackground = (data: NewLeaveRequestEmailData) => {
 
 /**
  * Złożenie wniosku. Serwer liczy wszystko sam pod blokadą puli tej osoby (dwa wnioski wysłane naraz liczą się po
- * kolei): dni robocze, podział (najpierw zaległe), rok puli, status. Powiadomienie i historia w tej samej transakcji,
+ * kolei): dni (sposobem z typu), podział (najpierw zaległe), rok puli, status. Typ bez zatwierdzania: wniosek od razu
+ * zatwierdzony, administratorzy dostają „Zgłoszona nieobecność”. Powiadomienie i historia w tej samej transakcji,
  * e-mail po zapisie.
  */
 export const createRequest = async (input: LeaveRequestData, actor: Actor): Promise<Result<MyLeaveRequest>> => {
@@ -115,8 +122,9 @@ export const createRequest = async (input: LeaveRequestData, actor: Actor): Prom
       q.listBusy(conn, actor.id, open.year),
     ]);
     const usage = usageByUser.get(actor.id) ?? EMPTY_USAGE;
+    const today = todayIsoDate();
     const check = checkLeaveRequest(
-      { type: { ...type, usedOfLimit: typeUsage.get(type.id) ?? 0 }, dateFrom: input.dateFrom, dateTo: input.dateTo, today: todayIsoDate() },
+      { type: { ...type, usedOfLimit: typeUsage.get(type.id) ?? 0 }, dateFrom: input.dateFrom, dateTo: input.dateTo, today },
       { poolYear: open.year, annualDays: open.annual_days, carriedDays: open.carried_days, ...usage, busy },
     );
     if (check.kind !== 'ok') return refusal(check, type.name);
@@ -126,11 +134,13 @@ export const createRequest = async (input: LeaveRequestData, actor: Actor): Prom
       leaveTypeId: type.id,
       dateFrom: input.dateFrom,
       dateTo: input.dateTo,
+      dayCount: check.dayCount,
       workingDays: check.workingDays,
       daysFromCarried: check.fromCarried,
       daysFromAnnual: check.fromAnnual,
       poolYear: open.year,
       comment: input.comment,
+      autoApproved: !type.requiresApproval,
     };
     const id = await q.insertRequest(conn, row);
     await logActivity(conn, {
@@ -148,11 +158,14 @@ export const createRequest = async (input: LeaveRequestData, actor: Actor): Prom
         working_days: row.workingDays,
         days_from_carried: row.daysFromCarried,
         days_from_annual: row.daysFromAnnual,
+        // Tylko to, co odbiega od zwykłego wniosku: dni kalendarzowe i zatwierdzenie bez decyzji.
+        ...(row.dayCount === 'calendar' ? { day_count: row.dayCount } : {}),
+        ...(row.autoApproved ? { status: 'approved', auto_approved: true } : {}),
       }),
     });
     await notifyAdmins(conn, {
-      type: 'leave_request_new',
-      params: { employee: actor.name, leaveType: type.name, dateFrom: row.dateFrom, dateTo: row.dateTo, days: row.workingDays },
+      type: row.autoApproved ? 'leave_absence_reported' : 'leave_request_new',
+      params: { employee: actor.name, leaveType: type.name, dateFrom: row.dateFrom, dateTo: row.dateTo, days: row.workingDays, dayCount: row.dayCount },
       link: leaveRequestPath(id),
       actor,
     });
@@ -163,26 +176,32 @@ export const createRequest = async (input: LeaveRequestData, actor: Actor): Prom
       dateFrom: row.dateFrom,
       dateTo: row.dateTo,
       workingDays: row.workingDays,
+      dayCount: row.dayCount,
+      autoApproved: row.autoApproved,
       daysFromCarried: row.daysFromCarried,
       daysFromAnnual: row.daysFromAnnual,
       leftAfter: check.leftAfter,
       comment: row.comment,
     };
     const saved = await q.findOwnRequest(conn, id, actor.id);
-    return q.toRequest(saved!);
+    return withCanWithdraw(q.toRequest(saved!), today);
   });
   if (email) emailInBackground(email);
   return result;
 };
 
-/** Wycofanie własnego wniosku, który czeka na decyzję; dni wracają do puli (wniosek przestaje się liczyć). */
+/**
+ * Wycofanie własnego wniosku: czekającego albo zatwierdzonego automatycznie, póki wolno (`canWithdrawRequest`: do
+ * pierwszego dnia albo w dniu złożenia); dni wracają do puli (wniosek przestaje się liczyć).
+ */
 export const withdrawRequest = async (id: number, actor: Actor): Promise<Result> =>
   withTransaction(async (conn) => {
     const request = await q.findOwnRequest(conn, id, actor.id);
     if (!request) return notFound();
-    if (request.status !== 'pending') return fail(409, M.notPending);
+    const state = { status: request.status, autoApproved: Boolean(request.auto_approved), dateFrom: request.date_from, createdAt: request.created_at };
+    if (!canWithdrawRequest(state, todayIsoDate())) return fail(409, M.cannotWithdraw);
     // Warunek statusu w samym UPDATE: drugie wycofanie wysłane naraz nic już nie zmieni.
-    if ((await q.setWithdrawn(conn, id, actor.id)) === 0) return fail(409, M.notPending);
+    if ((await q.setWithdrawn(conn, id, actor.id, request.status)) === 0) return fail(409, M.cannotWithdraw);
     await logActivity(conn, {
       userId: actor.id,
       userName: actor.name,

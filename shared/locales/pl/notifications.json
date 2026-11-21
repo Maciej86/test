@@ -16,7 +16,11 @@
   "types": {
     "leave_request_new": {
       "title": "Nowy wniosek: {{employee}}",
-      "detail": "{{leaveType}}, {{dateFrom}} – {{dateTo}}, dni robocze: {{days}}"
+      "detail": "{{leaveType}}, {{dateFrom}} – {{dateTo}}, {{daysText}}"
+    },
+    "leave_absence_reported": {
+      "title": "Zgłoszona nieobecność: {{employee}}",
+      "detail": "{{leaveType}}, {{dateFrom}} – {{dateTo}}, {{daysText}}"
     },
     "leave_request_withdrawn": {
       "title": "Wniosek wycofany: {{employee}}",

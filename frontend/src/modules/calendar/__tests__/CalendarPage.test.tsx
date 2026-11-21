@@ -7,7 +7,7 @@ import { renderRoutes } from '../../../test/render';
 import { CalendarPage } from '../CalendarPage';
 
 const absence = (o: Partial<CalendarAbsence> & { id: number; userId: number }): CalendarAbsence => ({
-  leaveTypeName: 'Wypoczynkowy', color: 'green', status: 'approved', dateFrom: '2026-11-23', dateTo: '2026-11-27', days: 5, ...o,
+  leaveTypeName: 'Wypoczynkowy', color: 'green', status: 'approved', dateFrom: '2026-11-23', dateTo: '2026-11-27', days: 5, dayCount: 'working', ...o,
 });
 
 const data = (o: Partial<CalendarResponse> = {}): CalendarResponse => ({

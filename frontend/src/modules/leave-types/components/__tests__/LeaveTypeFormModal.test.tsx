@@ -7,7 +7,7 @@ import { renderWithProviders } from '../../../../test/render';
 import { HideLeaveTypeModal } from '../HideLeaveTypeModal';
 import { LeaveTypeFormModal } from '../LeaveTypeFormModal';
 
-const onDemand: LeaveTypeItem = { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, color: 'teal', hidden: false, requestsCount: 3 };
+const onDemand: LeaveTypeItem = { id: 2, name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, color: 'teal', dayCount: 'working', requiresApproval: true, hidden: false, requestsCount: 3 };
 
 const conflict = (message: string, hiddenType?: { id: number; name: string }) => {
   const config = { url: '/leave-types', headers: new AxiosHeaders() };
@@ -46,7 +46,25 @@ describe('LeaveTypeFormModal', () => {
     fill('Nazwa', 'Chorobowe');
     fireEvent.click(screen.getByRole('button', { name: 'fioletowy' }));
     save();
-    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/leave-types', { name: 'Chorobowe', deductsPool: true, yearlyLimit: '', color: 'grape' }));
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/leave-types', { name: 'Chorobowe', deductsPool: true, yearlyLimit: '', color: 'grape', dayCount: 'working', requiresApproval: true }));
+  });
+
+  it('day count and approval: new type counts working days and needs approval; choosing calendar days and no approval sends them', async () => {
+    vi.spyOn(api, 'post').mockResolvedValue({ data: { id: 9 } });
+    show(null);
+    expect(screen.getByRole('radio', { name: /dni robocze/ })).toBeChecked();
+    expect(screen.getByLabelText('Wymaga zatwierdzenia', { exact: false })).toBeChecked();
+    fill('Nazwa', 'Ojcowski');
+    fireEvent.click(screen.getByRole('radio', { name: /dni kalendarzowe/ }));
+    fireEvent.click(screen.getByLabelText('Wymaga zatwierdzenia', { exact: false }));
+    save();
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/leave-types', { name: 'Ojcowski', deductsPool: true, yearlyLimit: '', color: 'green', dayCount: 'calendar', requiresApproval: false }));
+  });
+
+  it('editing a calendar-day type without approval shows its settings', () => {
+    show({ ...onDemand, dayCount: 'calendar', requiresApproval: false });
+    expect(screen.getByRole('radio', { name: /dni kalendarzowe/ })).toBeChecked();
+    expect(screen.getByLabelText('Wymaga zatwierdzenia', { exact: false })).not.toBeChecked();
   });
 
   it('color of an edited type is preselected', () => {
@@ -66,7 +84,7 @@ describe('LeaveTypeFormModal', () => {
     expect(await screen.findByText('Wartość jest za duża.')).toBeInTheDocument();
     fill('Limit dni w roku', '');
     save();
-    await waitFor(() => expect(post).toHaveBeenCalledWith('/leave-types', { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: '', color: 'green' }));
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/leave-types', { name: 'Szkoleniowy', deductsPool: true, yearlyLimit: '', color: 'green', dayCount: 'working', requiresApproval: true }));
   });
 
   it('editing a type used in requests shows the warning; 0 requests → no warning', () => {
@@ -86,7 +104,7 @@ describe('LeaveTypeFormModal', () => {
     show(onDemand);
     fill('Limit dni w roku', '');
     save();
-    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/leave-types/2', { name: 'Na żądanie', deductsPool: true, yearlyLimit: '', color: 'teal' }));
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/leave-types/2', { name: 'Na żądanie', deductsPool: true, yearlyLimit: '', color: 'teal', dayCount: 'working', requiresApproval: true }));
   });
 
   it('409 name_taken → error under the name', async () => {
@@ -118,7 +136,7 @@ describe('LeaveTypeFormModal', () => {
     const success = vi.spyOn(notify, 'success');
     const { onClose } = show(onDemand);
     save();
-    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/leave-types/2', { name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, color: 'teal' }));
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/leave-types/2', { name: 'Na żądanie', deductsPool: true, yearlyLimit: 4, color: 'teal', dayCount: 'working', requiresApproval: true }));
     await waitFor(() => expect(success).toHaveBeenCalledWith('Zapisano zmiany'));
     expect(onClose).toHaveBeenCalled();
   });

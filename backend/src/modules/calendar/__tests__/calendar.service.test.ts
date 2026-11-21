@@ -11,7 +11,7 @@ const { pool } = await import('../../../db/pool');
 const s = await import('../calendar.service');
 
 const people = [{ id: 8, name: 'Paweł Dąbrowski' }, { id: 2, name: 'Jan Kowalski' }];
-const absence = { id: 21, userId: 2, leaveTypeName: 'Wypoczynkowy', color: 'green' as const, status: 'pending' as const, dateFrom: '2026-11-26', dateTo: '2026-11-27', days: 2 };
+const absence = { id: 21, userId: 2, leaveTypeName: 'Wypoczynkowy', color: 'green' as const, status: 'pending' as const, dateFrom: '2026-11-26', dateTo: '2026-11-27', days: 2, dayCount: 'working' as const };
 
 beforeEach(() => {
   vi.clearAllMocks();

@@ -13,7 +13,7 @@ describe('leave types api', () => {
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
     const wrapper = ({ children }: { children: ReactNode }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
     const { result } = renderHook(() => useUpdateLeaveType(), { wrapper });
-    await result.current.mutateAsync({ id: 3, name: 'Bezpłatny', deductsPool: false, yearlyLimit: '', color: 'grape' });
+    await result.current.mutateAsync({ id: 3, name: 'Bezpłatny', deductsPool: false, yearlyLimit: '', color: 'grape', dayCount: 'calendar', requiresApproval: false });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['leave-types'] });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['calendar'] });
   });

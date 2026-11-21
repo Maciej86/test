@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { CALENDAR_FROM_MAX, CALENDAR_FROM_MIN } from '../constants/calendar';
-import type { LeaveTypeColor } from '../constants/leaveTypes';
+import type { LeaveDayCount, LeaveTypeColor } from '../constants/leaveTypes';
 import { isoDate, optionalField } from './fields';
 
 const M = { min: 'validation.min', max: 'validation.max' } as const;
@@ -27,8 +27,9 @@ export interface CalendarAbsence {
   status: 'pending' | 'approved';
   dateFrom: string;
   dateTo: string;
-  /** Dni wniosku (dziś zawsze robocze). */
+  /** Dni wniosku liczone sposobem zapamiętanym we wniosku (`dayCount`). */
   days: number;
+  dayCount: LeaveDayCount;
 }
 
 export interface CalendarResponse {

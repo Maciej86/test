@@ -7,6 +7,9 @@ export const LEAVE_REQUEST_COMMENT_MAX = 500;
 export const LEAVE_REQUEST_STATUSES = ['pending', 'approved', 'rejected', 'withdrawn', 'cancelled'] as const;
 export type LeaveRequestStatus = (typeof LEAVE_REQUEST_STATUSES)[number];
 
+/** Typ bez zatwierdzania (np. chorobowe) może zaczynać się tyle dni przed dziś (zwolnienie z datą wsteczną). */
+export const NO_APPROVAL_BACKDATE_DAYS = 7;
+
 /** Rok w adresie listy wniosków (`?year=2026`). */
 export const LEAVE_REQUEST_YEAR_MIN = 2000;
 export const LEAVE_REQUEST_YEAR_MAX = 2100;
@@ -21,6 +24,7 @@ export const MY_LEAVE_MESSAGES = {
   notEnoughDays: 'my-leave.server.not_enough_days',
   limitExceeded: 'my-leave.server.limit_exceeded',
   notPending: 'my-leave.server.not_pending',
+  cannotWithdraw: 'my-leave.server.cannot_withdraw',
   notApproved: 'my-leave.server.not_approved',
   typeUnavailable: 'my-leave.server.type_unavailable',
   pastDate: 'my-leave.validation.past_date',

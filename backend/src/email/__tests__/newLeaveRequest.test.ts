@@ -9,6 +9,8 @@ const data: NewLeaveRequestEmailData = {
   dateFrom: '2027-02-08',
   dateTo: '2027-02-12',
   workingDays: 5,
+  dayCount: 'working',
+  autoApproved: false,
   daysFromCarried: 3,
   daysFromAnnual: 2,
   leftAfter: 24,
@@ -94,5 +96,18 @@ describe('newLeaveRequestEmail', () => {
     expect(html).toMatch(/^<!doctype html>/i);
     expect(html).toContain('lang="pl"');
     expect(html).toContain('max-width:560px');
+  });
+
+  it('type without approval (sick leave): "Zgłoszona nieobecność" subject and heading, no "waits for your decision", calendar days', () => {
+    const sick = { ...data, leaveTypeName: 'Chorobowe', dateFrom: '2026-11-15', dateTo: '2026-11-21', workingDays: 7, dayCount: 'calendar' as const, autoApproved: true, daysFromCarried: 0, daysFromAnnual: 0, leftAfter: null, comment: null };
+    const mail = newLeaveRequestEmail(sick);
+    expect(mail.subject).toBe('Zgłoszona nieobecność: Jan Kowalski, 15.11.2026–21.11.2026');
+    for (const body of [mail.html, mail.text]) {
+      expect(body).toContain('Zgłoszona nieobecność');
+      expect(body).toContain('Jan Kowalski zgłosił(a) nieobecność. Jest już zatwierdzona, nie wymaga Twojej decyzji.');
+      expect(body).toContain('7 dni kalendarzowych');
+      expect(body).not.toContain('czeka na Twoją decyzję');
+      expect(body).not.toContain('Zostanie po zatwierdzeniu');
+    }
   });
 });

@@ -25,6 +25,16 @@ const DeductsBadge = ({ deducts }: { deducts: boolean }) => {
   return <Badge variant="light" color={deducts ? 'navy' : 'gray'}>{deducts ? t('deducts_yes') : t('deducts_no')}</Badge>;
 };
 
+const DayCountText = ({ lt }: { lt: LeaveTypeItem }) => {
+  const { t } = useTranslation('leave-types');
+  return <Text span inherit c={lt.hidden ? 'dimmed' : undefined}>{t(`day_count.${lt.dayCount}`)}</Text>;
+};
+
+const ApprovalBadge = ({ required }: { required: boolean }) => {
+  const { t } = useTranslation('leave-types');
+  return <Badge variant="light" color={required ? 'navy' : 'gray'}>{required ? t('approval_yes') : t('approval_no')}</Badge>;
+};
+
 const NameCell = ({ lt }: { lt: LeaveTypeItem }) => {
   const { t } = useTranslation('leave-types');
   return (
@@ -89,6 +99,8 @@ export const LeaveTypesTable = ({ rows, visibleCount, onMove, ...actions }: List
           <Table.Tr>
             <Table.Th w={70} aria-label={t('col_order')} />
             <Table.Th>{t('col_name')}</Table.Th>
+            <Table.Th>{t('col_day_count')}</Table.Th>
+            <Table.Th>{t('col_approval')}</Table.Th>
             <Table.Th>{t('col_deducts')}</Table.Th>
             <Table.Th>{t('col_limit')}</Table.Th>
             <Table.Th ta="right">{t('col_requests')}</Table.Th>
@@ -100,6 +112,8 @@ export const LeaveTypesTable = ({ rows, visibleCount, onMove, ...actions }: List
             <Table.Tr key={lt.id}>
               <Table.Td>{!lt.hidden && <OrderArrows index={i} count={visibleCount} onMove={(direction) => onMove(lt, direction)} />}</Table.Td>
               <Table.Td><NameCell lt={lt} /></Table.Td>
+              <Table.Td><DayCountText lt={lt} /></Table.Td>
+              <Table.Td><ApprovalBadge required={lt.requiresApproval} /></Table.Td>
               <Table.Td><DeductsBadge deducts={lt.deductsPool} /></Table.Td>
               <Table.Td c={lt.hidden ? 'dimmed' : undefined}><LimitText limit={lt.yearlyLimit} /></Table.Td>
               <Table.Td ta="right" c="dimmed">{lt.requestsCount}</Table.Td>
@@ -124,6 +138,10 @@ export const LeaveTypeCards = ({ rows, visibleCount, onMove, ...actions }: ListP
               <NameCell lt={lt} />
               <DeductsBadge deducts={lt.deductsPool} />
             </Group>
+            <Group gap="xs"><ApprovalBadge required={lt.requiresApproval} /></Group>
+            <Text size="sm" c="dimmed">
+              {t('col_day_count')}: <DayCountText lt={lt} />
+            </Text>
             <Text size="sm" c="dimmed">
               {t('col_limit')}: <LimitText limit={lt.yearlyLimit} />
             </Text>

@@ -6,7 +6,9 @@ import {
   MY_LEAVE_MESSAGES as M,
   type LeaveRequestStatus,
 } from '../constants/myLeave';
+import type { LeaveDayCount } from '../constants/leaveTypes';
 import { isoDate, optionalField, text, wholeNumber } from './fields';
+import type { SelectableLeaveType } from './leaveTypes';
 
 /** Największy numer w kolumnie INT UNSIGNED, którą zna formularz (ochrona przed ogromnymi liczbami). */
 const LEAVE_TYPE_ID_MAX = 2_147_483_647;
@@ -63,7 +65,7 @@ export interface MyLeaveOverview {
     leftCarriedDays: number;
   };
   /** Widoczne typy w kolejności; `usedOfLimit` = dni czekające i zatwierdzone tego typu w roku otwartym. */
-  types: { id: number; name: string; deductsPool: boolean; yearlyLimit: number | null; usedOfLimit: number }[];
+  types: (SelectableLeaveType & { usedOfLimit: number })[];
   /** Lata z wnioskami i rok otwarty, od najnowszego. */
   years: number[];
   busy: LeaveBusyRange[];
@@ -85,6 +87,11 @@ export interface MyLeaveRequest {
   decidedByName: string | null;
   decidedAt: string | null;
   createdAt: string;
+  /** Sposób liczenia dni zapamiętany przy złożeniu i zatwierdzenie bez decyzji (typ bez zatwierdzania). */
+  dayCount: LeaveDayCount;
+  autoApproved: boolean;
+  /** Czy pracownik może jeszcze wycofać (liczy serwer: `canWithdrawRequest`). */
+  canWithdraw: boolean;
 }
 
 export interface MyLeaveRequestsResponse {

@@ -6,6 +6,7 @@ import {
   LEAVE_REQUESTS_MESSAGES as M,
   type LeaveRequestFilter,
 } from '../constants/leaveRequests';
+import type { LeaveDayCount } from '../constants/leaveTypes';
 import { LEAVE_REQUEST_YEAR_MAX, LEAVE_REQUEST_YEAR_MIN, type LeaveRequestStatus } from '../constants/myLeave';
 import { addressNumber, text } from './fields';
 import { listQuerySchema } from './list';
@@ -54,6 +55,8 @@ export interface LeaveRequestListItem {
   decidedByName: string | null;
   decidedAt: string | null;
   createdAt: string;
+  dayCount: LeaveDayCount;
+  autoApproved: boolean;
   /** Dni do wykorzystania w otwartym roku osoby (pula + zaległe − zatwierdzone − czekające); brak puli = null. */
   poolLeft: { left: number; total: number } | null;
   /** Zatwierdzony, a pula roku wniosku jeszcze niezamknięta. */

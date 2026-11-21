@@ -1,5 +1,5 @@
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
-import type { CalendarAbsence, DashboardAbsence, DashboardList, DashboardPendingRequest, LeaveRequestFilter, LeaveRequestStatus } from '@app/shared';
+import type { CalendarAbsence, DashboardAbsence, DashboardList, DashboardPendingRequest, LeaveDayCount, LeaveRequestFilter, LeaveRequestStatus } from '@app/shared';
 import { PAGE_SIZE } from '../../config/constants';
 import { likePattern } from '../../db/like';
 import type { Db } from '../../db/pool';
@@ -30,6 +30,8 @@ export interface RequestRow extends RowDataPacket {
   decided_by_name: string | null;
   decided_at: Date | null;
   created_at: Date;
+  day_count: LeaveDayCount;
+  auto_approved: number | boolean;
 }
 
 /** Wiersz po zamianie: pola jak w API plus numer osoby (do puli), bez liczb puli. */
@@ -52,11 +54,13 @@ export interface RequestItem {
   decidedByName: string | null;
   decidedAt: string | null;
   createdAt: string;
+  dayCount: LeaveDayCount;
+  autoApproved: boolean;
 }
 
 const SELECT_REQUEST = `SELECT r.id, r.user_id, u.name AS employee_name, u.archived_at AS employee_archived_at, r.leave_type_id,
   lt.name AS leave_type_name, lt.deducts_pool, r.date_from, r.date_to, r.working_days, r.days_from_carried, r.days_from_annual,
-  r.pool_year, r.comment, r.status, r.decision_reason, r.decided_by_name, r.decided_at, r.created_at`;
+  r.pool_year, r.comment, r.status, r.decision_reason, r.decided_by_name, r.decided_at, r.created_at, r.day_count, r.auto_approved`;
 const FROM = 'FROM leave_requests r JOIN users u ON u.id = r.user_id JOIN leave_types lt ON lt.id = r.leave_type_id';
 
 export const toItem = (r: RequestRow): RequestItem => ({
@@ -78,6 +82,8 @@ export const toItem = (r: RequestRow): RequestItem => ({
   decidedByName: r.decided_by_name,
   decidedAt: r.decided_at ? r.decided_at.toISOString() : null,
   createdAt: r.created_at.toISOString(),
+  dayCount: r.day_count,
+  autoApproved: Boolean(r.auto_approved),
 });
 
 export interface ListFilters {
@@ -132,7 +138,7 @@ export const pendingSummary = async (db: Db): Promise<{ count: number; oldestAt:
 /** Pulpit administratora: wnioski czekające (każdy rok), od najwcześniejszego początku urlopu; `total` = wszystkie. */
 export const listPendingForDashboard = async (db: Db, limit: number): Promise<DashboardList<DashboardPendingRequest>> => {
   const [rows] = await db.query<RowDataPacket[]>(
-    `SELECT r.id, u.name AS employee_name, lt.name AS leave_type_name, r.date_from, r.date_to, r.working_days, r.created_at ${FROM}
+    `SELECT r.id, u.name AS employee_name, lt.name AS leave_type_name, r.date_from, r.date_to, r.working_days, r.day_count, r.created_at ${FROM}
      WHERE r.status = ? ORDER BY r.date_from ASC, r.created_at ASC, r.id ASC LIMIT ?`, // rule-ok: stała FROM z tego pliku, wartości przez ?
     [PENDING, limit],
   );
@@ -145,6 +151,7 @@ export const listPendingForDashboard = async (db: Db, limit: number): Promise<Da
       dateFrom: r.date_from as string,
       dateTo: r.date_to as string,
       workingDays: r.working_days as number,
+      dayCount: r.day_count as LeaveDayCount,
       createdAt: (r.created_at as Date).toISOString(),
     })),
     total: Number(count[0]?.total ?? 0),
@@ -172,7 +179,7 @@ export const listAbsences = async (db: Db, from: string, to: string): Promise<Da
 export const listCalendarAbsences = async (db: Db, userIds: number[], from: string, to: string): Promise<CalendarAbsence[]> => {
   if (userIds.length === 0) return [];
   const [rows] = await db.query<RowDataPacket[]>(
-    `SELECT r.id, r.user_id, lt.name AS leave_type_name, lt.color, r.status, r.date_from, r.date_to, r.working_days
+    `SELECT r.id, r.user_id, lt.name AS leave_type_name, lt.color, r.status, r.date_from, r.date_to, r.working_days, r.day_count
      FROM leave_requests r JOIN leave_types lt ON lt.id = r.leave_type_id
      WHERE r.status IN (?) AND r.user_id IN (?) AND r.date_from <= ? AND r.date_to >= ?
      ORDER BY r.date_from, r.id`,
@@ -187,6 +194,7 @@ export const listCalendarAbsences = async (db: Db, userIds: number[], from: stri
     dateFrom: r.date_from as string,
     dateTo: r.date_to as string,
     days: r.working_days as number,
+    dayCount: r.day_count as LeaveDayCount,
   }));
 };
 

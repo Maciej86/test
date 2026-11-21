@@ -32,7 +32,7 @@ const anna = { id: 1, name: 'Anna Nowak' };
 const item = (o: Partial<Item> = {}): Item => ({
   id: 21, userId: 7, employeeName: 'Jan Kowalski', employeeArchived: false, leaveTypeName: 'Wypoczynkowy', deductsPool: true,
   dateFrom: '2026-11-26', dateTo: '2026-11-27', workingDays: 2, daysFromCarried: 0, daysFromAnnual: 2, poolYear: 2026, comment: null,
-  status: 'pending', decisionReason: null, decidedByName: null, decidedAt: null, createdAt: '2026-11-16T08:12:00.000Z', ...o,
+  status: 'pending', decisionReason: null, decidedByName: null, decidedAt: null, createdAt: '2026-11-16T08:12:00.000Z', dayCount: 'working', autoApproved: false, ...o,
 });
 const janPool = { id: 1, user_id: 7, year: 2026, annual_days: 26, carried_days: 4, closed_at: null } as never;
 

@@ -34,38 +34,38 @@ usunięte.
   „Chorobowe” w danych), Wnioski urlopowe i wspólny `LeaveRequestDrawer` („Zatwierdzony automatycznie (typ bez
   zatwierdzania)”), Typy urlopów (nowe teksty podpowiedzi i ostrzeżenia), E-mail (stan „Zgłoszona nieobecność”) →
   `npx tsc -p mockups`, `npm run check`
-- [ ] 3. Stałe i schematy: `NO_APPROVAL_BACKDATE_DAYS = 7` w `shared/src/constants/myLeave.ts`;
+- [x] 3. Stałe i schematy: `NO_APPROVAL_BACKDATE_DAYS = 7` w `shared/src/constants/myLeave.ts`;
   `leaveTypeSchema` + `dayCount: z.enum(LEAVE_DAY_COUNTS)`, `requiresApproval: z.boolean`; `LeaveTypeItem`
   i `SelectableLeaveType` z `dayCount`, `requiresApproval`; wniosek (`MyLeaveRequest`, wiersz i szczegóły Wniosków,
   `CalendarAbsence`, wnioski na Pulpicie) z `dayCount`, `autoApproved`, a `MyLeaveRequest` z `canWithdraw`. Testy
   schematu: obie wartości, `'hours'` → błąd, brak → błąd → `npm run check`
-- [ ] 4. Migracje `031_leave_types_day_count.sql`, `032_leave_types_requires_approval.sql`,
+- [x] 4. Migracje `031_leave_types_day_count.sql`, `032_leave_types_requires_approval.sql`,
   `033_leave_requests_day_count.sql` (z komentarzem kolumny `working_days`), `034_leave_requests_auto_approved.sql`,
   `035_leave_types_sick_seed.sql` („Chorobowe”: `calendar`, bez zatwierdzania, nie odejmuje, bez limitu, `grape`,
   ostatnia pozycja; `INSERT … SELECT … WHERE NOT EXISTS` po nazwie, także ukrytego) + test migracji (drugie
   uruchomienie nic nie dodaje, typ o tej nazwie zostaje bez zmian) → `npm run migrate`, `npm run check`
-- [ ] 5. Typy urlopów, serwer: zapytania i serwis zapisują i zwracają `day_count`, `requires_approval`; historia
+- [x] 5. Typy urlopów, serwer: zapytania i serwis zapisują i zwracają `day_count`, `requires_approval`; historia
   zmian ma oba pola przed → po; `findSelectableLeaveType` i `listSelectableLeaveTypes` je zwracają. Testy tras
   (zapis, lista, 400) w `backend/src/modules/leave-types/__tests__/` → `npm run check`
-- [ ] 6. Typy urlopów, ekran: kolumny „Liczenie dni” i „Zatwierdzanie” (tabela i karty), w oknie `Radio.Group`
+- [x] 6. Typy urlopów, ekran: kolumny „Liczenie dni” i „Zatwierdzanie” (tabela i karty), w oknie `Radio.Group`
   „Liczenie dni” i `Switch` „Wymaga zatwierdzenia” jak w makiecie (nowy typ: robocze, włączony), nowe teksty
   podpowiedzi i ostrzeżenia. Porównane z: `LeaveTypeModals` (makieta) → ta sama rama okna, tylko nowe pola. Testy
   ekranu → `npm run check`
-- [ ] 7. `checkLeaveRequest` (shared): typ dostaje `dayCount`, `requiresApproval`; najwcześniejsza data „Od” =
+- [x] 7. `checkLeaveRequest` (shared): typ dostaje `dayCount`, `requiresApproval`; najwcześniejsza data „Od” =
   dziś, a bez zatwierdzania dziś − `NO_APPROVAL_BACKDATE_DAYS` (funkcja `earliestLeaveStart(type, today)` w tym samym
   pliku, używa jej też okno wniosku); dni = `countWorkingDays` albo liczba wszystkich dni; `no_working_days` tylko
   przy roboczych; wynik `ok` ma `dayCount`. Testy: 7 dni wstecz ok, 8 → `past_date`, z zatwierdzaniem wczoraj →
   `past_date`, piątek–poniedziałek kalendarzowo = 4, sobota–niedziela kalendarzowo = 2 (nie `no_working_days`), limit
   14 dni kalendarzowych: 14 ok, 15 → `limit_exceeded`, pula odejmuje dni kalendarzowe, rok zamknięty przy dacie
   wstecz → `year_closed` → `npm run check`
-- [ ] 8. Moje urlopy, złożenie (serwer): `createRequest` zapisuje `day_count` z typu; typ bez zatwierdzania →
+- [x] 8. Moje urlopy, złożenie (serwer): `createRequest` zapisuje `day_count` z typu; typ bez zatwierdzania →
   `status = 'approved'`, `auto_approved = 1`, `decided_at = NOW()`; powiadomienie `leave_absence_reported`
   (nowy rodzaj w `shared/src/constants/notifications.ts`, parametry z `dayCount`) zamiast `leave_request_new`;
   `leave_request_new` też dostaje `dayCount`; e-mail z polem `autoApproved` i `dayCount` (wersja „Zgłoszona
   nieobecność”: temat, nagłówek, wstęp, bez „Zostanie po zatwierdzeniu”). Historia: `status`, `auto_approved`. Testy
   w `backend/src/modules/my-leave/__tests__/` i `backend/src/email/__tests__/` (treść obu wersji, wersja tekstowa) →
   `npm run check`
-- [ ] 9. Moje urlopy, wycofanie (serwer): `canWithdrawRequest(r, today)` w `shared/src/leaveRequestCheck.ts`:
+- [x] 9. Moje urlopy, wycofanie (serwer): `canWithdrawRequest(r, today)` w `shared/src/leaveRequestCheck.ts`:
   `pending` → tak; `approved` z `autoApproved` → `dateFrom ≥ today` albo `toIsoDate(createdAt) === today`; reszta →
   nie. `withdrawRequest` używa jej pod blokadą wiersza (warunek także w `UPDATE`: dwa wycofania naraz → jedno),
   komunikat 409 „Tego wniosku nie możesz już wycofać”; lista wniosków zwraca `canWithdraw`. Testy: każdy przypadek
@@ -98,3 +98,15 @@ usunięte.
 - Typ bez zatwierdzania, który odejmuje dni z puli: brak dni nadal blokuje, a zatwierdzony od razu zmniejsza pulę.
 - Wniosek automatyczny nie pojawia się w „Czekają” ani w boksie „do rozpatrzenia” na Pulpicie.
 - Data wstecz na przełomie roku: grudzień zamknięty → `year_closed`, a nie zapis w nowym roku.
+
+## Ustalenia w trakcie budowy
+
+- Kroki 3–9 zrobione jednym ciągiem: nowe pola w typach danych wymagały od razu zmian w zapytaniach, ekranie Typów
+  urlopów i danych testowych, inaczej `npm run check` nie byłby zielony między krokami.
+- Pulpit pokazuje liczbę dni z jednostką („2 dni robocze” zamiast „2 dni”), jak reszta aplikacji (wspólne
+  `leaveDaysText`).
+- Kolumna „Dni robocze” we wszystkich listach i na wydruku nazywa się „Dni”, a wartość ma jednostkę.
+- Historia zmian złożenia wniosku dopisuje `day_count` tylko przy dniach kalendarzowych, a `status`
+  i `auto_approved` tylko przy zatwierdzeniu automatycznym (zwykły wniosek bez zmian).
+- Wycofanie zwraca nowy komunikat `cannot_withdraw` („Tego wniosku nie możesz już wycofać…”) zamiast `not_pending`.
+- Ikona powiadomienia „Zgłoszona nieobecność”: termometr, zielona (wniosek jest już zatwierdzony).
